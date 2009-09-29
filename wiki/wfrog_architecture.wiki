@@ -5,7 +5,7 @@
 wfrog is a lightweight headless simple but powerful weather station logger.
 
 
-= Details =
+= Architecture Details =
 
 
 
@@ -27,11 +27,11 @@ It is structured in 4 components:
 
 3) database
 
-- Use real multiuser DBMS, allowing data query from other nodes, hot backups, etc.
+- Use real multiuser DBMS, allowing data query from other computers, online backups, etc.
 
-- Keep SQL sentences standard so that most DBMS can be used.
+- Keep SQL sentences standard so that most DBMS can be used. So far we have tested Firebird 2.1
 
-- Keep the database simple: 1 table with one record every n minutes (by default 15) plus 1 index.
+- Keep the database simple: 1 table with one record every n minutes (by default 15) plus 1 index. This gives around 35000 rows per year which allow most reasonable queries to run directly on that table.
 
 - The database units should be metric.
 
@@ -43,4 +43,31 @@ It is structured in 4 components:
 
 
 
-Ideally 1,2 and 4 should be separate OS processes (3 will always be), with separate configs, etc. (this implies using some os mechanism like named pipes, etc. to communicate, which is not that difficult). The 2.6 python module multithreading offers interesting features, but I agree that we should stay on 2.5 if 2.6 is still not available on debian.
+Ideally 1,2 and 4 should be separate OS processes (3 will always be), with separate configs, etc. (this implies using some os mechanism like named pipes, etc. to communicate, which is not that difficult). 
+
+
+= Data model =
+
+CREATE TABLE METEO(
+  TIMESTAMP_UTC Timestamp NOT NULL,
+  TIMESTAMP_LOCAL Timestamp NOT NULL,
+  TEMP Numeric(3,1),
+  TEMP_MIN Numeric(3,1),
+  TEMP_MIN_TIME Timestamp,
+  TEMP_MAX Numeric(3,1),
+  TEMP_MAX_TIME Timestamp,
+  HUM Numeric(2,1),
+  WIND Numeric(4,1),
+  WIND_DIR Smallint,
+  WIND_GUST Numeric(4,1),
+  WIND_GUST_DIR Smallint,
+  WIND_GUST_TIME Timestamp,
+  DEW_POINT Numeric(3,1),
+  RAIN Numeric(5,1),
+  RAIN_RATE Numeric(5,1),
+  RAIN_RATE_TIME Timestamp,
+  PRESSURE Numeric(5,1),
+  CONSTRAINT PK_METEO PRIMARY KEY (TIMESTAMP_UTC)
+);
+
+CREATE DESCENDING INDEX IDX_METEO1 ON METEO (TIMESTAMP_LOCAL);
