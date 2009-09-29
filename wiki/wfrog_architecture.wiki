@@ -2,7 +2,7 @@
 
 = Introduction =
 
-wfrog is a lightweight headless simple station logger.
+wfrog is a lightweight headless simple but powerful weather station logger.
 
 
 = Details =
@@ -37,11 +37,10 @@ It is structured in 4 components:
 
 
 
-3) renderer & uploader
+4) renderer & uploader
 
-- Produces any file (html / xml / txt / graphs / etc.) requested by the user containing current data, daily/monthly/yearly aggregates, etc. etc. The renderer obtains the data by accessing to the database.
+- Produces any file (html / xml / txt / graphs / etc.) requested by the user containing current data, daily/monthly/yearly aggregates, etc. etc. The renderer obtains the data by accessing to the database, and uploads those files to the requested destinations.
 
 
 
 Ideally 1,2 and 4 should be separate OS processes (3 will always be), with separate configs, etc. (this implies using some os mechanism like named pipes, etc. to communicate, which is not that difficult). The 2.6 python module multithreading offers interesting features, but I agree that we should stay on 2.5 if 2.6 is still not available on debian.
-
