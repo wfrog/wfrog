@@ -48,6 +48,7 @@ Ideally 1,2 and 4 should be separate OS processes (3 will always be), with separ
 
 = Data model =
 
+{{{
 CREATE TABLE METEO(
   TIMESTAMP_UTC Timestamp NOT NULL,
   TIMESTAMP_LOCAL Timestamp NOT NULL,
@@ -71,3 +72,4 @@ CREATE TABLE METEO(
 );
 
 CREATE DESCENDING INDEX IDX_METEO1 ON METEO (TIMESTAMP_LOCAL);
+}}}
