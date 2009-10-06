@@ -21,7 +21,7 @@ It is structured in 4 components:
 
 2) logger
 
-- Receives the data from the driver and every n minutes writes a new record to the database and then sends a signal to the renderer to notify new data available.
+- Receives the data from the driver and every n minutes writes a new record to the database.
 
 
 
