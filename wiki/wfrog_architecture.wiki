@@ -45,6 +45,35 @@ It is structured in 4 components:
 
 Ideally 1,2 and 4 should be separate OS processes (3 will always be), with separate configs, etc. (this implies using some os mechanism like named pipes, etc. to communicate, which is not that difficult). 
 
+= Interprocess communication =
+
+In order to be able to have different process for the logger, driver and renderer we need means of communication between them. The goal is to have the most generic type of communication possible in order to allow processes to run on different machines, different platforms (windows and linux for instance), etc. Here is a proposal that should allow this:
+
+1 ) logger -> renderer 
+
+The renderer process extracts all information directly from the database. In order to detect the arrival of new data it can easily query the database every min or 30 sec. with the following select: 
+
+SELECT MAX(TIMESTAMP_UTC) FROM METEO. 
+
+Since there is an ascending index such query is fast and light and therefore there's no need to have other means of communication.
+
+
+2) driver -> logger
+
+Use XMLRPC calls. XMLRPC is a simple RPC protocol without the compatibility issues of SOAP and very easy to implement in Python. Python has the following two modules:
+
+- SimpleXMLRPCServer  (xmlrpc.server in Python 3.0)
+- xmlrpcclib  (xmlrpc.client in Python 3.0)
+
+Eventually it would also be possible to write drivers in another language implementing this protocol.
+
+The idea would be to implement the following calls:
+
+report_rain(total, rate)
+report_wind(dirDeg, avgSpeed, gustSpeed)
+report_barometer(pressure)
+report_temperature(temp, humidity)
+report_uv(uv)
 
 = Data model =
 
