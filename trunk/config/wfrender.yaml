@@ -1,0 +1,24 @@
+context:
+    database: { url: 'file://database.db' }
+renderer: !http
+    root: !template
+        path: templates/current.html
+        mime: text/html
+        renderer: !data
+            source: !wxdataxml
+                path: test/data.xml
+            renderer: !multi
+                renderers:
+                    temp0_current: !value {}
+                    hum0_current: !value {}
+                    temp1_current: !value {}
+                    hum1_current: !value {}
+                    pressure_current: !value {}
+                    rain_current_rate: !value {}
+                    wind: !multi
+                        renderers:
+                            wind_speed: !value {}
+                            wind_radar: !windradar {}
+
+
+
