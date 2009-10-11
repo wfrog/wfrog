@@ -1,4 +1,5 @@
 #summary Description of wfrog architecture.
+#labels Phase-Design
 
 = Introduction =
 
