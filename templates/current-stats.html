@@ -1,0 +1,20 @@
+<html>
+<body>
+#filter WebSafe
+Current temp: $days.temp_current
+<br>
+##Todays rain: $days.rain_today
+<br>
+#end filter
+Last 30 days:<br>
+<img src="$days.temp_chart"/>
+<br>
+Last 7 days evolution:<br>
+<img src="$hours.temp_chart"/>
+<br>
+Last 7 days wind:<br>
+##<img src="$hours.wind_radar"/>
+</body>
+</html>
+
+
