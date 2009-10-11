@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
 ## Copyright 2009 Jordi Puigsegur <jordi.puigsegur@gmail.com>
-##                Laurent Bovet <lbovet@windmaster.ch>
+##                Laurent Bovet <laurent.bovet@windmaster.ch>
 ##
-##  This file is part of WFrog
+##  This file is part of wfrog
 ##
-##  WFrog is free software: you can redistribute it and/or modify
+##  wfrog is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU General Public License as published by
 ##  the Free Software Foundation, either version 3 of the License, or
 ##  (at your option) any later version.
