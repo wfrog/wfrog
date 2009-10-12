@@ -33,6 +33,7 @@ class YamlConfigurer(object):
     DEFAULT_CONFIG = "config/wfrender.yaml"
 
     watcher_running = False
+    builtins = [ "renderer", "data" ]
     extensions = {}
     logger=logging.getLogger("config")
 
@@ -94,10 +95,13 @@ class YamlConfigurer(object):
         engine.root_renderer = config["renderer"]
         engine.initial_context = config["context"]
 
-        if options.reload_config and not self.watcher_running:
+        if ( options.reload_config or options.reload_mod) and not self.watcher_running:
             self.watcher_running = True
             engine.daemon = True
-            FileWatcher(options.config, self, engine, options, args).start()
+            modules = []
+            modules.extend(self.builtins)
+            modules.extend(self.extensions.keys())
+            FileWatcher(options, modules, self, engine, options, args).start()
 
     def print_help(self, module):
         desc = self.get_help_desc(module, summary=True)
@@ -128,37 +132,44 @@ class FileWatcher(Thread):
 
     logger = logging.getLogger("config.watcher")
 
-    def __init__(self,filename,configurer,engine,*args,**kwargs):
+    def __init__(self, options, modules, configurer, engine, *args, **kwargs):
         Thread.__init__(self)
-        self.filename=filename
-        self.configurer=configurer
-        self.engine=engine
-        self.args=args
-        self.kwargs=kwargs
+        self.config_file = options.config
+        self.modules = modules
+        self.configurer = configurer
+        self.engine = engine
+        self.args = args
+        self.kwargs = kwargs
 
     def run(self):
-        config_this_modified = config_last_modified = os.stat(self.filename).st_mtime
-        renderer_this_modified = renderer_last_modified = last_mod('renderer')
+        config_this_modified = time.time()
+
+        modules_modified = {}
+        for m in self.modules:
+            modules_modified[m] = time.time()
         while self.engine.daemon:
             time.sleep(1)
 
-            config_last_modified = os.stat(self.filename).st_mtime
+            config_last_modified = os.stat(self.config_file).st_mtime
             if config_last_modified > config_this_modified:
-                self.logger.debug("Changed detected on "+self.filename)
+                self.logger.debug("Changed detected on "+self.config_file)
                 self.reconfigure()
                 config_this_modified = config_last_modified
 
-            renderer_last_modified = last_mod('renderer')
-            if renderer_last_modified > renderer_this_modified:
-                print "Reloading renderers."
-                reload_modules('renderer')
-                self.reconfigure()
-                renderer_this_modified = last_mod('renderer')
+            for m in modules_modified.keys():
+                last_modified = last_mod(m)
+                if last_modified > modules_modified[m]:
+                    print "Reloading module '"+m+"'"
+                    reload_modules(m)
+                    self.reconfigure()
+                    modules_modified = last_mod(m)
 
     def reconfigure(self):
         self.logger.info("Reconfiguring engine...")
-        if self.engine.root_renderer.close:
+        try:
             self.engine.root_renderer.close()
+        except:
+            pass
         self.configurer.configure(self.engine,*self.args, **self.kwargs)
 
 def reload_modules(parent):
