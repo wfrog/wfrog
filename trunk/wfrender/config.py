@@ -33,7 +33,7 @@ class YamlConfigurer(object):
     DEFAULT_CONFIG = "config/wfrender.yaml"
 
     watcher_running = False
-    builtins = [ "renderer", "data" ]
+    builtins = [ "renderer", "datasource" ]
     extensions = {}
     logger=logging.getLogger("config")
 
@@ -159,10 +159,9 @@ class FileWatcher(Thread):
             for m in modules_modified.keys():
                 last_modified = last_mod(m)
                 if last_modified > modules_modified[m]:
-                    print "Reloading module '"+m+"'"
                     reload_modules(m)
                     self.reconfigure()
-                    modules_modified = last_mod(m)
+                    modules_modified[m] = last_mod(m)
 
     def reconfigure(self):
         self.logger.info("Reconfiguring engine...")
