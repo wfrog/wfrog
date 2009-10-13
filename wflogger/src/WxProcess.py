@@ -1,9 +1,9 @@
 ## Copyright 2009 Jordi Puigsegur <jordi.puigsegur@gmail.com>
-##                Laurent Bovet <laurent.bovet@windmaster.ch>
+##                Laurent Bovet <lbovet@windmaster.ch>
 ##
-##  This file is part of wfrog
+##  This file is part of WFrog
 ##
-##  wfrog is free software: you can redistribute it and/or modify
+##  WFrog is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU General Public License as published by
 ##  the Free Software Foundation, either version 3 of the License, or
 ##  (at your option) any later version.
@@ -17,7 +17,7 @@
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ## TODO: Control errors & retries writting to database
-##       Add support for UV sensor
+##       Add aggregates support for UV sensor (current value already showing)
 ##       Prepare por null windchill and heatindex values
 ##       Control errors & retries writting xml file (not necessary if this feature is move to a renderer)
 ##       Support for other DBMS (should be easy <== no special features used)
@@ -99,12 +99,18 @@ class WxProcess (Thread):
         else:
             return "'%s'" % time.strftime(self.TIME_FORMAT, data['wind_gust_time'])
 
+    def _get_uv_index(self, data):
+        if 'uv_index' in data:
+            return '%g' % data['uv_index']
+        else:
+            return 'NULL'
+
     def _writeDB(self, data):
         sql = """
 INSERT INTO METEO (TIMESTAMP_UTC, TIMESTAMP_LOCAL, TEMP, TEMP_MIN, TEMP_MIN_TIME, TEMP_MAX, 
                    TEMP_MAX_TIME, HUM, WIND, WIND_DIR, WIND_GUST, WIND_GUST_DIR, WIND_GUST_TIME, 
-                   DEW_POINT, RAIN, RAIN_RATE, RAIN_RATE_TIME, PRESSURE)               
-VALUES (%s, %s, %g, %g, %s, %g, %s, %g, %g, %s, %g, %s, %s, %g, %g, %g, %s, %g)
+                   DEW_POINT, RAIN, RAIN_RATE, RAIN_RATE_TIME, PRESSURE, UV_INDEX)               
+VALUES (%s, %s, %g, %g, %s, %g, %s, %g, %g, %s, %g, %s, %s, %g, %g, %g, %s, %g, %s)
 """ % ("'%s'" % time.strftime(self.TIME_FORMAT, time.gmtime()), 
        "'%s'" % time.strftime(self.TIME_FORMAT, time.localtime()),
        data['temp'], 
@@ -122,7 +128,8 @@ VALUES (%s, %s, %g, %g, %s, %g, %s, %g, %g, %s, %g, %s, %s, %g, %g, %g, %s, %g)
        data['rain'], 
        data['rain_rate'], 
        self._get_rain_rate_time(data), 
-       data['sea_level_pressure'])
+       data['sea_level_pressure'],
+       self._get_uv_index(data))
         try:
             bdd = FbDB(self.DATABASE)
             bdd.connect()
@@ -238,6 +245,8 @@ WHERE TIMESTAMP_LOCAL >= '%s'""" % initial_date
         WxData['current.wind_gust.speed(m/s)'] = data['wind_gust']
         if data['wind_gust'] != 0.0:
             WxData['current.wind_gust.dir(deg)'] = data['wind_gust_dir']
+        if 'uv_index' in data:
+            WxData['current.uv_index'] = data['uv_index']
         
         now = time.localtime()
         ## Today data

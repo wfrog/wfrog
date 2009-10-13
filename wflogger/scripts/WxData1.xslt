@@ -63,6 +63,10 @@ Strict//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd" i
             <th>Pressure (sea level)</th>
             <td><xsl:value-of select="pressure"/> <xsl:value-of select="pressure/@units"/></td>
         </tr>
+        <tr>
+            <th>UV Index</th>
+            <td><xsl:value-of select="uv_index"/></td>
+        </tr>
     </tbody>
 </table>
 </xsl:template>

@@ -1,9 +1,9 @@
 ## Copyright 2009 Jordi Puigsegur <jordi.puigsegur@gmail.com>
-##                Laurent Bovet <laurent.bovet@windmaster.ch>
+##                Laurent Bovet <lbovet@windmaster.ch>
 ##
-##  This file is part of wfrog
+##  This file is part of WFrog
 ##
-##  wfrog is free software: you can redistribute it and/or modify
+##  WFrog is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU General Public License as published by
 ##  the Free Software Foundation, either version 3 of the License, or
 ##  (at your option) any later version.
@@ -16,8 +16,7 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-## TODO: Add support for UV sensor
-##       Prepare por null windchill and heatindex values
+## TODO: Prepare por null windchill and heatindex values
 ##       Improve aggregation so that it is not necessary to query the database each time
 
 import time, logging
@@ -65,6 +64,8 @@ class WxParser ():
         self._rain_rate_time = None
         ## Pressure
         self._pressure = []
+        ## UV
+        self._uv_index = None
         ## Log
         self._logger.info ('new_period')
 
@@ -111,9 +112,10 @@ class WxParser ():
             self._hum_max_time = time.localtime()
         self._lock.release()
 
-    def _report_uv(self, uv):
+    def _report_uv(self, uv_index):
         self._lock.acquire()
-        pass
+        if self._uv_index == None or self._uv_index < uv_index:
+            self._uv_index = uv_index
         self._lock.release()
     
     def get_data(self):
@@ -170,6 +172,10 @@ class WxParser ():
         
         ## Heat Index
         data['heat_index'] = round(HeatIndex(data['temp'], data['hum']), 1) 
+        
+        ## UV
+        if self._uv_index != None:
+            data['uv_index'] = self._uv_index
 
         ## Log
         self._logger.info('get_data')
