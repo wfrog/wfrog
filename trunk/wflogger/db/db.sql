@@ -15,7 +15,6 @@
 --  You should have received a copy of the GNU General Public License
 --  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
--- TODO: Add support for UV sensor
 
 CREATE TABLE METEO(
   TIMESTAMP_UTC Timestamp NOT NULL,
@@ -36,7 +35,10 @@ CREATE TABLE METEO(
   RAIN_RATE Numeric(5,1),
   RAIN_RATE_TIME Timestamp,
   PRESSURE Numeric(5,1),
+  UV_INDEX Smallint,
   CONSTRAINT PK_METEO PRIMARY KEY (TIMESTAMP_UTC)
 );
+
+-- To add UV col to existing table: ALTER TABLE METEO ADD UV SMALLINT;
 
 CREATE DESCENDING INDEX IDX_METEO1 ON METEO (TIMESTAMP_LOCAL);

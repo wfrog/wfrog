@@ -1,159 +1,70 @@
 <?xml version="1.0"?>
+
+<!--Template for www.meteoclimatic.com-->
+
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:output method="text"/>
+
 <xsl:template match="WxData">
-<html>
-<head>
-<title>WxData</title>
-</head>
-<body>
-<p>Last update: <xsl:value-of select="time"/></p>
+<xsl:text>*VER=DATA2*COD=xxxxxxxxxxxx*UPD=</xsl:text>
+<xsl:value-of select="substring(time,9,2)"/>
+<xsl:text>/</xsl:text>
+<xsl:value-of select="substring(time,6,2)"/>
+<xsl:text>/</xsl:text>
+<xsl:value-of select="substring(time,1,4)"/>
+<xsl:text> </xsl:text>
+<xsl:value-of select="substring(time,12,2)"/>
+<xsl:text>:</xsl:text>
+<xsl:value-of select="substring(time,15,2)"/>
 <xsl:apply-templates select="current"/>
 <xsl:apply-templates select="today"/>
 <xsl:apply-templates select="month"/>
 <xsl:apply-templates select="year"/>
-</body>
-</html>
+<xsl:text>*EOT*</xsl:text>
 </xsl:template>
 
 <xsl:template match="current">
-<H3>Current values</H3>
-<table>
-    <tbody>
-        <tr>
-            <th width="50%"></th>
-            <th width="50%">Value</th>
-        </tr>
-        <tr>
-            <th>Temperature</th>
-            <td><xsl:value-of select="temperature"/> <xsl:value-of select="temperature/@units"/></td>
-        </tr>
-        <tr>
-            <th>Humidity</th>
-            <td><xsl:value-of select="humidity"/> <xsl:value-of select="humidity/@units"/></td>
-        </tr>
-        <tr>
-            <th>Dew point</th>
-            <td><xsl:value-of select="dew_point"/> <xsl:value-of select="dew_point/@units"/></td>
-        </tr>
-        <tr>
-            <th>Wind chill</th>
-            <td><xsl:value-of select="wind_chill"/> <xsl:value-of select="wind_chill/@units"/></td>
-        </tr>
-        <tr>
-            <th>Heat Index</th>
-            <td><xsl:value-of select="heat_index"/> <xsl:value-of select="heat_index/@units"/></td>
-        </tr>
-        <tr>
-            <th>Wind avg</th>
-            <td>
-                <xsl:value-of select="wind_avg/speed"/> <xsl:value-of select="wind_avg/speed/@units"/>
-                (<xsl:value-of select="wind_avg/dir"/> <xsl:value-of select="wind_avg/dir/@units"/>)
-            </td>
-        </tr>
-        <tr>
-            <th>Wind gust</th>
-            <td>
-                <xsl:value-of select="wind_gust/speed"/> <xsl:value-of select="wind_gust/speed/@units"/>
-                (<xsl:value-of select="wind_gust/dir"/> <xsl:value-of select="wind_gust/dir/@units"/>)
-            </td>
-        </tr>
-        <tr>
-            <th>Pressure (sea level)</th>
-            <td><xsl:value-of select="pressure"/> <xsl:value-of select="pressure/@units"/></td>
-        </tr>
-    </tbody>
-</table>
+<xsl:text>*TMP=</xsl:text><xsl:value-of select="temperature"/>
+<xsl:text>*WND=</xsl:text><xsl:value-of select="wind_gust/speed"/>
+<xsl:text>*AZI=</xsl:text><xsl:value-of select="wind_gust/dir"/>
+<xsl:text>*BAR=</xsl:text><xsl:value-of select="pressure"/>
+<xsl:text>*HUM=</xsl:text><xsl:value-of select="humidity"/>
+<xsl:text>*SUN=</xsl:text>
 </xsl:template>
 
 <xsl:template match="today">
-<H3>Today values</H3>
-<xsl:call-template name="aggregate_values"/>
+<xsl:text>*DHTM=</xsl:text><xsl:value-of select="temperature/max/value"/> 
+<xsl:text>*DLTM=</xsl:text><xsl:value-of select="temperature/min/value"/> 
+<xsl:text>*DHHM=</xsl:text><xsl:value-of select="humidity/max/value"/>   
+<xsl:text>*DLHM=</xsl:text><xsl:value-of select="humidity/min/value"/>  
+<xsl:text>*DHBR=</xsl:text><xsl:value-of select="pressure/max/value"/>    
+<xsl:text>*DLBR=</xsl:text><xsl:value-of select="pressure/min/value"/> 
+<xsl:text>*DGST=</xsl:text><xsl:value-of select="wind_gust/max/speed"/>
+<xsl:text>*DPCP=</xsl:text><xsl:value-of select="rain_fall/value"/>      
 </xsl:template>
 
 <xsl:template match="month">
-<H3>This month values</H3>
-<xsl:call-template name="aggregate_values"/>
+<xsl:text>*MHTM=</xsl:text><xsl:value-of select="temperature/max/value"/> 
+<xsl:text>*MLTM=</xsl:text><xsl:value-of select="temperature/min/value"/> 
+<xsl:text>*MHHM=</xsl:text><xsl:value-of select="humidity/max/value"/>   
+<xsl:text>*MLHM=</xsl:text><xsl:value-of select="humidity/min/value"/>  
+<xsl:text>*MHBR=</xsl:text><xsl:value-of select="pressure/max/value"/>    
+<xsl:text>*MLBR=</xsl:text><xsl:value-of select="pressure/min/value"/> 
+<xsl:text>*MGST=</xsl:text><xsl:value-of select="wind_gust/max/speed"/>
+<xsl:text>*MPCP=</xsl:text><xsl:value-of select="rain_fall/value"/>      
 </xsl:template>
 
 <xsl:template match="year">
-<H3>Current year values</H3>
-<xsl:call-template name="aggregate_values"/>
-</xsl:template>
-
-<xsl:template name="aggregate_values">
-<table>
-    <tbody>
-        <tr>
-            <td></td>
-            <th>Value</th>
-            <th>Min.</th>
-            <th>Max.</th>
-        </tr>
-        <tr>
-            <th>Temperature</th>
-            <td></td>
-            <td>
-                <xsl:value-of select="temperature/min/value"/> <xsl:value-of select="temperature/min/value/@units"/>
-                (<small> <xsl:value-of select="temperature/min/time"/> </small>)
-            </td>
-            <td>
-                <xsl:value-of select="temperature/max/value"/> <xsl:value-of select="temperature/max/value/@units"/>
-                (<small> <xsl:value-of select="temperature/max/time"/> </small>) 
-            </td>
-        </tr>
-        <tr>
-            <th>Humidity</th>
-            <td></td>
-            <td>
-                <xsl:value-of select="humidity/min/value"/> <xsl:value-of select="humidity/min/value/@units"/>
-                (<small> <xsl:value-of select="humidity/min/time"/> </small>)
-            </td>
-            <td>
-                <xsl:value-of select="humidity/max/value"/> <xsl:value-of select="humidity/max/value/@units"/>
-                (<small> <xsl:value-of select="humidity/max/time"/> </small>) 
-            </td>
-        </tr>
-        <tr>
-            <th>Rain</th>
-	    <td>
-                <xsl:value-of select="rain_fall/value"/> <xsl:value-of select="rain_fall/value/@units"/>
-            </td>
-            <td></td>
-            <td>
-                <xsl:if test="rain_rate/max/value">
-                    <xsl:value-of select="rain_rate/max/value"/> <xsl:value-of select="rain_rate/max/value/@units"/>
-                    (<small> <xsl:value-of select="rain_rate/max/time"/> </small>)
-                </xsl:if>
-            </td>
-        </tr>
-        <tr>
-            <th>Wind gust</th>
-            <td></td>
-            <td></td>
-            <td>
-                <xsl:value-of select="wind_gust/max/speed"/> <xsl:value-of select="wind_gust/max/speed/@units"/>
-                (<small> <xsl:value-of select="wind_gust/max/dir"/> <xsl:value-of select="wind_gust/max/dir/@units"/>, 
-                 <xsl:value-of select="wind_gust/max/time"/> </small>)
-            </td>
-        </tr>
-        <tr>
-            <th>Pressure</th>
-            <td></td>
-            <td>
-                <xsl:value-of select="pressure/min/value"/> <xsl:value-of select="pressure/min/value/@units"/>
-                (<small> <xsl:value-of select="pressure/min/time"/> </small>)
-            </td>
-            <td>
-                <xsl:value-of select="pressure/max/value"/> <xsl:value-of select="pressure/max/value/@units"/>
-                (<small> <xsl:value-of select="pressure/max/time"/> </small>) 
-            </td>
-        </tr>
-    </tbody>
-</table>
+<xsl:text>*YHTM=</xsl:text><xsl:value-of select="temperature/max/value"/> 
+<xsl:text>*YLTM=</xsl:text><xsl:value-of select="temperature/min/value"/> 
+<xsl:text>*YHHM=</xsl:text><xsl:value-of select="humidity/max/value"/>   
+<xsl:text>*YLHM=</xsl:text><xsl:value-of select="humidity/min/value"/>  
+<xsl:text>*YHBR=</xsl:text><xsl:value-of select="pressure/max/value"/>    
+<xsl:text>*YLBR=</xsl:text><xsl:value-of select="pressure/min/value"/> 
+<xsl:text>*YGST=</xsl:text><xsl:value-of select="wind_gust/max/speed"/>
+<xsl:text>*YPCP=</xsl:text><xsl:value-of select="rain_fall/value"/>      
 </xsl:template>
 
 </xsl:stylesheet>
 
-</xsl:stylesheet>
 
