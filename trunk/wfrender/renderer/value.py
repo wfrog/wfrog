@@ -27,7 +27,7 @@ class ValueRenderer(object):
 
     def render(self,data,context={}):
         if self.select == "last":
-            return data[self.key]['series'][self.serie][len(data['series'][self.serie])-1]
+            return data[self.key]['series'][self.serie][len(data[self.key]['series'][self.serie])-1]
         else:
             if self.select == "value":
                 return data[self.key]["value"]
