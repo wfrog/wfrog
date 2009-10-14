@@ -176,7 +176,7 @@ class FileWatcher(Thread):
         self.configurer.configure(self.engine,*self.args, **self.kwargs)
         if self.options.command:       
             time.sleep(0.2)        
-            print "ho"
+            self.logger.info("Running command: "+self.options.command)
             os.system(self.options.command)
 
 def reload_modules(parent):

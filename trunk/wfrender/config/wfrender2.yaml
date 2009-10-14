@@ -16,7 +16,7 @@ renderer: !http
                     renderer: !multi
                         renderers:
                             temp_chart: !chart
-                                series:
+                                series: 
                                     temp.max:
                                         color: 'DDDDDD'
                                         fill: 'DDDDDD'
