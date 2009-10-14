@@ -31,7 +31,18 @@ class HttpRenderer(object):
     Renderer starting an embedded HTTP server and serves the content results from the wrapped renderers.
     The URL corresponds to the wrapped renderer names.
     Only one such renderer must be configured in one process.
+    For being able to reload configuration (-r) and modules (-R), this renderer must be the root renderer of the engine.
 
+    [ Properties ]
+
+    root: (optional)
+        A renderer providing a result served on the base URI.
+
+    renderers: (optional)
+        Must be set if root is not set. A key/value dictionary of renderers providing a results served on URIs corresponding to the key names.
+
+    port: (optional)
+        The listening TCP port. Defaults to 8080.
     """
 
     renderers = None

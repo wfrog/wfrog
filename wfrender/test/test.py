@@ -9,9 +9,7 @@ class Test1(object):
     """
     This is a test extension
     """
-
-class TestElement(Test1, yaml.YAMLObject):
-    yaml_tag = "!test"
+    pass
 
 def random_data(points=16, maximum=100):
     return [random.random() * maximum for a in xrange(points)]

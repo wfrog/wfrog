@@ -67,7 +67,7 @@ class YamlConfigurer(object):
             self.print_help(renderer)
             print "Data Sources"
             print "------------\n"
-            self.print_help(data)
+            self.print_help(datasource)
             if options.extension_names:
                 print "Extensions"
                 print "----------\n"
@@ -135,6 +135,7 @@ class FileWatcher(Thread):
     def __init__(self, options, modules, configurer, engine, *args, **kwargs):
         Thread.__init__(self)
         self.config_file = options.config
+        self.options = options
         self.modules = modules
         self.configurer = configurer
         self.engine = engine
@@ -151,17 +152,18 @@ class FileWatcher(Thread):
             time.sleep(1)
 
             config_last_modified = os.stat(self.config_file).st_mtime
-            if config_last_modified > config_this_modified:
+            if config_last_modified > config_this_modified and self.options.reload_config:
                 self.logger.debug("Changed detected on "+self.config_file)
                 self.reconfigure()
                 config_this_modified = config_last_modified
 
-            for m in modules_modified.keys():
-                last_modified = last_mod(m)
-                if last_modified > modules_modified[m]:
-                    reload_modules(m)
-                    self.reconfigure()
-                    modules_modified[m] = last_mod(m)
+            if self.options.reload_mod:
+                for m in modules_modified.keys():
+                    last_modified = last_mod(m)
+                    if last_modified > modules_modified[m]:
+                        reload_modules(m)
+                        self.reconfigure()
+                        modules_modified[m] = last_mod(m)
 
     def reconfigure(self):
         self.logger.info("Reconfiguring engine...")

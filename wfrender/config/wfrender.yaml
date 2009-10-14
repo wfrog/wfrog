@@ -9,16 +9,16 @@ renderer: !http
                 path: test/data.xml
             renderer: !multi
                 renderers:
-                    temp0_current: !value {}
-                    hum0_current: !value {}
-                    temp1_current: !value {}
-                    hum1_current: !value {}
-                    pressure_current: !value {}
-                    rain_current_rate: !value {}
+                    temp0_current: !value { key: temp0 }
+                    hum0_current: !value { key: hum0 }
+                    temp1_current: !value { key: temp1 }
+                    hum1_current: !value { key: hum1 }
+                    pressure_current: !value { key: pressure }
+                    rain_current_rate: !value { key: rain }
                     wind: !multi
                         renderers:
-                            wind_speed: !value {}
-                            wind_radar: !windradar {}
+                            wind_speed: !value { key: wind }
+                            wind_radar: !windradar { key: wind }
 
 
 

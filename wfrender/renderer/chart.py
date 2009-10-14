@@ -56,11 +56,13 @@ class GoogleChartWindRadarRenderer(object):
     Renders wind data as a radar google chart URL
     """
 
+    key = None
+
     def render(self,data={}, context={}):
         color = '000000'
         bg = 'FFFFFF'
-        size = 20+data['value']
-        pos = data['dir']
+        size = 20+data[self.key]['value']
+        pos = data[self.key]['dir']
         line = [0] * 16
         tail = [0] * 16
         head = [0] * 16
