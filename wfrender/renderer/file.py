@@ -40,8 +40,8 @@ class FileRenderer(object):
     suffix = None
 
     def render(self, data={}, context={}):
-        assert renderer_module.is_renderer(renderer), "'file.renderer' must be set to a renderer"
-        assert path is not None, "'file.path' must be set"
+        assert renderer_module.is_renderer(self.renderer), "'file.renderer' must be set to a renderer"
+        assert self.path is not None, "'file.path' must be set"
 
         [ mime, content ] = self.renderer.render(data, context)
 

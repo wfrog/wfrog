@@ -23,7 +23,7 @@ from pygooglechart import RadarChart
 from pygooglechart import SimpleLineChart
 import renderer
 
-class GoogleChartRenderer(object):
+class GoogleChartRenderer(object):    
     """
     Renders the data as a google chart URL.
 
@@ -34,20 +34,21 @@ class GoogleChartRenderer(object):
         their options.
 
     """
-
+    
     series = None
+    labels = None
 
     def render(self,data={}, context={}):
 
-        assert series is not null, "'chart.series' must be set"
-        assert renderer.is_dict(series), "'chart.series' must be a key/value dictionary"
+        assert self.series is not None, "'chart.series' must be set"
+        assert renderer.is_dict(self.series), "'chart.series' must be a key/value dictionary"
 
         chart = SimpleLineChart(200, 125)
 
         for serie in self.series.keys():
-            chart.add_data(data['series'][serie])
+            chart.add_data(data[serie.split('.')[0]]['series'][serie.split('.')[1]])
 
-        chart.set_axis_labels(Axis.BOTTOM, data['series']["lbl"])
+        #chart.set_axis_labels(Axis.BOTTOM, data[self.labels.split('.')[0]]['series'][self.labels.split('.')[1]])
 
         return chart.get_url()
 

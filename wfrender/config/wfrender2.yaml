@@ -4,37 +4,44 @@ context:
         width: 200
         height: 100
         bgcolor: 70BDF5;
-renderer: !file
-    path: output.html
-    renderer: !template
-            path: wfrender.html
-            mime: text/html
-            renderer: !multi
-                renderers:
-                    days: !data
-                        #source: !daily { period: 30 }
-                        source: !simulator {}
-                        renderer: !multi
-                            renderers:
-                                temp_chart: !chart
-                                    series:
-                                        max:
-                                            color: 'DDDDDD'
-                                            fill: 'DDDDDD'
-                                            max: { color: orange, label: right }
-                                        avg: { color: 'FF0000', fill: 'DDDDDD', label: right  }
-                                        min: { color: 'DDDDDD'}
+renderer: !http    
+    root: !template
+        path: templates/current-stats.html
+        mime: text/html
+        renderer: !multi
+            renderers:
+                days: !data
+                    #source: !daily { period: 30 }
+                    source: !simulator {} 
+                    renderer: !multi
+                        renderers:
+                            temp_chart: !chart
+                                series:
+                                    temp.max:
+                                        color: 'DDDDDD'
+                                        fill: 'DDDDDD'
+                                        max: { color: orange, label: right }
+                                    temp.avg:
+                                        color: 'FF0000'
+                                        fill: 'DDDDDD'
+                                        label: right
+                                    temp.min:
+                                        color: 'DDDDDD'
+                                labels:
+                                    temp.lbl
 
-                                temp_current: !value
-                                    serie: avg
-                                    select: last
-                    hours: !data
-                        #source: !hourly {period: 168}
-                        source: !simulator {}
-                        renderer: !multi
-                            renderers:
-                                temp_chart: !chart
-                                    series:
-                                        avg: { color: blue }
+                            temp_current: !value
+                                key: temp
+                                serie: avg
+                                select: last
+                hours: !data
+                    #source: !hourly {period: 168}
+                    source: !simulator {}
+                    renderer: !multi
+                        renderers:
+                            temp_chart: !chart
+                                series:
+                                    temp.avg:
+                                        color: blue
 
 

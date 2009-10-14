@@ -47,6 +47,7 @@ class YamlConfigurer(object):
         opt_parser.add_option("-R", "--reload-modules", action="store_true", dest="reload_mod", help="Reloads the data source, renderer and extension modules if they change during execution")
         opt_parser.add_option("-q", "--quiet", action="store_true", dest="quiet", help="Issues only errors, nothing else")
         opt_parser.add_option("-d", "--debug", action="store_true", dest="debug", help="Issues all debug messages")
+        opt_parser.add_option("-c", "--command", dest="command", help="A command to execute after automatic reload. Useful to trigger events during development such as browser reload.")
 
     def configure(self, engine, options, args):
         if not options.quiet:
@@ -149,13 +150,14 @@ class FileWatcher(Thread):
         for m in self.modules:
             modules_modified[m] = time.time()
         while self.engine.daemon:
-            time.sleep(1)
+            time.sleep(0.2)
 
             config_last_modified = os.stat(self.config_file).st_mtime
             if config_last_modified > config_this_modified and self.options.reload_config:
                 self.logger.debug("Changed detected on "+self.config_file)
                 self.reconfigure()
                 config_this_modified = config_last_modified
+                changed = True
 
             if self.options.reload_mod:
                 for m in modules_modified.keys():
@@ -172,6 +174,10 @@ class FileWatcher(Thread):
         except:
             pass
         self.configurer.configure(self.engine,*self.args, **self.kwargs)
+        if self.options.command:       
+            time.sleep(0.2)        
+            print "ho"
+            os.system(self.options.command)
 
 def reload_modules(parent):
     logger = logging.getLogger("config.loader")
