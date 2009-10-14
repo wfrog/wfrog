@@ -22,6 +22,7 @@ from pygooglechart import Axis
 from pygooglechart import RadarChart
 from pygooglechart import SimpleLineChart
 import renderer
+import logging
 
 class GoogleChartRenderer(object):    
     """
@@ -38,6 +39,8 @@ class GoogleChartRenderer(object):
     series = None
     labels = None
 
+    logger = logging.getLogger("renderer.chart")
+
     def render(self,data={}, context={}):
 
         assert self.series is not None, "'chart.series' must be set"
@@ -48,7 +51,8 @@ class GoogleChartRenderer(object):
         for serie in self.series.keys():
             chart.add_data(data[serie.split('.')[0]]['series'][serie.split('.')[1]])
 
-        #chart.set_axis_labels(Axis.BOTTOM, data[self.labels.split('.')[0]]['series'][self.labels.split('.')[1]])
+        if self.labels:
+            chart.set_axis_labels(Axis.BOTTOM, data[self.labels.split('.')[0]]['series'][self.labels.split('.')[1]])
 
         return chart.get_url()
 
