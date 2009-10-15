@@ -76,6 +76,47 @@ report_barometer(pressure)
 report_temperature(temp, humidity)
 report_uv(uv)
 
+==Message-Oriented Alternative==
+
+In a more message-oriented way, the idea is to pass events instead of performing calls. A typical event would be:
+
+{{{
+event.type = 'temp'
+event.sensor = 0
+event.value = 15
+}}}
+
+With a corresponding XML representation:
+{{{
+<temp>
+  <sensor>0</sensor>
+  <value>15</value>
+</temp>
+}}}
+
+Setting up connectors able to listen evens from stdin or http requires a bit of low-level infrastructure illustrated in: http://code.google.com/p/wfrog/source/browse/trunk/wfrender/test/xmlstream.py
+
+This example file is working and shows boths of these connectors. The XML binding requires lxml:
+{{{
+$ easy_install lxml
+}}}
+
+To test the stdin connector:
+{{{
+$ cat stream.xml | python xmlstream.py
+}}}
+
+To test the http one:
+{{{
+python xmlstream.py -s http
+}}}
+and in another shell:
+{{{
+wget -t 1 --post-data "<temp><sensor>0</sensor><value>4</value></temp>" http://localhost:8080
+}}}
+
+The example also shows internal decoupling with a blocking queue and local creation of events in the case where the driver would be embedded in the sames python process as the logger.
+
 = Data model =
 
 {{{
