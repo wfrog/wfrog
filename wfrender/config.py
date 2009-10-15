@@ -26,6 +26,7 @@ import time
 from threading import Thread
 import inspect
 import logging
+import traceback
 
 class YamlConfigurer(object):
     """Returns a configuration read from a yaml file (default to wfrender.yaml in cwd)"""
@@ -163,10 +164,13 @@ class FileWatcher(Thread):
                 for m in modules_modified.keys():
                     last_modified = last_mod(m)
                     if last_modified > modules_modified[m]:
-                        reload_modules(m)
-                        self.reconfigure()
+                        try:
+                            reload_modules(m)
+                            self.reconfigure()                            
+                        except:
+                            traceback.print_exc()
                         modules_modified[m] = last_mod(m)
-
+    
     def reconfigure(self):
         self.logger.info("Reconfiguring engine...")
         try:
@@ -188,6 +192,7 @@ def reload_modules(parent):
         reload(m[1])
     logger.debug("Reloading module '"+parent.__name__+"'.")
     reload(parent)
+
 
 def last_mod(parent):
     logger = logging.getLogger("config.loader")
