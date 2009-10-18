@@ -36,7 +36,9 @@ class TemplateRenderer(object):
         self.renderer=renderer
 
     def render(self,data={}, context={}):
-        content = self.renderer.render(data, context)
+        content = ""
+        if self.renderer:
+            content = self.renderer.render(data, context)
         try:
             template = Template(file=file(self.path, "r"), searchList=[content])
             return [ self.mime, str(template) ]
