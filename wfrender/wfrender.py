@@ -84,3 +84,4 @@ class RenderEngine(object):
 if __name__ == "__main__":
     engine = RenderEngine(main=True)
     result = engine.process()
+    engine.logger.debug("Finished main()")

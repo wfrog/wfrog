@@ -16,23 +16,68 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+import time
+from threading import Thread
+
 class MultiRenderer(object):
     """
     Wraps a list of renderers and delegates the rendering to them.
     The result is a dictionary containing the result of each rende-
     rer indexed by names.
 
-    Properties
+    This renderer is closable and will call close on each wrapped
+    renderer.
+
+    [ Properties ]
 
     renderers:
         A dictionary in which keys are names and values are the renderer
         objects the rendering is delegated to.
+
+    parallel: (optional)
+        Boolean value. True if the renderers must be called in parallel
+        i.e. each in a separate thread.
+        Useful when using blocking renderers like schedulers or http.
+        When true, this renderer returns nothing, it just launches the
+        renderer threads and returns.
+
     """
 
     renderers={}
+    threads = []
+
+    logger = logging.getLogger('renderer.multi')
 
     def render(self,data,context={}):
         result = {}
         for name, r in self.renderers.iteritems():
-            result[name] = r.render(data, context)
-        return result
+            if self.parallel:
+                thread = Thread( target=lambda : r.render(data, context) )
+                self.threads.append(thread)
+                thread.start()
+            else:
+                result[name] = r.render(data, context)
+
+        if self.parallel:
+            try:
+                while True:
+                    time.sleep(2)
+            except KeyboardInterrupt:
+                self.logger.debug("^C received, closing renderers")
+                self.close()
+                raise
+
+            for thread in self.threads:
+                self.logger.debug("Main thread waiting for thread "+str(thread)+" to finish")
+                thread.join()
+
+        else:
+            return result
+
+    def close(self):
+        for name, r in self.renderers.iteritems():
+            try:
+                r.close()
+            except:
+                pass

@@ -57,4 +57,4 @@ class FileRenderer(object):
         finally:
             f.close()
 
-        return "Wrote result to "+filename
+        return filename

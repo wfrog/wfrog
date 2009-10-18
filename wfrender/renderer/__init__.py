@@ -21,8 +21,10 @@ import yaml
 import chart
 import data
 import file
+import ftp
 import http
 import multi
+import scheduler
 import template
 import value
 
@@ -34,7 +36,7 @@ def is_dict(obj):
     return obj is not None and dir(obj).__contains__('has_key')
 
 def assert_renderer_dict(name, obj):
-    assert isDict(obj), "'"+name+"' is not a key/value dictionary"
+    assert is_dict(obj), "'"+name+"' is not a key/value dictionary"
     for r in obj.keys():
         assert isRenderer(obj[r]), "'"+name+"."+r+"' is not a renderer"
 
@@ -52,11 +54,17 @@ class YamlDataRenderer(data.DataRenderer, yaml.YAMLObject):
 class YamlFileRenderer(file.FileRenderer, yaml.YAMLObject):
     yaml_tag = u'!file'
 
+class YamlFtpRenderer(ftp.FtpRenderer, yaml.YAMLObject):
+    yaml_tag = u'!ftp'
+
 class YamlHttpRenderer(http.HttpRenderer, yaml.YAMLObject):
     yaml_tag = u'!http'
 
 class YamlMultiRenderer(multi.MultiRenderer, yaml.YAMLObject):
     yaml_tag = u'!multi'
+
+class YamlMultiRenderer(scheduler.SchedulerRenderer, yaml.YAMLObject):
+    yaml_tag = u'!scheduler'
 
 class YamlTemplateRenderer(template.TemplateRenderer, yaml.YAMLObject):
     yaml_tag = u'!template'
