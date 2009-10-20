@@ -58,16 +58,19 @@ class RenderEngine(object):
         self.configurer.configure(self,options,args)
 
     def process(self, data=initial_data, context={}):
-        current_context = copy.deepcopy(self.initial_context)
-        current_context.update(context)
+        
         try:
             if self.daemon:
                 self.logger.info("Running as daemon")
                 while self.daemon:
                     self.logger.debug("Starting root rendering.")
+                    current_context = copy.deepcopy(self.initial_context)
+                    current_context.update(context)
                     self.root_renderer.render(data, current_context)
             else:
                 self.logger.debug("Starting root rendering.")
+                current_context = copy.deepcopy(self.initial_context)
+                current_context.update(context)
                 return self.root_renderer.render(data, current_context)
         except KeyboardInterrupt:
             self.logger.info("Stopping daemon...")

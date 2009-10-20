@@ -31,14 +31,11 @@ class TemplateRenderer(object):
 
     logger = logging.getLogger("renderer.template")
 
-    def __init__(self, path, renderer):
-        self.path=path
-        self.renderer=renderer
-
     def render(self,data={}, context={}):
         content = ""
         if self.renderer:
             content = self.renderer.render(data, context)
+        
         try:
             template = Template(file=file(self.path, "r"), searchList=[content])
             return [ self.mime, str(template) ]

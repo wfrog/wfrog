@@ -46,6 +46,7 @@ class MultiRenderer(object):
 
     renderers={}
     threads = []
+    parallel = False
 
     logger = logging.getLogger('renderer.multi')
 

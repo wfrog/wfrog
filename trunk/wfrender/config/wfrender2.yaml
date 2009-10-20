@@ -2,8 +2,9 @@ context:
     database: { url: 'file://database.db' }
     chart_defaults:
         width: 200
-        height: 100
-        bgcolor: 70BDF5;
+        height: 125
+        bgcolor: 70BDF5
+        color: violet
 renderer: !http    
     root: !template
         path: templates/current-stats.html

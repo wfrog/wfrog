@@ -61,6 +61,9 @@ class HttpRenderer(object):
         if self.renderers:
             renderer.assert_renderer_dict('http.renderers', self.renderers)
 
+        self.context = context
+        self.data = data
+
         try:
             global _HttpRendererSingleton
             _HttpRendererSingleton = self
@@ -85,6 +88,8 @@ class HttpRendererHandler(BaseHTTPRequestHandler):
         global _HttpRendererSingleton
         renderers = _HttpRendererSingleton.renderers
         root = _HttpRendererSingleton.root
+        context = _HttpRendererSingleton.context
+        data = _HttpRendererSingleton.data
         content = None
 
         name = self.path.strip('/')
@@ -97,10 +102,10 @@ class HttpRendererHandler(BaseHTTPRequestHandler):
                     content += "<a href='"+renderer+"'>"+renderer+"</a><br>"
                 content += "</body></html>"
             else:
-                [ mime, content ] = root.render()
+                [ mime, content ] = root.render(data, context)
         else:
             if renderers is not None and renderers.has_key(name):
-                [ mime, content ] = renderers[name].render()
+                [ mime, content ] = renderers[name].render(data, context)
 
         if content:
             self.send_response(200)
