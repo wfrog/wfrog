@@ -22,7 +22,10 @@ from pygooglechart import Axis
 from pygooglechart import RadarChart
 from pygooglechart import SimpleLineChart
 import renderer
+import webcolors
+import re
 import logging
+
 
 class GoogleChartRenderer(object):    
     """
@@ -46,10 +49,27 @@ class GoogleChartRenderer(object):
         assert self.series is not None, "'chart.series' must be set"
         assert renderer.is_dict(self.series), "'chart.series' must be a key/value dictionary"
 
-        chart = SimpleLineChart(200, 125)
+        width = _defaults(context, 'width', 200)
+        height =_defaults(context, 'height', 125)
+        color = _defaults(context, 'color', 'orange')
+        bgcolor = _defaults(context, 'bgcolor', "00000000")
+
+        if context.has_key("chart_defaults"):
+            defaults = context["chart_defaults"]
+            if defaults.has_key('width'):
+                width = defaults['width']
+            if defaults.has_key('height'):
+                height = defaults['height']                
+
+        chart = SimpleLineChart(width, height)        
+
+        colours = []
 
         for serie in self.series.keys():
             chart.add_data(data[serie.split('.')[0]]['series'][serie.split('.')[1]])
+            colours.append(_valid_color(color))
+
+        chart.set_colours(colours)
 
         if self.labels:
             chart.set_axis_labels(Axis.BOTTOM, data[self.labels.split('.')[0]]['series'][self.labels.split('.')[1]])
@@ -138,3 +158,17 @@ Axis.set_style = _axis_set_style
 Axis.style_to_url = _axis_style_to_url
 
 Chart.set_axis_style = _chart_set_axis_style
+
+def _defaults(context, property, default):
+    result = default
+    if context.has_key("chart_defaults"):
+        defaults = context["chart_defaults"]
+        if defaults.has_key(property):
+            result = defaults[property]
+    return result
+
+def _valid_color(color):
+    if re.match("[0-9]+", color):
+        return color
+    else:
+        return webcolors.name_to_hex(color)[1:]
