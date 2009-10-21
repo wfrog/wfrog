@@ -24,8 +24,8 @@ import simulator
 
 # YAML mappings
 
-class YamlSimulatorQuery(simulator.SimulatorQuery, yaml.YAMLObject):
+class YamlSimulatorDataSource(simulator.SimulatorDataSource, yaml.YAMLObject):
     yaml_tag = u'!simulator'
 
-class YamlWxDataXmlQuery(xmlquery.WxDataXmlQuery, yaml.YAMLObject):
+class YamlWxDataXmlDataSource(xmlquery.WxDataXmlDataSource, yaml.YAMLObject):
     yaml_tag = u'!wxdataxml'

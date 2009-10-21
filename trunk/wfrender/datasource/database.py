@@ -16,3 +16,52 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import kinterbasdb
+
+class DatabaseDataSource(object):
+    """
+    Queries a database for consolidated data.
+    """"
+
+    db_url: None
+
+
+    def execute(self,data={}, context={}):
+        pass
+
+
+class FirebirdDB():
+    def __init__(self, bdd, user='sysdba', password='masterkey', charset='ISO8859_1'):
+        self._bdd = bdd
+        self._user = user
+        self._password = password
+        self._charset = charset
+
+    def connect(self):
+        self._db = kinterbasdb.connect(dsn=self._bdd,
+                                       user=self._user,
+                                       password=self._password,
+                                       charset=self._charset)
+
+    def select(self, sql):
+        cursor = self._db.cursor()
+        cursor.execute(sql)
+        l = []
+        for e in cursor.fetchall():
+            l.append(e)
+        cursor.close()
+        self._db.commit()
+        return l
+
+    def execute(self, sql):
+        cursor = self._db.cursor()
+        cursor.execute(sql)
+        cursor.close()
+        self._db.commit()
+
+    def disconnect(self):
+        try:
+            self._db.close()
+        except:
+            pass
+

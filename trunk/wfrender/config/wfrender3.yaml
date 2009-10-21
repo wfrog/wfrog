@@ -1,0 +1,12 @@
+context: {}
+renderer: !multi
+    parallel: true
+    renderers:
+        one: !scheduler
+            periodicity: 2
+            renderer: !template
+                path: hello.txt
+        two: !scheduler
+            periodicity: 3
+            renderer: !template
+                path: hello.txt
