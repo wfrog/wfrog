@@ -16,7 +16,7 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-class SimulatorQuery(object):
+class SimulatorDataSource(object):
     """
     Return a simulated harcoded data.
     """
@@ -50,5 +50,5 @@ class SimulatorQuery(object):
                     "avg" : [ 3, 5, 6, 6 ],
                     }
                 }
-                
-            }        
+
+            }

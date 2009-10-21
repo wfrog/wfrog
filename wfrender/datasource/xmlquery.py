@@ -18,7 +18,7 @@
 
 import xml.dom.minidom
 
-class WxDataXmlQuery(object):
+class WxDataXmlDataSource(object):
     """
     Reads data from a WxData file
     """
