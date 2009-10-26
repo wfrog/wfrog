@@ -24,8 +24,23 @@ from pygooglechart import SimpleLineChart
 import renderer
 import webcolors
 import re
+import copy
 import logging
+import sys
 
+class ChartConfig(object):
+    width = 200
+    height = 125
+    color = 'orange'
+    thickness = 1.5
+    text = '7F7F7F'
+    bgcolor = '00000000'
+    y_margin = 2
+    fill = None
+    zero = None
+    
+    def __missing__(item):
+        return None
 
 class GoogleChartRenderer(object):    
     """
@@ -49,31 +64,52 @@ class GoogleChartRenderer(object):
         assert self.series is not None, "'chart.series' must be set"
         assert renderer.is_dict(self.series), "'chart.series' must be a key/value dictionary"
 
-        width = _defaults(context, 'width', 200)
-        height =_defaults(context, 'height', 125)
-        color = _defaults(context, 'color', 'orange')
-        bgcolor = _defaults(context, 'bgcolor', "00000000")
+        # merge builtin defaults, context and renderer config
+        config = ChartConfig()       
+        if context.has_key('chart_defaults'):
+            config.__dict__.update(context['chart_defaults'])
+        config.__dict__.update(self.__dict__)        
 
-        if context.has_key("chart_defaults"):
-            defaults = context["chart_defaults"]
-            if defaults.has_key('width'):
-                width = defaults['width']
-            if defaults.has_key('height'):
-                height = defaults['height']                
+        chart = SimpleLineChart(config.width, config.height)        
 
-        chart = SimpleLineChart(width, height)        
+        colors = []        
 
-        colours = []
+        index=0
+        min_data=sys.maxint
+        max_data=-sys.maxint
+        for key, serie in self.series.iteritems():
+            serie_config = ChartConfig()
+            serie_config.__dict__.update(config.__dict__)
+            serie_config.__dict__.update(serie)
+            serie_data = data[key.split('.')[0]]['series'][key.split('.')[1]]
+            chart.add_data(serie_data)
+            min_data = min( min_data, min(serie_data))
+            max_data = max( max_data, max(serie_data))
+            colors.append(_valid_color(serie_config.color))            
+            
+            if serie_config.fill:
+                color = serie_config.fill['color']
+                to = self.series.keys().index(serie_config.fill['to'])
+                chart.add_fill_range(_valid_color(color), index, to)
+            
+            chart.set_line_style(index, config.thickness)
+            
+            index = index + 1
 
-        for serie in self.series.keys():
-            chart.add_data(data[serie.split('.')[0]]['series'][serie.split('.')[1]])
-            colours.append(_valid_color(color))
+        chart.y_range=[min_data-config.y_margin, max_data+config.y_margin]
+        chart.set_axis_range(Axis.LEFT, min_data-config.y_margin, max_data+config.y_margin)
 
-        chart.set_colours(colours)
+        if config.zero:
+            chart.add_data([0]*2)
+            colors.append(_valid_color(config.zero['color']))
+            chart.set_line_style(index, 0.5)
+
+        chart.set_colours(colors)
+        chart.fill_solid(Chart.BACKGROUND, _valid_color(config.bgcolor))        
 
         if self.labels:
             chart.set_axis_labels(Axis.BOTTOM, data[self.labels.split('.')[0]]['series'][self.labels.split('.')[1]])
-
+            chart.set_axis_style(0, _valid_color(config.text))
         return chart.get_url()
 
 class GoogleChartWindRadarRenderer(object):
@@ -168,7 +204,7 @@ def _defaults(context, property, default):
     return result
 
 def _valid_color(color):
-    if re.match("[0-9]+", color):
+    if re.match("[A-F0-9]+", color):
         return color
     else:
         return webcolors.name_to_hex(color)[1:]

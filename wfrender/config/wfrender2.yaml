@@ -4,7 +4,8 @@ context:
         width: 200
         height: 125
         bgcolor: 70BDF5
-        color: violet
+        color: 1e2e6c
+        
 renderer: !http    
     root: !template
         path: templates/current-stats.html
@@ -16,20 +17,18 @@ renderer: !http
                     source: !simulator {} 
                     renderer: !multi
                         renderers:
-                            temp_chart: !chart
+                            temp_chart: !chart                            
                                 series: 
                                     temp.max:
-                                        color: 'DDDDDD'
-                                        fill: 'DDDDDD'
+                                        color: '9BCDF1'
+                                        fill: { color: '9BCDF1', to: temp.min }
                                         max: { color: orange, label: right }
-                                    temp.avg:
-                                        color: 'FF0000'
-                                        fill: 'DDDDDD'
+                                    temp.avg:                                      
                                         label: right
                                     temp.min:
-                                        color: 'DDDDDD'
-                                labels:
-                                    temp.lbl
+                                        color: '9BCDF1'
+                                labels: temp.lbl
+                                zero: { color: gray }
 
                             temp_current: !value
                                 key: temp
