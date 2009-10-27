@@ -28,6 +28,8 @@ import copy
 import logging
 import sys
 
+DENSITY_THRESHOLD = 1.78
+
 class ChartConfig(object):
     width = 200
     height = 125
@@ -38,6 +40,13 @@ class ChartConfig(object):
     y_margin = 2
     fill = None
     zero = None
+    max = None
+    min = None
+    last = None
+    style = 'v'
+    size = 10
+    axes = 'on'
+    ticks = 'on'
     
     def __missing__(item):
         return None
@@ -76,40 +85,96 @@ class GoogleChartRenderer(object):
 
         index=0
         min_data=sys.maxint
+        min_index=0
         max_data=-sys.maxint
+        max_index=0
         for key, serie in self.series.iteritems():
             serie_config = ChartConfig()
             serie_config.__dict__.update(config.__dict__)
             serie_config.__dict__.update(serie)
             serie_data = data[key.split('.')[0]]['series'][key.split('.')[1]]
             chart.add_data(serie_data)
-            min_data = min( min_data, min(serie_data))
-            max_data = max( max_data, max(serie_data))
+            
+            this_min = min( min_data, min(serie_data))
+            if this_min < min_data:
+                min_index = serie_data.index(this_min)
+            min_data = this_min
+            this_max = max( max_data, max(serie_data))
+            
+            if this_max > max_data:
+                max_index = serie_data.index(this_max)
+            max_data = this_max
+            
             colors.append(_valid_color(serie_config.color))            
             
+            if serie_config.max:
+                max_config = ChartConfig()
+                max_config.__dict__.update(serie_config.__dict__)                
+                max_config.__dict__.update(serie_config.max)
+                chart.add_marker(index, max_index, 't'+str(max_data), _valid_color(max_config.text), max_config.size)
+                chart.add_marker(index, max_index, max_config.style, _valid_color(max_config.color), max_config.thickness)
+
+            if serie_config.min:
+                min_config = ChartConfig()
+                min_config.__dict__.update(serie_config.__dict__)                
+                min_config.__dict__.update(serie_config.min)
+                chart.add_marker(index, min_index, 't'+str(min_data), _valid_color(min_config.text), min_config.size)
+                chart.add_marker(index, min_index, min_config.style, _valid_color(min_config.color), min_config.thickness)
+           
+            if serie_config.last:
+                last_config = ChartConfig()
+                last_config.__dict__.update(serie_config.__dict__)                
+                last_config.__dict__.update(serie_config.last)
+                last_index=len(serie_data)-1
+                last_data = serie_data[last_index]
+                chart.add_marker(index, last_index, 't'+str(last_data), _valid_color(last_config.text), last_config.size)
+                chart.add_marker(index, last_index, last_config.style, _valid_color(last_config.color), last_config.thickness)
+           
             if serie_config.fill:
-                color = serie_config.fill['color']
-                to = self.series.keys().index(serie_config.fill['to'])
-                chart.add_fill_range(_valid_color(color), index, to)
+                fill_config = ChartConfig()
+                fill_config.__dict__.update(serie_config.__dict__)
+                fill_config.__dict__.update(serie_config.fill)
+                to = self.series.keys().index(fill_config.to)
+                chart.add_fill_range(_valid_color(fill_config.color), index, to)
             
             chart.set_line_style(index, config.thickness)
             
             index = index + 1
 
-        chart.y_range=[min_data-config.y_margin, max_data+config.y_margin]
-        chart.set_axis_range(Axis.LEFT, min_data-config.y_margin, max_data+config.y_margin)
+        chart.y_range=[min_data-config.y_margin, max_data+config.y_margin]        
+        if config.axes == 'on':            
+            chart.set_axis_range(Axis.LEFT, min_data-config.y_margin, max_data+config.y_margin)        
+            chart.set_axis_style(0, _valid_color(config.text), config.size, 0, Axis.BOTH if config.ticks == 'on' else Axis.AXIS_LINES)
+        else:
+            chart.set_axis_labels(Axis.LEFT, [])
+            chart.set_axis_style(0, _valid_color(config.text), config.size, 0, Axis.TICK_MARKS, _valid_color(config.bgcolor))
 
         if config.zero:
+            zero_config = ChartConfig()
+            zero_config.__dict__.update(config.__dict__)
+            zero_config.__dict__.update(config.zero)
             chart.add_data([0]*2)
-            colors.append(_valid_color(config.zero['color']))
-            chart.set_line_style(index, 0.5)
+            colors.append(_valid_color(zero_config.color))
+            chart.set_line_style(index, zero_config.thickness)
 
         chart.set_colours(colors)
         chart.fill_solid(Chart.BACKGROUND, _valid_color(config.bgcolor))        
 
         if self.labels:
-            chart.set_axis_labels(Axis.BOTTOM, data[self.labels.split('.')[0]]['series'][self.labels.split('.')[1]])
-            chart.set_axis_style(0, _valid_color(config.text))
+            if config.axes == 'on':
+                labels_data = data[self.labels.split('.')[0]]['series'][self.labels.split('.')[1]]
+                density = 1.0 * len("".join(labels_data))*config.size  / config.width
+                print density            
+                if density > DENSITY_THRESHOLD:
+                    for i, v in enumerate(labels_data):
+                        if i % round(density) != 0:
+                            labels_data[i] = ' '
+                chart.set_axis_labels(Axis.BOTTOM, labels_data)                
+                chart.set_axis_style(1, _valid_color(config.text), config.size, 0, Axis.BOTH if config.ticks == 'on' else Axis.AXIS_LINES)
+            else:
+                chart.set_axis_labels(Axis.BOTTOM, []) 
+                chart.set_axis_style(1, _valid_color(config.text), config.size, 0, Axis.TICK_MARKS, _valid_color(config.bgcolor))
+                
         return chart.get_url()
 
 class GoogleChartWindRadarRenderer(object):
