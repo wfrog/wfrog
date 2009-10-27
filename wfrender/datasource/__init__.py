@@ -18,7 +18,7 @@
 
 import yaml
 
-import database
+#import database
 import xmlquery
 import simulator
 

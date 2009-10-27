@@ -1,10 +1,11 @@
 context:
     database: { url: 'file://database.db' }
     chart_defaults:
-        width: 200
+        #width: 270
         height: 125
         bgcolor: 70BDF5
-        color: 1e2e6c
+        color: indigo
+        text: indigo
         
 renderer: !http    
     root: !template
@@ -21,14 +22,15 @@ renderer: !http
                                 series: 
                                     temp.max:
                                         color: '9BCDF1'
-                                        fill: { color: '9BCDF1', to: temp.min }
-                                        max: { color: orange, label: right }
+                                        fill: { to: temp.min }
+                                        max: { color: brown, text: brown, thickness: 0.5 }
                                     temp.avg:                                      
-                                        label: right
+                                        last: { thickness: 5, style: 'o' }
                                     temp.min:
                                         color: '9BCDF1'
+                                        min: { color: blue, text: blue, thickness: 0.5 }
                                 labels: temp.lbl
-                                zero: { color: gray }
+                                zero: { color: gray, thickness: 0.5 }
 
                             temp_current: !value
                                 key: temp
