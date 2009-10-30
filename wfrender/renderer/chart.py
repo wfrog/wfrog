@@ -28,7 +28,7 @@ import copy
 import logging
 import sys
 
-DENSITY_THRESHOLD = 1.78
+LABEL_DENSITY_THRESHOLD = 1.78
 
 class ChartConfig(object):
     width = 200
@@ -37,7 +37,7 @@ class ChartConfig(object):
     thickness = 1.5
     text = '7F7F7F'
     bgcolor = '00000000'
-    y_margin = 2
+    y_margin = [ 2, 2 ]
     fill = None
     zero = None
     max = None
@@ -47,6 +47,11 @@ class ChartConfig(object):
     size = 10
     axes = 'on'
     ticks = 'on'
+    dash = None
+    legend = None
+    legend_pos = 'b'
+    marks = None
+    space = 1.5
     
     def __missing__(item):
         return None
@@ -75,35 +80,33 @@ class GoogleChartRenderer(object):
 
         # merge builtin defaults, context and renderer config
         config = ChartConfig()       
-        if context.has_key('chart_defaults'):
-            config.__dict__.update(context['chart_defaults'])
+        if context.has_key('chart'):
+            config.__dict__.update(context['chart'])
         config.__dict__.update(self.__dict__)        
 
         chart = SimpleLineChart(config.width, config.height)        
 
         colors = []        
+        legend_set = False
+        legend = []
+
+        chart_min = sys.maxint
+        chart_max = -sys.maxint
 
         index=0
-        min_data=sys.maxint
-        min_index=0
-        max_data=-sys.maxint
-        max_index=0
         for key, serie in self.series.iteritems():
             serie_config = ChartConfig()
             serie_config.__dict__.update(config.__dict__)
             serie_config.__dict__.update(serie)
             serie_data = data[key.split('.')[0]]['series'][key.split('.')[1]]
             chart.add_data(serie_data)
-            
-            this_min = min( min_data, min(serie_data))
-            if this_min < min_data:
-                min_index = serie_data.index(this_min)
-            min_data = this_min
-            this_max = max( max_data, max(serie_data))
-            
-            if this_max > max_data:
-                max_index = serie_data.index(this_max)
-            max_data = this_max
+                      
+            min_data = min(serie_data)
+            chart_min = min(chart_min, min_data)
+            min_index = serie_data.index(min_data)
+            max_data = max(serie_data)
+            chart_max = max(chart_max, max_data)
+            max_index = serie_data.index(max_data)
             
             colors.append(_valid_color(serie_config.color))            
             
@@ -137,13 +140,33 @@ class GoogleChartRenderer(object):
                 to = self.series.keys().index(fill_config.to)
                 chart.add_fill_range(_valid_color(fill_config.color), index, to)
             
-            chart.set_line_style(index, config.thickness)
+            if serie_config.dash:
+                chart.set_line_style(index, serie_config.thickness, serie_config.dash, serie_config.dash)
+            else:
+                chart.set_line_style(index, serie_config.thickness)
             
+            if serie_config.legend:
+                legend.append(serie_config.legend)
+                legend_set = True
+            else:
+                legend.append('')
+            
+            if serie_config.marks:
+                mark_config = ChartConfig()
+                mark_config.__dict__.update(serie_config.__dict__)
+                mark_config.__dict__.update(serie_config.marks)
+                mark_data = data[mark_config.serie.split('.')[0]]['series'][mark_config.serie.split('.')[1]]                
+                density = max(1.0, 1.0 * mark_config.space * len("".join(mark_data))*mark_config.size  / config.width)
+          
+                for i, v in enumerate(mark_data):
+                    if (i +1) % round(density) == 0:              
+                        chart.add_marker(index, i, 't'+str(mark_data[i]), _valid_color(mark_config.color), mark_config.size)                
+        
             index = index + 1
 
-        chart.y_range=[min_data-config.y_margin, max_data+config.y_margin]        
+        chart.y_range=[chart_min-config.y_margin[0], chart_max+config.y_margin[1]]     
         if config.axes == 'on':            
-            chart.set_axis_range(Axis.LEFT, min_data-config.y_margin, max_data+config.y_margin)        
+            chart.set_axis_range(Axis.LEFT, chart_min-config.y_margin[0], chart_max+config.y_margin[1])        
             chart.set_axis_style(0, _valid_color(config.text), config.size, 0, Axis.BOTH if config.ticks == 'on' else Axis.AXIS_LINES)
         else:
             chart.set_axis_labels(Axis.LEFT, [])
@@ -159,13 +182,17 @@ class GoogleChartRenderer(object):
 
         chart.set_colours(colors)
         chart.fill_solid(Chart.BACKGROUND, _valid_color(config.bgcolor))        
+        
+        if legend_set:
+            chart.set_legend(legend)
+            chart.set_legend_position(config.legend_pos)
 
         if self.labels:
             if config.axes == 'on':
                 labels_data = data[self.labels.split('.')[0]]['series'][self.labels.split('.')[1]]
                 density = 1.0 * len("".join(labels_data))*config.size  / config.width
-                print density            
-                if density > DENSITY_THRESHOLD:
+          
+                if density > LABEL_DENSITY_THRESHOLD:
                     for i, v in enumerate(labels_data):
                         if i % round(density) != 0:
                             labels_data[i] = ' '
@@ -260,13 +287,6 @@ Axis.style_to_url = _axis_style_to_url
 
 Chart.set_axis_style = _chart_set_axis_style
 
-def _defaults(context, property, default):
-    result = default
-    if context.has_key("chart_defaults"):
-        defaults = context["chart_defaults"]
-        if defaults.has_key(property):
-            result = defaults[property]
-    return result
 
 def _valid_color(color):
     if re.match("[A-F0-9]+", color):

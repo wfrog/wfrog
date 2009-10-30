@@ -156,6 +156,7 @@ class FileWatcher(Thread):
             config_last_modified = os.stat(self.config_file).st_mtime
             if config_last_modified > config_this_modified and self.options.reload_config:
                 self.logger.debug("Changed detected on "+self.config_file)
+                reload_modules('renderer')
                 self.reconfigure()
                 config_this_modified = config_last_modified
                 changed = True
@@ -175,6 +176,7 @@ class FileWatcher(Thread):
         self.logger.info("Reconfiguring engine...")
         try:
             self.engine.root_renderer.close()
+            time.sleep(0.1)
         except:
             pass
         self.configurer.configure(self.engine,*self.args, **self.kwargs)

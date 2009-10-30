@@ -1,8 +1,6 @@
 context:
     database: { url: 'file://database.db' }
-    chart_defaults:
-        #width: 270
-        height: 125
+    chart:
         bgcolor: 70BDF5
         color: indigo
         text: indigo
@@ -24,11 +22,16 @@ renderer: !http
                                         color: '9BCDF1'
                                         fill: { to: temp.min }
                                         max: { color: brown, text: brown, thickness: 0.5 }
-                                    temp.avg:                                      
+                                    temp.avg:                                 
                                         last: { thickness: 5, style: 'o' }
                                     temp.min:
                                         color: '9BCDF1'
                                         min: { color: blue, text: blue, thickness: 0.5 }
+                                    dew.avg:
+                                        color: darkcyan
+                                        thickness: 1
+                                        dash: 5
+                                        
                                 labels: temp.lbl
                                 zero: { color: gray, thickness: 0.5 }
 
@@ -43,7 +46,14 @@ renderer: !http
                         renderers:
                             temp_chart: !chart
                                 series:
-                                    temp.avg:
+                                    wind.avg:                                        
+                                        marks: {serie: wind.dir, color: white, size: 10 }                                        
                                         color: blue
+                                    wind.gust:
+                                        color: darkcyan
+                                        thickness: 0.5
+                                        max: { color: red, text: darkcyan}
+                                labels: wind.lbl
+                                y_margin: [ 0, 1 ]
 
 
