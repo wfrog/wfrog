@@ -24,7 +24,6 @@ import select
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import logging
 
-_HttpRendererSingleton = None
 
 class HttpRenderer(object):
     """
