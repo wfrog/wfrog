@@ -36,9 +36,5 @@ class TemplateRenderer(object):
         if self.renderer:
             content = self.renderer.render(data, context)
         
-        try:
-            template = Template(file=file(self.path, "r"), searchList=[content])
-            return [ self.mime, str(template) ]
-        except NotFound:
-            logger.error("Template '"+ self.path + "' not found.'")
-            raise
+        template = Template(file=file(self.path, "r"), searchList=[content])
+        return [ self.mime, str(template) ]
