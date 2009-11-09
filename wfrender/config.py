@@ -146,20 +146,26 @@ class FileWatcher(Thread):
 
     def run(self):
         config_this_modified = time.time()
+        templates_this_modified = time.time()
 
         modules_modified = {}
         for m in self.modules:
             modules_modified[m] = time.time()
         while self.engine.daemon:
-            time.sleep(0.2)
 
             config_last_modified = os.stat(self.config_file).st_mtime
             if config_last_modified > config_this_modified and self.options.reload_config:
                 self.logger.debug("Changed detected on "+self.config_file)
-                reload_modules('renderer')
                 self.reconfigure()
                 config_this_modified = config_last_modified
-                changed = True
+                continue
+
+            templates_last_modified = last_mod('templates')
+            if templates_last_modified > templates_this_modified and self.options.reload_config:
+                self.logger.debug("Changed detected on templates")
+                self.reconfigure()
+                templates_this_modified = templates_last_modified
+                continue
 
             if self.options.reload_mod:
                 for m in modules_modified.keys():
@@ -174,16 +180,24 @@ class FileWatcher(Thread):
     
     def reconfigure(self):
         self.logger.info("Reconfiguring engine...")
+        old_root_renderer = self.engine.root_renderer
+        self.configurer.configure(self.engine,*self.args, **self.kwargs)
         try:
-            self.engine.root_renderer.close()
+            old_root_renderer.close()
             time.sleep(0.1)
         except:
-            pass
-        self.configurer.configure(self.engine,*self.args, **self.kwargs)
-        if self.options.command:       
-            time.sleep(0.2)        
+            pass        
+        if self.options.command:         
             self.logger.info("Running command: "+self.options.command)
-            os.system(self.options.command)
+            command_thread = CommandThread()
+            command_thread.command = self.options.command
+            command_thread.start()            
+
+class CommandThread(Thread):
+    command = None
+    def run(self):
+        time.sleep(0.1)
+        os.system(self.command)        
 
 def reload_modules(parent):
     logger = logging.getLogger("config.loader")

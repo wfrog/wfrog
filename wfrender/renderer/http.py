@@ -121,7 +121,7 @@ class StoppableHTTPServer(HTTPServer):
         self.__serving = False
         self.__is_shut_down = threading.Event()
 
-    def serve_forever(self, poll_interval=0.2):
+    def serve_forever(self, poll_interval=0.1):
         """Handle one request at a time until shutdown.
 
         Polls for shutdown every poll_interval seconds. Ignores

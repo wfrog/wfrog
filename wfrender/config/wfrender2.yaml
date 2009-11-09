@@ -2,7 +2,7 @@ context:
     database: { url: 'file://database.db' }
     chart:
         bgcolor: 70BDF5
-        color: indigo
+        color: indigo               
         text: indigo
         
 renderer: !http    
@@ -21,9 +21,10 @@ renderer: !http
                                     temp.max:
                                         color: '9BCDF1'
                                         fill: { to: temp.min }
-                                        max: { color: brown, text: brown, thickness: 0.5 }
+                                        max: { color: darkred, text: darkred, thickness: 0.5 }
                                     temp.avg:                                 
                                         last: { thickness: 5, style: 'o' }
+                                        order: 1
                                     temp.min:
                                         color: '9BCDF1'
                                         min: { color: blue, text: blue, thickness: 0.5 }
@@ -44,16 +45,29 @@ renderer: !http
                     source: !simulator {}
                     renderer: !multi
                         renderers:
-                            temp_chart: !chart
+                            wind_chart: !chart                                
                                 series:
-                                    wind.avg:                                        
-                                        marks: {serie: wind.dir, color: white, size: 10 }                                        
-                                        color: blue
+                                    wind.speed:                                        
+                                        marks: {serie: wind.dir, size: 10 }       
                                     wind.gust:
-                                        color: darkcyan
-                                        thickness: 0.5
-                                        max: { color: red, text: darkcyan}
+                                        order: -1
+                                        color: '9BCDF1'
+                                        fill: { to: wind.speed }                                    
+                                        max: { color: darkred, text: darkred, thickness: 0.5 }
                                 labels: wind.lbl
                                 y_margin: [ 0, 1 ]
-
-
+                            wind_radar: !windradar
+                                width: 300
+                                height: 300
+                                arrow: { color: black, thickness: 5 }   
+                                max: { color: darkred, thickness: 8 }                             
+                                tail: { color: grey }
+                                trace: { color: green, size: 15, ratio: 3, length: 3 }
+                                sectors: { color: darkcyan }
+                                #bars: { color: blue, gust: red, thickness: 1 }
+                                lines: { color: None, gust: red, thickness: 1 }
+                                areas: { color: indigo, gust: FF222266 }
+                                beaufort: { color: black, intensity: 0.15 }
+                                
+                                
+                                
