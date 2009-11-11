@@ -36,5 +36,6 @@ class TemplateRenderer(object):
         if self.renderer:
             content = self.renderer.render(data, context)
         
+	self.logger.debug("Rendering with template "+self.path)
         template = Template(file=file(self.path, "r"), searchList=[content])
         return [ self.mime, str(template) ]

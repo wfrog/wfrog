@@ -95,7 +95,10 @@ class YamlConfigurer(object):
         config = yaml.load( file(options.config, "r") )
 
         engine.root_renderer = config["renderer"]
-        engine.initial_context = config["context"]
+        if config.has_key("context"):
+            engine.initial_context = config["context"]
+        else:
+            engine.initial_context = {}
 
         if ( options.reload_config or options.reload_mod) and not self.watcher_running:
             self.watcher_running = True

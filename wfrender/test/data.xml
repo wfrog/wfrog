@@ -38,11 +38,11 @@
     </thInt>
     <timestampt>2009.09.19.09.26.48</timestampt>
     <wind>
-        <avgSpeed>0.0</avgSpeed>
+        <avgSpeed>2.0</avgSpeed>
         <batteryOk>True</batteryOk>
         <dir>6</dir>
         <dirDeg>135</dirDeg>
         <dirStr>SE</dirStr>
-        <gustSpeed>0.0</gustSpeed>
+        <gustSpeed>3.0</gustSpeed>
     </wind>
 </WMRS200>

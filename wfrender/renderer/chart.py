@@ -29,40 +29,55 @@ import copy
 import logging
 import sys
 
+# Limit of the text density on x-axis to start removing label
 LABEL_DENSITY_THRESHOLD = 1.78
 
+# Default configuration
 class ChartConfig(object):
+    # Graph attributes
     width = 200
     height = 125
+    bgcolor = '00000000'    
+    y_margin = [ 2, 2 ]
+    axes = 'on'
+    ticks = 'on'
+    legend = None
+    legend_pos = 'b'
+    
+    # Drawing
     color = 'orange'
     thickness = 1.5
     text = '7F7F7F'
-    bgcolor = '00000000'
-    y_margin = [ 2, 2 ]
+    size = 10 # for text and markers
     fill = None
+    style = 'v' # for markers
+    dash = None
+    intensity = 0.5
+            
+    # Series
+    area = None
     zero = None
     max = None
     min = None
-    last = None
-    style = 'v'
-    size = 10
-    axes = 'on'
-    ticks = 'on'
-    dash = None
-    legend = None
-    legend_pos = 'b'
+    last = None    
     marks = None
-    space = 1.5
+    space = 1.5 # Spacing between marks
+
+    # Drawing order
     order = 0
-    radius = 16
-    median = 2
+    
+    # Wind Radar
+    radius = 16 # max value for logarithmic scaling
+    median = 2  # value in the middle of the graph
+        
     tail = None
-    arrow = { }
+    arrow = { }    
     trace = None
-    ratio = 3
-    length = 5
+    ratio = 3  # Size i
+    length = 5 # Number of traces
+    
     sectors = None
-    intensity = 0.5
+
     gust = None
     bars = None
     lines = None
@@ -70,7 +85,7 @@ class ChartConfig(object):
     beaufort = None
     
     def __missing__(item):
-        return None
+        return None # avoid exception when item is missing
 
 class GoogleChartRenderer(object):    
     """
@@ -100,6 +115,7 @@ class GoogleChartRenderer(object):
             config.__dict__.update(context['chart'])
         config.__dict__.update(self.__dict__)        
 
+        # create the chart
         chart = SimpleLineChart(config.width, config.height)        
 
         colors = []        
@@ -109,19 +125,21 @@ class GoogleChartRenderer(object):
         chart_min = sys.maxint
         chart_max = -sys.maxint
 
+        # Prepare series config
         ordered_series = []
         for key, serie in self.series.iteritems():
             serie_config = ChartConfig()
             serie_config.__dict__.update(config.__dict__)
-            serie_config.__dict__.update(serie)
-            
+            serie_config.__dict__.update(serie)            
             ordered_series.append( (serie_config.order, key, serie) )
+            
         ordered_series.sort( cmp=lambda x,y: cmp(x[0],y[0]) )
 
         ordered_keys = []
         for order, key, serie in ordered_series:
             ordered_keys.append(key)
 
+        # Draws for each serie
         index=0
         for order, key, serie in ordered_series:
             serie_config = ChartConfig()
@@ -130,13 +148,14 @@ class GoogleChartRenderer(object):
             serie_data = data[key.split('.')[0]]['series'][key.split('.')[1]]
             chart.add_data(serie_data)
                       
+            # Compute min and max value for the serie and the whole chart
             min_data = min(serie_data)
             chart_min = min(chart_min, min_data)
             min_index = serie_data.index(min_data)
             max_data = max(serie_data)
             chart_max = max(chart_max, max_data)
             max_index = serie_data.index(max_data)
-            
+                        
             colors.append(_valid_color(serie_config.color))            
             
             if serie_config.max:
@@ -162,10 +181,10 @@ class GoogleChartRenderer(object):
                 chart.add_marker(index, last_index, 't'+str(last_data), _valid_color(last_config.text), last_config.size)
                 chart.add_marker(index, last_index, last_config.style, _valid_color(last_config.color), last_config.thickness)
            
-            if serie_config.fill:
+            if serie_config.area:
                 fill_config = ChartConfig()
                 fill_config.__dict__.update(serie_config.__dict__)
-                fill_config.__dict__.update(serie_config.fill)
+                fill_config.__dict__.update(serie_config.area)
                 to = ordered_keys.index(fill_config.to)
                 chart.add_fill_range(_valid_color(fill_config.color), index, to)
             
@@ -193,6 +212,7 @@ class GoogleChartRenderer(object):
         
             index = index + 1
 
+        # Compute vertical range
         chart.y_range=[chart_min-config.y_margin[0], chart_max+config.y_margin[1]]     
         if config.axes == 'on':            
             chart.set_axis_range(Axis.LEFT, chart_min-config.y_margin[0], chart_max+config.y_margin[1])        
@@ -231,7 +251,7 @@ class GoogleChartRenderer(object):
                 chart.set_axis_labels(Axis.BOTTOM, []) 
                 chart.set_axis_style(1, _valid_color(config.text), config.size, 0, Axis.TICK_MARKS, _valid_color(config.bgcolor))
                 
-        return chart.get_url()+"&chma=10,10,10,10"
+        return chart.get_url()+"&chma=10,10,10,10" # add a margin
 
 class GoogleChartWindRadarRenderer(object):
     """
@@ -242,7 +262,7 @@ class GoogleChartWindRadarRenderer(object):
 
     def render(self,data={}, context={}):
         
-        # merge builtin defaults, context and renderer config
+        # Prepare config
         config = ChartConfig()       
         if context.has_key('chart'):
             config.__dict__.update(context['chart'])
@@ -304,6 +324,7 @@ class GoogleChartWindRadarRenderer(object):
         if config.beaufort:      
             beaufort_config.__dict__.update(config.beaufort)          
         
+        # Prepare data
         current_noscale = data[self.key]['value']
         last_gust_noscale = data[self.key]['gust']
         pos = int(round(data[self.key]['deg'] * 16 / 360.0))
@@ -355,7 +376,7 @@ class GoogleChartWindRadarRenderer(object):
             chart.add_marker(3, -1, "v", _valid_color(bars_config.color), bars_config.thickness, -1)        
         
         if config.beaufort:
-            chart.add_marker(0, "220:0.9", "@t"+str(beaufort(current_noscale)), _valid_color(beaufort_config.color) + "%02x" % (beaufort_config.intensity*255), config.width-config.size*5, 0)
+            chart.add_marker(0, "220:0.9", "@t"+str(beaufort(current_noscale)), _valid_color(beaufort_config.color) + "%02x" % (beaufort_config.intensity*255), min(config.height, config.width)-config.size*5, 0)
         
         colors = ["00000000", 
             _valid_color(tail_config.color),  
