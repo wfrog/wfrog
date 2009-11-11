@@ -55,7 +55,9 @@ class WxDataXmlDataSource(object):
 
         result['wind'] = {}
         result['wind']['value'] = float(dom.getElementsByTagName('wind')[0].getElementsByTagName('avgSpeed')[0].childNodes[0].data)
-        result['wind']['dir'] = int(dom.getElementsByTagName('wind')[0].getElementsByTagName('dir')[0].childNodes[0].data)
+        result['wind']['gust'] = float(dom.getElementsByTagName('wind')[0].getElementsByTagName('gustSpeed')[0].childNodes[0].data)
+        result['wind']['deg'] = int(dom.getElementsByTagName('wind')[0].getElementsByTagName('dirDeg')[0].childNodes[0].data)
+        result['wind']['dir'] = dom.getElementsByTagName('wind')[0].getElementsByTagName('dirStr')[0].childNodes[0].data
         result['wind']['unit'] = "m/s"
 
         return result

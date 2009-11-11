@@ -18,7 +18,8 @@ renderer: !http
                     wind: !multi
                         renderers:
                             wind_speed: !value { key: wind }
-                            wind_radar: !windradar { key: wind }
+                            wind_radar: !windradar
+                                arrow: { show: yes } 
 
 
 
