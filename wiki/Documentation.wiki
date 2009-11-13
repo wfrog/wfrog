@@ -81,12 +81,20 @@ python WxLogger.py
 
   * Adapt values in `wfrender/config/wfrender.yaml`
 
-==== Starting the Logger ====
+==== Starting the Renderer ====
 
 {{{
 cd wfrender
 python wfrender.py
 }}}
+
+==== Internal Web-Server ====
+
+The default configuration starts an internal web-server on port 8080.
+
+=== FTP ===
+
+TBD
 
 === Getting Help ===
 
