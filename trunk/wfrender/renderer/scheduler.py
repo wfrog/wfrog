@@ -30,13 +30,13 @@ class SchedulerRenderer(object):
     renderer
         The renderer to call periodically.
 
-    periodicity:
+    period:
         The repeat period in seconds.
 
     """
 
     renderers = None
-    periodicity = None
+    period = None
 
     alive = True
 
@@ -44,12 +44,12 @@ class SchedulerRenderer(object):
 
     def render(self, data={}, context={}):
         assert renderer.is_renderer(self.renderer), "'scheduler.renderer' must be set to a renderer"
-        assert self.periodicity is not None, "'scheduler.periodicity' must be set"
+        assert self.period is not None, "'scheduler.period' must be set"
 
         while self.alive:
             self.logger.debug("Rendering.")
             self.renderer.render(data, context)
-            time.sleep(self.periodicity)
+            time.sleep(self.period)
 
     def close(self):
         self.alive = False

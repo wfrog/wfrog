@@ -55,27 +55,28 @@ class FtpRenderer(object):
     logger = logging.getLogger("renderer.ftp")
 
     def render(self, data={}, context={}):
-        renderer_module.assert_renderer_dict('renderers', self.renderers)
+        renderer.assert_renderer_dict('renderers', self.renderers)
         assert self.host is not None, "'ftp.host' must be set"
         assert self.username is not None, "'ftp.username' must be set"
         assert self.password is not None, "'ftp.password' must be set"
 
-        files=[]
+        files= {}        
 
         for key in self.renderers.keys():
-            files.append(self.renderers[key].render(data, context))
+            files[key] = self.renderers[key].render(data, context)
 
         ftp = ftplib.FTP()
-        logger.debug("Connecting to "+self.host+":"+str(self.port))
+        self.logger.debug("Connecting to "+self.host+":"+str(self.port))
         ftp.connect(self.host, self.port)
-        logger.debug("Authenticating...")
+        self.logger.debug("Authenticating...")
         ftp.login(self.username, self.password)
-        if directory is not None:
-            logger.debug("Moving to directory "+self.directory)
+        if self.directory is not None:
+            self.logger.debug("Moving to directory "+self.directory)
             ftp.cwd(self.directory)
 
-        for filename in files:
-            logger.debug("Sending "+filename)
-            f = open(filename, 'r')
-            ftp.storebinary(filename, f)
-            s.close()
+        for remote_file, local_file in files.iteritems():
+            self.logger.debug("Sending "+local_file+" to "+remote_file)
+            f = open(local_file, 'r')
+            ftp.storbinary("STOR "+remote_file, f)
+            f.close()
+        ftp.close()
