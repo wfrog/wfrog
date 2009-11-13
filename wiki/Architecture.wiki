@@ -89,6 +89,7 @@ wfdriver --station=wmrs200 --device=/dev/usbTTy0 --output=http --url=http://logg
 wflogger --input=http --port=7878
 }}}
 
+See below the message-oriented alternative.
 
 _End of Comment_
 
