@@ -1,5 +1,7 @@
 #summary Ideas that will guide the development of wrfog 0.5.
 
+<wiki:toc/>
+
 = Architecture Details =
 
 It is structured in 4 components:
@@ -198,3 +200,27 @@ trunk/           (will be copied to tags/wfrog-0.1 and targzipped for release)
   README
   setup.py
 }}}
+
+= Units =
+
+_Proposal from Laurent_
+
+There are several places where unit conversion can occur. Especially in the driver and renderer.
+
+I suggest that unit conversion sits in a dedicated module (something like wfcommon).
+
+The rule would be to use only SI units at the following places:
+  * Communication. E.g. between driver and logger
+  * Storage in database
+Then, the conversion would be only in the driver from the station units to SI and in the renderer from SI to user units.
+
+We have basically the following quantities to measure with the most suitable SI unit and the non-SI units we support.
+|| *Quantity* || *SI* || *Supported* ||
+|| Temperature || C || F, K? ||
+|| Pressure    || hPa (=mbar) || mmHg, inHg ||
+|| Wind speed  || m/s || km/h, knt, mph, beaufort ||
+|| Rain rate   || mm/s || mm/h, in/h ||
+|| Rain sum    || mm || in ||
+
+  * Relative humidity is in %, which is not a unit.
+  * UV Index is defined as such.
