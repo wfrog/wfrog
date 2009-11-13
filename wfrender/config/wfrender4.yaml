@@ -22,7 +22,7 @@ renderer: !http
                                         color: '9BCDF1'
                                         area: { to: temp.min }
                                         max: { color: darkred, text: darkred, thickness: 0.5 }
-                                    temp.avg:                                 
+                                    temp.avg:                                                                         
                                         last: { thickness: 5, style: 'o' }
                                         order: 1
                                     temp.min:
@@ -48,8 +48,10 @@ renderer: !http
                             wind_chart: !chart                                
                                 series:
                                     wind.speed:                                        
-                                        marks: {serie: wind.dir, size: 10 }       
+                                        marks: {serie: wind.dir, size: 10 } 
+                                        interpolate: true      
                                     wind.gust:
+                                        interpolate: true
                                         order: -1
                                         color: '9BCDF1'
                                         area: { to: wind.speed }                                    
@@ -59,7 +61,7 @@ renderer: !http
                             wind_now: !windradar
                                 width: 125
                                 height: 125
-                                arrow: { show: yes }   
+                                arrow: { show: true }   
                                 max: { color: EEAAAA, thickness: 4 }                             
                                 trace: { color: lightgray, size: 10, ratio: 3, length: 3 }
                                 beaufort: { color: lightgray, intensity: 0.3 }
