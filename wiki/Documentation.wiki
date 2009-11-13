@@ -1,0 +1,23 @@
+#summary Usage and Installation guide
+#labels Phase-Support,Featured
+
+= Installation =
+
+== Needed dependencies ==
+
+The dependencies are of two types:
+   * Binary packages. We show here how to install them on a debian-based distribution using apt-get
+   * Python eggs installed using 'easy_install' from pipy's setuptools. 
+
+*Binaries*
+   * Python 2.5 or 2.6: 
+{{{
+apt-get install python
+}}}
+   * Python setup tools for =easy_install=:
+{{{
+apt-get install python-setuptools
+}}}
+   * Firebird database 2.0 or 2.1
+
+*Python eggs*
