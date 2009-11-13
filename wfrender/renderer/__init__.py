@@ -38,7 +38,7 @@ def is_dict(obj):
 def assert_renderer_dict(name, obj):
     assert is_dict(obj), "'"+name+"' is not a key/value dictionary"
     for r in obj.keys():
-        assert isRenderer(obj[r]), "'"+name+"."+r+"' is not a renderer"
+        assert is_renderer(obj[r]), "'"+name+"."+r+"' is not a renderer"
 
 # YAML mappings
 
