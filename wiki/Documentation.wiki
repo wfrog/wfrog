@@ -6,13 +6,13 @@
 == Needed dependencies ==
 
 The dependencies are of two types:
-   * Binary packages. We show here how to install them on a debian-based distribution using apt-get
+   * Binary packages. We show here how to install them on a debian-based distribution using apt-get.
    * Python eggs installed using 'easy_install' from pipy's setuptools. 
 
 *Binaries*
-   * Python 2.5 or 2.6: 
 {{{
-apt-get install python                # Python 2.5 or 2.6: 
+apt-get install python2.6             # Python 2.6 or 
+#apt-get install python2.5             # Python 2.5
 apt-get install python-setuptools     # Python setup tools for `easy_install`
 apt-get install firebird2.1-super     # Firebird database 2.1 or
 #apt-get install firebird2.0-super    # Firebird database 2.0 
@@ -20,11 +20,29 @@ apt-get install python-kinterbasdb    # Python binding for firebird
 }}}
 
 *Python eggs*
-   * USB
 {{{
 easy_install pyusb                    # USB
 easy_install yaml                     # Config files
 easy_install pygooglechart            # Chart rendering
 easy_install cheetah                  # Template engine
+easy_install webcolors                # Color names for chart
 easy_install lxml                     # XML serialization 
 }}}
+
+== Download ==
+
+  * Download the wfrog distribution from the [http://code.google.com/p/wfrog/downloads/list download page] (as soon as 0.1 is released) or [[http://code.google.com/p/wfrog/source/checkout checkout from subversion].
+
+== Prepare Database ==
+
+TBD
+
+= Manual =
+
+== Logger ==
+
+TBD
+
+== Renderer ==
+
+TBD
