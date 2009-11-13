@@ -12,12 +12,16 @@ The dependencies are of two types:
 *Binaries*
    * Python 2.5 or 2.6: 
 {{{
-apt-get install python
+apt-get install python                # Python 2.5 or 2.6: 
+apt-get install python-setuptools     # Python setup tools for `easy_install`
+#apt-get install firebird2.0-super    # Firebird database 2.0 or 
+apt-get install firebird2.1-super     # Firebird database 2.1
+apt-get install python-kinterbasdb    # Python binding for firebird
 }}}
-   * Python setup tools for =easy_install=:
-{{{
-apt-get install python-setuptools
-}}}
-   * Firebird database 2.0 or 2.1
 
 *Python eggs*
+   * USB
+{{{
+easy_install pyusb                    # USB 
+
+}}}
