@@ -14,14 +14,17 @@ The dependencies are of two types:
 {{{
 apt-get install python                # Python 2.5 or 2.6: 
 apt-get install python-setuptools     # Python setup tools for `easy_install`
-#apt-get install firebird2.0-super    # Firebird database 2.0 or 
-apt-get install firebird2.1-super     # Firebird database 2.1
+apt-get install firebird2.1-super     # Firebird database 2.1 or
+#apt-get install firebird2.0-super    # Firebird database 2.0 
 apt-get install python-kinterbasdb    # Python binding for firebird
 }}}
 
 *Python eggs*
    * USB
 {{{
-easy_install pyusb                    # USB 
-
+easy_install pyusb                    # USB
+easy_install yaml                     # Config files
+easy_install pygooglechart            # Chart rendering
+easy_install cheetah                  # Template engine
+easy_install lxml                     # XML serialization 
 }}}
