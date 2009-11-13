@@ -20,6 +20,7 @@ It is structured in 4 components:
 - Receives the data from the driver and every n minutes writes a new record to the database.
 
 _Comment by Laurent_
+
 I think that there are actually three steps in collecting the data:
 
 i) The driver collects "raw" data at a rate decided by the station and not the same for all sensors. Then it sends this data to
@@ -29,6 +30,7 @@ ii) An aggregator which accumulate the data until a "sample" should be issued. A
 iii) The actual logger which simply does inserts in the table.
 
 In my opinion, these three components should have each one its own thread. They communicate though a Queue (in blocking manner). Then, in a further step, we can even imagine running them in different processes, so that they can be deployed remotely, for example. It makes also sense to have a decoupling in the case the driver is developed in another technology. In this latter case, decoupling the driver and aggregator makes the work of writing a new driver very simple.
+
 _End of Comment_
 
 
