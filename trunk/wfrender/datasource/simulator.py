@@ -33,7 +33,9 @@ class SimulatorDataSource(object):
             "temp" : {
                 "value" : 3,
                 "min" : 1,
+                "min_time": time.localtime()
                 "max" : 6,
+                "max_time": time.localtime()
                 "unit" : "C",
                 "series" : {
                     "lbl" : [ "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00" ],
@@ -42,6 +44,8 @@ class SimulatorDataSource(object):
                     "max" : [ 2, 1.4, 3, 2.8, 6, 4.5, 4.6, 4.3, 5, 5  ]
                     }
                 },
+            "hum" :
+
             "dew" : {
                 "value" : 3,
                 "unit" : "C",
