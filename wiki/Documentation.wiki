@@ -12,7 +12,7 @@ The dependencies are of two types:
 *Binaries*
 {{{
 apt-get install python2.6             # Python 2.6 or 
-#apt-get install python2.5             # Python 2.5
+#apt-get install python2.5            # Python 2.5
 apt-get install python-setuptools     # Python setup tools for `easy_install`
 apt-get install firebird2.1-super     # Firebird database 2.1 or
 #apt-get install firebird2.0-super    # Firebird database 2.0 
