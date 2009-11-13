@@ -209,14 +209,14 @@ There are several places where unit conversion can occur. Especially in the driv
 
 I suggest that unit conversion sits in a dedicated module (something like wfcommon).
 
-The rule would be to use only SI units at the following places:
+The rule would be to use only refrence units taken inspired from SI units at the following places:
   * Communication. E.g. between driver and logger
   * Storage in database
-Then, the conversion would be only in the driver from the station units to SI and in the renderer from SI to user units.
+Then, conversion would occur only in the driver from the station units to SI and in the renderer from SI to user units.
 
 We have basically the following quantities to measure with the most suitable SI unit and the non-SI units we support.
-|| *Quantity* || *SI* || *Supported* ||
-|| Temperature || C || F, K? ||
+|| *Quantity* || *Reference* || *Supported* ||
+|| Temperature || C || F ||
 || Pressure    || hPa (=mbar) || mmHg, inHg ||
 || Wind speed  || m/s || km/h, knt, mph, beaufort ||
 || Rain rate   || mm/s || mm/h, in/h ||
