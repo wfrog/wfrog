@@ -31,7 +31,7 @@ easy_install lxml                     # XML serialization
 
 == Download ==
 
-  * Download the wfrog distribution from the [http://code.google.com/p/wfrog/downloads/list download page] (as soon as 0.1 is released) or [[http://code.google.com/p/wfrog/source/checkout checkout from subversion].
+  * Download the wfrog distribution from the [http://code.google.com/p/wfrog/downloads/list download page] (as soon as 0.1 is released) or [http://code.google.com/p/wfrog/source/checkout checkout from subversion].
 
 == Prepare Database ==
 
