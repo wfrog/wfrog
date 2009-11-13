@@ -1,28 +1,31 @@
-#summary Description of wfrog architecture.
-
-= Introduction =
-
-wfrog is a lightweight headless simple but powerful weather station logger.
-
+#summary Ideas that will guide the development of wrfog 0.5.
 
 = Architecture Details =
 
-
-
 It is structured in 4 components:
-
 
 
 1) driver
 
 - reads / retrieves / receives / etc. data from the weather station and sends part of it (external temperature & humidity, wind, station pressure and rain) to the logger via messages. Optionally the driver can produce an xml file with the current conditions as would be seen on the station console.
 
-
-
 2) logger
 
 - Receives the data from the driver and every n minutes writes a new record to the database.
 
+_Comment by Laurent_
+
+I think that there are actually three steps in collecting the data:
+
+i) The driver collects "raw" data at a rate decided by the station and not the same for all sensors. Then it sends this data to
+
+ii) An aggregator which accumulate the data until a "sample" should be issued. A sample is actually the content of a db row. Accumulating means calculating the min max. The time between two samples is precisely the configurable value which is typically 15 min. The accumulator also maintains the current-condition xml file. When the aggregator "issues" samples, it sends them to
+
+iii) The actual logger which simply does inserts in the table.
+
+In my opinion, these three components should have each one its own thread. They communicate though a Queue (in blocking manner). Then, in a further step, we can even imagine running them in different processes, so that they can be deployed remotely, for example. It makes also sense to have a decoupling in the case the driver is developed in another technology. In this latter case, decoupling the driver and aggregator makes the work of writing a new driver very simple.
+
+_End of Comment_
 
 
 3) database
@@ -35,25 +38,21 @@ It is structured in 4 components:
 
 - The database units should be metric.
 
-
-
 4) renderer & uploader
 
 - Produces any file (html / xml / txt / graphs / etc.) requested by the user containing current data, daily/monthly/yearly aggregates, etc. etc. The renderer obtains the data by accessing to the database, and uploads those files to the requested destinations.
 
-
-
-Ideally 1,2 and 4 should be separate OS processes (3 will always be), with separate configs, etc. (this implies using some os mechanism like named pipes, etc. to communicate, which is not that difficult). 
+Ideally 1,2 and 4 should be separate OS processes (3 will always be), with separate configs, etc. (this implies using some os mechanism like named pipes, etc. to communicate, which is not that difficult).
 
 = Interprocess communication =
 
 In order to be able to have different process for the logger, driver and renderer we need means of communication between them. The goal is to have the most generic type of communication possible in order to allow processes to run on different machines, different platforms (windows and linux for instance), etc. Here is a proposal that should allow this:
 
-1 ) logger -> renderer 
+1 ) logger -> renderer
 
-The renderer process extracts all information directly from the database. In order to detect the arrival of new data it can easily query the database every min or 30 sec. with the following select: 
+The renderer process extracts all information directly from the database. In order to detect the arrival of new data it can easily query the database every min or 30 sec. with the following select:
 
-SELECT MAX(TIMESTAMP_UTC) FROM METEO. 
+SELECT MAX(TIMESTAMP_UTC) FROM METEO.
 
 Since there is an ascending index such query is fast and light and therefore there's no need to have other means of communication.
 
@@ -74,6 +73,24 @@ report_wind(dirDeg, avgSpeed, gustSpeed)
 report_barometer(pressure)
 report_temperature(temp, humidity)
 report_uv(uv)
+
+_Comment by Laurent_
+
+I've read your ideas about xmlrpc. I think it is a good idea to provide a XML over HTTP communication channel. However, if we base the internal architecture on Queues and want to describe univoqually the XML interface with a XSD schema, we should maybe prefer a more message-oriented integration. Like simply accept the driver events as schema-defined XML messages POSTed on a SimpleHTTPServer. This way, we could use the same XML messages also if some integration is done through another transport (pipes, files, ...).
+
+In my idea, it would be possible to launch the driver and logger with such commands:
+{{{
+wfdriver --station=wmrs200 --device=/dev/usbTTy0 --output=stdout | wflogger --input=stdin
+}}}
+Or if we have them on a different machine:
+{{{
+wfdriver --station=wmrs200 --device=/dev/usbTTy0 --output=http --url=http://loggerhost:7878/wflogger
+
+wflogger --input=http --port=7878
+}}}
+
+
+_End of Comment_
 
 ==Message-Oriented Alternative==
 
