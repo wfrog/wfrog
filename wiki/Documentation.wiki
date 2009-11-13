@@ -15,7 +15,7 @@ As of wfrog 0.1, three processes are involved:
 
 The dependencies are of two types:
    * Binary packages. We show here how to install them on a debian-based distribution using apt-get.
-   * Python eggs installed using 'easy_install' from pipy's setuptools. 
+   * Python eggs installed using 'easy_install' from pypi setuptools. 
 
 *Binaries*
 {{{
@@ -43,16 +43,16 @@ sudo easy_install lxml                     # XML serialization
 
 == Prepare Database ==
 
-== Firebird 2.0 ==
+=== Firebird 2.0 ===
 
-=== Start Server ===
+==== Start Database Server ====
 
 {{{
 sudo mkdir -p /var/run/firebird/2.0
 sudo dpkg-reconfigure firebird2.0-super
 }}}
 
-=== Create Database=
+==== Create Database ====
 
 {{{
 sudo mkdir /var/lib/firebird/2.0/data
