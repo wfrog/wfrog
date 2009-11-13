@@ -11,22 +11,22 @@ The dependencies are of two types:
 
 *Binaries*
 {{{
-apt-get install python2.6             # Python 2.6 or 
-#apt-get install python2.5            # Python 2.5
-apt-get install python-setuptools     # Python setup tools for `easy_install`
-apt-get install firebird2.1-super     # Firebird database 2.1 or
-#apt-get install firebird2.0-super    # Firebird database 2.0 
-apt-get install python-kinterbasdb    # Python binding for firebird
+sudo apt-get install python2.6             # Python 2.6 or 
+#sudo apt-get install python2.5            # Python 2.5
+sudo apt-get install python-setuptools     # Python setup tools for `easy_install`
+sudo apt-get install firebird2.1-super     # Firebird database 2.1 or
+#sudo apt-get install firebird2.0-super    # Firebird database 2.0 
+sudo apt-get install python-kinterbasdb    # Python binding for firebird
 }}}
 
 *Python eggs*
 {{{
-easy_install pyusb                    # USB
-easy_install yaml                     # Config files
-easy_install pygooglechart            # Chart rendering
-easy_install cheetah                  # Template engine
-easy_install webcolors                # Color names for chart
-easy_install lxml                     # XML serialization 
+sudo easy_install pyusb                    # USB
+sudo easy_install yaml                     # Config files
+sudo easy_install pygooglechart            # Chart rendering
+sudo easy_install cheetah                  # Template engine
+sudo easy_install webcolors                # Color names for chart
+sudo easy_install lxml                     # XML serialization 
 }}}
 
 == Download ==
@@ -35,7 +35,22 @@ easy_install lxml                     # XML serialization
 
 == Prepare Database ==
 
-TBD
+== Firebird 2.0 ==
+
+=== Start Server ===
+
+{{{
+sudo mkdir -p /var/run/firebird/2.0
+sudo dpkg-reconfigure firebird2.0-super
+}}}
+
+=== Create Database=
+
+{{{
+sudo mkdir /var/lib/firebird/2.0/data
+/usr/lib/firebird/2.0/bin/isql -u sysdba -p masterkey
+SQL> 
+
 
 = Manual =
 
