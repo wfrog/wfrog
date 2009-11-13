@@ -32,6 +32,22 @@ import sys
 # Limit of the text density on x-axis to start removing label
 LABEL_DENSITY_THRESHOLD = 1.78
 
+# Make min robust to None
+def rmin(a,b):
+    result = min(a,b)
+    if result == None:
+        result = max(a,b)
+        if result == None:
+            result = 0
+    return result
+    
+def amin(a):
+    m=sys.maxint
+    for i in a:
+        if i and i < m:
+            m=i
+    return m
+
 # Default configuration
 class ChartConfig(object):
     # Graph attributes
@@ -53,6 +69,7 @@ class ChartConfig(object):
     style = 'v' # for markers
     dash = None
     intensity = 0.5
+    interpolate = False
             
     # Series
     area = None
@@ -146,11 +163,15 @@ class GoogleChartRenderer(object):
             serie_config.__dict__.update(config.__dict__)
             serie_config.__dict__.update(serie)
             serie_data = data[key.split('.')[0]]['series'][key.split('.')[1]]
+            
+            if serie_config.interpolate:
+                serie_data = interpolate(serie_data)
+            
             chart.add_data(serie_data)
                       
             # Compute min and max value for the serie and the whole chart
-            min_data = min(serie_data)
-            chart_min = min(chart_min, min_data)
+            min_data = amin(serie_data)
+            chart_min = rmin(chart_min, min_data)
             min_index = serie_data.index(min_data)
             max_data = max(serie_data)
             chart_max = max(chart_max, max_data)
@@ -203,12 +224,19 @@ class GoogleChartRenderer(object):
                 mark_config = ChartConfig()
                 mark_config.__dict__.update(serie_config.__dict__)
                 mark_config.__dict__.update(serie_config.marks)
-                mark_data = data[mark_config.serie.split('.')[0]]['series'][mark_config.serie.split('.')[1]]                
+                mark_data = copy.copy(data[mark_config.serie.split('.')[0]]['series'][mark_config.serie.split('.')[1]])
+                for i, m in enumerate(mark_data):
+                    if not m:
+                        mark_data[i] = " "
                 density = max(1.0, 1.0 * mark_config.space * len("".join(mark_data))*mark_config.size  / config.width)
           
                 for i, v in enumerate(mark_data):
-                    if (i +1) % round(density) == 0:              
-                        chart.add_marker(index, i, 't'+str(mark_data[i]), _valid_color(mark_config.color), mark_config.size)                
+                    if (i +1) % round(density) == 0:         
+                        if serie_data[i] != 0:
+                            text = str(mark_data[i])
+                        else:
+                            text = " "                        
+                        chart.add_marker(index, i, 't'+text, _valid_color(mark_config.color), mark_config.size)                
         
             index = index + 1
 
@@ -376,7 +404,7 @@ class GoogleChartWindRadarRenderer(object):
             chart.add_marker(3, -1, "v", _valid_color(bars_config.color), bars_config.thickness, -1)        
         
         if config.beaufort:
-            chart.add_marker(0, "220:0.9", "@t"+str(beaufort(current_noscale)), _valid_color(beaufort_config.color) + "%02x" % (beaufort_config.intensity*255), min(config.height, config.width)-config.size*5, 0)
+            chart.add_marker(0, "220:0.9", "@t"+str(beaufort(current_noscale)), _valid_color(beaufort_config.color) + "%02x" % (beaufort_config.intensity*255), rmin(config.height, config.width)-config.size*5, 0)
         
         colors = ["00000000", 
             _valid_color(tail_config.color),  
@@ -392,7 +420,7 @@ class GoogleChartWindRadarRenderer(object):
                 sec = [0] * 16
                 avg = self.scale(data[self.key]['sectors']['avg'][i], config.median, config.radius)                
                 freq_value = data[self.key]['sectors']['freq'][i]*255
-                freq_value = min(255, (1+2*sectors_config.intensity) * freq_value)
+                freq_value = rmin(255, (1+2*sectors_config.intensity) * freq_value)
                 freq = "%02x" % int(freq_value)
                 start = i-0.5
                 stop = i+0.5
@@ -400,7 +428,7 @@ class GoogleChartWindRadarRenderer(object):
 
         if config.trace:
             nval = len(data[self.key]['series']['deg'])
-            nbullet = min(trace_config.length, nval)
+            nbullet = rmin(trace_config.length, nval)
             minsize = trace_config.size / float(trace_config.ratio)
             maxsize = trace_config.size
             size = float(maxsize)
@@ -498,6 +526,23 @@ def _valid_color(color):
         return color
     else:
         return webcolors.name_to_hex(color)[1:]
+
+def interpolate(data):
+    result = copy.copy(data)
+    (last, index, count) = (None, None, 0)
+    for i,val in enumerate(data):
+        if not val:
+            if last:                         # ignore leading None(s)
+                if not index:                # if first None 
+                    index = i
+                count = count + 1
+        else:
+            if index:                        # there has been None(s) before
+                for j in range(index, i):
+                    result[j] = last + (j - index + 1)*(val - last)/float(count+1)
+                (index, count) = (None, 0)
+            last = val
+    return result
 
 def beaufort(mps):
     if mps < 0.3:
