@@ -7,7 +7,7 @@
 
 As of wfrog 0.1, three processes are involved:
 
-   # The Firebird database
+   # The Database.
    # The Logger. Reads data from the USB station, logs data into the database. It also maintains a XML file with current conditions.
    # The Renderer. Reads data from the database and/or the XML file and renders it on a web page, either served by an internal web server or sent on a FTP site.
 
