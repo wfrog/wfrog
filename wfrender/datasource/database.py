@@ -22,6 +22,49 @@ import sys
 
 kinterbasdb.init(type_conv=0)
 
+class FirebirdDB():
+    def __init__(self, bdd, user='sysdba', password='masterkey', charset='ISO8859_1'):
+        self._bdd = bdd
+        self._user = user
+        self._password = password
+        self._charset = charset
+
+    def connect(self):
+        self._db = kinterbasdb.connect(dsn=self._bdd,
+                                       user=self._user,
+                                       password=self._password,
+                                       charset=self._charset)
+        try:
+            self._db.cursor().execute("DECLARE EXTERNAL FUNCTION lpad \
+               CSTRING(255) NULL, INTEGER, CSTRING(1) NULL \
+               RETURNS CSTRING(255) FREE_IT \
+               ENTRY_POINT 'IB_UDF_lpad' MODULE_NAME 'ib_udf'")
+        except:
+            pass
+
+    def select(self, sql):
+        cursor = self._db.cursor()
+        cursor.execute(sql)
+        l = []
+        for e in cursor.fetchall():
+            l.append(e)
+        cursor.close()
+        self._db.commit()
+        return l
+
+    def execute(self, sql):
+        cursor = self._db.cursor()
+        cursor.execute(sql)
+        cursor.close()
+        self._db.commit()
+
+    def disconnect(self):
+        try:
+            self._db.close()
+        except:
+            pass
+
+
 class DatabaseDataSource(object):
     """
     Queries a database for consolidated data.
@@ -30,18 +73,14 @@ class DatabaseDataSource(object):
     timestamp_field = "TIMESTAMP_LOCAL"
 
     separator = '.'
-    switch = True #False
+    switch = False
+    conc = chr(124)*2
 
     BEFORE=1
     AFTER=2
 
-    lpad_function="DECLARE EXTERNAL FUNCTION lpad \
-           CSTRING(255) NULL, INTEGER, CSTRING(1) NULL \
-           RETURNS CSTRING(255) FREE_IT \
-           ENTRY_POINT 'IB_UDF_lpad' MODULE_NAME 'ib_udf'"
-
     lpa="lpad("
-    lpz =")"
+    lpz=",2,'0')"
 
     YEAR=[
         "EXTRACT(YEAR FROM "+timestamp_field+")",
@@ -50,26 +89,26 @@ class DatabaseDataSource(object):
         None, None]
 
     MONTH=[
-        "EXTRACT(MONTH FROM "+timestamp_field+")&'"+separator+"'&EXTRACT(YEAR FROM "+timestamp_field+")",
+        lpa+"EXTRACT(MONTH FROM "+timestamp_field+")"+lpz+conc+"'"+separator+"'"+conc+"EXTRACT(YEAR FROM "+timestamp_field+")",
         '',
         sys.maxint,
         None, BEFORE]
 
     DAY=[
-        "EXTRACT(" + ("DAY" if not switch else "MONTH")+" FROM "+timestamp_field+")&'.'&EXTRACT("+("MONTH" if not switch else "DAY")+" FROM "+timestamp_field+")",
-        "&'"+separator+"'&",
+        lpa+"EXTRACT(" + ("DAY" if not switch else "MONTH")+" FROM "+timestamp_field+")"+lpz+conc+"'.'"+conc+lpa+"EXTRACT("+("MONTH" if not switch else "DAY")+" FROM "+timestamp_field+")"+lpz,
+        conc+"'"+separator+"'"+conc,
         365,
         YEAR, BEFORE if not switch else AFTER]
 
     HOUR=[
-        "EXTRACT(HOUR FROM "+timestamp_field+")&':00'",
-        "&' '&",
+        lpa+"EXTRACT(HOUR FROM "+timestamp_field+")"+lpz+conc+"':00'",
+        conc+"' '"+conc,
         24,
         DAY, AFTER]
 
     MINUTE=[
-        "EXTRACT(HOUR FROM "+timestamp_field+")&':'&EXTRACT(MINUTE FROM "+timestamp_field+")",
-        "&' '&",
+        lpa+"EXTRACT(HOUR FROM "+timestamp_field+")"+lpz+conc+"':'"+conc+lpa+"EXTRACT(MINUTE FROM "+timestamp_field+")"+lpz,
+        conc+"' '"+conc,
         60*24,
         DAY, AFTER]
 
@@ -80,13 +119,13 @@ class DatabaseDataSource(object):
         'month': MONTH,
         'year': YEAR }
 
-    TEMP= ['avg(temp) as temp_avg, min(temp) as temp_min, max(temp) as temp_max)']
+    TEMP= ['avg(temp) as temp_avg, min(temp) as temp_min, max(temp) as temp_max']
     HUM= ['avg(hum) as hum_avg']
-    DEW= ['avg(dew) as dew_avg']
+    DEW= ['avg(dew_point) as dew_avg']
     WIND= ['avg(wind) as wind_avg, max(wind_gust) as wind_gust']
     PRESSURE= ['avg(pressure) as pressure_avg']
     RAIN= ['sum(rain) as rain_sum, avg(rain_rate) as rain_rate']
-    UV= ['avg(uv) as uv_avg']
+    UV= ['avg(uv_index) as uv_avg']
 
     measure_list = (TEMP, HUM, DEW, WIND, PRESSURE, RAIN, UV)
 
@@ -95,7 +134,7 @@ class DatabaseDataSource(object):
     password = 'masterkey'
     table = 'METEO'
     period = 'hour'
-    span = 24*366
+    span = 24
     measures = [ TEMP, HUM, DEW, WIND, PRESSURE, RAIN, UV ]
 
     def get_key(self, p, span, key):
@@ -119,55 +158,30 @@ class DatabaseDataSource(object):
         key = self.get_key(self.periods[self.period], self.span, "")
 
         select = StringIO()
-        select.write("SELECT "+key+" AS key")
+        select.write("SELECT "+key+" AS PERIOD")
 
         for measure in self.measures:
             select.write(", ")
             select.write(measure[0])
 
-        select.write(" FROM "+self.table+" WHERE ... ")
-        select.write("GROUP BY "+key)
+        select.write(" FROM "+self.table)#+" WHERE ... ")
+        select.write(" GROUP BY PERIOD ORDER BY MIN("+self.timestamp_field+")")
 
         print select.getvalue()
-
-    def create_column_sql(measure, period, span):
-        return
-
-DatabaseDataSource().execute()
-
-
-class FirebirdDB():
-    def __init__(self, bdd, user='sysdba', password='masterkey', charset='ISO8859_1'):
-        self._bdd = bdd
-        self._user = user
-        self._password = password
-        self._charset = charset
-
-    def connect(self):
-        self._db = kinterbasdb.connect(dsn=self._bdd,
-                                       user=self._user,
-                                       password=self._password,
-                                       charset=self._charset)
-
-    def select(self, sql):
-        cursor = self._db.cursor()
-        cursor.execute(sql)
-        l = []
-        for e in cursor.fetchall():
-            l.append(e)
-        cursor.close()
-        self._db.commit()
-        return l
-
-    def execute(self, sql):
-        cursor = self._db.cursor()
-        cursor.execute(sql)
-        cursor.close()
-        self._db.commit()
-
-    def disconnect(self):
+        
+        db = FirebirdDB(self.url)
+        db.connect()
         try:
-            self._db.close()
-        except:
-            pass
+            for row in db.select(select.getvalue()):
+                print repr(row)
+        finally:
+            db.disconnect()
+        
+
+ds = DatabaseDataSource()
+ds.url = 'localhost:/var/lib/firebird/2.0/data/wfrog.db'
+ds.period = 'day'
+ds.span = 30
+ds.switch=True
+ds.execute()
 
