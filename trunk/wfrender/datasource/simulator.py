@@ -34,7 +34,6 @@ class SimulatorDataSource(object):
                 "value" : 3,
                 "min" : 1,
                 "max" : 6,
-                "unit" : "C",
                 "series" : {
                     "lbl" : [ "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00" ],
                     "avg" : [ -1, -0.6, 1, 2.5, None, 4.2, 3.5, 1, 3.2, 3 ],
@@ -45,7 +44,6 @@ class SimulatorDataSource(object):
 
             "dew" : {
                 "value" : 3,
-                "unit" : "C",
                 "series" : {
                     "lbl" : [ "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00" ],
                     "avg" : [ -4, -3.8, -3.5, -2, None, 1.2, .3, -0.2, 0, 1],
@@ -54,7 +52,6 @@ class SimulatorDataSource(object):
             "wind" : {
                 "value" : 2.2,
                 "gust" : 6,
-                "unit" : "m/s",
                 "deg" : 43,
                 "dir" : "NE",
                 "series" : {
