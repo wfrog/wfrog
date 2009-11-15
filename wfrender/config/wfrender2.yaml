@@ -35,9 +35,9 @@ renderer: !http
                         renderers:
                             wind_chart: !chart                                
                                 series:
-                                    wind.speed:                                        
+                                    wind.avg:                                        
                                         marks: {serie: wind.dir, color: gray, size: 12 }       
-                                    wind.gust:
+                                    wind.max:
                                         order: -1
                                         color: EEAAAA
                                         area: { color: peachpuff, to: wind.speed }                                    

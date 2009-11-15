@@ -354,7 +354,7 @@ class GoogleChartWindRadarRenderer(object):
         
         # Prepare data
         current_noscale = data[self.key]['value']
-        last_gust_noscale = data[self.key]['gust']
+        last_gust_noscale = data[self.key]['max']
         pos = int(round(data[self.key]['deg'] * 16 / 360.0))
 
         max = config.median * 2        
@@ -369,7 +369,7 @@ class GoogleChartWindRadarRenderer(object):
                 avg.append(self.scale(val, config.median, config.radius))
             avg.append(avg[0])
             gust = []
-            for val in data[self.key]['sectors']['gust']:
+            for val in data[self.key]['sectors']['max']:
                 gust.append(self.scale(val, config.median, config.radius))
             gust.append(gust[0])
         else:

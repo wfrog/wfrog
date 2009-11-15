@@ -18,7 +18,7 @@
 
 import yaml
 
-#import database
+import database
 import xmlquery
 import simulator
 
@@ -26,6 +26,9 @@ import simulator
 
 class YamlSimulatorDataSource(simulator.SimulatorDataSource, yaml.YAMLObject):
     yaml_tag = u'!simulator'
+
+class YamlDatabaseDataSource(database.DatabaseDataSource, yaml.YAMLObject):
+    yaml_tag = u'!database'
 
 class YamlWxDataXmlDataSource(xmlquery.WxDataXmlDataSource, yaml.YAMLObject):
     yaml_tag = u'!wxdataxml'

@@ -1,5 +1,5 @@
 context:
-    database: { url: 'file://database.db' }
+    database: { url: 'localhost:/var/lib/firebird/2.0/data/wfrog.db' }
     chart:
         bgcolor: 70BDF5
         color: indigo               
@@ -12,8 +12,10 @@ renderer: !http
         renderer: !multi
             renderers:
                 days: !data
-                    #source: !daily { period: 30 }
-                    source: !simulator {} 
+                    source: !database 
+                        slice: day
+                        span: 15
+                        swicth: true
                     renderer: !multi
                         renderers:
                             temp_chart: !chart                            
@@ -47,14 +49,14 @@ renderer: !http
                         renderers:
                             wind_chart: !chart                                
                                 series:
-                                    wind.speed:                                        
+                                    wind.avg:                                        
                                         marks: {serie: wind.dir, size: 10 } 
                                         interpolate: true      
-                                    wind.gust:
+                                    wind.max:
                                         interpolate: true
                                         order: -1
                                         color: '9BCDF1'
-                                        area: { to: wind.speed }                                    
+                                        area: { to: wind.avg }                                    
                                         max: { color: darkred, text: darkred, thickness: 0.5 }
                                 labels: wind.lbl
                                 y_margin: [ 0, 1 ]
