@@ -40,7 +40,7 @@ renderer: !http
                                     wind.max:
                                         order: -1
                                         color: EEAAAA
-                                        area: { color: peachpuff, to: wind.speed }                                    
+                                        area: { color: peachpuff, to: wind.avg }                                    
                                         max: { color: darkred, text: darkred, thickness: 0.5 }
                                 labels: wind.lbl
                                 y_margin: [ 0, 1 ]
