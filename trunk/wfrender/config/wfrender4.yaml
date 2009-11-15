@@ -13,9 +13,9 @@ renderer: !http
             renderers:
                 days: !data
                     source: !database 
-                        slice: day
-                        span: 15
-                        swicth: true
+                        slice: minute
+                        span: 120
+                        
                     renderer: !multi
                         renderers:
                             temp_chart: !chart                            
@@ -27,6 +27,7 @@ renderer: !http
                                     temp.avg:                                                                         
                                         last: { thickness: 5, style: 'o' }
                                         order: 1
+                                        interpolate: true
                                     temp.min:
                                         color: '9BCDF1'
                                         min: { color: blue, text: blue, thickness: 0.5 }
