@@ -172,21 +172,27 @@ class GoogleChartRenderer(object):
             # Compute min and max value for the serie and the whole chart
             min_data = amin(serie_data)
             chart_min = rmin(chart_min, min_data)
-            min_index = serie_data.index(min_data)
+            if serie_data.__contains__(min_data):
+                min_index = serie_data.index(min_data)
+            else:
+                min_index = None
             max_data = max(serie_data)
             chart_max = max(chart_max, max_data)
-            max_index = serie_data.index(max_data)
+            if serie_data.__contains__(max_data):
+                max_index = serie_data.index(max_data)
+            else:
+                max_index = None                    
                         
             colors.append(_valid_color(serie_config.color))            
             
-            if serie_config.max:
+            if serie_config.max and max_index :
                 max_config = ChartConfig()
                 max_config.__dict__.update(serie_config.__dict__)                
                 max_config.__dict__.update(serie_config.max)
                 chart.add_marker(index, max_index, 't'+str(max_data), _valid_color(max_config.text), max_config.size)
                 chart.add_marker(index, max_index, max_config.style, _valid_color(max_config.color), max_config.thickness)
 
-            if serie_config.min:
+            if serie_config.min and min_index:
                 min_config = ChartConfig()
                 min_config.__dict__.update(serie_config.__dict__)                
                 min_config.__dict__.update(serie_config.min)
@@ -199,8 +205,9 @@ class GoogleChartRenderer(object):
                 last_config.__dict__.update(serie_config.last)
                 last_index=len(serie_data)-1
                 last_data = serie_data[last_index]
-                chart.add_marker(index, last_index, 't'+str(last_data), _valid_color(last_config.text), last_config.size)
-                chart.add_marker(index, last_index, last_config.style, _valid_color(last_config.color), last_config.thickness)
+                if last_data:
+                    chart.add_marker(index, last_index, 't'+str(last_data), _valid_color(last_config.text), last_config.size)
+                    chart.add_marker(index, last_index, last_config.style, _valid_color(last_config.color), last_config.thickness)
            
             if serie_config.area:
                 fill_config = ChartConfig()
@@ -265,8 +272,8 @@ class GoogleChartRenderer(object):
             chart.set_legend_position(config.legend_pos)
 
         if self.labels:
-            if config.axes == 'on':
-                labels_data = data[self.labels.split('.')[0]]['series'][self.labels.split('.')[1]]
+            labels_data = data[self.labels.split('.')[0]]['series'][self.labels.split('.')[1]]
+            if config.axes == 'on':               
                 density = 1.0 * len("".join(labels_data))*config.size  / config.width
           
                 if density > LABEL_DENSITY_THRESHOLD:

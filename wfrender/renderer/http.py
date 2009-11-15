@@ -22,6 +22,8 @@ import threading
 import socket
 import select
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+import copy
+import urlparse, cgi
 import logging
 
 
@@ -88,10 +90,19 @@ class HttpRendererHandler(BaseHTTPRequestHandler):
         renderers = _HttpRendererSingleton.renderers
         root = _HttpRendererSingleton.root
         context = _HttpRendererSingleton.context
-        data = _HttpRendererSingleton.data
+        
+        data = copy.deepcopy(_HttpRendererSingleton.data)
+        
+        params = cgi.parse_qsl(urlparse.urlsplit(self.path).query)
+        for p in params:
+            data[p[0]] = p[1]
+        
+        
+        print repr(data)
+        
         content = None
 
-        name = self.path.strip('/')
+        name = urlparse.urlsplit(self.path).path.strip('/')
 
         if name == "":
             if not root:

@@ -46,7 +46,7 @@ class DatabaseDataSource(object):
     lpa="lpad("
     lpz=",2,'0')"
 
-    TEMP= ['avg(temp), min(temp), max(temp) ', ['avg', 'min', 'max'], 'temp', [ 'avg' ]]
+    TEMP= ['avg(temp), min(temp), max(temp) ', ['avg', 'min', 'max'], 'temp, temp, temp', [ 'avg', 'min', 'max' ]]
     HUM= ['avg(hum)', ['avg'], 'hum', ['avg']]
     DEW= ['avg(dew_point)', ['avg'], 'dew_point', ['avg']]
     WIND= ['avg(wind), max(wind_gust)', ['avg', 'max'], 'wind, wind_gust', ['avg', 'max']]
@@ -150,6 +150,7 @@ class DatabaseDataSource(object):
             'month': MONTH,
             'year': YEAR }
 
+        where_clause=""
         if begin:
             where_clause = " WHERE " + timestamp_field + ">='" + format(begin) + "'"
             if end:
@@ -166,7 +167,7 @@ class DatabaseDataSource(object):
             if end:
                 if span:
                     begin = delta(end, -span, slice)
-                    where_clause = " WHERE "+timestamp_field + ">='" + format(begin) + " AND " 
+                    where_clause = " WHERE "+timestamp_field + ">='" + format(begin) + "' AND " 
                     where_clause = where_clause + timestamp_field + "<='" + format(end) + "'"
                 else:
                     span=sys.maxint # TODO: calculate exact span
@@ -212,7 +213,7 @@ class DatabaseDataSource(object):
         finally:
             db.disconnect()
         
-        if holes:
+        if holes and begin and end:
             map = {}
             for row in result:
                 map[row[0]]=row
@@ -271,7 +272,11 @@ def delta(d, n, slice):
     if slice == 'year':
         return d2+datetime.timedelta(n*365) # TODO: calculate exact start of year
 
-kinterbasdb.init(type_conv=0)
+
+try:
+    kinterbasdb.init(type_conv=0)
+except:
+    pass
 
 class FirebirdDB():
     def __init__(self, bdd, user='sysdba', password='masterkey', charset='ISO8859_1'):
