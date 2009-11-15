@@ -22,6 +22,11 @@ import sys
 import logging
 import datetime
 
+class DatabaseConfig(object):
+    url = None
+    username = 'sysdba'
+    password = 'masterkey'    
+
 class DatabaseDataSource(object):
     """
     Queries a database for consolidated data.
@@ -41,13 +46,13 @@ class DatabaseDataSource(object):
     lpa="lpad("
     lpz=",2,'0')"
 
-    TEMP= ['avg(temp) as temp_avg, min(temp) as temp_min, max(temp) as temp_max', 3]
-    HUM= ['avg(hum) as hum_avg', 1]
-    DEW= ['avg(dew_point) as dew_avg', 1]
-    WIND= ['avg(wind) as wind_avg, max(wind_gust) as wind_gust', 2]
-    PRESS = ['avg(pressure) as press_avg', 1]
-    RAIN= ['sum(rain) as rain_sum, avg(rain_rate) as rain_rate', 2]
-    UV= ['avg(uv_index) as uv_avg', 1]
+    TEMP= ['avg(temp), min(temp), max(temp) ', ['avg', 'min', 'max'], 'temp', [ 'avg' ]]
+    HUM= ['avg(hum)', ['avg'], 'hum', ['avg']]
+    DEW= ['avg(dew_point)', ['avg'], 'dew_point', ['avg']]
+    WIND= ['avg(wind), max(wind_gust)', ['avg', 'max'], 'wind, wind_gust', ['avg', 'max']]
+    PRESS = ['avg(pressure)', ['avg'], 'pressure', ['avg']]
+    RAIN= ['sum(rain), avg(rain_rate)', ['fall', 'rate'], 'rain, rain_rate', ['fall', 'rate']]
+    UV= ['max(uv_index)', ['index'], 'uv_index', ['index']]
 
     measure_map = {
         'temp': TEMP,
@@ -60,8 +65,8 @@ class DatabaseDataSource(object):
     }    
 
     url = None
-    username = 'sysdba'
-    password = 'masterkey'
+    username = None
+    password = None
     table = 'METEO'
     slice = 'hour'
     span = 24
@@ -89,6 +94,11 @@ class DatabaseDataSource(object):
         return (key, date_format)
 
     def execute(self,data={}, context={}):
+
+        config = DatabaseConfig()
+        if context.has_key('database'):
+            config.__dict__.update(context['database'])
+        config.__dict__.update(self.__dict__)  
 
         conc = self.conc
         lpa = self.lpa
@@ -174,23 +184,30 @@ class DatabaseDataSource(object):
                 
         select.write("SELECT "+key+" AS slice")
 
+        if slice == "minute":
+            measure_index = 2
+        else:
+            measure_index = 0
+
         row_length=1
         for measure in self.measures:
             if self.measure_map.has_key(measure):
                 select.write(", ")
-                select.write(self.measure_map[measure][0])         
-                row_length = row_length + self.measure_map[measure][1]    
+                select.write(self.measure_map[measure][measure_index])
+                row_length = row_length + len(self.measure_map[measure][measure_index+1])
 
         select.write(" FROM "+self.table + where_clause )
         
-        if not slice == "sample":
+        if slice == "minute":
+            select.write(" ORDER BY "+self.timestamp_field)
+        else:
             select.write(" GROUP BY slice")
+            select.write(" ORDER BY MIN("+self.timestamp_field+")")
         
-        select.write(" ORDER BY MIN("+self.timestamp_field+")")
-        
-        db = FirebirdDB(self.url)
+        db = FirebirdDB(config.url, config.username, config.password)
         db.connect()
         try:
+            self.logger.debug(select.getvalue())
             result = db.select(select.getvalue())   
         finally:
             db.disconnect()
@@ -211,10 +228,26 @@ class DatabaseDataSource(object):
                     result.append(r)
                 d = delta(d, 1, slice)
         
-        for row in result:
-            print repr(row)
-
-        self.logger.debug(select.getvalue())
+        result_data = {}
+        result_data.update(data)
+        items = []
+        labels = []
+        
+        for measure in self.measures:
+            if self.measure_map.has_key(measure):
+                key = measure
+                result_data[key]={ 'series': {} }            
+                for serie in self.measure_map[measure][measure_index+1]:
+                    result_data[key]['series'][serie] = []
+                    result_data[key]['series']['lbl'] = labels
+                    items.append((key, serie))
+        
+        for row in result:            
+            labels.append(row[0])
+            for item in range(0, row_length-1):
+                result_data[items[item][0]]['series'][items[item][1]].append(row[item+1])
+            
+        return result_data
 
 def parse(isodate):
     if len(isodate) == 10:
@@ -286,8 +319,8 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     ds = DatabaseDataSource()
     ds.url = 'localhost:/var/lib/firebird/2.0/data/wfrog.db'
-    ds.slice = 'hour'
-    ds.span = 10
+    ds.slice = 'day'
+    ds.span = 4
     data = {}
-    data['time_begin'] = '2009-10-27 14:00:00'
+    data['time_begin'] = '2009-11-01'
     ds.execute(data)
