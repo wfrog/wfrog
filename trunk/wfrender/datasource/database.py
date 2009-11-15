@@ -19,6 +19,224 @@
 import kinterbasdb
 from StringIO import StringIO
 import sys
+import logging
+import datetime
+
+class DatabaseDataSource(object):
+    """
+    Queries a database for consolidated data.
+    """
+
+    logger = logging.getLogger("datasource.database")
+
+    timestamp_field = "TIMESTAMP_LOCAL"
+
+    separator = '.'
+    switch = False
+    conc = chr(124)*2
+
+    BEFORE=1
+    AFTER=2
+
+    lpa="lpad("
+    lpz=",2,'0')"
+
+    TEMP= ['avg(temp) as temp_avg, min(temp) as temp_min, max(temp) as temp_max', 3]
+    HUM= ['avg(hum) as hum_avg', 1]
+    DEW= ['avg(dew_point) as dew_avg', 1]
+    WIND= ['avg(wind) as wind_avg, max(wind_gust) as wind_gust', 2]
+    PRESS = ['avg(pressure) as press_avg', 1]
+    RAIN= ['sum(rain) as rain_sum, avg(rain_rate) as rain_rate', 2]
+    UV= ['avg(uv_index) as uv_avg', 1]
+
+    measure_map = {
+        'temp': TEMP,
+        'hum': HUM,
+        'dew': DEW,
+        'wind': WIND,
+        'press': PRESS,
+        'rain': RAIN,
+        'uv': UV
+    }    
+
+    url = None
+    username = 'sysdba'
+    password = 'masterkey'
+    table = 'METEO'
+    slice = 'hour'
+    span = 24
+    measures = [ 'temp', 'hum', 'dew', 'wind', 'sector', 'press', 'rain', 'uv' ]
+    holes = True
+
+    def get_key(self, p, span, key='', date_format=''):
+        (sql, sep, max_span, next, pos, df) = (p[0], p[1], p[2], p[3], p[4], p[5])
+
+        actual_sep = ''
+        if span > max_span:
+            (key, date_format) = self.get_key(next, span / max_span, key, date_format)
+            actual_sep=sep            
+        if not actual_sep == '':
+            db_sep = self.conc+"'"+actual_sep+"'"+self.conc
+        else:
+            db_sep=''
+                                 
+        if pos == self.AFTER:
+            key = key + db_sep + sql
+            date_format = date_format + actual_sep + df
+        else:
+            key = sql + db_sep + key
+            date_format = df + actual_sep + date_format
+        return (key, date_format)
+
+    def execute(self,data={}, context={}):
+
+        conc = self.conc
+        lpa = self.lpa
+        lpz = self.lpz
+        separator = self.separator
+        timestamp_field = self.timestamp_field
+        switch = self.switch
+        holes = self.holes
+        
+        begin = parse(data['time_begin']) if data.has_key('time_begin') else None
+        end = parse(data['time_end']) if data.has_key('time_end') else None
+        span = data['time_span'] if data.has_key('time_span') else self.span
+        slice = data['time_slice'] if data.has_key('time_slice') else self.slice
+
+        YEAR=[
+            "EXTRACT(YEAR FROM "+timestamp_field+")",
+            '',
+            sys.maxint,
+            None, None, "%Y"]
+
+        MONTH=[
+            lpa+"EXTRACT(MONTH FROM "+timestamp_field+")"+lpz+conc+"'"+separator+"'"+conc+"EXTRACT(YEAR FROM "+timestamp_field+")",
+            '',
+            sys.maxint,
+            None, self.BEFORE, "%m"+separator+"%Y"]
+
+        DAY=[
+            lpa+"EXTRACT(" + ("DAY" if not switch else "MONTH")+" FROM "+timestamp_field+")"+lpz+conc+"'.'"+conc+lpa+"EXTRACT("+("MONTH" if not switch else "DAY")+" FROM "+timestamp_field+")"+lpz,
+            separator,
+            365,
+            YEAR, self.BEFORE if not switch else self.AFTER, "%d"+separator+"%m"]
+
+        HOUR=[
+            lpa+"EXTRACT(HOUR FROM "+timestamp_field+")"+lpz+conc+"':00'",
+            ' ',
+            24,
+            DAY, self.AFTER, "%H:00"]
+
+        MINUTE=[
+            lpa+"EXTRACT(HOUR FROM "+timestamp_field+")"+lpz+conc+"':'"+conc+lpa+"EXTRACT(MINUTE FROM "+timestamp_field+")"+lpz,
+            ' ',
+            60*24,
+            DAY, self.AFTER, "%H:%M"]
+
+        slices = {
+            'minute': MINUTE,
+            'hour': HOUR,
+            'day': DAY,
+            'month': MONTH,
+            'year': YEAR }
+
+        if begin:
+            where_clause = " WHERE " + timestamp_field + ">='" + format(begin) + "'"
+            if end:
+                where_clause = where_clause + " AND " + timestamp_field + "<='" + format(end) + "'"
+                span=sys.maxint # TODO: calculate exact span
+            else:                
+                if span:
+                    end=delta(begin, span, slice)
+                    where_clause = where_clause + " AND " + timestamp_field + "<='" + format(end) + "'"
+                else:
+                    end=datetime.datetime.now()
+                    span=sys.maxint # TODO: calculate exact span
+        else:
+            if end:
+                if span:
+                    begin = delta(end, -span, slice)
+                    where_clause = " WHERE "+timestamp_field + ">='" + format(begin) + " AND " 
+                    where_clause = where_clause + timestamp_field + "<='" + format(end) + "'"
+                else:
+                    span=sys.maxint # TODO: calculate exact span
+            else:                
+                end=datetime.datetime.now()
+                begin=delta(datetime.datetime.now(), -span, slice)
+                if span:
+                    where_clause = " WHERE "+timestamp_field + ">='" + format(begin) + "'"         
+                else:
+                    span=sys.maxint # TODO: calculate exact span
+
+        (key, date_format) = self.get_key(slices[slice], span)
+
+        select = StringIO()
+                
+        select.write("SELECT "+key+" AS slice")
+
+        row_length=1
+        for measure in self.measures:
+            if self.measure_map.has_key(measure):
+                select.write(", ")
+                select.write(self.measure_map[measure][0])         
+                row_length = row_length + self.measure_map[measure][1]    
+
+        select.write(" FROM "+self.table + where_clause )
+        
+        if not slice == "sample":
+            select.write(" GROUP BY slice")
+        
+        select.write(" ORDER BY MIN("+self.timestamp_field+")")
+        
+        db = FirebirdDB(self.url)
+        db.connect()
+        try:
+            result = db.select(select.getvalue())   
+        finally:
+            db.disconnect()
+        
+        if holes:
+            map = {}
+            for row in result:
+                map[row[0]]=row
+                          
+            result = []
+            d = begin
+            while d <= end:
+                df = d.strftime(date_format)
+                if map.has_key(df):
+                    result.append(map[df])
+                else:
+                    r = tuple([df]+([None]*(row_length-1)))
+                    result.append(r)
+                d = delta(d, 1, slice)
+        
+        for row in result:
+            print repr(row)
+
+        self.logger.debug(select.getvalue())
+
+def parse(isodate):
+    if len(isodate) == 10:
+        return datetime.datetime.strptime(isodate, "%Y-%m-%d")
+    else:
+        return datetime.datetime.strptime(isodate, "%Y-%m-%d"+isodate[10]+"%H:%M:%S")
+
+def format(d):
+    return d.isoformat(' ')
+
+def delta(d, n, slice):
+    d2=d.replace(microsecond=0)
+    if slice == 'minute':
+        return d2+datetime.timedelta(0,n*60)
+    if slice == 'hour':
+        return d2+datetime.timedelta(0,n*3600)
+    if slice == 'day':
+        return d2+datetime.timedelta(n)
+    if slice == 'month':
+        return d2+datetime.timedelta(n*31) # TODO: calculate exact start of month
+    if slice == 'year':
+        return d2+datetime.timedelta(n*365) # TODO: calculate exact start of year
 
 kinterbasdb.init(type_conv=0)
 
@@ -64,124 +282,12 @@ class FirebirdDB():
         except:
             pass
 
-
-class DatabaseDataSource(object):
-    """
-    Queries a database for consolidated data.
-    """
-
-    timestamp_field = "TIMESTAMP_LOCAL"
-
-    separator = '.'
-    switch = False
-    conc = chr(124)*2
-
-    BEFORE=1
-    AFTER=2
-
-    lpa="lpad("
-    lpz=",2,'0')"
-
-    YEAR=[
-        "EXTRACT(YEAR FROM "+timestamp_field+")",
-        '',
-        sys.maxint,
-        None, None]
-
-    MONTH=[
-        lpa+"EXTRACT(MONTH FROM "+timestamp_field+")"+lpz+conc+"'"+separator+"'"+conc+"EXTRACT(YEAR FROM "+timestamp_field+")",
-        '',
-        sys.maxint,
-        None, BEFORE]
-
-    DAY=[
-        lpa+"EXTRACT(" + ("DAY" if not switch else "MONTH")+" FROM "+timestamp_field+")"+lpz+conc+"'.'"+conc+lpa+"EXTRACT("+("MONTH" if not switch else "DAY")+" FROM "+timestamp_field+")"+lpz,
-        conc+"'"+separator+"'"+conc,
-        365,
-        YEAR, BEFORE if not switch else AFTER]
-
-    HOUR=[
-        lpa+"EXTRACT(HOUR FROM "+timestamp_field+")"+lpz+conc+"':00'",
-        conc+"' '"+conc,
-        24,
-        DAY, AFTER]
-
-    MINUTE=[
-        lpa+"EXTRACT(HOUR FROM "+timestamp_field+")"+lpz+conc+"':'"+conc+lpa+"EXTRACT(MINUTE FROM "+timestamp_field+")"+lpz,
-        conc+"' '"+conc,
-        60*24,
-        DAY, AFTER]
-
-    periods = {
-        'minute': MINUTE,
-        'hour': HOUR,
-        'day': DAY,
-        'month': MONTH,
-        'year': YEAR }
-
-    TEMP= ['avg(temp) as temp_avg, min(temp) as temp_min, max(temp) as temp_max']
-    HUM= ['avg(hum) as hum_avg']
-    DEW= ['avg(dew_point) as dew_avg']
-    WIND= ['avg(wind) as wind_avg, max(wind_gust) as wind_gust']
-    PRESSURE= ['avg(pressure) as pressure_avg']
-    RAIN= ['sum(rain) as rain_sum, avg(rain_rate) as rain_rate']
-    UV= ['avg(uv_index) as uv_avg']
-
-    measure_list = (TEMP, HUM, DEW, WIND, PRESSURE, RAIN, UV)
-
-    url = None
-    username = 'sysdba'
-    password = 'masterkey'
-    table = 'METEO'
-    period = 'hour'
-    span = 24
-    measures = [ TEMP, HUM, DEW, WIND, PRESSURE, RAIN, UV ]
-
-    def get_key(self, p, span, key):
-        (sql, sep, max_span, next, pos) = (p[0], p[1], p[2], p[3], p[4])
-
-        actual_sep = ''
-        if span > max_span:
-            key = self.get_key(next, span / max_span, key)
-            actual_sep=sep
-        if pos == self.AFTER:
-            key = key + actual_sep + sql
-        else:
-            key = sql + actual_sep + key
-        return key
-
-    def execute(self,data={}, context={}):
-
-        start = False
-        stop = False
-
-        key = self.get_key(self.periods[self.period], self.span, "")
-
-        select = StringIO()
-        select.write("SELECT "+key+" AS PERIOD")
-
-        for measure in self.measures:
-            select.write(", ")
-            select.write(measure[0])
-
-        select.write(" FROM "+self.table)#+" WHERE ... ")
-        select.write(" GROUP BY PERIOD ORDER BY MIN("+self.timestamp_field+")")
-
-        print select.getvalue()
-        
-        db = FirebirdDB(self.url)
-        db.connect()
-        try:
-            for row in db.select(select.getvalue()):
-                print repr(row)
-        finally:
-            db.disconnect()
-        
-
-ds = DatabaseDataSource()
-ds.url = 'localhost:/var/lib/firebird/2.0/data/wfrog.db'
-ds.period = 'day'
-ds.span = 30
-ds.switch=True
-ds.execute()
-
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
+    ds = DatabaseDataSource()
+    ds.url = 'localhost:/var/lib/firebird/2.0/data/wfrog.db'
+    ds.slice = 'hour'
+    ds.span = 10
+    data = {}
+    data['time_begin'] = '2009-10-27 14:00:00'
+    ds.execute(data)
