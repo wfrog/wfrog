@@ -18,7 +18,7 @@
 
 from xml.etree import ElementTree
 from time import struct_time, strftime
-import mx.DateTime
+fromt datetime import datetime
 
 def format(obj, time_format):
     if isinstance(obj, int):
@@ -29,7 +29,7 @@ def format(obj, time_format):
         return strftime(time_format, obj)
     elif isinstance(obj, (str, unicode)):
         return obj.strip()
-    elif isinstance(obj, type(mx.DateTime.DateTime(2000))):
+    elif isinstance(obj, datetime):
         return obj.strftime(time_format)
     else:
         return "%r" % obj
