@@ -59,6 +59,7 @@ levels = {'debug': logging.DEBUG,
           'critical': logging.CRITICAL}
 logger.setLevel(levels.get(LOG_LEVEL.lower(), logging.WARNING))
 logger.info("WxLogger INIT")
+logger.debug("Log level is debug")
 
 ## Main
 if WEATHER_STATION == 'WMR928NX':
