@@ -26,19 +26,28 @@
 
 CONFIG_FILE = 'WxLogger.cfg'
 
+import optparse
+
+opt_parser = optparse.OptionParser()
+opt_parser.add_option("-f", "--file", dest="config", default=CONFIG_FILE,
+               help="Configuration file. Defaults to '" + CONFIG_FILE + "'", metavar="CONFIG_FILE")
+(options, args) = opt_parser.parse_args()
+
 ## Configuration setup
 from ConfigParser import RawConfigParser
 config = RawConfigParser()
-config.read(CONFIG_FILE)
+config.read(options.config)
 LOG_FILENAME = config.get('WxLogger','LOG_FILENAME')
 LOG_LEVEL = config.get('WxLogger','LOG_LEVEL')
 WEATHER_STATION = config.get('WxLogger','WEATHER_STATION')
+LOG_SIZE = config.get('WxLogger','LOG_SIZE')
+LOG_BACKUPS = config.get('WxLogger','LOG_BACKUPS')
 
 ## Logging setup
 import logging, logging.handlers
 logger = logging.getLogger('WxLogger')
 handler = logging.handlers.RotatingFileHandler(
-                      filename=LOG_FILENAME,  maxBytes=5242880, backupCount=5)
+                      filename=LOG_FILENAME,  maxBytes=int(LOG_SIZE), backupCount=int(LOG_BACKUPS))
 formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 handler.setFormatter(formatter)
 
