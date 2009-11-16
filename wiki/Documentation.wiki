@@ -27,11 +27,11 @@ sudo apt-get install python-setuptools     # Python setup tools for `easy_instal
 sudo apt-get install firebird2.1-super     # Firebird database 2.1 or
 #sudo apt-get install firebird2.0-super    # Firebird database 2.0 
 sudo apt-get install python-kinterbasdb    # Python binding for firebird
+sudo apt-get install python-pyusb          # USB
 }}}
 
 *Python eggs*
 {{{
-sudo easy_install pyusb                    # USB
 sudo easy_install yaml                     # Config files
 sudo easy_install pygooglechart            # Chart rendering
 sudo easy_install cheetah                  # Template engine
