@@ -104,13 +104,13 @@ class WMRS200Reader (Thread):
                 if errors > 10:
                     exit(1)
                 
-                input_buffer += packet[1:packet[0]+1]
+            input_buffer += packet[1:packet[0]+1]
 
-                if packet != None:
-                    if len(packet) > 0:
-                        input_buffer += packet[1:packet[0]+1]
-                        #logging.debug("USB RAW DATA: %s" % self._list2bytes(packet))
- 
+            if packet != None:
+                if len(packet) > 0:
+                    input_buffer += packet[1:packet[0]+1]
+                    #logging.debug("USB RAW DATA: %s" % self._list2bytes(packet))
+
             if len(input_buffer) > 20:
                 errors = 0
                 # Using two bytes of 0xFF as record separators, extract as many
