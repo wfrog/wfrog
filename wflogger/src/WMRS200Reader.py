@@ -100,8 +100,8 @@ class WMRS200Reader (Thread):
                 self._logger.error("Exception reading interrupt: "+ str(e))
                 self._logger.error(repr(sys.exc_info()[2]))
                 errors = errors + 1
-				time.sleep(3)
-		        if errors > 10:
+                time.sleep(3)
+                if errors > 10:
                     exit(1)
                 
                 input_buffer += packet[1:packet[0]+1]
