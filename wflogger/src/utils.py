@@ -18,7 +18,7 @@
 
 from xml.etree import ElementTree
 from time import struct_time, strftime
-fromt datetime import datetime
+from datetime import datetime
 
 def format(obj, time_format):
     if isinstance(obj, int):
