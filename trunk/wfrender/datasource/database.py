@@ -205,11 +205,21 @@ class DatabaseDataSource(object):
             select.write(" GROUP BY slice")
             select.write(" ORDER BY MIN("+self.timestamp_field+")")
         
+        if measures.__contains__("sector"):
+            sector_select = "SELECT avg(wind), max(wind_gust), count(*) " +
+                where_clause +
+                " AND wind > 0 GROUP BY wind_dir"
+        
         db = FirebirdDB(config.url, config.username, config.password)
         db.connect()
         try:
             self.logger.debug(select.getvalue())
             result = db.select(select.getvalue())   
+            
+            if measures.__contains__("sector"):
+                self.logger.debug(sector_select)
+                sector_result = db.select(sector_select)   
+            
         finally:
             db.disconnect()
         
@@ -247,6 +257,18 @@ class DatabaseDataSource(object):
             labels.append(row[0])
             for item in range(0, row_length-1):
                 result_data[items[item][0]]['series'][items[item][1]].append(row[item+1])
+            
+        if measures.__contains__("sector"):
+            if not result_data.has_key('wind'):
+                result_data['wind'] = {}
+            result_data['wind']['sectors'] = {
+                "lbl" : ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'],
+                "freq" : [],
+                "avg" :  [],
+                "max" :  []
+            }
+            
+        # TODO: fill lists
             
         return result_data
 
