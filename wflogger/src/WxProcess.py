@@ -27,6 +27,12 @@ import sys, time, kinterbasdb, logging
 from threading import Thread
 from utils import write2xml
 
+# Remove the dependency to mx.DateTime
+try:
+    kinterbasdb.init(type_conv=0)
+except:
+    pass
+
 ## Firebird database driver
 class FbDB():
     def __init__(self, bdd, user='sysdba', password='masterkey', charset='ISO8859_1'):
