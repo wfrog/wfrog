@@ -32,7 +32,7 @@ sudo apt-get install python-pyusb          # USB
 
 *Python eggs*
 {{{
-sudo easy_install yaml                     # Config files
+sudo easy_install pyyaml                   # Config files
 sudo easy_install pygooglechart            # Chart rendering
 sudo easy_install cheetah                  # Template engine
 sudo easy_install webcolors                # Color names for chart
