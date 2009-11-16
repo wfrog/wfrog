@@ -59,6 +59,7 @@ sudo dpkg-reconfigure firebird2.0-super
 {{{
 sudo mkdir /var/lib/firebird/2.0/data
 /usr/lib/firebird/2.0/bin/isql -u sysdba -p masterkey
+cd wflogger/db
 SQL> create database 'localhost:/var/lib/firebird/2.0/data/wfrog.db';
 SQL> IN db.sql;
 }}}
