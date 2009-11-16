@@ -104,8 +104,6 @@ class WMRS200Reader (Thread):
                 if errors > 10:
                     exit(1)
                 
-            input_buffer += packet[1:packet[0]+1]
-
             if packet != None:
                 if len(packet) > 0:
                     input_buffer += packet[1:packet[0]+1]
