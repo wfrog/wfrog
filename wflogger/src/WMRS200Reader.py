@@ -29,6 +29,8 @@
 import sys, usb, logging
 from WMRS200Parser import WMRS200Parser
 from threading import Thread
+import time
+import sys
 
 vendor_id  = 0xfde
 product_id = 0xca01
@@ -88,19 +90,29 @@ class WMRS200Reader (Thread):
 
         input_buffer = []
 
+        errors = 0
         while True:
             try:
                 packet = devh.interruptRead(usb.ENDPOINT_IN + 1,  # endpoint number 
                                             0x0000008,            # bytes to read
                                             10000)                # timeout
+            except Exception, e:
+                self._logger.error("Exception reading interrupt: "+ str(e))
+                self._logger.error(repr(sys.exc_info()[2]))
+                errors = errors + 1
+				time.sleep(3)
+		        if errors > 10:
+                    exit(1)
+                
+                input_buffer += packet[1:packet[0]+1]
+
                 if packet != None:
                     if len(packet) > 0:
                         input_buffer += packet[1:packet[0]+1]
                         #logging.debug("USB RAW DATA: %s" % self._list2bytes(packet))
-            except:
-                self._logger.error("Exception reading interrupt")
-
+ 
             if len(input_buffer) > 20:
+                errors = 0
                 # Using two bytes of 0xFF as record separators, extract as many
                 # full messages as possible and add them to the message queue.
                 while True:
