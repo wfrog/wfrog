@@ -40,7 +40,7 @@ def rmin(a,b):
         if result == None:
             result = 0
     return result
-    
+
 def amin(a):
     m=sys.maxint
     for i in a:
@@ -53,13 +53,13 @@ class ChartConfig(object):
     # Graph attributes
     width = 200
     height = 125
-    bgcolor = '00000000'    
+    bgcolor = '00000000'
     y_margin = [ 2, 2 ]
     axes = 'on'
     ticks = 'on'
     legend = None
     legend_pos = 'b'
-    
+
     # Drawing
     color = 'orange'
     thickness = 1.5
@@ -70,29 +70,29 @@ class ChartConfig(object):
     dash = None
     intensity = 0.5
     interpolate = False
-            
+
     # Series
     area = None
     zero = None
     max = None
     min = None
-    last = None    
+    last = None
     marks = None
     space = 1.5 # Spacing between marks
 
     # Drawing order
     order = 0
-    
+
     # Wind Radar
     radius = 16 # max value for logarithmic scaling
     median = 2  # value in the middle of the graph
-        
+
     tail = None
-    arrow = { }    
+    arrow = { }
     trace = None
     ratio = 3  # Size i
     length = 5 # Number of traces
-    
+
     sectors = None
 
     gust = None
@@ -100,11 +100,11 @@ class ChartConfig(object):
     lines = None
     areas = None
     beaufort = None
-    
+
     def __missing__(item):
         return None # avoid exception when item is missing
 
-class GoogleChartRenderer(object):    
+class GoogleChartRenderer(object):
     """
     Renders the data as a google chart URL.
 
@@ -115,7 +115,7 @@ class GoogleChartRenderer(object):
         their options.
 
     """
-    
+
     series = None
     labels = None
 
@@ -127,15 +127,15 @@ class GoogleChartRenderer(object):
         assert renderer.is_dict(self.series), "'chart.series' must be a key/value dictionary"
 
         # merge builtin defaults, context and renderer config
-        config = ChartConfig()       
+        config = ChartConfig()
         if context.has_key('chart'):
             config.__dict__.update(context['chart'])
-        config.__dict__.update(self.__dict__)        
+        config.__dict__.update(self.__dict__)
 
         # create the chart
-        chart = SimpleLineChart(config.width, config.height)        
+        chart = SimpleLineChart(config.width, config.height)
 
-        colors = []        
+        colors = []
         legend_set = False
         legend = []
 
@@ -147,9 +147,9 @@ class GoogleChartRenderer(object):
         for key, serie in self.series.iteritems():
             serie_config = ChartConfig()
             serie_config.__dict__.update(config.__dict__)
-            serie_config.__dict__.update(serie)            
+            serie_config.__dict__.update(serie)
             ordered_series.append( (serie_config.order, key, serie) )
-            
+
         ordered_series.sort( cmp=lambda x,y: cmp(x[0],y[0]) )
 
         ordered_keys = []
@@ -163,12 +163,10 @@ class GoogleChartRenderer(object):
             serie_config.__dict__.update(config.__dict__)
             serie_config.__dict__.update(serie)
             serie_data = data[key.split('.')[0]]['series'][key.split('.')[1]]
-            
+
             if serie_config.interpolate:
                 serie_data = interpolate(serie_data)
-            
-            chart.add_data(serie_data)
-                      
+
             # Compute min and max value for the serie and the whole chart
             min_data = amin(serie_data)
             chart_min = rmin(chart_min, min_data)
@@ -181,52 +179,53 @@ class GoogleChartRenderer(object):
             if serie_data.__contains__(max_data):
                 max_index = serie_data.index(max_data)
             else:
-                max_index = None                    
-                        
-            colors.append(_valid_color(serie_config.color))            
-            
+                max_index = None
+
+            chart.add_data(serie_data)
+            colors.append(_valid_color(serie_config.color))
+
             if serie_config.max and max_index :
                 max_config = ChartConfig()
-                max_config.__dict__.update(serie_config.__dict__)                
+                max_config.__dict__.update(serie_config.__dict__)
                 max_config.__dict__.update(serie_config.max)
                 chart.add_marker(index, max_index, 't'+str(max_data), _valid_color(max_config.text), max_config.size)
                 chart.add_marker(index, max_index, max_config.style, _valid_color(max_config.color), max_config.thickness)
 
             if serie_config.min and min_index:
                 min_config = ChartConfig()
-                min_config.__dict__.update(serie_config.__dict__)                
+                min_config.__dict__.update(serie_config.__dict__)
                 min_config.__dict__.update(serie_config.min)
                 chart.add_marker(index, min_index, 't'+str(min_data), _valid_color(min_config.text), min_config.size)
                 chart.add_marker(index, min_index, min_config.style, _valid_color(min_config.color), min_config.thickness)
-           
+
             if serie_config.last:
                 last_config = ChartConfig()
-                last_config.__dict__.update(serie_config.__dict__)                
+                last_config.__dict__.update(serie_config.__dict__)
                 last_config.__dict__.update(serie_config.last)
                 last_index=len(serie_data)-1
                 last_data = serie_data[last_index]
                 if last_data:
                     chart.add_marker(index, last_index, 't'+str(last_data), _valid_color(last_config.text), last_config.size)
                     chart.add_marker(index, last_index, last_config.style, _valid_color(last_config.color), last_config.thickness)
-           
+
             if serie_config.area:
                 fill_config = ChartConfig()
                 fill_config.__dict__.update(serie_config.__dict__)
                 fill_config.__dict__.update(serie_config.area)
                 to = ordered_keys.index(fill_config.to)
                 chart.add_fill_range(_valid_color(fill_config.color), index, to)
-            
+
             if serie_config.dash:
                 chart.set_line_style(index, serie_config.thickness, serie_config.dash, serie_config.dash)
             else:
                 chart.set_line_style(index, serie_config.thickness)
-            
+
             if serie_config.legend:
                 legend.append(serie_config.legend)
                 legend_set = True
             else:
                 legend.append('')
-            
+
             if serie_config.marks:
                 mark_config = ChartConfig()
                 mark_config.__dict__.update(serie_config.__dict__)
@@ -236,21 +235,21 @@ class GoogleChartRenderer(object):
                     if not m:
                         mark_data[i] = " "
                 density = max(1.0, 1.0 * mark_config.space * len("".join(mark_data))*mark_config.size  / config.width)
-          
+
                 for i, v in enumerate(mark_data):
-                    if (i +1) % round(density) == 0:         
+                    if (i +1) % round(density) == 0:
                         if serie_data[i] != 0:
                             text = str(mark_data[i])
                         else:
-                            text = " "                        
-                        chart.add_marker(index, i, 't'+text, _valid_color(mark_config.color), mark_config.size)                
-        
+                            text = " "
+                        chart.add_marker(index, i, 't'+text, _valid_color(mark_config.color), mark_config.size)
+
             index = index + 1
 
         # Compute vertical range
-        chart.y_range=[chart_min-config.y_margin[0], chart_max+config.y_margin[1]]     
-        if config.axes == 'on':            
-            chart.set_axis_range(Axis.LEFT, chart_min-config.y_margin[0], chart_max+config.y_margin[1])        
+        chart.y_range=[chart_min-config.y_margin[0], chart_max+config.y_margin[1]]
+        if config.axes == 'on':
+            chart.set_axis_range(Axis.LEFT, chart_min-config.y_margin[0], chart_max+config.y_margin[1])
             chart.set_axis_style(0, _valid_color(config.text), config.size, 0, Axis.BOTH if config.ticks == 'on' else Axis.AXIS_LINES)
         else:
             chart.set_axis_labels(Axis.LEFT, [])
@@ -265,27 +264,27 @@ class GoogleChartRenderer(object):
             chart.set_line_style(index, zero_config.thickness)
 
         chart.set_colours(colors)
-        chart.fill_solid(Chart.BACKGROUND, _valid_color(config.bgcolor))        
-        
+        chart.fill_solid(Chart.BACKGROUND, _valid_color(config.bgcolor))
+
         if legend_set:
             chart.set_legend(legend)
             chart.set_legend_position(config.legend_pos)
 
         if self.labels:
             labels_data = data[self.labels.split('.')[0]]['series'][self.labels.split('.')[1]]
-            if config.axes == 'on':               
+            if config.axes == 'on':
                 density = 1.0 * len("".join(labels_data))*config.size  / config.width
-          
+
                 if density > LABEL_DENSITY_THRESHOLD:
                     for i, v in enumerate(labels_data):
                         if i % round(density) != 0:
                             labels_data[i] = ' '
-                chart.set_axis_labels(Axis.BOTTOM, labels_data)                
+                chart.set_axis_labels(Axis.BOTTOM, labels_data)
                 chart.set_axis_style(1, _valid_color(config.text), config.size, 0, Axis.BOTH if config.ticks == 'on' else Axis.AXIS_LINES)
             else:
-                chart.set_axis_labels(Axis.BOTTOM, []) 
+                chart.set_axis_labels(Axis.BOTTOM, [])
                 chart.set_axis_style(1, _valid_color(config.text), config.size, 0, Axis.TICK_MARKS, _valid_color(config.bgcolor))
-                
+
         return chart.get_url()+"&chma=10,10,10,10" # add a margin
 
 class GoogleChartWindRadarRenderer(object):
@@ -296,75 +295,75 @@ class GoogleChartWindRadarRenderer(object):
     key = 'wind'
 
     def render(self,data={}, context={}):
-        
+
         # Prepare config
-        config = ChartConfig()       
+        config = ChartConfig()
         if context.has_key('chart'):
             config.__dict__.update(context['chart'])
-        config.__dict__.update(self.__dict__)  
-           
+        config.__dict__.update(self.__dict__)
+
         tail_config = ChartConfig()
-        tail_config.__dict__.update(config.__dict__)                    
-        if config.tail:        
+        tail_config.__dict__.update(config.__dict__)
+        if config.tail:
             tail_config.__dict__.update(config.tail)
         else:
             tail_config.color = "00000000"
-        
+
         arrow_config = ChartConfig()
-        arrow_config.__dict__.update(config.__dict__)      
-        arrow_config.text = "00000000"  
-        if config.arrow:      
+        arrow_config.__dict__.update(config.__dict__)
+        arrow_config.text = "00000000"
+        if config.arrow:
             arrow_config.__dict__.update(config.arrow)
         else:
-            arrow_config.color = "00000000"      
+            arrow_config.color = "00000000"
 
         gust_config = ChartConfig()
-        gust_config.__dict__.update(config.__dict__)             
-        gust_config.text = "00000000"  
-        if config.max:      
+        gust_config.__dict__.update(config.__dict__)
+        gust_config.text = "00000000"
+        if config.max:
             gust_config.__dict__.update(config.max)
         else:
-            gust_config.color = "00000000"               
+            gust_config.color = "00000000"
 
         trace_config = ChartConfig()
-        trace_config.__dict__.update(config.__dict__)      
-        if config.trace:      
-            trace_config.__dict__.update(config.trace)  
+        trace_config.__dict__.update(config.__dict__)
+        if config.trace:
+            trace_config.__dict__.update(config.trace)
 
         sectors_config = ChartConfig()
-        sectors_config.__dict__.update(config.__dict__)      
-        if config.sectors:      
+        sectors_config.__dict__.update(config.__dict__)
+        if config.sectors:
             sectors_config.__dict__.update(config.sectors)
-            
+
         bars_config = ChartConfig()
-        bars_config.__dict__.update(config.__dict__)      
-        if config.bars:      
-            bars_config.__dict__.update(config.bars)        
+        bars_config.__dict__.update(config.__dict__)
+        if config.bars:
+            bars_config.__dict__.update(config.bars)
 
         lines_config = ChartConfig()
-        lines_config.__dict__.update(config.__dict__)      
-        if config.lines:      
+        lines_config.__dict__.update(config.__dict__)
+        if config.lines:
             lines_config.__dict__.update(config.lines)
         else:
             lines_config.color = "00000000"
             lines_config.gust = "00000000"
 
         areas_config = ChartConfig()
-        areas_config.__dict__.update(config.__dict__)      
-        if config.areas:      
-            areas_config.__dict__.update(config.areas)                
-        
+        areas_config.__dict__.update(config.__dict__)
+        if config.areas:
+            areas_config.__dict__.update(config.areas)
+
         beaufort_config = ChartConfig()
-        beaufort_config.__dict__.update(config.__dict__)      
-        if config.beaufort:      
-            beaufort_config.__dict__.update(config.beaufort)          
-        
+        beaufort_config.__dict__.update(config.__dict__)
+        if config.beaufort:
+            beaufort_config.__dict__.update(config.beaufort)
+
         # Prepare data
         current_noscale = data[self.key]['value']
         last_gust_noscale = data[self.key]['max']
         pos = int(round(data[self.key]['deg'] * 16 / 360.0))
 
-        max = config.median * 2        
+        max = config.median * 2
         current = self.scale(current_noscale, config.median, config.radius)
         last_gust_scaled = self.scale(last_gust_noscale, config.median, config.radius)
 
@@ -399,7 +398,7 @@ class GoogleChartWindRadarRenderer(object):
         chart = RadarChart(config.width, config.height, y_range=(0,max) )
         chart.add_data([0] * 2)
         chart.add_data(line)
-        chart.add_data(gust)        
+        chart.add_data(gust)
         chart.add_data(avg)
         chart.add_data(crown)
         chart.add_data(tail)
@@ -408,24 +407,24 @@ class GoogleChartWindRadarRenderer(object):
 
         if config.bars:
             chart.add_marker(2, -1, "v", _valid_color(bars_config.gust), bars_config.thickness, -1)
-            chart.add_marker(3, -1, "v", _valid_color(bars_config.color), bars_config.thickness, -1)        
-        
+            chart.add_marker(3, -1, "v", _valid_color(bars_config.color), bars_config.thickness, -1)
+
         if config.beaufort:
             chart.add_marker(0, "220:0.9", "@t"+str(beaufort(current_noscale)), _valid_color(beaufort_config.color) + "%02x" % (beaufort_config.intensity*255), rmin(config.height, config.width)-config.size*5, 0)
-        
-        colors = ["00000000", 
-            _valid_color(tail_config.color),  
-            _valid_color(lines_config.gust),            
+
+        colors = ["00000000",
+            _valid_color(tail_config.color),
+            _valid_color(lines_config.gust),
             _valid_color(lines_config.color),
-            "00000000", 
-            _valid_color(arrow_config.color), 
+            "00000000",
+            _valid_color(arrow_config.color),
             _valid_color(arrow_config.color),
             "00000000"]
 
         if config.sectors:
             for i in range(0,16):
                 sec = [0] * 16
-                avg = self.scale(data[self.key]['sectors']['avg'][i], config.median, config.radius)                
+                avg = self.scale(data[self.key]['sectors']['avg'][i], config.median, config.radius)
                 freq_value = data[self.key]['sectors']['freq'][i]*255
                 freq_value = rmin(255, (1+2*sectors_config.intensity) * freq_value)
                 freq = "%02x" % int(freq_value)
@@ -439,9 +438,9 @@ class GoogleChartWindRadarRenderer(object):
             minsize = trace_config.size / float(trace_config.ratio)
             maxsize = trace_config.size
             size = float(maxsize)
-            inc = (maxsize-minsize) / nbullet        
+            inc = (maxsize-minsize) / nbullet
             n = 0
-            for p in reversed(data[self.key]['series']['deg']):     
+            for p in reversed(data[self.key]['series']['deg']):
                 chart.add_marker(4, int(p/22.5), 'o', _valid_color(trace_config.color), size)
                 size = size - inc
                 n = n + 1
@@ -471,7 +470,7 @@ class GoogleChartWindRadarRenderer(object):
         chart.set_line_style(5, arrow_thickness)
         chart.set_line_style(6, arrow_thickness)
 
-        chart.fill_solid(Chart.BACKGROUND, _valid_color(config.bgcolor)) 
+        chart.fill_solid(Chart.BACKGROUND, _valid_color(config.bgcolor))
 
         return chart.get_url()
 
@@ -540,7 +539,7 @@ def interpolate(data):
     for i,val in enumerate(data):
         if not val:
             if last:                         # ignore leading None(s)
-                if not index:                # if first None 
+                if not index:                # if first None
                     index = i
                 count = count + 1
         else:
@@ -577,4 +576,4 @@ def beaufort(mps):
     if mps < 32.6:
         return 11
     return 12
-            
+
