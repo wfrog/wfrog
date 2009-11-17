@@ -1,0 +1,3 @@
+http://img0.gmodules.com/ig/images/weather/mist.png
+http://img0.gmodules.com/ig/images/weather/sunny.png
+http://img0.gmodules.com/ig/images/weather/mostly_sunny.png
