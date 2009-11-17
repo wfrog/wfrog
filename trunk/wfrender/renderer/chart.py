@@ -59,6 +59,7 @@ class ChartConfig(object):
     ticks = 'on'
     legend = None
     legend_pos = 'b'
+    nval = 100
 
     # Drawing
     color = 'orange'
@@ -163,7 +164,7 @@ class GoogleChartRenderer(object):
             serie_config.__dict__.update(config.__dict__)
             serie_config.__dict__.update(serie)
             serie_data = data[key.split('.')[0]]['series'][key.split('.')[1]]
-
+                          
             if serie_config.interpolate:
                 serie_data = interpolate(serie_data)
 
@@ -180,6 +181,8 @@ class GoogleChartRenderer(object):
                 max_index = serie_data.index(max_data)
             else:
                 max_index = None
+
+            serie_data = compress_to(serie_data, config.nval, min_index, max_index)
 
             chart.add_data(serie_data)
             colors.append(_valid_color(serie_config.color))
@@ -231,6 +234,7 @@ class GoogleChartRenderer(object):
                 mark_config.__dict__.update(serie_config.__dict__)
                 mark_config.__dict__.update(serie_config.marks)
                 mark_data = copy.copy(data[mark_config.serie.split('.')[0]]['series'][mark_config.serie.split('.')[1]])
+                mark_data = compress_to(mark_data, config.nval, min_index, max_index)
                 for i, m in enumerate(mark_data):
                     if not m:
                         mark_data[i] = " "
@@ -272,6 +276,7 @@ class GoogleChartRenderer(object):
 
         if self.labels:
             labels_data = data[self.labels.split('.')[0]]['series'][self.labels.split('.')[1]]
+            labels_data = compress_to(labels_data, config.nval, None, None)
             if config.axes == 'on':
                 density = 1.0 * len("".join(labels_data))*config.size  / config.width
 
@@ -359,15 +364,15 @@ class GoogleChartWindRadarRenderer(object):
             beaufort_config.__dict__.update(config.beaufort)
 
         # Prepare data
-        current_noscale = data[self.key]['value']
-        last_gust_noscale = data[self.key]['max']
-        pos = int(round(data[self.key]['deg'] * 16 / 360.0))
-
+        if data[self.key].has_key('value'):
+            current_noscale = data[self.key]['value']
+            last_gust_noscale = data[self.key]['max']
+            pos = int(round(data[self.key]['deg'] * 16 / 360.0))        
+            current = self.scale(current_noscale, config.median, config.radius)
+            last_gust_scaled = self.scale(last_gust_noscale, config.median, config.radius)
+            arrow_thickness = 0.3+3.0*arrow_config.thickness*current/max
+            
         max = config.median * 2
-        current = self.scale(current_noscale, config.median, config.radius)
-        last_gust_scaled = self.scale(last_gust_noscale, config.median, config.radius)
-
-        arrow_thickness = 0.3+3.0*arrow_config.thickness*current/max
 
         if config.bars or config.areas or config.sectors:
             avg = []
@@ -388,12 +393,13 @@ class GoogleChartWindRadarRenderer(object):
         last_gust = [0] * 16
         head = [0] * 16
 
-        line[pos] = max
-        tail[pos] = current
-        last_gust[pos] = last_gust_scaled
-        head[ (pos - 1 + 16) % 16 ] = current*0.6
-        head[ (pos + 16) % 16 ] = current*0.3
-        head[ (pos + 1) % 16 ] = current*0.6
+        if data[self.key].has_key('value'):
+            line[pos] = max
+            tail[pos] = current
+            last_gust[pos] = last_gust_scaled
+            head[ (pos - 1 + 16) % 16 ] = current*0.6
+            head[ (pos + 16) % 16 ] = current*0.3
+            head[ (pos + 1) % 16 ] = current*0.6
 
         chart = RadarChart(config.width, config.height, y_range=(0,max) )
         chart.add_data([0] * 2)
@@ -463,12 +469,20 @@ class GoogleChartWindRadarRenderer(object):
         chart.set_colours( colors )
         chart.set_axis_labels(Axis.BOTTOM, ['N', '', 'NE', '', 'E', '', 'SE', '', 'S', '', 'SW', '', 'W', '', 'NW', ''])
         chart.set_axis_style(0, _valid_color(config.text), 10, 0, 'l', _valid_color(config.bgcolor));
-        chart.set_line_style(1, tail_config.thickness)
+        if data[self.key].has_key('value'):
+            chart.set_line_style(1, tail_config.thickness)
+        else:
+            chart.set_line_style(1, 0)
         chart.set_line_style(2, lines_config.thickness)
         chart.set_line_style(3, lines_config.thickness)
         chart.set_line_style(4, 0)
-        chart.set_line_style(5, arrow_thickness)
-        chart.set_line_style(6, arrow_thickness)
+        if data[self.key].has_key('value'):
+            chart.set_line_style(5, arrow_thickness)
+            chart.set_line_style(6, arrow_thickness)
+        else:
+            chart.set_line_style(5, 0)
+            chart.set_line_style(6, 0)
+            
 
         chart.fill_solid(Chart.BACKGROUND, _valid_color(config.bgcolor))
 
@@ -550,6 +564,18 @@ def interpolate(data):
             last = val
     return result
 
+def compress_to(data, n, min_index, max_index):
+    while len(data) > n:
+        l = len(data)
+        d = l-n        # how many values to remove
+        r = l / d      # each r-th must be removed
+        print "compress "+str(l)+" to "+str(n)+" by "+str(r)
+        if r < 2:
+            r = 2
+        data = compress(data, r, min_index, max_index)
+        print "compressed to "+str(len(data))
+    return data
+
 def compress(data, ratio, min_index, max_index):
     result = []
     r = ratio
@@ -560,7 +586,7 @@ def compress(data, ratio, min_index, max_index):
             ext=v
         if v:
             last=v
-        if i % r == 0:
+        if not i % r == 0:
             if ext:
                 result.append(ext)
                 ext=None

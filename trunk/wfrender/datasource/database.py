@@ -205,14 +205,14 @@ class DatabaseDataSource(object):
             select.write(" GROUP BY slice")
             select.write(" ORDER BY MIN("+self.timestamp_field+")")
 
-        if measures.__contains__("sector"):
+        if self.measures.__contains__("sector"):
             sector = "22.5*(round(wind_dir/22.5))"
-            sector_select = "SELECT "+sector+", avg(wind), count(*) " +
-                where_clause +
+            sector_select = "SELECT "+sector+", avg(wind), count(*) " + \
+                " FROM "+self.table + where_clause + \
                 " AND wind > 0 GROUP BY "+sector
-            sector_gust = "22.5*(wind_gust_dir/22.5)"
-            sector_gust_select = "SELECT "+sector_gust+", max(wind_gust)" +
-                where_clause +
+            sector_gust = "22.5*(round(wind_gust_dir/22.5))"
+            sector_gust_select = "SELECT "+sector_gust+", max(wind_gust)" + \
+                " FROM "+self.table + where_clause + \
                 " AND wind > 0 GROUP BY "+sector_gust
 
         db = FirebirdDB(config.url, config.username, config.password)
@@ -221,7 +221,7 @@ class DatabaseDataSource(object):
             self.logger.debug(select.getvalue())
             result = db.select(select.getvalue())
 
-            if measures.__contains__("sector"):
+            if self.measures.__contains__("sector"):
                 self.logger.debug(sector_select)
                 sector_result = db.select(sector_select)
                 self.logger.debug(sector_gust_select)
@@ -265,7 +265,7 @@ class DatabaseDataSource(object):
             for item in range(0, row_length-1):
                 result_data[items[item][0]]['series'][items[item][1]].append(row[item+1])
 
-        if measures.__contains__("sector"):
+        if self.measures.__contains__("sector"):
             if not result_data.has_key('wind'):
                 result_data['wind'] = {}
             result_data['wind']['sectors'] = {
@@ -282,14 +282,14 @@ class DatabaseDataSource(object):
         for (d,v) in sector_gust_result:
             sector_gust_map[d]=v
 
-           for d in range(0, 16):
-               deg = 22.5*i
-            if sector_map.has_key(deg):
-                result_data['wind']['sectors']['avg'][i]=sector_map[deg][0];
-                result_data['wind']['sectors']['freq'][i]=sector_map[deg][0];
+            for i in range(0, 16):
+                deg = 22.5*i
+                if sector_map.has_key(deg):
+                    result_data['wind']['sectors']['avg'][i]=sector_map[deg][0];
+                    result_data['wind']['sectors']['freq'][i]=sector_map[deg][1];
 
-            if sector_gust_map.has_key(deg):
-                result_data['wind']['sectors']['gust'][i]=sector_gust_map[deg][0];
+                if sector_gust_map.has_key(deg):
+                    result_data['wind']['sectors']['max'][i]=sector_gust_map[deg];
 
         result_data['wind']['sectors']['freq'] = normalize(result_data['wind']['sectors']['freq'])
 
@@ -318,11 +318,13 @@ def delta(d, n, slice):
         return d2+datetime.timedelta(n*365) # TODO: calculate exact start of year
 
 def normalize(data):
-    sum = sum(data)
+    s = sum(data)
+    if s == 0:
+        return data
     result = []
     for d in data:
-        result.append(float(d)/sum)
-
+        result.append(float(d)/s)
+    return result
 
 try:
     kinterbasdb.init(type_conv=0)
@@ -346,6 +348,13 @@ class FirebirdDB():
                CSTRING(255) NULL, INTEGER, CSTRING(1) NULL \
                RETURNS CSTRING(255) FREE_IT \
                ENTRY_POINT 'IB_UDF_lpad' MODULE_NAME 'ib_udf'")
+        except:
+            pass             
+        try:
+            self._db.cursor().execute("DECLARE EXTERNAL FUNCTION Round \
+                INT BY DESCRIPTOR, INT BY DESCRIPTOR \
+                RETURNS PARAMETER 2 \
+                ENTRY_POINT 'fbround' MODULE_NAME 'fbudf'")
         except:
             pass
 

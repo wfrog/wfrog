@@ -13,8 +13,8 @@ renderer: !http
             renderers:
                 days: !data
                     source: !database 
-                        slice: minute
-                        span: 120
+                        slice: hour
+                        span: 365
                         
                     renderer: !multi
                         renderers:
@@ -44,14 +44,15 @@ renderer: !http
                                 serie: avg
                                 select: last
                 hours: !data
-                    #source: !hourly {period: 168}
-                    source: !simulator {}
+                    source: !database 
+                        slice: hour
+                        span: 60
                     renderer: !multi
                         renderers:
                             wind_chart: !chart                                
                                 series:
                                     wind.avg:                                        
-                                        marks: {serie: wind.dir, size: 10 } 
+                                        #marks: {serie: wind.dir, size: 10 } 
                                         interpolate: true      
                                     wind.max:
                                         interpolate: true
@@ -64,10 +65,10 @@ renderer: !http
                             wind_now: !windradar
                                 width: 125
                                 height: 125
-                                arrow: { show: true }   
-                                max: { color: EEAAAA, thickness: 4 }                             
-                                trace: { color: lightgray, size: 10, ratio: 3, length: 3 }
-                                beaufort: { color: lightgray, intensity: 0.3 }
+                            #    arrow: { show: true }   
+                            #    max: { color: EEAAAA, thickness: 4 }                             
+                            #    trace: { color: lightgray, size: 10, ratio: 3, length: 3 }
+                            #    beaufort: { color: lightgray, intensity: 0.3 }
                             wind_stat: !windradar
                                 width: 200
                                 height: 200
