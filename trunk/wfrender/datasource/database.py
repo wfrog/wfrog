@@ -25,7 +25,7 @@ import datetime
 class DatabaseConfig(object):
     url = None
     username = 'sysdba'
-    password = 'masterkey'    
+    password = 'masterkey'
 
 class DatabaseDataSource(object):
     """
@@ -62,7 +62,7 @@ class DatabaseDataSource(object):
         'press': PRESS,
         'rain': RAIN,
         'uv': UV
-    }    
+    }
 
     url = None
     username = None
@@ -79,12 +79,12 @@ class DatabaseDataSource(object):
         actual_sep = ''
         if span > max_span:
             (key, date_format) = self.get_key(next, span / max_span, key, date_format)
-            actual_sep=sep            
+            actual_sep=sep
         if not actual_sep == '':
             db_sep = self.conc+"'"+actual_sep+"'"+self.conc
         else:
             db_sep=''
-                                 
+
         if pos == self.AFTER:
             key = key + db_sep + sql
             date_format = date_format + actual_sep + df
@@ -98,7 +98,7 @@ class DatabaseDataSource(object):
         config = DatabaseConfig()
         if context.has_key('database'):
             config.__dict__.update(context['database'])
-        config.__dict__.update(self.__dict__)  
+        config.__dict__.update(self.__dict__)
 
         conc = self.conc
         lpa = self.lpa
@@ -107,7 +107,7 @@ class DatabaseDataSource(object):
         timestamp_field = self.timestamp_field
         switch = self.switch
         holes = self.holes
-        
+
         begin = parse(data['time_begin']) if data.has_key('time_begin') else None
         end = parse(data['time_end']) if data.has_key('time_end') else None
         span = data['time_span'] if data.has_key('time_span') else self.span
@@ -156,7 +156,7 @@ class DatabaseDataSource(object):
             if end:
                 where_clause = where_clause + " AND " + timestamp_field + "<='" + format(end) + "'"
                 span=sys.maxint # TODO: calculate exact span
-            else:                
+            else:
                 if span:
                     end=delta(begin, span, slice)
                     where_clause = where_clause + " AND " + timestamp_field + "<='" + format(end) + "'"
@@ -167,22 +167,22 @@ class DatabaseDataSource(object):
             if end:
                 if span:
                     begin = delta(end, -span, slice)
-                    where_clause = " WHERE "+timestamp_field + ">='" + format(begin) + "' AND " 
+                    where_clause = " WHERE "+timestamp_field + ">='" + format(begin) + "' AND "
                     where_clause = where_clause + timestamp_field + "<='" + format(end) + "'"
                 else:
                     span=sys.maxint # TODO: calculate exact span
-            else:                
+            else:
                 end=datetime.datetime.now()
                 begin=delta(datetime.datetime.now(), -span, slice)
                 if span:
-                    where_clause = " WHERE "+timestamp_field + ">='" + format(begin) + "'"         
+                    where_clause = " WHERE "+timestamp_field + ">='" + format(begin) + "'"
                 else:
                     span=sys.maxint # TODO: calculate exact span
 
         (key, date_format) = self.get_key(slices[slice], span)
 
         select = StringIO()
-                
+
         select.write("SELECT "+key+" AS slice")
 
         if slice == "minute":
@@ -198,36 +198,43 @@ class DatabaseDataSource(object):
                 row_length = row_length + len(self.measure_map[measure][measure_index+1])
 
         select.write(" FROM "+self.table + where_clause )
-        
+
         if slice == "minute":
             select.write(" ORDER BY "+self.timestamp_field)
         else:
             select.write(" GROUP BY slice")
             select.write(" ORDER BY MIN("+self.timestamp_field+")")
-        
+
         if measures.__contains__("sector"):
-            sector_select = "SELECT avg(wind), max(wind_gust), count(*) " +
+            sector = "22.5*(round(wind_dir/22.5))"
+            sector_select = "SELECT "+sector+", avg(wind), count(*) " +
                 where_clause +
-                " AND wind > 0 GROUP BY wind_dir"
-        
+                " AND wind > 0 GROUP BY "+sector
+            sector_gust = "22.5*(wind_gust_dir/22.5)"
+            sector_gust_select = "SELECT "+sector_gust+", max(wind_gust)" +
+                where_clause +
+                " AND wind > 0 GROUP BY "+sector_gust
+
         db = FirebirdDB(config.url, config.username, config.password)
         db.connect()
         try:
             self.logger.debug(select.getvalue())
-            result = db.select(select.getvalue())   
-            
+            result = db.select(select.getvalue())
+
             if measures.__contains__("sector"):
                 self.logger.debug(sector_select)
-                sector_result = db.select(sector_select)   
-            
+                sector_result = db.select(sector_select)
+                self.logger.debug(sector_gust_select)
+                sector_gust_result = db.select(sector_gust_select)
+
         finally:
             db.disconnect()
-        
+
         if holes and begin and end:
             map = {}
             for row in result:
                 map[row[0]]=row
-                          
+
             result = []
             d = begin
             while d <= end:
@@ -238,38 +245,54 @@ class DatabaseDataSource(object):
                     r = tuple([df]+([None]*(row_length-1)))
                     result.append(r)
                 d = delta(d, 1, slice)
-        
+
         result_data = {}
         result_data.update(data)
         items = []
         labels = []
-        
+
         for measure in self.measures:
             if self.measure_map.has_key(measure):
                 key = measure
-                result_data[key]={ 'series': {} }            
+                result_data[key]={ 'series': {} }
                 for serie in self.measure_map[measure][measure_index+1]:
                     result_data[key]['series'][serie] = []
                     result_data[key]['series']['lbl'] = labels
                     items.append((key, serie))
-        
-        for row in result:            
+
+        for row in result:
             labels.append(row[0])
             for item in range(0, row_length-1):
                 result_data[items[item][0]]['series'][items[item][1]].append(row[item+1])
-            
+
         if measures.__contains__("sector"):
             if not result_data.has_key('wind'):
                 result_data['wind'] = {}
             result_data['wind']['sectors'] = {
                 "lbl" : ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'],
-                "freq" : [],
-                "avg" :  [],
-                "max" :  []
+                "freq" : [0]*16,
+                "avg" :  [0]*16,
+                "max" :  [0]*16
             }
-            
-        # TODO: fill lists
-            
+
+        sector_map = {}
+        for (d,v,c) in sector_result:
+            sector_map[d]=(v,c)
+        sector_gust_map = {}
+        for (d,v) in sector_gust_result:
+            sector_gust_map[d]=v
+
+           for d in range(0, 16):
+               deg = 22.5*i
+            if sector_map.has_key(deg):
+                result_data['wind']['sectors']['avg'][i]=sector_map[deg][0];
+                result_data['wind']['sectors']['freq'][i]=sector_map[deg][0];
+
+            if sector_gust_map.has_key(deg):
+                result_data['wind']['sectors']['gust'][i]=sector_gust_map[deg][0];
+
+        result_data['wind']['sectors']['freq'] = normalize(result_data['wind']['sectors']['freq'])
+
         return result_data
 
 def parse(isodate):
@@ -293,6 +316,12 @@ def delta(d, n, slice):
         return d2+datetime.timedelta(n*31) # TODO: calculate exact start of month
     if slice == 'year':
         return d2+datetime.timedelta(n*365) # TODO: calculate exact start of year
+
+def normalize(data):
+    sum = sum(data)
+    result = []
+    for d in data:
+        result.append(float(d)/sum)
 
 
 try:
