@@ -550,6 +550,26 @@ def interpolate(data):
             last = val
     return result
 
+def compress(data, ratio, min_index, max_index):
+    result = []
+    r = ratio
+    ext=None
+    last=None
+    for i, v in enumerate(data):
+        if i == max_index or i == min_index:
+            ext=v
+        if v:
+            last=v
+        if i % r == 0:
+            if ext:
+                result.append(ext)
+                ext=None
+            else:
+                result.append(v if v else last)
+            last=None
+    return result
+
+
 def beaufort(mps):
     if mps < 0.3:
         return 0
