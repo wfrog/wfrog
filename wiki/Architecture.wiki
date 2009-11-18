@@ -29,6 +29,13 @@ In my opinion, these three components should have each one its own thread. They 
 
 _End of Comment_
 
+_Comment by Jordi_
+
+I agree that the driver should be a separate process.
+Also, I see two advantages of decoupling the aggregator and the database writer might help in having adapters for several databases. It also makes possible to enqueue database writes and thus be able to perform maintenance operations on the database much easily. 
+
+_End of Comment_
+
 
 3) database
 
@@ -36,7 +43,7 @@ _End of Comment_
 
 - Keep SQL sentences standard so that most DBMS can be used. So far we have tested Firebird 2.1
 
-- Keep the database simple: 1 table with one record every n minutes (by default 15) plus 1 index. This gives around 35000 rows per year which allow most reasonable queries to run directly on that table.
+- Keep the database simple: 1 table with one record every n minutes (by default 15) plus 1 index. This gives around 35000 rows per year at 15 min. period or 105000 rows per year writting data at 5 min. intervals. In both cases most reasonable queries could be run directly on that table.
 
 - The database units should be metric.
 
@@ -94,6 +101,13 @@ wflogger --input=http --port=7878
 See below the message-oriented alternative.
 
 _End of Comment_
+
+_Comment by Jordi_
+
+It is a good idea to use a message oriented approach instead of using remote calls. It simplifies concurrency and makes it easier to have in the long run more heterogeneous sources of information.
+
+_End of Comment_
+
 
 ==Message-Oriented Alternative==
 
@@ -163,6 +177,54 @@ CREATE TABLE METEO(
 
 CREATE DESCENDING INDEX IDX_METEO1 ON METEO (TIMESTAMP_LOCAL);
 }}}
+
+_Comment by Jordi_
+Database structure revisited
+- no min/max timestamps
+- precision adjustements
+
+{{{
+CREATE TABLE METEO
+(
+  TIMESTAMP_UTC Timestamp NOT NULL,
+  TIMESTAMP_LOCAL Timestamp NOT NULL,
+  TEMP Numeric(3,1),
+  TEMP_MIN Numeric(3,1),
+  TEMP_MAX Numeric(3,1),
+  HUM Numeric(3,1),
+  WIND Numeric(4,1),
+  WIND_DIR Smallint,
+  WIND_GUST Numeric(4,1),
+  WIND_GUST_DIR Smallint,
+  DEW_POINT Numeric(3,1),
+  RAIN Numeric(4,1),
+  RAIN_RATE Numeric(4,1),
+  PRESSURE Numeric(5,1),
+  UV_INDEX Smallint,
+  CONSTRAINT PK_METEO PRIMARY KEY (TIMESTAMP_UTC)
+);
+
+UPDATE RDB$RELATION_FIELDS set RDB$DESCRIPTION = 'TEMPERATURE (ºC)'  where RDB$FIELD_NAME = 'TEMP' and RDB$RELATION_NAME = 'METEO';
+UPDATE RDB$RELATION_FIELDS set RDB$DESCRIPTION = '% RELATIVE HUMIDITY'  where RDB$FIELD_NAME = 'HUM' and RDB$RELATION_NAME = 'METEO';
+UPDATE RDB$RELATION_FIELDS set RDB$DESCRIPTION = 'WIND AVERAGE SPEED (m./sec.)'  where RDB$FIELD_NAME = 'WIND' and RDB$RELATION_NAME = 'METEO';
+UPDATE RDB$RELATION_FIELDS set RDB$DESCRIPTION = 'WIND PREDOMINANT DIRECTION (0º-359º)'  where RDB$FIELD_NAME = 'WIND_DIR' and RDB$RELATION_NAME = 'METEO';
+UPDATE RDB$RELATION_FIELDS set RDB$DESCRIPTION = 'WIND GUST SPEED (m./sec.)'  where RDB$FIELD_NAME = 'WIND_GUST' and RDB$RELATION_NAME = 'METEO';
+UPDATE RDB$RELATION_FIELDS set RDB$DESCRIPTION = 'WIND GUST DIRECTION (0º-359º)'  where RDB$FIELD_NAME = 'WIND_GUST_DIR' and RDB$RELATION_NAME = 'METEO';
+UPDATE RDB$RELATION_FIELDS set RDB$DESCRIPTION = 'DEWPOINT TEMPERATURE (ºC)'  where RDB$FIELD_NAME = 'DEW_POINT' and RDB$RELATION_NAME = 'METEO';
+UPDATE RDB$RELATION_FIELDS set RDB$DESCRIPTION = 'RAIN FALL (mm.)'  where RDB$FIELD_NAME = 'RAIN' and RDB$RELATION_NAME = 'METEO';
+UPDATE RDB$RELATION_FIELDS set RDB$DESCRIPTION = 'RAIN RATE (mm./hr.)'  where RDB$FIELD_NAME = 'RAIN_RATE' and RDB$RELATION_NAME = 'METEO';
+UPDATE RDB$RELATION_FIELDS set RDB$DESCRIPTION = 'ATMOSFERIC PRESSURE (mb.)'  where RDB$FIELD_NAME = 'PRESSURE' and RDB$RELATION_NAME = 'METEO';
+UPDATE RDB$RELATION_FIELDS set RDB$DESCRIPTION = 'UV INDEX'  where RDB$FIELD_NAME = 'UV_INDEX' and RDB$RELATION_NAME = 'METEO';
+CREATE DESCENDING INDEX IDX_METEO1 ON METEO (TIMESTAMP_LOCAL);
+}}}
+
+Pending: check if it is necessary to record TEMP_MIN / TEMP_MAX. Reducing default sampling rate to 5 min. we might not need these two fields. 
+
+Current row size would be reduced to < 35 bytes.
+
+_End of Comment_
+
+
 
 = Project Structure =
 
