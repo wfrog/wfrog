@@ -18,11 +18,12 @@
 
 import yaml
 
-import chart
-import data
+#import chart
+#import data
 import file
 import ftp
 import http
+import include
 import multi
 import scheduler
 import template
@@ -42,14 +43,14 @@ def assert_renderer_dict(name, obj):
 
 # YAML mappings
 
-class YamlGoogleChartRenderer(chart.GoogleChartRenderer, yaml.YAMLObject):
-    yaml_tag = u'!chart'
+#class YamlGoogleChartRenderer(chart.GoogleChartRenderer, yaml.YAMLObject):
+ #   yaml_tag = u'!chart'
 
-class YamlGoogleWindRadarChartRenderer(chart.GoogleChartWindRadarRenderer, yaml.YAMLObject):
-    yaml_tag = u'!windradar'
+#class YamlGoogleWindRadarChartRenderer(chart.GoogleChartWindRadarRenderer, yaml.YAMLObject):
+ #   yaml_tag = u'!windradar'
 
-class YamlDataRenderer(data.DataRenderer, yaml.YAMLObject):
-    yaml_tag = u'!data'
+#class YamlDataRenderer(data.DataRenderer, yaml.YAMLObject):
+#    yaml_tag = u'!data'
 
 class YamlFileRenderer(file.FileRenderer, yaml.YAMLObject):
     yaml_tag = u'!file'
@@ -59,6 +60,9 @@ class YamlFtpRenderer(ftp.FtpRenderer, yaml.YAMLObject):
 
 class YamlHttpRenderer(http.HttpRenderer, yaml.YAMLObject):
     yaml_tag = u'!http'
+
+class IncludeHttpRenderer(include.IncludeRenderer, yaml.YAMLObject):
+    yaml_tag = u'!include'
 
 class YamlMultiRenderer(multi.MultiRenderer, yaml.YAMLObject):
     yaml_tag = u'!multi'

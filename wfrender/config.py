@@ -22,6 +22,7 @@ import datasource
 import optparse
 import sys
 import os
+from os import path
 import time
 from threading import Thread
 import inspect
@@ -99,6 +100,7 @@ class YamlConfigurer(object):
             engine.initial_context = config["context"]
         else:
             engine.initial_context = {}
+        engine.initial_context['_yaml_config_file'] = path.abspath(options.config)
 
         if ( options.reload_config or options.reload_mod) and not self.watcher_running:
             self.watcher_running = True
@@ -176,11 +178,11 @@ class FileWatcher(Thread):
                     if last_modified > modules_modified[m]:
                         try:
                             reload_modules(m)
-                            self.reconfigure()                            
+                            self.reconfigure()
                         except:
                             traceback.print_exc()
                         modules_modified[m] = last_mod(m)
-    
+
     def reconfigure(self):
         self.logger.info("Reconfiguring engine...")
         old_root_renderer = self.engine.root_renderer
@@ -189,18 +191,18 @@ class FileWatcher(Thread):
             old_root_renderer.close()
             time.sleep(0.1)
         except:
-            pass        
-        if self.options.command:         
+            pass
+        if self.options.command:
             self.logger.info("Running command: "+self.options.command)
             command_thread = CommandThread()
             command_thread.command = self.options.command
-            command_thread.start()            
+            command_thread.start()
 
 class CommandThread(Thread):
     command = None
     def run(self):
         time.sleep(0.1)
-        os.system(self.command)        
+        os.system(self.command)
 
 def reload_modules(parent):
     logger = logging.getLogger("config.loader")

@@ -31,6 +31,7 @@ class RenderEngine(object):
     initial_context = None
     initial_data = {}
     daemon = False
+    output = False
 
     logger = logging.getLogger("engine")
 
@@ -44,6 +45,7 @@ class RenderEngine(object):
             self.configurer = config.YamlConfigurer(opt_parser)
             if main:
                 opt_parser.add_option("-D", "--data", dest="data_string", help="Passes specific data value/pairs to renderers", metavar="key1=value1,key2=value2")
+                opt_parser.add_option("-O", dest="output", action="store_true", help="Outputs the result (if any) on standard output")
                 (options, args) = opt_parser.parse_args()
 
                 if options.data_string:
@@ -52,13 +54,17 @@ class RenderEngine(object):
                         pieces = pair.split('=')
                         assert(len(pieces)==2, "Key-value pair not in the form key=value: ", pair)
                         self.initial_data[pieces[0].strip()] = pieces[1].strip()
+
+                if options.output:
+                    self.output=True
+
         self.reconfigure(options, args)
 
     def reconfigure(self, options=None, args=[]):
         self.configurer.configure(self,options,args)
 
     def process(self, data=initial_data, context={}):
-        
+
         try:
             if self.daemon:
                 self.logger.info("Running as daemon")
@@ -87,4 +93,6 @@ class RenderEngine(object):
 if __name__ == "__main__":
     engine = RenderEngine(main=True)
     result = engine.process()
+    if engine.output:
+        print str(result)
     engine.logger.debug("Finished main()")
