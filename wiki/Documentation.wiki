@@ -133,3 +133,5 @@ python wfrender.py --help                # General help
 python wfrender.py -L                    # List and descriptions of !elements
 python wfrender.py -H ELEMENT            # Help on a specific element
 }}}
+
+<p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
