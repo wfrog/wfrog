@@ -1,6 +1,8 @@
 #summary Usage and Installation guide
 #labels Phase-Support,Featured
 
+<p align="center"><img src="http://wfrog.googlecode.com/svn/wiki/images/logo-web.png"/></p>
+
 <wiki:toc/>
 
 = Architecture =
