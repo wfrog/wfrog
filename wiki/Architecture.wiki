@@ -179,7 +179,9 @@ CREATE DESCENDING INDEX IDX_METEO1 ON METEO (TIMESTAMP_LOCAL);
 }}}
 
 _Comment by Jordi_
-Database structure revisited
+
+Database structure revisited:
+
 - no min/max timestamps
 - precision adjustements
 
