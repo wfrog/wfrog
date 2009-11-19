@@ -221,9 +221,9 @@ UPDATE RDB$RELATION_FIELDS set RDB$DESCRIPTION = 'UV INDEX'  where RDB$FIELD_NAM
 CREATE DESCENDING INDEX IDX_METEO1 ON METEO (TIMESTAMP_LOCAL);
 }}}
 
-Pending: check if it is necessary to record TEMP_MIN / TEMP_MAX. Reducing default sampling rate to 5 min. we might not need these two fields. 
+TEMP_MIN / TEMP_MAX are still necessary. I've experienced temperature changes of 2/3 degrees in 15 min. periods.
 
-Current row size would be reduced to < 35 bytes.
+Row size is aprox. 45 bytes.
 
 _End of Comment_
 
