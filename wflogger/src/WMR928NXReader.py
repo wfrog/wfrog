@@ -31,7 +31,7 @@ class WMR928NXReader (Thread):
         self._wxData = wxData
         self._logger = logging.getLogger('WxLogger.WMR928NXReader')
         ## Configuration
-        self.PORT_NUMBER = config.get('WMR928NX', 'PORT_NUMBER')
+        self.PORT_NUMBER = int(config.get('WMR928NX', 'PORT_NUMBER'))
 
     def _list2bytes(self, d):
         return reduce(lambda a, b: a + b, map(lambda a: "%02X " % a, d))
