@@ -32,7 +32,7 @@ def format(obj, time_format):
     elif isinstance(obj, datetime):
         return obj.strftime(time_format)
     else:
-        return "%r" % obj
+        return "unknown"
 
 def extract_units(tag):
     i = tag.find('(') 
