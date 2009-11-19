@@ -61,7 +61,7 @@ class YamlFtpRenderer(ftp.FtpRenderer, yaml.YAMLObject):
 class YamlHttpRenderer(http.HttpRenderer, yaml.YAMLObject):
     yaml_tag = u'!http'
 
-class IncludeHttpRenderer(include.IncludeRenderer, yaml.YAMLObject):
+class YamlIncludeRenderer(include.IncludeRenderer, yaml.YAMLObject):
     yaml_tag = u'!include'
 
 class YamlMultiRenderer(multi.MultiRenderer, yaml.YAMLObject):

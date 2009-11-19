@@ -1,3 +1,3 @@
 
 renderer: !include
-    path: wfrender3.yaml
+    path: wfrender6.yaml
