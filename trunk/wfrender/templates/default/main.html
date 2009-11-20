@@ -1,0 +1,108 @@
+<head>
+    <title>Weather Dashboard</title>
+    <style>
+        body {
+            font-family: helvetica; 
+            font-size: 13px; 
+            color: #8D7641;
+        }
+        .value {
+            color: #007000;
+        }
+        .bordered {
+            border: 1px solid tan;
+        }
+        .cell {
+            margin: 4px;
+            padding: 6px;
+            float: left;
+        }    
+        .nopad {
+            padding: 0px;
+        }
+        .pad {
+            padding: 6px;
+        }
+        .line {
+            padding-top: 3px;
+            padding-bottom: 3px;
+        }
+        .header {
+            height: 55px;
+        }
+        .wide {
+            width: 95%;
+        }
+        .leftCell {
+            float: left;
+        }
+        .rightCell {
+            float: right;
+        }        
+        .bigger {
+            font-size: 140%;
+        }
+    </style>
+</head>
+<body>
+<div class="wide bordered line cell">
+            wfrog - Weather Dashboard - <span class="value">$current.timestamp</span>
+</div>
+<div class="bordered header cell">
+    <a href="http://www.wfrog.org"><img border="0" src="http://code.google.com/p/wfrog/logo" alt="wfrog"/></a>
+</div>
+<div class="bordered header cell">    
+    <div class="leftCell">
+            <span class="bigger" ><span class="value">$current.temp1</span>&deg;</span>C<br>
+            Humidity <span class="value">$int($current.hum1)</span> % <br>
+            Pressure <span class="value">$int($current.press)</span> hPa
+    </div>
+    <div class="rightCell">
+        <div class="rightCell">
+            <font face="Webdings">&#72;</font> 
+        </div><br>
+        <span class="value">$current.temp0</span>&deg;C <br>
+        <div class="rightCell">
+            <span class="value">$int($current.hum0)</span> %<br>
+        </div>
+    </div>        
+</div>
+<div class="bordered cell nopad">
+    <div class="leftCell">
+        <img src="$current.wind.dir"/>
+    </div>
+    <div class="leftCell pad">
+        Wind <span class="value">$int($current.wind.speed)</span> m/s<br>
+        Gust <span class="value">$int($current.wind.gust)</span> m/s<br>
+        Rain <span class="value">$int($current.rain)</span> mm/h<br>
+    </div>    
+</div>
+<br>
+<div>
+    <div class="bordered cell" style="clear: both">
+        Temperature and Dew Point<br>
+        <img src="$chart.temp"/>
+    </div>
+    <div class="bordered cell">
+        Humidity<br>
+        <img src="$chart.hum"/>
+    </div>
+    <div class="bordered cell">
+        Pressure<br>
+        <img src="$chart.press"/>
+    </div>
+</div>
+<div class="leftCell">
+    <div class="bordered cell"  style="clear: both">
+        Wind and Gusts<br>
+        <img src="$chart.wind"/>
+    </div>
+    <div class="bordered cell">
+        Wind Direction<br>
+        <img src="$chart.wind_dir"/>
+    </div>
+</div>
+</body>
+
+
+

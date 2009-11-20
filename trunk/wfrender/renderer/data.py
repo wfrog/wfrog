@@ -40,5 +40,19 @@ class DataRenderer(object):
         assert self.renderer is not None, "'data.renderer' must be set"
         assert renderer.is_renderer(self.renderer), "'data.renderer' must be a renderer"
         new_data = self.source.execute(data, context)
-        new_data.update(data)
+        merge_dictionary(new_data, data)
         return self.renderer.render(new_data, context)
+
+def merge_dictionary(dst, src):
+    stack = [(dst, src)]
+    while stack:
+        current_dst, current_src = stack.pop()
+        for key in current_src:
+            if key not in current_dst:
+                current_dst[key] = current_src[key]
+            else:
+                if isinstance(current_src[key], dict) and isinstance(current_dst[key], dict) :
+                    stack.append((current_dst[key], current_src[key]))
+                else:
+                    current_dst[key] = current_src[key]
+    return dst

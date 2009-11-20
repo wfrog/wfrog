@@ -16,6 +16,8 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+
 class ValueRenderer(object):
     """
     Returns the main value as a string.
@@ -23,11 +25,16 @@ class ValueRenderer(object):
 
     key = None
     select = 'value'
+    value = None
     serie = None
+
+    logger = logging.getLogger('renderer.value')
 
     def render(self,data,context={}):
         if self.select == "last":
             return data[self.key]['series'][self.serie][len(data[self.key]['series'][self.serie])-1]
         else:
             if self.select == "value":
-                return data[self.key]["value"]
+                val_key = self.value if self.value else 'value'                    
+                self.logger.debug("Getting value for '"+self.key+"."+val_key+"'")
+                return data[self.key][val_key]

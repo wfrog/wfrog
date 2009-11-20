@@ -17,6 +17,7 @@
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import xml.dom.minidom
+from datetime import datetime
 
 class WxDataXmlDataSource(object):
     """
@@ -45,9 +46,9 @@ class WxDataXmlDataSource(object):
         result['hum0']['value'] = float(dom.getElementsByTagName('thInt')[0].getElementsByTagName('humidity')[0].childNodes[0].data)
         result['hum0']['unit'] = "%"
 
-        result['pressure'] = {}
-        result['pressure']['value'] = float(dom.getElementsByTagName('barometer')[0].getElementsByTagName('pressure')[0].childNodes[0].data)
-        result['pressure']['unit'] = "mb"
+        result['press'] = {}
+        result['press']['value'] = float(dom.getElementsByTagName('barometer')[0].getElementsByTagName('pressure')[0].childNodes[0].data)
+        result['press']['unit'] = "mb"
 
         result['rain'] = {}
         result['rain']['value'] = float(dom.getElementsByTagName('rain')[0].getElementsByTagName('rate')[0].childNodes[0].data)
@@ -55,10 +56,13 @@ class WxDataXmlDataSource(object):
 
         result['wind'] = {}
         result['wind']['value'] = float(dom.getElementsByTagName('wind')[0].getElementsByTagName('avgSpeed')[0].childNodes[0].data)
-        result['wind']['gust'] = float(dom.getElementsByTagName('wind')[0].getElementsByTagName('gustSpeed')[0].childNodes[0].data)
+        result['wind']['max'] = float(dom.getElementsByTagName('wind')[0].getElementsByTagName('gustSpeed')[0].childNodes[0].data)
         result['wind']['deg'] = int(dom.getElementsByTagName('wind')[0].getElementsByTagName('dirDeg')[0].childNodes[0].data)
         result['wind']['dir'] = dom.getElementsByTagName('wind')[0].getElementsByTagName('dirStr')[0].childNodes[0].data
         result['wind']['unit'] = "m/s"
+
+        result['info'] = {}
+        result['info']['timestamp'] = datetime.strptime(dom.getElementsByTagName('timestampt')[0].childNodes[0].data, "%Y.%m.%d.%H.%M.%S")
 
         return result
 

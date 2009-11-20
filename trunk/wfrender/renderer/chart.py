@@ -62,9 +62,9 @@ class ChartConfig(object):
     nval = 100
 
     # Drawing
-    color = 'orange'
+    color = '008000'
     thickness = 1.5
-    text = '7F7F7F'
+    text = '8d7641'
     size = 10 # for text and markers
     fill = None
     style = 'v' # for markers
@@ -252,9 +252,9 @@ class GoogleChartRenderer(object):
 
         # Compute vertical range
         chart.y_range=[chart_min-config.y_margin[0], chart_max+config.y_margin[1]]
-        if config.axes == 'on':
+        if config.axes:
             chart.set_axis_range(Axis.LEFT, chart_min-config.y_margin[0], chart_max+config.y_margin[1])
-            chart.set_axis_style(0, _valid_color(config.text), config.size, 0, Axis.BOTH if config.ticks == 'on' else Axis.AXIS_LINES)
+            chart.set_axis_style(0, _valid_color(config.text), config.size, 0, Axis.BOTH if config.ticks else Axis.AXIS_LINES)
         else:
             chart.set_axis_labels(Axis.LEFT, [])
             chart.set_axis_style(0, _valid_color(config.text), config.size, 0, Axis.TICK_MARKS, _valid_color(config.bgcolor))
@@ -364,15 +364,16 @@ class GoogleChartWindRadarRenderer(object):
             beaufort_config.__dict__.update(config.beaufort)
 
         # Prepare data
+
+        max = config.median * 2
+        
         if data[self.key].has_key('value'):
             current_noscale = data[self.key]['value']
             last_gust_noscale = data[self.key]['max']
             pos = int(round(data[self.key]['deg'] * 16 / 360.0))        
             current = self.scale(current_noscale, config.median, config.radius)
             last_gust_scaled = self.scale(last_gust_noscale, config.median, config.radius)
-            arrow_thickness = 0.3+3.0*arrow_config.thickness*current/max
-            
-        max = config.median * 2
+            arrow_thickness = 0.3+3.0*arrow_config.thickness*current/max            
 
         if config.bars or config.areas or config.sectors:
             avg = []
@@ -394,7 +395,7 @@ class GoogleChartWindRadarRenderer(object):
         head = [0] * 16
 
         if data[self.key].has_key('value'):
-            line[pos] = max
+            line[pos] = max if current > 0 else 0
             tail[pos] = current
             last_gust[pos] = last_gust_scaled
             head[ (pos - 1 + 16) % 16 ] = current*0.6
@@ -416,7 +417,7 @@ class GoogleChartWindRadarRenderer(object):
             chart.add_marker(3, -1, "v", _valid_color(bars_config.color), bars_config.thickness, -1)
 
         if config.beaufort:
-            chart.add_marker(0, "220:0.9", "@t"+str(beaufort(current_noscale)), _valid_color(beaufort_config.color) + "%02x" % (beaufort_config.intensity*255), rmin(config.height, config.width)-config.size*5, 0)
+            chart.add_marker(0, "220:0.9", "@t"+str(beaufort(current_noscale)), _valid_color(beaufort_config.color) + "%02x" % (beaufort_config.intensity*255), rmin(config.height, config.width)-config.size*5, -1)
 
         colors = ["00000000",
             _valid_color(tail_config.color),
@@ -467,8 +468,10 @@ class GoogleChartWindRadarRenderer(object):
             chart.add_fill_range(_valid_color(arrow_config.fill), 6, 0)
 
         chart.set_colours( colors )
-        chart.set_axis_labels(Axis.BOTTOM, ['N', '', 'NE', '', 'E', '', 'SE', '', 'S', '', 'SW', '', 'W', '', 'NW', ''])
-        chart.set_axis_style(0, _valid_color(config.text), 10, 0, 'l', _valid_color(config.bgcolor));
+        
+        if config.axes:
+            chart.set_axis_labels(Axis.BOTTOM, ['N', '', 'NE', '', 'E', '', 'SE', '', 'S', '', 'SW', '', 'W', '', 'NW', ''])
+            chart.set_axis_style(0, _valid_color(config.text), config.size, 0, 'l', _valid_color(config.bgcolor));
         if data[self.key].has_key('value'):
             chart.set_line_style(1, tail_config.thickness)
         else:
@@ -569,11 +572,11 @@ def compress_to(data, n, min_index, max_index):
         l = len(data)
         d = l-n        # how many values to remove
         r = l / d      # each r-th must be removed
-        print "compress "+str(l)+" to "+str(n)+" by "+str(r)
+        #print "compress "+str(l)+" to "+str(n)+" by "+str(r)
         if r < 2:
             r = 2
         data = compress(data, r, min_index, max_index)
-        print "compressed to "+str(len(data))
+        #print "compressed to "+str(len(data))
     return data
 
 def compress(data, ratio, min_index, max_index):
