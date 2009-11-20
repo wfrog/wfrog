@@ -1,25 +1,11 @@
 context:
-    database: { url: 'file://database.db' }
-renderer: !http
-    root: !template
-        path: templates/current.html
-        mime: text/html
-        renderer: !data
-            source: !wxdataxml
-                path: test/data.xml
-            renderer: !multi
-                renderers:
-                    temp0_current: !value { key: temp0 }
-                    hum0_current: !value { key: hum0 }
-                    temp1_current: !value { key: temp1 }
-                    hum1_current: !value { key: hum1 }
-                    pressure_current: !value { key: pressure }
-                    rain_current_rate: !value { key: rain }
-                    wind: !multi
-                        renderers:
-                            wind_speed: !value { key: wind }
-                            wind_radar: !windradar
-                                arrow: { show: yes } 
-
-
-
+    database: { url: 'localhost:/var/lib/firebird/2.0/data/wfrog.db' }
+renderer: !http    
+    root: !include
+        path: default/24hours.yaml
+    renderers:
+        30days: !include
+            path: default/30days.yaml
+        365days: !include
+            path: default/365days.yaml
+    
