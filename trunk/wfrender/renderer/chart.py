@@ -581,10 +581,11 @@ def compress_to(data, n, min_index, max_index):
     # Also set a value to 0 if all data is None
     v = None
     for i in data:
-        if i:
+        if i and not i=0:
             v = i
     if not v:
         data[0]=0
+        data[1]=0.1
 
     return data
 
