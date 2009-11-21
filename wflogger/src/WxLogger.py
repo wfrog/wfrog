@@ -27,6 +27,7 @@
 CONFIG_FILE = 'WxLogger.cfg'
 
 import optparse
+import sys
 
 opt_parser = optparse.OptionParser()
 opt_parser.add_option("-f", "--file", dest="config", default=CONFIG_FILE,
@@ -96,8 +97,10 @@ p.setName('WxProcess')
 p.setDaemon(True)
 p.start()
 
-## Wait to exit
-raw_input("Press a key to exit")
+try:
+    p.join()
+except KeyboardInterrupt:
+    sys.exit(0)
 
 ## Log
 logger.info("WxLogger EXIT")
