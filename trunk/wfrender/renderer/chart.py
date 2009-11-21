@@ -290,7 +290,11 @@ class GoogleChartRenderer(object):
                 chart.set_axis_labels(Axis.BOTTOM, [])
                 chart.set_axis_style(1, _valid_color(config.text), config.size, 0, Axis.TICK_MARKS, _valid_color(config.bgcolor))
 
-        return chart.get_url()+"&chma=10,10,10,10" # add a margin
+        try:
+            return chart.get_url()+"&chma=10,10,10,10" # add a margin
+        except:
+            self.logger.exception("Could not render chart")
+            return "http://chart.apis.google.com/chart?cht=lc&chs="+config.width+"x"+config.height
 
 class GoogleChartWindRadarRenderer(object):
     """
@@ -576,16 +580,7 @@ def compress_to(data, n, min_index, max_index):
         if r < 2:
             r = 2
         data = compress(data, r, min_index, max_index)
-        #print "compressed to "+str(len(data))
-        
-    # Also set a value to 0 if all data is None
-    v = None
-    for i in data:
-        if i and not i==0:
-            v = i
-    if not v:
-        data[0]=0
-        data[1]=0.1
+        #print "compressed to "+str(len(data))        
 
     return data
 
