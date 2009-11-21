@@ -1,6 +1,6 @@
 renderer: !data
     source: !currentxml
-        path: test/data.xml
+        path: /tmp/current_conditions.xml
     renderer: !multi
         renderers:
             temp0: !value { key: temp0 }
