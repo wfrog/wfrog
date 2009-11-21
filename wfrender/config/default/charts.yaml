@@ -7,7 +7,6 @@ renderer: !multi
                     area: { to: temp.min }
                     max: { color: darkred, text: darkred, thickness: 0.5 }
                 temp.avg:                                                                         
-                    last: { thickness: 5, style: 'o' }
                     order: 1
                 temp.min:
                     color: wheat
