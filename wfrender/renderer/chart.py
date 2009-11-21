@@ -294,7 +294,7 @@ class GoogleChartRenderer(object):
             return chart.get_url()+"&chma=10,10,10,10" # add a margin
         except:
             self.logger.exception("Could not render chart")
-            return "http://chart.apis.google.com/chart?cht=lc&chs="+config.width+"x"+config.height
+            return "http://chart.apis.google.com/chart?cht=lc&chs="+str(config.width)+"x"+str(config.height)
 
 class GoogleChartWindRadarRenderer(object):
     """
