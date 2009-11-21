@@ -26,6 +26,14 @@ renderer: !multi
             series: 
                 press.avg: {}        
             labels: press.lbl            
+        rain: !chart                            
+            series: 
+                rain.rate: {}        
+            labels: rain.lbl  
+        uv: !chart                            
+            series: 
+                uv.index: {}        
+            labels: uv.lbl                          
         wind: !chart                                
             series:
                 wind.avg: {}                    

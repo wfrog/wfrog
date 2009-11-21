@@ -1,11 +1,18 @@
 <head>
-    <title>Weather Dashboard</title>
+    <title>Weather Dashboard - wfrog</title>
     <style>
         body {
             font-family: helvetica; 
             font-size: 13px; 
             color: #8D7641;
         }
+        a {
+            color: #8D7641;
+        }
+            A:link {text-decoration: none}
+            A:visited {text-decoration: none}
+            A:active {text-decoration: none}
+            A:hover {text-decoration: underline;}
         .value {
             color: #007000;
         }
@@ -13,22 +20,30 @@
             border: 1px solid tan;
         }
         .cell {
-            margin: 4px;
+            margin: 3px;
             padding: 6px;
             float: left;
         }    
         .nopad {
             padding: 0px;
         }
-        .pad {
-            padding: 6px;
+        .pad {           
+            padding: 6px; 
+            padding-top: 10px;
+            padding-bottom: 2px;
         }
+        .smallpad {           
+            padding: 4px;             
+            padding-bottom: 2px;
+        }        
         .line {
             padding-top: 3px;
             padding-bottom: 3px;
         }
         .header {
-            height: 55px;
+            height: 64px;
+            padding-top: 10px;
+            padding-bottom: 2px;
         }
         .wide {
             width: 95%;
@@ -38,28 +53,72 @@
         }
         .rightCell {
             float: right;
+        }
+        .leftpad {
+            padding-left: 5;
         }        
         .bigger {
             font-size: 140%;
         }
+        .tabPane {
+            width: 95%;
+            margin: 3px;
+            padding-top: 3px;
+            padding-bottom: 0px;
+            clear: both;
+            height: 21px;
+            border-bottom: 1px solid tan;
+        }
+        .tab {
+            margin-bottom:3px;
+            margin-left: 3px;
+            margin-right: 3px;   
+            padding-left: 6px;
+            padding-right: 6px;         
+            padding-top: 2px;
+            padding-bottom: 2px;    
+            float: left;
+            height: 16px;
+            background: wheat;
+            border-bottom: 1px solid wheat;
+        }
+        .selected {
+            background: white;
+            border-right: 1px solid tan;
+            border-top: 1px solid tan;
+            border-left: 1px solid tan;
+            border-bottom: 1px solid white;
+        }
+        .symbol {
+            font-size:120%;
+        }
+        .graph {
+            line-height:18px;
+        }
+        .units {
+            float: right;
+            color: tan;            
+        }        
     </style>
 </head>
 <body>
+
 <div class="wide bordered line cell">
-            wfrog - Weather Dashboard - <span class="value">$current.timestamp</span>
+            wfrog - Weather Dashboard <div class="rightCell">&#8986; <span class="value">$current.timestamp</span></div>
 </div>
+
 <div class="bordered header cell">
-    <a href="http://www.wfrog.org"><img border="0" src="http://code.google.com/p/wfrog/logo" alt="wfrog"/></a>
+    <a class="verticallyCentered" href="http://www.wfrog.org"><img border="0" src="http://code.google.com/p/wfrog/logo" alt="wfrog"/></a>
 </div>
 <div class="bordered header cell">    
     <div class="leftCell">
-            <span class="bigger" ><span class="value">$current.temp1</span>&deg;</span>C<br>
+            <span class="symbol">&#9832;</span> <span class="bigger" ><span class="value">$current.temp1</span>&deg;</span>C<br>
             Humidity <span class="value">$int($current.hum1)</span> % <br>
             Pressure <span class="value">$int($current.press)</span> hPa
     </div>
-    <div class="rightCell">
+    <div class="rightCell leftpad">
         <div class="rightCell">
-            <font face="Webdings">&#72;</font> 
+            <span class="bigger">&#8962; &nbsp;</span>
         </div><br>
         <span class="value">$current.temp0</span>&deg;C <br>
         <div class="rightCell">
@@ -71,38 +130,63 @@
     <div class="leftCell">
         <img src="$current.wind.dir"/>
     </div>
-    <div class="leftCell pad">
-        Wind <span class="value">$int($current.wind.speed)</span> m/s<br>
+    <div class="leftCell smallpad">
+        <br style="font-size:50%">Wind <span class="value">$int($current.wind.speed)</span> m/s<br>
         Gust <span class="value">$int($current.wind.gust)</span> m/s<br>
         Rain <span class="value">$int($current.rain)</span> mm/h<br>
+        <!-- UV Index <span class="value">0</span> -->
     </div>    
 </div>
-<br>
+<div class="tabPane">
+    <div class="leftCell" style="width:10px;">&nbsp;</div>
+    <div id="24hours" class="tab"><a href="/?time_end=2009-11-07">24 Hours</a></div>
+    <div id="30days" class="tab"><a href="/30days.html?time_end=2009-11-07">30 Days</a></div>
+    <div id="365days" class="tab"><a href="/365days.html?time_end=2009-11-07">365 Days</a></div>
+</div>
 <div>
-    <div class="bordered cell" style="clear: both">
-        Temperature and Dew Point<br>
+    <div class="bordered cell graph">
+        <span class="symbol">&#9832;</span> Temperature and Dew Point<div class="units">&deg;C</div><br>
         <img src="$chart.temp"/>
     </div>
-    <div class="bordered cell">
-        Humidity<br>
+    <div class="bordered cell graph">
+        <span class="symbol">&#8776;</span> Humidity<div class="units">%</div><br>
         <img src="$chart.hum"/>
     </div>
-    <div class="bordered cell">
-        Pressure<br>
+    <div class="bordered cell graph">
+        <span class="symbol">&#9878;</span> Pressure<div class="units">hPa</div><br>
         <img src="$chart.press"/>
     </div>
 </div>
 <div class="leftCell">
-    <div class="bordered cell"  style="clear: both">
-        Wind and Gusts<br>
+    <div class="bordered cell graph"  style="clear: both">
+        <span class="symbol">&#9872;</span> Wind and Gusts<div class="units">m/s</div><br>
         <img src="$chart.wind"/>
     </div>
-    <div class="bordered cell">
-        Wind Direction<br>
+    <div class="bordered cell graph">
+        <span class="symbol">&#10037;</span> Wind Direction<br>
         <img src="$chart.wind_dir"/>
     </div>
 </div>
+<div class="leftCell">
+    <div class="bordered cell graph"  style="clear: both">
+        <span class="symbol">&#9748;</span> Rain<div class="units">mm/hr</div><br>
+        <img src="$chart.rain"/>
+    </div><!--
+    <div class="bordered cell graph">
+        <span class="symbol">&#9728;</span> UV Index<br>
+        <img src="$chart.uv"/>
+    </div>-->
+</div>
 </body>
 
-
+<script>
+// Highlight the correct tab according to the url
+if(window.location.href.indexOf("30days.html") > -1) {
+    document.getElementById("30days").className += ' selected';
+} else if(window.location.href.indexOf("365days.html") > -1) {
+    document.getElementById("365days").className += ' selected';    
+} else {
+    document.getElementById("24hours").className += ' selected';
+}
+</script>
 

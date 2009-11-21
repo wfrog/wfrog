@@ -30,5 +30,5 @@ class YamlSimulatorDataSource(simulator.SimulatorDataSource, yaml.YAMLObject):
 class YamlDatabaseDataSource(database.DatabaseDataSource, yaml.YAMLObject):
     yaml_tag = u'!database'
 
-class YamlWxDataXmlDataSource(xmlquery.WxDataXmlDataSource, yaml.YAMLObject):
-    yaml_tag = u'!wxdataxml'
+class YamlCurrentConditionsXmlDataSource(xmlquery.CurrentConditionsXmlDataSource, yaml.YAMLObject):
+    yaml_tag = u'!currentxml'

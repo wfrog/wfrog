@@ -4,8 +4,8 @@ renderer: !http
     root: !include
         path: default/24hours.yaml
     renderers:
-        30days: !include
+        30days.html: !include
             path: default/30days.yaml
-        365days: !include
+        365days.html: !include
             path: default/365days.yaml
     
