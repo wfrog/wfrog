@@ -53,6 +53,9 @@ class MultiRenderer(object):
     def render(self,data,context={}):
         result = {}
         for name, r in self.renderers.iteritems():
+            
+            logger.debug("Rendering "+name)
+            
             if self.parallel:
                 thread = Thread( target=lambda : r.render(data, context) )
                 self.threads.append(thread)

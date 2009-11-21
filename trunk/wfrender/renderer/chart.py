@@ -577,6 +577,15 @@ def compress_to(data, n, min_index, max_index):
             r = 2
         data = compress(data, r, min_index, max_index)
         #print "compressed to "+str(len(data))
+        
+    # Also set a value to 0 if all data is None
+    v = None
+    for i in data:
+        if i:
+            v = i
+    if not v:
+        data[0]=0
+
     return data
 
 def compress(data, ratio, min_index, max_index):

@@ -97,9 +97,6 @@ class HttpRendererHandler(BaseHTTPRequestHandler):
         for p in params:
             data[p[0]] = p[1]
         
-        
-        print repr(data)
-        
         content = None
 
         name = urlparse.urlsplit(self.path).path.strip('/')
