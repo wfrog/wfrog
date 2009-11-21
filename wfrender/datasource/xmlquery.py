@@ -19,9 +19,9 @@
 import xml.dom.minidom
 from datetime import datetime
 
-class WxDataXmlDataSource(object):
+class CurrentConditionsXmlDataSource(object):
     """
-    Reads data from a WxData file
+    Reads data from a Current Conditions XML file
     """
 
     def __init__(self, path):
