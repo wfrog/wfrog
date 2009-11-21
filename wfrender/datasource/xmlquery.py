@@ -62,7 +62,7 @@ class CurrentConditionsXmlDataSource(object):
         result['wind']['unit'] = "m/s"
 
         result['info'] = {}
-        result['info']['timestamp'] = datetime.strptime(dom.getElementsByTagName('timestampt')[0].childNodes[0].data, "%Y.%m.%d.%H.%M.%S")
+        result['info']['timestamp'] = datetime.strptime(dom.getElementsByTagName('times')[0].childNodes[0].data, "%Y-%m-%d %H:%M:%S")
 
         return result
 
