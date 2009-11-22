@@ -49,7 +49,7 @@ do_start_logger()
     #   2 if daemon could not be started
     start-stop-daemon --start --quiet --background --make-pidfile --pidfile $PIDFILE_LOGGER -d $LOGGER_DIR --exec $LOGGER_DIR/$LOGGER --test > /dev/null \
         || return 1
-    start-stop-daemon --start --quiet --background --make-pidfile --pidfile $PIDFILE_LOGGER -d $LOGGER_DIR --exec $LOGGER_DIR/$LOGGER $LOGGER_ARGS \
+    start-stop-daemon --start --quiet --background --make-pidfile --pidfile $PIDFILE_LOGGER -d $LOGGER_DIR --exec $LOGGER_DIR/$LOGGER -- $LOGGER_ARGS \
         || return 2
 }
 
