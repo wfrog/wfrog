@@ -87,6 +87,9 @@ class RenderEngine(object):
                 return
             else:
                 raise
+        except Exception, e:
+            self.logger.exception(e.message)
+            raise
         finally:
             self.daemon = False
 

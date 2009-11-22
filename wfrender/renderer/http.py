@@ -78,6 +78,9 @@ class HttpRenderer(object):
             self.logger.info('^C received, shutting down server')
             self.server.shutdown()
             raise KeyboardInterrupt()
+        except Exception, e:
+            self.logger.exception(e.message)
+            raise
 
     def close(self):
         self.logger.debug('Close requested')
