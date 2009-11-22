@@ -165,6 +165,10 @@ class GoogleChartRenderer(object):
             serie_config.__dict__.update(serie)
             serie_data = data[key.split('.')[0]]['series'][key.split('.')[1]]
                           
+            if flat(serie_data):
+                print "FLAAAT"
+                continue
+                          
             if serie_config.interpolate:
                 serie_data = interpolate(serie_data)
 
@@ -251,9 +255,12 @@ class GoogleChartRenderer(object):
             index = index + 1
 
         # Compute vertical range
-        chart.y_range=[chart_min-config.y_margin[0], chart_max+config.y_margin[1]]
+        
         if config.axes:
-            chart.set_axis_range(Axis.LEFT, chart_min-config.y_margin[0], chart_max+config.y_margin[1])
+            if not chart_min == sys.maxint and not chart_max == -sys.maxint:
+                chart.set_axis_range(Axis.LEFT, chart_min-config.y_margin[0], chart_max+config.y_margin[1])
+            else:
+                chart.set_axis_range(Axis.LEFT, 0, 100)
             chart.set_axis_style(0, _valid_color(config.text), config.size, 0, Axis.BOTH if config.ticks else Axis.AXIS_LINES)
         else:
             chart.set_axis_labels(Axis.LEFT, [])
@@ -553,6 +560,14 @@ def _valid_color(color):
         return color
     else:
         return webcolors.name_to_hex(color)[1:]
+
+def flat(data):
+    if len(data)==0:
+        return true
+    for d in data:
+        if d and not d==0: 
+            return False
+    return True
 
 def interpolate(data):
     result = copy.copy(data)
