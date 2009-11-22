@@ -18,7 +18,7 @@ NAME=wfrog
 DESC="wfrog logger - Weather Station Software "
 LOGGER_DIR=/opt/wfrog/wflogger/src
 LOGGER=WxLogger.py
-LOGGER_ARGS=
+LOGGER_ARGS="-f /etc/wfrog/wflogger.conf"
 PIDFILE_LOGGER=/var/run/wflogger.pid
 SCRIPTNAME=/etc/init.d/wfrog
 CONFIG_FILE=/etc/wfrog/wflogger.conf
@@ -26,7 +26,7 @@ CONFIG_FILE=/etc/wfrog/wflogger.conf
 # Exit if the package is not installed
 [ -x "$LOGGER_DIR/$LOGGER" ] || exit 0
 
-[ -x "$CONFIG_FILE" ] && LOGGER_ARGS="$LOGGER_ARGS -f $CONFIG_FILE"
+[ -e "$CONFIG_FILE" ] && LOGGER_ARGS="$LOGGER_ARGS -f $CONFIG_FILE"
 
 # Read configuration variable file if it is present
 [ -r /etc/default/$NAME ] && . /etc/default/$NAME
