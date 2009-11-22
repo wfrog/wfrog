@@ -1,0 +1,28 @@
+#summary Guide to install wfrog on a Voyage Linux system
+
+<p align="center"><img src="http://wfrog.googlecode.com/svn/wiki/images/logo-web.png"/></p>
+
+<wiki:toc/>
+
+=Introduction=
+
+The wfrog software is likely to be run on a low-consumption PC like an [http://www.pcengines.ch Alix] board  
+
+There are not many alternatives in chosing an OS for such devices. One that seems appropriate is [http://linux.voyage.hk/ Voyage Linux] because it is debian-based and offers easy installation of dependency packages (see [Documentation]).
+
+Voyage Linux is based on Debian Etch, which is good because it is proven very stable and bad because it offers some outdated software packages like Python 2.4 instead of 2.5, which is required by wfrog.
+
+This guide is an attempt to collect installation steps of neede dependencies on Voyage 
+Linux.
+
+=Preparing Voyage Linux=
+
+You may want to get rid of the read-only mount of / in order to write the data on the disk. For that, change `/etc/init.d/mountall.sh`.
+
+=Python=
+
+{{{
+apt-get install python2.5
+}}}
+
+Then relink `/usr/bin/python` to `python2.5`
