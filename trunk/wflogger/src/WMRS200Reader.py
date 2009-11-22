@@ -97,8 +97,7 @@ class WMRS200Reader (Thread):
                                             0x0000008,            # bytes to read
                                             10000)                # timeout
             except Exception, e:
-                self._logger.error("Exception reading interrupt: "+ str(e))
-                self._logger.error(repr(sys.exc_info()[2]))
+                self._logger.exception("Exception reading interrupt: "+ str(e))
                 errors = errors + 1
                 time.sleep(3)
                 if errors > 10:
