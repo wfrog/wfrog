@@ -135,3 +135,20 @@ python wfrender.py -H ELEMENT            # Help on a specific element
 }}}
 
 <p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
+
+== Install as a boot-time service ==
+
+Steps to make wfrog start and stop automatically on a debian-based system:
+
+  * Unzip wrog in `/opt/wfrog`
+  * Make links to the daemon scripts (as root)
+{{{
+cd /etc/init.d/
+ln -s /opt/wfrog/bin/wfrender 
+ln -s /opt/wfrog/bin/wflogger 
+}}}
+  * Make these scripts be called by the system (as root)
+{{{
+update-rc.d wfrender defaults 99
+update-rc.d wflogger defaults 99
+}}}
