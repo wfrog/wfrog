@@ -69,7 +69,7 @@ class DatabaseDataSource(object):
     password = None
     table = 'METEO'
     slice = 'hour'
-    span = 24
+    span = 23
     measures = [ 'temp', 'hum', 'dew', 'wind', 'sector', 'press', 'rain', 'uv' ]
     holes = True
 
@@ -128,19 +128,19 @@ class DatabaseDataSource(object):
         DAY=[
             lpa+"EXTRACT(" + ("DAY" if not switch else "MONTH")+" FROM "+timestamp_field+")"+lpz+conc+"'.'"+conc+lpa+"EXTRACT("+("MONTH" if not switch else "DAY")+" FROM "+timestamp_field+")"+lpz,
             separator,
-            365,
+            363,
             YEAR, self.BEFORE if not switch else self.AFTER, "%d"+separator+"%m"]
 
         HOUR=[
             lpa+"EXTRACT(HOUR FROM "+timestamp_field+")"+lpz+conc+"':00'",
             ' ',
-            24,
+            23,
             DAY, self.AFTER, "%H:00"]
 
         MINUTE=[
             lpa+"EXTRACT(HOUR FROM "+timestamp_field+")"+lpz+conc+"':'"+conc+lpa+"EXTRACT(MINUTE FROM "+timestamp_field+")"+lpz,
             ' ',
-            60*24,
+            60*24-1,
             DAY, self.AFTER, "%H:%M"]
 
         slices = {
