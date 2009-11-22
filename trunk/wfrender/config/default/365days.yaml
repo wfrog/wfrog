@@ -4,7 +4,7 @@ renderer: !template
     renderer: !data
         source: !database 
             slice: day
-            span: 365
+            span: 363
         renderer: !multi
             renderers:
                 current: !include
