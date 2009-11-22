@@ -10,7 +10,9 @@ The wfrog software is likely to be run on a low-consumption PC like an [http://w
 
 There are not many alternatives in chosing an OS for such devices. One that seems appropriate is [http://linux.voyage.hk/ Voyage Linux] because it is debian-based and offers easy installation of dependency packages (see [Documentation]).
 
-Voyage Linux is based on Debian Etch, which is good because it is proven very stable and bad because it offers some outdated software packages like Python 2.4 instead of 2.5, which is required by wfrog.
+Voyage Linux is based on Debian Etch, which is:
+  * good because it is proven very stable
+  * bad because it offers some outdated software packages like Python 2.4 instead of 2.5, which is required by wfrog.
 
 This guide is an attempt to collect installation steps of neede dependencies on Voyage 
 Linux.
