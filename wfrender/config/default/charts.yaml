@@ -37,7 +37,6 @@ renderer: !multi
             series:
                 wind.avg: {}                    
                 wind.max:
-                    interpolate: true
                     order: -1
                     color: tan             
                     thickness: 1       
@@ -48,7 +47,7 @@ renderer: !multi
         wind_dir: !windradar
             width: 125
             height: 125
-            sectors: { color: FFFB80, intensity: 1 }
+            sectors: { color: 00AF00, intensity: 1 }
             lines: { gust: tan, thickness: 1 }
             areas: {  gust: wheat }      
             
