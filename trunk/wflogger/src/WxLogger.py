@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 
 ## Copyright 2009 Jordi Puigsegur <jordi.puigsegur@gmail.com>
 ##                Laurent Bovet <lbovet@windmaster.ch>
