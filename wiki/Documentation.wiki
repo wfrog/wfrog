@@ -96,7 +96,7 @@ Get example content from the default config files, respectively:
 /opt/wfrog/wfrender/config/wfrender.yaml
 }}}
 
-If you create =wfrender.conf= from =wfrender.yaml=, you will also need to copy the included files of =/opt/wfrog/wfrender/config/default= under a similar structure in =/etc/wfrog=.
+If you create `wfrender.conf` from `wfrender.yaml`, you will also need to copy the included files of `/opt/wfrog/wfrender/config/default` under a similar structure in `/etc/wfrog`.
 
 = User Manual =
 
