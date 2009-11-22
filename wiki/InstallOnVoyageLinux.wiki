@@ -50,4 +50,7 @@ Pin-Priority: 999
 
 ==Cheetah==
 
-Unless you precompile the C extensions on another machine, you have to install the pure python package with `easy_install2.5 cheetah`.
+The binary package is too old. You have to install the pure python package with:
+{{{
+easy_install2.5 cheetah
+}}}
