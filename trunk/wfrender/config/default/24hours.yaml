@@ -4,7 +4,7 @@ renderer: !template
     renderer: !data
         source: !database 
             slice: hour
-            span: 24
+            span: 23
         renderer: !multi
             renderers:
                 current: !include
