@@ -257,7 +257,7 @@ class GoogleChartRenderer(object):
         
         if config.axes:
             if not chart_min == sys.maxint and not chart_max == -sys.maxint:
-                range_min = round(chart_min-config.y_margin[0])
+                range_min = round(chart_min-config.y_margin[0])-1
                 range_max = round(chart_max+config.y_margin[1])
                 print str(range_min) +" "+str(range_max)
                 chart.set_axis_range(Axis.LEFT, range_min, range_max+1)
