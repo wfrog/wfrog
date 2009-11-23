@@ -21,6 +21,7 @@ renderer: !multi
             series: 
                 hum.avg: {}        
             labels: hum.lbl
+            y_margin: [ 10, 5 ]
         press: !chart                            
             series: 
                 press.avg: {}        

@@ -166,7 +166,6 @@ class GoogleChartRenderer(object):
             serie_data = data[key.split('.')[0]]['series'][key.split('.')[1]]
                           
             if flat(serie_data):
-                print "FLAAAT"
                 continue
                           
             if serie_config.interpolate:
@@ -259,6 +258,8 @@ class GoogleChartRenderer(object):
         if config.axes:
             if not chart_min == sys.maxint and not chart_max == -sys.maxint:
                 chart.set_axis_range(Axis.LEFT, chart_min-config.y_margin[0], chart_max+config.y_margin[1])
+                chart.add_data([chart_min-config.y_margin[0], chart_max+config.y_margin[1]])
+                colors.append("00000000")
             else:
                 chart.set_axis_range(Axis.LEFT, 0, 100)
             chart.set_axis_style(0, _valid_color(config.text), config.size, 0, Axis.BOTH if config.ticks else Axis.AXIS_LINES)
@@ -266,11 +267,11 @@ class GoogleChartRenderer(object):
             chart.set_axis_labels(Axis.LEFT, [])
             chart.set_axis_style(0, _valid_color(config.text), config.size, 0, Axis.TICK_MARKS, _valid_color(config.bgcolor))
 
-        if config.zero:
+        if config.zero and chart_min-config.y_margin[0] < 0:
             zero_config = ChartConfig()
             zero_config.__dict__.update(config.__dict__)
             zero_config.__dict__.update(config.zero)
-            chart.add_data([0]*2)
+            chart.add_data([0]*2)                        
             colors.append(_valid_color(zero_config.color))
             chart.set_line_style(index, zero_config.thickness)
 
