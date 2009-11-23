@@ -44,7 +44,7 @@ def rmin(a,b):
 def amin(a):
     m=sys.maxint
     for i in a:
-        if i and i < m:
+        if not i == None and i < m:
             m=i
     return m
 
