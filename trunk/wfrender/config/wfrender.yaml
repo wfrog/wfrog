@@ -1,10 +1,5 @@
 context:
-    database: { url: 'localhost:/var/lib/firebird/2.0/data/wfrog.db' }
-    units: 
-        temp: F
-        press: mmHg
-        wind: kt
-        rain: in        
+    database: { url: 'localhost:/var/lib/firebird/2.0/data/wfrog.db' }  
 renderer: !http    
     cookies: [ units ]
     root: !include
