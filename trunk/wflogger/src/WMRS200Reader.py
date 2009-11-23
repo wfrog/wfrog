@@ -138,7 +138,10 @@ class WMRS200Reader (Thread):
                         self._logger.debug("Warning: zero length message in input")
                     else:
                         # Parse the message
-                        self._wxData.parse_record(input_buffer[startSep + 2 : endSep])
+                        try:
+                            self._wxData.parse_record(input_buffer[startSep + 2 : endSep])
+                        except Exception, e:
+                            self._logger.exception(e.message)
 
                     # remove this message from the input queue
                     input_buffer = input_buffer[endSep:]
