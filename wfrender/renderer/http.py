@@ -139,15 +139,11 @@ class HttpRendererHandler(BaseHTTPRequestHandler):
             cookie = Cookie.SimpleCookie(cookie_str)            
             for i in cookie:
                 parts = i.split('.')
-                if len(parts) != 2:
-                    self.send_error(500,"Malformed cookie")
-                    return                        
-                section = parts[0]
-                value = parts[1]
-                if not cookie_sections.__contains__(section):
-                    self.send_error(403,"Permission Denied")
-                    return    
-                context[section][value]=cookie[i].value
+                if len(parts) == 2:             
+                    section = parts[0]
+                    key = parts[1]
+                    if cookie_sections.__contains__(section) and context[section].has_key(key):
+                        context[section][key]=cookie[i].value
             
         if name == "":
             if not root:
