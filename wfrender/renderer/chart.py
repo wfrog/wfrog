@@ -24,6 +24,7 @@ from pygooglechart import SimpleLineChart
 from math import log
 import math
 import renderer
+import units
 import webcolors
 import re
 import copy
@@ -128,6 +129,8 @@ class GoogleChartRenderer(object):
         assert self.series is not None, "'chart.series' must be set"
         assert renderer.is_dict(self.series), "'chart.series' must be a key/value dictionary"
 
+        converter = units.Converter(context["units"])
+
         # merge builtin defaults, context and renderer config
         config = ChartConfig()
         if context.has_key('chart'):
@@ -165,7 +168,8 @@ class GoogleChartRenderer(object):
             serie_config.__dict__.update(config.__dict__)
             serie_config.__dict__.update(serie)
             serie_data = data[key.split('.')[0]]['series'][key.split('.')[1]]
-                          
+            measure = key.split('.')[0]
+            
             if flat(serie_data):
                 continue
                           
@@ -195,14 +199,16 @@ class GoogleChartRenderer(object):
                 max_config = ChartConfig()
                 max_config.__dict__.update(serie_config.__dict__)
                 max_config.__dict__.update(serie_config.max)
-                chart.add_marker(index, max_index, 't'+str(max_data), _valid_color(max_config.text), max_config.size)
+                str_max_data = str(round(converter.convert(measure, max_data), 1))
+                chart.add_marker(index, max_index, 't'+str_max_data, _valid_color(max_config.text), max_config.size)
                 chart.add_marker(index, max_index, max_config.style, _valid_color(max_config.color), max_config.thickness)
 
             if serie_config.min and not min_index == None:
                 min_config = ChartConfig()
                 min_config.__dict__.update(serie_config.__dict__)
                 min_config.__dict__.update(serie_config.min)
-                chart.add_marker(index, min_index, 't'+str(min_data), _valid_color(min_config.text), min_config.size)
+                str_min_data = str(round(converter.convert(measure, min_data), 1))
+                chart.add_marker(index, min_index, 't'+str_min_data, _valid_color(min_config.text), min_config.size)
                 chart.add_marker(index, min_index, min_config.style, _valid_color(min_config.color), min_config.thickness)
 
             if serie_config.last:
@@ -212,6 +218,7 @@ class GoogleChartRenderer(object):
                 last_index=len(serie_data)-1
                 last_data = serie_data[last_index]
                 if last_data:
+                    str_last_data = str(round(converter.convert(measure, last_data), 1))
                     chart.add_marker(index, last_index, 't'+str(last_data), _valid_color(last_config.text), last_config.size)
                     chart.add_marker(index, last_index, last_config.style, _valid_color(last_config.color), last_config.thickness)
 
@@ -258,11 +265,15 @@ class GoogleChartRenderer(object):
         
         if config.axes:
             if not chart_min == sys.maxint and not chart_max == -sys.maxint:
-                range_min = math.floor(chart_min-config.y_margin[0])
-                range_max = math.ceil(chart_max+config.y_margin[1])
-                self.logger.debug("Y range: "+str(range_min) +" "+str(range_max))
-                chart.set_axis_range(Axis.LEFT, range_min, range_max+1)
-                chart.add_data([range_min, range_max])
+                range_min = chart_min-config.y_margin[0]
+                range_max = chart_max+config.y_margin[1]
+                range_min_target_units = math.floor(converter.convert(measure, range_min))
+                range_max_target_units = math.ceil(converter.convert(measure, range_max))
+                range_min_ref_units = converter.convert_back(measure, range_min_target_units)
+                range_max_ref_units = converter.convert_back(measure, range_max_target_units)
+                self.logger.debug("Y range: "+str(range_min_target_units) +" "+str(range_max_target_units))
+                chart.set_axis_range(Axis.LEFT, range_min_target_units, range_max_target_units+1)
+                chart.add_data([range_min_ref_units, range_max_ref_units])
                 colors.append("00000000")
             else:
                 chart.set_axis_range(Axis.LEFT, 0, 100)
@@ -271,7 +282,7 @@ class GoogleChartRenderer(object):
             chart.set_axis_labels(Axis.LEFT, [])
             chart.set_axis_style(0, _valid_color(config.text), config.size, 0, Axis.TICK_MARKS, _valid_color(config.bgcolor))
 
-        if config.zero and chart_min-config.y_margin[0] < 0:
+        if config.zero and range_min_ref_units < 0:
             zero_config = ChartConfig()
             zero_config.__dict__.update(config.__dict__)
             zero_config.__dict__.update(config.zero)
@@ -433,7 +444,7 @@ class GoogleChartWindRadarRenderer(object):
             chart.add_marker(3, -1, "v", _valid_color(bars_config.color), bars_config.thickness, -1)
 
         if config.beaufort:
-            chart.add_marker(0, "220:0.9", "@t"+str(beaufort(current_noscale)), _valid_color(beaufort_config.color) + "%02x" % (beaufort_config.intensity*255), rmin(config.height, config.width)-config.size*5, -1)
+            chart.add_marker(0, "220:0.9", "@t"+str(units.MpsToBft(current_noscale)), _valid_color(beaufort_config.color) + "%02x" % (beaufort_config.intensity*255), rmin(config.height, config.width)-config.size*5, -1)
 
         colors = ["00000000",
             _valid_color(tail_config.color),
@@ -624,30 +635,5 @@ def compress(data, ratio, min_index, max_index):
     return result
 
 
-def beaufort(mps):
-    if mps < 0.3:
-        return 0
-    if mps < 1.5:
-        return 1
-    if mps < 3.4:
-        return 2
-    if mps < 5.4:
-        return 3
-    if mps < 7.9:
-        return 4
-    if mps < 10.7:
-        return 5
-    if mps < 13.8:
-        return 6
-    if mps < 17.1:
-        return 7
-    if mps < 20.7:
-        return 8
-    if mps < 24.4:
-        return 9
-    if mps < 28.4:
-        return 10
-    if mps < 32.6:
-        return 11
-    return 12
+
 

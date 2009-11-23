@@ -20,6 +20,12 @@ from Cheetah.Template import Template
 from Cheetah.NameMapper import NotFound
 import logging
 
+def rnd(value, dec=0):
+    if value == round(value):
+        return int(round(value))
+    else:
+        return round(value, dec)
+
 class TemplateRenderer(object):
     """
     Executes a wrapped renderer and fills a template with the resulting data.
@@ -32,10 +38,11 @@ class TemplateRenderer(object):
     logger = logging.getLogger("renderer.template")
 
     def render(self,data={}, context={}):
+        print context
         content = ""
         if self.renderer:
-            content = self.renderer.render(data, context)
-        
-	self.logger.debug("Rendering with template "+self.path)
-        template = Template(file=file(self.path, "r"), searchList=[content])
+            content = self.renderer.render(data, context)        
+        self.logger.debug("Rendering with template "+self.path)
+        content["rnd"]=rnd
+        template = Template(file=file(self.path, "r"), searchList=[content, context])
         return [ self.mime, str(template) ]
