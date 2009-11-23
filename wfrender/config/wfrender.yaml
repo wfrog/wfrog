@@ -6,6 +6,7 @@ context:
         wind: kt
         rain: in        
 renderer: !http    
+    cookies: [ units ]
     root: !include
         path: default/24hours.yaml
     renderers:

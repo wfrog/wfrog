@@ -1,3 +1,12 @@
+#set $http = $getVar('http', False)
+#from units import unit_roll
+#def unitstr(m,u)
+#if $http 
+<a href="-set-?s=units&k=$m&v=$unit_roll($m,$u)">$u</a>
+#else 
+$u
+#end if
+#end def
 <head>
     <title>Weather Dashboard - wfrog</title>
     <style>
@@ -112,15 +121,15 @@
 </div>
 <div class="bordered header cell">    
     <div class="leftCell">
-            <span class="symbol">&#9832;</span> <span class="bigger" ><span class="value">$rnd($current.temp1, 1)</span>&deg;</span>$units.temp<br>
+            <span class="symbol">&#9832;</span> <span class="bigger" ><span class="value">$rnd($current.temp1, 1)</span>&deg;</span>$unitstr('temp',$units.temp)<br>
             Humidity <span class="value">$rnd($current.hum1)</span> % <br>
-            Pressure <span class="value">$rnd($current.press)</span> $units.press
+            Pressure <span class="value">$rnd($current.press)</span> $unitstr('press',$units.press)
     </div>
     <div class="rightCell leftpad">
         <div class="rightCell">
             <span class="bigger">&#8962; &nbsp;</span>
         </div><br>
-        <span class="value">$rnd($current.temp0,1)</span>&deg;$units.temp <br>
+        <span class="value">$rnd($current.temp0,1)</span>&deg;$unitstr('temp',$units.temp) <br>
         <div class="rightCell">
             <span class="value">$rnd($current.hum0)</span> %<br>
         </div>
@@ -131,9 +140,9 @@
         <img src="$current.wind.dir"/>
     </div>
     <div class="leftCell smallpad">
-        <br style="font-size:50%">Wind <span class="value">$rnd($current.wind.speed, 1)</span> $units.wind<br>
-        Gust <span class="value">$rnd($current.wind.gust, 1)</span> $units.wind<br>
-        Rain <span class="value">$rnd($current.rain, 1)</span> $units.rain/h<br>
+        <br style="font-size:50%">Wind <span class="value">$rnd($current.wind.speed, 1)</span> $unitstr('wind',$units.wind)<br>
+        Gust <span class="value">$rnd($current.wind.gust, 1)</span> $unitstr('wind',$units.wind)<br>
+        Rain <span class="value">$rnd($current.rain, 1)</span> $unitstr('rain',$units.rain)/h<br>
         <!-- UV Index <span class="value">0</span> -->
     </div>    
 </div>
@@ -145,7 +154,7 @@
 </div>
 <div>
     <div class="bordered cell graph">
-        <span class="symbol">&#9832;</span> Temperature and Dew Point<div class="units">&deg;$units.temp</div><br>
+        <span class="symbol">&#9832;</span> Temperature and Dew Point<div class="units">&deg;$unitstr('temp',$units.temp)</div><br>
         <img src="$chart.temp"/>
     </div>
     <div class="bordered cell graph">
@@ -153,13 +162,13 @@
         <img src="$chart.hum"/>
     </div>
     <div class="bordered cell graph">
-        <span class="symbol">&#9878;</span> Pressure<div class="units">$units.press</div><br>
+        <span class="symbol">&#9878;</span> Pressure<div class="units">$unitstr('press',$units.press)</div><br>
         <img src="$chart.press"/>
     </div>
 </div>
 <div class="leftCell">
     <div class="bordered cell graph"  style="clear: both">
-        <span class="symbol">&#9872;</span> Wind and Gusts<div class="units">$units.wind</div><br>
+        <span class="symbol">&#9872;</span> Wind and Gusts<div class="units">$unitstr('wind',$units.wind)</div><br>
         <img src="$chart.wind"/>
     </div>
     <div class="bordered cell graph">
@@ -169,7 +178,7 @@
 </div>
 <div class="leftCell">
     <div class="bordered cell graph"  style="clear: both">
-        <span class="symbol">&#9748;</span> Rain<div class="units">$units.rain</div><br>
+        <span class="symbol">&#9748;</span> Rain<div class="units">$unitstr('rain',$units.rain)</div><br>
         <img src="$chart.rain"/>
     </div>
     <div class="bordered cell graph">
