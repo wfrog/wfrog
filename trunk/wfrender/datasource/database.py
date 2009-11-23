@@ -132,10 +132,10 @@ class DatabaseDataSource(object):
             YEAR, self.BEFORE if not switch else self.AFTER, "%d"+separator+"%m"]
 
         HOUR=[
-            lpa+"EXTRACT(HOUR FROM "+timestamp_field+")"+lpz+conc+"':00'",
+            lpa+"EXTRACT(HOUR FROM "+timestamp_field+")"+lpz+conc+"''",
             ' ',
             23,
-            DAY, self.AFTER, "%H:00"]
+            DAY, self.AFTER, "%H"]
 
         MINUTE=[
             lpa+"EXTRACT(HOUR FROM "+timestamp_field+")"+lpz+conc+"':'"+conc+lpa+"EXTRACT(MINUTE FROM "+timestamp_field+")"+lpz,

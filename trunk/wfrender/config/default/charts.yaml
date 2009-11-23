@@ -28,7 +28,7 @@ renderer: !multi
             labels: press.lbl            
         rain: !chart                            
             series: 
-                rain.rate: {}        
+                rain.fall: {}        
             labels: rain.lbl  
         uv: !chart                            
             series: 
