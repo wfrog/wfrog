@@ -218,11 +218,12 @@ e: byte 3 * 256 + byte 2, in inches/hour (verify time unit)
         #qnhForecast = record[5] >> 4
         #qnhForecast_txt = WxForecast.get(forecast, str(qnhForecast))
 
-        self.logger.info("has temp"+str(self._WxCurrent.has_key['th1.temp']))
-        self.logger.info("has hum"+str(self._WxCurrent.has_key['th1.hum']))
-        self.logger.info("got pressure "+pressure)
+        try:
+        self._logger.info("has temp"+str(self._WxCurrent.has_key['th1.temp']))
+        self._logger.info("has hum"+str(self._WxCurrent.has_key['th1.hum']))
+        self._logger.info("got pressure "+pressure)
         if self._WxCurrent.has_key['th1.temp'] and self._WxCurrent.has_key['th1.humidity']:
-            self.logger.info("calculating pressure")
+            self._logger.info("calculating pressure")
             pressure = round(StationToSeaLevelPressure(
                                                    pressure,
                                                    self.ALTITUDE, self._WxCurrent['th1.temp'], self.MEAN_TEMP, 
