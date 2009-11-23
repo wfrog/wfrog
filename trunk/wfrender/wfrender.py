@@ -22,13 +22,14 @@ import config
 import copy
 import optparse
 import logging
+import units
 
 class RenderEngine(object):
     """Entry point of the rendering"""
 
     root_renderer = None
     configurer = None
-    initial_context = None
+    initial_context = { "units" : units.reference }
     initial_data = {}
     daemon = False
     output = False

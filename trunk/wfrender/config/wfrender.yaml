@@ -1,5 +1,10 @@
 context:
     database: { url: 'localhost:/var/lib/firebird/2.0/data/wfrog.db' }
+    units: 
+        temp: F
+        press: mmHg
+        wind: kt
+        rain: in        
 renderer: !http    
     root: !include
         path: default/24hours.yaml

@@ -28,6 +28,7 @@ from threading import Thread
 import inspect
 import logging
 import traceback
+import dict
 
 class YamlConfigurer(object):
     """Returns a configuration read from a yaml file (default to wfrender.yaml in cwd)"""
@@ -97,10 +98,11 @@ class YamlConfigurer(object):
 
         engine.root_renderer = config["renderer"]
         if config.has_key("context"):
-            engine.initial_context = config["context"]
+            config_context = config["context"]
         else:
-            engine.initial_context = {}
-        engine.initial_context['_yaml_config_file'] = path.abspath(options.config)
+            config_context = {}
+        config_context['_yaml_config_file'] = path.abspath(options.config)
+        engine.initial_context = dict.merge(engine.initial_context, config_context)
 
         if ( options.reload_config or options.reload_mod) and not self.watcher_running:
             self.watcher_running = True
