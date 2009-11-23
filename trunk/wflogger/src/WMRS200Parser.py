@@ -218,7 +218,6 @@ e: byte 3 * 256 + byte 2, in inches/hour (verify time unit)
         #qnhForecast = record[5] >> 4
         #qnhForecast_txt = WxForecast.get(forecast, str(qnhForecast))
 
-        try:
         self._logger.info("has temp"+str(self._WxCurrent.has_key['th1.temp']))
         self._logger.info("has hum"+str(self._WxCurrent.has_key['th1.hum']))
         self._logger.info("got pressure "+pressure)
