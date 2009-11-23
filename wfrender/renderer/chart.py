@@ -85,8 +85,8 @@ class ChartConfig(object):
     order = 0
 
     # Wind Radar
-    radius = 16 # max value for logarithmic scaling
-    median = 2  # value in the middle of the graph
+    radius = 18 # max value for logarithmic scaling
+    median = 2.5  # value in the middle of the graph
 
     tail = None
     arrow = { }
@@ -190,14 +190,14 @@ class GoogleChartRenderer(object):
             chart.add_data(serie_data)
             colors.append(_valid_color(serie_config.color))
 
-            if serie_config.max and max_index :
+            if serie_config.max and not max_index == None :
                 max_config = ChartConfig()
                 max_config.__dict__.update(serie_config.__dict__)
                 max_config.__dict__.update(serie_config.max)
                 chart.add_marker(index, max_index, 't'+str(max_data), _valid_color(max_config.text), max_config.size)
                 chart.add_marker(index, max_index, max_config.style, _valid_color(max_config.color), max_config.thickness)
 
-            if serie_config.min and min_index:
+            if serie_config.min and not min_index == None:
                 min_config = ChartConfig()
                 min_config.__dict__.update(serie_config.__dict__)
                 min_config.__dict__.update(serie_config.min)
