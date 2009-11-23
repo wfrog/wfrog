@@ -119,6 +119,39 @@ python WxLogger.py
 
   * Adapt values in `wfrender/config/wfrender.yaml`
 
+== Changing Default Units ==
+
+In `wfrender.yaml`, add a `units:` section in the `context:` section. Example:
+
+{{{
+context:
+    database: { url: 'localhost:/var/lib/firebird/2.0/data/wfrog.db' }
+    units: 
+        temp: F
+        press: mmHg
+        wind: kt
+        rain: in     
+}}}
+
+Supported units:
+  * temp
+    * C
+    * F
+  * press
+    * hPa
+    * mmHg
+    * inHg
+  * wind
+    * m/s
+    * km/h
+    * mph
+    * kt
+    * bft      
+  * rain
+    * mm
+    * in
+
+
 === Starting the Renderer ===
 
 {{{
