@@ -73,17 +73,17 @@ class WMRS200Parser (WxParser):
     Length 11 
     Example: 00 60 00 00 14 09 1c 04 09 01 a7
 
-    Byte	Data	Comment
-    0	00 	Battery data in high nibble, lowest bit 1 if main unit runs only on battery
-    1	60 	Identifier
-    2-3	00 00 	Unknown
-    4	14 	Minutes: 20
-    5	09 	Hour: 09
-    6	1c 	Day: 28
-    7	04 	Month: 04, April
-    8	09 	Year: 2009 (add 2000)
-    9	01 	Time Zone: GMT +1 (highest bit 1 if negative)
-    10	a7 	Checksum: 167
+    Byte    Data    Comment
+    0   00  Battery data in high nibble, lowest bit 1 if main unit runs only on battery
+    1   60  Identifier
+    2-3 00 00   Unknown
+    4   14  Minutes: 20
+    5   09  Hour: 09
+    6   1c  Day: 28
+    7   04  Month: 04, April
+    8   09  Year: 2009 (add 2000)
+    9   01  Time Zone: GMT +1 (highest bit 1 if negative)
+    10  a7  Checksum: 167
         """
         power = (record[0]) >> 4
         powered = ((power & 0x8) >> 3) == 0    # VERIFIED -- EXTERNAL POWER INDICATOR
@@ -110,22 +110,22 @@ class WMRS200Parser (WxParser):
 
     def _parse_rain_record(self, record):
         """
-    Length	16	
+    Length  16  
     Example: 00 41 ff 02 0c 00 00 00 25 00 00 0c 01 01 06 87
     Byte Data   Comment
-    0	 00 	Battery level in high nibble
-    1	 41 	Identifier
-    2-3	 ff 02 	Rain ratlogging.basicConfig(level=logging.WARNING)
+    0    00     Battery level in high nibble
+    1    41     Identifier
+    2-3  ff 02  Rain ratlogging.basicConfig(level=logging.WARNING)
 e: byte 3 * 256 + byte 2, in inches/hour (verify time unit)
-    4-5	 0c 00 	Rain last hour: byte 5 * 256 + byte 4, in inches
-    6-7	 00 00 	Rain last 24 hours: byte 7 * 256 + byte 6, in inches
-    8-9	 00 25 	Total rain since reset date: byte 9 * 256 + byte 8, in inches
-    10	 00 	Minute of reset date
-    11	 0c 	Hour of reset date
-    12	 01 	Day of reset date
-    13	 01 	Month of reset date
-    14	 06 	Year + 2000 of reset date
-    15	 4e 	Checksum
+    4-5  0c 00  Rain last hour: byte 5 * 256 + byte 4, in inches
+    6-7  00 00  Rain last 24 hours: byte 7 * 256 + byte 6, in inches
+    8-9  00 25  Total rain since reset date: byte 9 * 256 + byte 8, in inches
+    10   00     Minute of reset date
+    11   0c     Hour of reset date
+    12   01     Day of reset date
+    13   01     Month of reset date
+    14   06     Year + 2000 of reset date
+    15   4e     Checksum
         """
         batteryOk = (record[0] & 0x40) == 0
 
@@ -158,18 +158,18 @@ e: byte 3 * 256 + byte 2, in inches/hour (verify time unit)
 
     def _parse_wind_record(self, record):
         """
-    Length	10	
+    Length  10  
     Example: 00 48 0a 0c 16 e0 02 00 20 76
-    Byte Data	Comment
-    0	 00     Battery level in high nibble
-    1	 48     Identifier
-    2	 0a     Wind direction in low nibble, 10 * 360 / 16 = 225 degrees
-    3	 0c     Unknown
-    4-5	 16 e0  Wind gust, (low nibble of byte 5 * 256 + byte 4) / 10
-    5-6	 e0 02  Wind average, (high nibble of byte 5 + byte 6 * 16) / 10
-    7	 00 	?
-    8	 20 	?
-    9	 76 	Checksum
+    Byte Data   Comment
+    0    00     Battery level in high nibble
+    1    48     Identifier
+    2    0a     Wind direction in low nibble, 10 * 360 / 16 = 225 degrees
+    3    0c     Unknown
+    4-5  16 e0  Wind gust, (low nibble of byte 5 * 256 + byte 4) / 10
+    5-6  e0 02  Wind average, (high nibble of byte 5 + byte 6 * 16) / 10
+    7    00     ?
+    8    20     ?
+    9    76     Checksum
         """
         batteryOk = (record[0] & 0x40) == 0                
         dir = record[2] & (0x0f)
@@ -198,9 +198,9 @@ e: byte 3 * 256 + byte 2, in inches/hour (verify time unit)
 
     def _parse_barometer_record(self, record):
         """
-    Length	7
+    Length  7
     Example: 00 46 ed 03 ed 33 56
-    Byte	Data	Comment
+    Byte    Data    Comment
     0    00     Unused?
     1    46     Identifier
     2-3  ed 03  Absolute pressure, low nibble of byte 3 * 256 + byte 2
@@ -218,32 +218,36 @@ e: byte 3 * 256 + byte 2, in inches/hour (verify time unit)
         #qnhForecast = record[5] >> 4
         #qnhForecast_txt = WxForecast.get(forecast, str(qnhForecast))
 
-        # Current Data
-        self._WxCurrent['barometer.pressure'] = pressure
-        self._WxCurrent['barometer.forecast'] = forecast
-        self._WxCurrent['barometer.forecastTxt'] = forecastTxt
+        if self._WxCurrent.has_key['th1.temp'] and self._WxCurrent.has_key['th1.humidity']:
+            pressure = round(StationToSeaLevelPressure(
+                                                   pressure,
+                                                   self.ALTITUDE, self._WxCurrent['th1.temp'], self.MEAN_TEMP, 
+                                                   self._WxCurrent['th1.humidity'], 'paDavisVP'),1)
+            # Current Data
+            self._WxCurrent['barometer.pressure'] = pressure
+            self._WxCurrent['barometer.forecast'] = forecast
+            self._WxCurrent['barometer.forecastTxt'] = forecastTxt
 
-        # Report data
-        self._report_barometer(pressure)
+            # Report data
+            self._report_barometer(pressure)
 
-        # Log
-        self._logger.info("Barometer Forecast: %s, Pressure: %d mb", forecastTxt, pressure)
+            # Log
+            self._logger.info("Barometer Forecast: %s, Pressure: %d mb", forecastTxt, pressure)
 
     def _parse_temperature_record(self, record):
         """
-    Length	11	
+    Length  11  
     Example: 20 42 d1 91 00 48 64 00 00 20 90
-    Byte	Data	Comment
-    0	20 	Battery level in high nibble. Temp trend in low nibble?
-    1	42 	Identifier
-    2	d1 	Low nibble is device channel number, high nibble humidity trend and smiley code
-    3-4	91 00 	Temperatlogging.basicConfig(level=logging.WARNING)
-ure: (256 * byte 4 + byte 3) / 10 = 14,5 degrees
-    5	48 	Humidity: 72%
-    6-7	64 00 	Dew point: (256 * byte 7 + byte 6) / 10 = 10 degrees
-    8	00 	?
-    9	20 	?
-    10	90
+    Byte    Data    Comment
+    0   20  Battery level in high nibble. Temp trend in low nibble?
+    1   42  Identifier
+    2   d1  Low nibble is device channel number, high nibble humidity trend and smiley code
+    3-4 91 00   Temperature: (256 * byte 4 + byte 3) / 10 = 14,5 degrees
+    5   48  Humidity: 72%
+    6-7 64 00   Dew point: (256 * byte 7 + byte 6) / 10 = 10 degrees
+    8   00  ?
+    9   20  ?
+    10  90
         """
         sensor = record[2] & 0x0f
         sensorName = THSensors[sensor]
@@ -286,7 +290,7 @@ ure: (256 * byte 4 + byte 3) / 10 = 14,5 degrees
 
     def _parse_uv_record(self, record):
         """
-    Length	6	
+    Length  6   
     Example: 00 47 01 00 48 00
     Byte Data  Comment
     0    00    Battery level in high nibble

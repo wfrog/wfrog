@@ -159,10 +159,7 @@ class WxParser ():
         
         ## QFF pressure (Sea Level Pressure)
         pressure = sum(self._pressure)/len(self._pressure)
-        data['sea_level_pressure'] = round(StationToSeaLevelPressure(
-                                                   sum(self._pressure)/len(self._pressure),
-                                                   self.ALTITUDE, data['temp'], self.MEAN_TEMP, 
-                                                   data['hum'], 'paDavisVP'),1)
+        data['sea_level_pressure'] = pressure
         
         ## Dew Point
         data['dew_point'] = round(DewPoint(data['temp'], data['hum'], 'vaDavisVP'), 1)
