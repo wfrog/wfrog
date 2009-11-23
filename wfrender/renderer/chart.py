@@ -260,7 +260,7 @@ class GoogleChartRenderer(object):
             if not chart_min == sys.maxint and not chart_max == -sys.maxint:
                 range_min = math.floor(chart_min-config.y_margin[0])
                 range_max = math.ceil(chart_max+config.y_margin[1])
-                print str(range_min) +" "+str(range_max)
+                self.logger.debug("Y range: "+str(range_min) +" "+str(range_max))
                 chart.set_axis_range(Axis.LEFT, range_min, range_max+1)
                 chart.add_data([range_min, range_max])
                 colors.append("00000000")
