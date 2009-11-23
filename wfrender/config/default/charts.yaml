@@ -30,6 +30,7 @@ renderer: !multi
             series: 
                 rain.fall: {}        
             labels: rain.lbl  
+            y_margin: [ 0, 1 ]
         uv: !chart                            
             series: 
                 uv.index: {}        
