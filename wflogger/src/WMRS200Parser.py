@@ -218,25 +218,28 @@ e: byte 3 * 256 + byte 2, in inches/hour (verify time unit)
         #qnhForecast = record[5] >> 4
         #qnhForecast_txt = WxForecast.get(forecast, str(qnhForecast))
 
-        self._logger.info("has temp"+str(self._WxCurrent.has_key['th1.temp']))
-        self._logger.info("has hum"+str(self._WxCurrent.has_key['th1.hum']))
-        self._logger.info("got pressure "+pressure)
-        if self._WxCurrent.has_key['th1.temp'] and self._WxCurrent.has_key['th1.humidity']:
-            self._logger.info("calculating pressure")
-            pressure = round(StationToSeaLevelPressure(
-                                                   pressure,
-                                                   self.ALTITUDE, self._WxCurrent['th1.temp'], self.MEAN_TEMP, 
-                                                   self._WxCurrent['th1.humidity'], 'paDavisVP'),1)
-            # Current Data
-            self._WxCurrent['barometer.pressure'] = pressure
-            self._WxCurrent['barometer.forecast'] = forecast
-            self._WxCurrent['barometer.forecastTxt'] = forecastTxt
+        try:
+            self._logger.info("has temp"+str(self._WxCurrent.has_key['th1.temp']))
+            self._logger.info("has hum"+str(self._WxCurrent.has_key['th1.hum']))
+            self._logger.info("got pressure "+pressure)
+            if self._WxCurrent.has_key['th1.temp'] and self._WxCurrent.has_key['th1.humidity']:
+                self._logger.info("calculating pressure")
+                pressure = round(StationToSeaLevelPressure(
+                                                       pressure,
+                                                       self.ALTITUDE, self._WxCurrent['th1.temp'], self.MEAN_TEMP, 
+                                                       self._WxCurrent['th1.humidity'], 'paDavisVP'),1)
+                # Current Data
+                self._WxCurrent['barometer.pressure'] = pressure
+                self._WxCurrent['barometer.forecast'] = forecast
+                self._WxCurrent['barometer.forecastTxt'] = forecastTxt
 
-            # Report data
-            self._report_barometer(pressure)
+                # Report data
+                self._report_barometer(pressure)
 
-            # Log
-            self._logger.info("Barometer Forecast: %s, Pressure: %d mb", forecastTxt, pressure)
+                # Log
+                self._logger.info("Barometer Forecast: %s, Pressure: %d mb", forecastTxt, pressure)
+        except Exception, e:
+            self._logger.exception(e.message)
 
     def _parse_temperature_record(self, record):
         """
