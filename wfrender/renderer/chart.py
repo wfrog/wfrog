@@ -54,7 +54,7 @@ class ChartConfig(object):
     width = 250
     height = 150
     bgcolor = '00000000'
-    y_margin = [ 2, 2 ]
+    y_margin = [ 2, 1 ]
     axes = 'on'
     ticks = 'on'
     legend = None
@@ -257,9 +257,12 @@ class GoogleChartRenderer(object):
         
         if config.axes:
             if not chart_min == sys.maxint and not chart_max == -sys.maxint:
-                chart.set_axis_range(Axis.LEFT, chart_min-config.y_margin[0], chart_max+config.y_margin[1])
-                chart.add_data([chart_min-config.y_margin[0], chart_max+config.y_margin[1]])
-                colors.append("00000000")
+                range_min = round(chart_min-config.y_margin[0])
+                range_max = round(chart_max+config.y_margin[1])
+                print str(range_min) +" "+str(range_max)
+                chart.set_axis_range(Axis.LEFT, range_min, range_max+1)
+                chart.add_data([range_min, range_max])
+                #colors.append("00000000")
             else:
                 chart.set_axis_range(Axis.LEFT, 0, 100)
             chart.set_axis_style(0, _valid_color(config.text), config.size, 0, Axis.BOTH if config.ticks else Axis.AXIS_LINES)
