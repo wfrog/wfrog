@@ -284,7 +284,7 @@ We have basically the following quantities to measure with the most suitable SI 
 || Temperature || C || F ||
 || Pressure    || hPa (=mbar) || mmHg, inHg ||
 || Wind speed  || m/s || km/h, knt, mph, beaufort ||
-|| Rain rate   || mm/s || mm/h, in/h ||
+|| Rain rate   || mm/h || in/h ||
 || Rain sum    || mm || in ||
 
   * Relative humidity is in %, which is not a unit.
