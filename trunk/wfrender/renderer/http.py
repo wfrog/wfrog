@@ -23,7 +23,7 @@ import socket
 import select
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import copy
-import urlparse, cgi
+import urlparse, cgi, Cookie
 import logging
 
 
@@ -48,11 +48,15 @@ class HttpRenderer(object):
 
     port: (optional)
         The listening TCP port. Defaults to 8080.
+        
+    cookies: (optional)
+        List of context sections overridable with a cookie using the -set- uri.
     """
 
     renderers = None
     port = 8080
     root = None
+    cookies = []
 
     logger = logging.getLogger("renderer.http")
 
@@ -63,6 +67,7 @@ class HttpRenderer(object):
             renderer.assert_renderer_dict('http.renderers', self.renderers)
 
         self.context = context
+        self.context["http"] = True
         self.data = data
 
         try:
@@ -92,7 +97,9 @@ class HttpRendererHandler(BaseHTTPRequestHandler):
         global _HttpRendererSingleton
         renderers = _HttpRendererSingleton.renderers
         root = _HttpRendererSingleton.root
-        context = _HttpRendererSingleton.context
+        context = copy.deepcopy(_HttpRendererSingleton.context)
+        cookie_sections = _HttpRendererSingleton.cookies
+        
         
         data = copy.deepcopy(_HttpRendererSingleton.data)
         
@@ -104,6 +111,44 @@ class HttpRendererHandler(BaseHTTPRequestHandler):
 
         name = urlparse.urlsplit(self.path).path.strip('/')
 
+        if name == "-set-":
+            if data.has_key("s") and data.has_key("k") and data.has_key("v"):
+                section = data["s"]
+                key = data["k"]
+                value = data["v"]                
+                if not cookie_sections.__contains__(section):
+                    self.send_error(403,"Permission Denied")
+                    return       
+                context[section][key]=value
+                cookie = Cookie.SimpleCookie()
+                
+                cookie[section+"."+key]=value
+                
+                self.send_response(302)
+                self.send_header('Location', self.headers["Referer"] if self.headers.has_key("Referer") else "/")                
+                self.wfile.write(cookie)
+                self.end_headers()                
+
+                return
+            else:
+                self.send_error(500,"Missing parameters")
+                return        
+            
+        cookie_str = self.headers.get('Cookie')
+        if cookie_str:
+            cookie = Cookie.SimpleCookie(cookie_str)            
+            for i in cookie:
+                parts = i.split('.')
+                if len(parts) != 2:
+                    self.send_error(500,"Malformed cookie")
+                    return                        
+                section = parts[0]
+                value = parts[1]
+                if not cookie_sections.__contains__(section):
+                    self.send_error(403,"Permission Denied")
+                    return    
+                context[section][value]=cookie[i].value
+            
         if name == "":
             if not root:
                 mime = "text/html"
@@ -117,7 +162,7 @@ class HttpRendererHandler(BaseHTTPRequestHandler):
             if renderers is not None and renderers.has_key(name):
                 [ mime, content ] = renderers[name].render(data, context)
 
-        if content:
+        if content:          
             self.send_response(200)
             self.send_header('Content-type', mime)
             self.end_headers()

@@ -264,6 +264,7 @@ class GoogleChartRenderer(object):
         # Compute vertical range
         
         if config.axes:
+            range_min_ref_units = 0
             if not chart_min == sys.maxint and not chart_max == -sys.maxint:
                 range_min = chart_min-config.y_margin[0]
                 range_max = chart_max+config.y_margin[1]
@@ -282,7 +283,7 @@ class GoogleChartRenderer(object):
             chart.set_axis_labels(Axis.LEFT, [])
             chart.set_axis_style(0, _valid_color(config.text), config.size, 0, Axis.TICK_MARKS, _valid_color(config.bgcolor))
 
-        if config.zero and range_min_ref_units < 0:
+        if config.zero and config.axes and range_min_ref_units < 0:
             zero_config = ChartConfig()
             zero_config.__dict__.update(config.__dict__)
             zero_config.__dict__.update(config.zero)
@@ -444,7 +445,7 @@ class GoogleChartWindRadarRenderer(object):
             chart.add_marker(3, -1, "v", _valid_color(bars_config.color), bars_config.thickness, -1)
 
         if config.beaufort:
-            chart.add_marker(0, "220:0.9", "@t"+str(units.MpsToBft(current_noscale)), _valid_color(beaufort_config.color) + "%02x" % (beaufort_config.intensity*255), rmin(config.height, config.width)-config.size*5, -1)
+            chart.add_marker(0, "220:0.9", "@t"+str(int(round(units.MpsToBft(current_noscale)))), _valid_color(beaufort_config.color) + "%02x" % (beaufort_config.intensity*255), rmin(config.height, config.width)-config.size*5, -1)
 
         colors = ["00000000",
             _valid_color(tail_config.color),
