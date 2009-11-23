@@ -51,8 +51,8 @@ def amin(a):
 # Default configuration
 class ChartConfig(object):
     # Graph attributes
-    width = 200
-    height = 125
+    width = 250
+    height = 150
     bgcolor = '00000000'
     y_margin = [ 2, 2 ]
     axes = 'on'

@@ -46,8 +46,8 @@ renderer: !multi
             labels: wind.lbl
             y_margin: [ 0, 1 ]
         wind_dir: !windradar
-            width: 125
-            height: 125
+            width: 150
+            height: 150
             sectors: { color: 00AF00, intensity: 1 }
             lines: { gust: tan, thickness: 1 }
             areas: {  gust: wheat }      
