@@ -128,6 +128,20 @@ class WxParser ():
             self._lock.release()
             return None
         
+        # Calculate wind dominant direction (simple algorithm)
+        histo = {}
+        for d in self._wind_dir:
+            if not histo.has_key(d):
+                histo[d]=1
+            else:
+                histo[d]+=1
+        max_n = 0
+        dom_wind_dir = 0
+        for d, n in histo.iteritems():
+            if n > max_n:
+                max_n = n
+                dom_wind_dir = d
+        
         data = {
             'temp': sum(self._temp)/len(self._temp),
             'temp_min': self._temp_min,
@@ -140,7 +154,7 @@ class WxParser ():
             'hum_max': self._hum_max,
             'hum_max_time': self._hum_max_time,
             'wind': sum(self._wind)/len(self._wind),
-            'wind_dir': sum(self._wind_dir)/len(self._wind_dir),
+            'wind_dir': dom_wind_dir,
             #'wind_dir_str': f(data['wind_dir'])
             'wind_gust': self._wind_gust,
             'wind_gust_dir': self._wind_gust_dir, 
