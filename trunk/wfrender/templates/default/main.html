@@ -1,7 +1,6 @@
-#set $http = $getVar('http', False)
 #from units import unit_roll
 #def unitstr(m,u)
-#if $http 
+#if $getVar('http', False)
 <a href="-set-?s=units&k=$m&v=$unit_roll($m,$u)">$u</a>
 #else 
 $u
@@ -105,8 +104,7 @@ $u
             line-height:18px;
         }
         .units {
-            float: right;
-            color: tan;            
+            float: right;         
         }        
     </style>
 </head>
