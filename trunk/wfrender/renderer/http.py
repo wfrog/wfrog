@@ -67,7 +67,7 @@ class HttpRenderer(object):
             renderer.assert_renderer_dict('http.renderers', self.renderers)
 
         self.context = context
-        self.context["http"] = True
+        self.context["http"] = True # Put in the context that we use the http render. It may be useful to know that in templates.
         self.data = data
 
         try:
