@@ -14,13 +14,13 @@
 
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
 PATH=/usr/sbin:/usr/bin:/sbin:/bin
-NAME=wfrog
+NAME=wflogger
 DESC="wfrog logger - Weather Station Software "
 LOGGER_DIR=/opt/wfrog/wflogger/src
 LOGGER=WxLogger.py
 LOGGER_ARGS=
 PIDFILE_LOGGER=/var/run/wflogger.pid
-SCRIPTNAME=/etc/init.d/wfrog
+SCRIPTNAME=/etc/init.d/wflogger
 CONFIG_FILE=/etc/wfrog/wflogger.conf
 
 # Exit if the package is not installed
