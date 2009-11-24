@@ -8,7 +8,7 @@ $u
 #end def
 <html>
 <head>
-    <title>Weather Dashboard - wfrog $context.version</title>
+    <title>Weather Dashboard - wfrog $version</title>
     <style>
         body {
             font-family: helvetica;
@@ -33,8 +33,11 @@ $u
             padding: 6px;
             float: left;
         }
-        .nopad {
-            padding: 0px;
+        .headerNoPad {
+            margin: 3px;
+            padding-left: 6px;
+            padding-right: 6px;            
+            float: left;
         }
         .pad {
             padding: 6px;
@@ -50,15 +53,24 @@ $u
             padding-bottom: 3px;
         }
         .header {
-            height: 82px;
-            padding-top: 10px;
-            padding-bottom: 2px;
+            margin: 3px;
+            padding-left: 6px;
+            padding-right: 6px;
+            padding-top: 10px;    
+            padding-bottom: 2px;                 
+            float: left;            
+        }
+        .headerContent {
+            height: 64px;            
         }
         .wide {
             width: 95%;
         }
         .leftCell {
             float: left;
+        }
+        .rightAlign {
+            text-align: right;
         }
         .rightCell {
             position: relative;
@@ -116,26 +128,29 @@ $u
 <body>
 
 <div class="wide bordered line cell">
-            <div class="leftCell">wfrog $context.version - Weather Dashboard </div><div class="rightCell">&#8986; <span class="value">$current.timestamp</span></div>
+            <div class="leftCell">wfrog $version - Weather Dashboard </div><div class="rightCell">&#8986; <span class="value">$current.timestamp</span></div>
 </div>
 
-<div class="bordered header cell">
-    <a href="http://www.wfrog.org"><img border="0" src="http://code.google.com/p/wfrog/logo" alt="wfrog"/></a>
+<div class="bordered header">
+    <div class="headerContent">
+        <a href="http://www.wfrog.org"><img border="0" src="http://code.google.com/p/wfrog/logo" alt="wfrog"/></a>
+    </div>
 </div>
-<div class="bordered header cell">
-    <div class="leftCell">
+<div class="bordered header">
+    <div class="headerContent">
+        <div class="leftCell">
             <span class="symbol">&#9832;</span> <span class="bigger" ><span class="value">$rnd($current.temp1, 1)</span>&deg;</span>$unitstr('temp',$units.temp)<br>
             Humidity <span class="value">$rnd($current.hum1)</span> % <br>
             Pressure <span class="value">$rnd($current.press)</span> $unitstr('press',$units.press)
-    </div>
-    <div class="rightCell leftpad">
+        </div>
+        <div class="leftCell leftpad rightAlign">
             <span class="bigger">&#8962; &nbsp;</span><br>
             <span class="value">$rnd($current.temp0,1)</span>&deg;$unitstr('temp',$units.temp) <br>
             <span class="value">$rnd($current.hum0)</span> %
         </div>
     </div>
 </div>
-<div class="bordered cell nopad">
+<div class="bordered headerNoPad">
     <div class="leftCell">
         <img src="$current.wind.dir"/>
     </div>
@@ -155,35 +170,35 @@ $u
 <div>
     <div class="bordered cell graph">
         <div class="leftCell"><span class="symbol">&#9832;</span> Temperature and Dew Point</div><div class="units">&deg;$unitstr('temp',$units.temp)</div>
-        <img src="$chart.temp"/>
+        <div><img src="$chart.temp"/></div>
     </div>
     <div class="bordered cell graph">
         <div class="leftCell"><span class="symbol">&#8776;</span> Humidity</div><div class="units">%</div>
-        <img src="$chart.hum"/>
+        <div><img src="$chart.hum"/></div>
     </div>
     <div class="bordered cell graph">
        <div class="leftCell"> <span class="symbol">&#9839;</span> Pressure</div><div class="units">$unitstr('press',$units.press)</div>
-        <img src="$chart.press"/>
+        <div><img src="$chart.press"/></div>
     </div>
 </div>
 <div class="leftCell">
     <div class="bordered cell graph"  style="clear: both">
         <div class="leftCell"><span class="symbol">&#8885;</span> Wind and Gusts</div><div class="units">$unitstr('wind',$units.wind)</div>
-        <img src="$chart.wind"/>
+        <div><img src="$chart.wind"/></div>
     </div>
     <div class="bordered cell graph">
         <div class="leftCell"><span class="symbol">&#10037;</span> Wind Direction</div>
-        <img src="$chart.wind_dir"/>
+        <div><img src="$chart.wind_dir"/></div>
     </div>
 </div>
 <div class="leftCell">
     <div class="bordered cell graph"  style="clear: both">
         <div class="leftCell"><span class="symbol">&#9730;</span> Rain</div><div class="units">$unitstr('rain',$units.rain)</div>
-        <img src="$chart.rain"/>
+        <div><img src="$chart.rain"/></div>
     </div>
     <div class="bordered cell graph">
         <div class="leftCell"><span class="symbol">&#9728;</span> UV Index</div>
-        <img src="$chart.uv"/>
+        <div><img src="$chart.uv"/></div>
     </div>
 </div>
 </body>
