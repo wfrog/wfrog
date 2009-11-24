@@ -6,7 +6,7 @@
 # Default-Start:     2 3 4 5
 # Default-Stop:      S 0 1 6
 # Short-Description: wfrog renderer
-# Description:       Weather Station Software
+# Description:       wfrog - Weather Station Software
 ### END INIT INFO
 
 # Author: Laurent bovet <laurent.bovet@windmaster.ch>
