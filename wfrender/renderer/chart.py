@@ -190,7 +190,7 @@ class GoogleChartRenderer(object):
             else:
                 max_index = None
 
-            serie_data = compress_to(serie_data, config.nval, min_index, max_index)
+            (serie_data, min_index, max_index) = compress_to(serie_data, config.nval, min_index, max_index)
 
             chart.add_data(serie_data)
             colors.append(_valid_color(serie_config.color))
@@ -245,7 +245,7 @@ class GoogleChartRenderer(object):
                 mark_config.__dict__.update(serie_config.__dict__)
                 mark_config.__dict__.update(serie_config.marks)
                 mark_data = copy.copy(data[mark_config.serie.split('.')[0]]['series'][mark_config.serie.split('.')[1]])
-                mark_data = compress_to(mark_data, config.nval, min_index, max_index)
+                mark_data = compress_to(mark_data, config.nval, min_index, max_index)[0]
                 for i, m in enumerate(mark_data):
                     if not m:
                         mark_data[i] = " "
@@ -300,7 +300,7 @@ class GoogleChartRenderer(object):
 
         if self.labels:
             labels_data = data[self.labels.split('.')[0]]['series'][self.labels.split('.')[1]]
-            labels_data = compress_to(labels_data, config.nval, None, None)
+            labels_data = compress_to(labels_data, config.nval, None, None)[0]
             if config.axes == 'on':
                 density = 1.0 * len("".join(labels_data))*config.size  / config.width
 
@@ -611,29 +611,39 @@ def compress_to(data, n, min_index, max_index):
         #print "compress "+str(l)+" to "+str(n)+" by "+str(r)
         if r < 2:
             r = 2
-        data = compress(data, r, min_index, max_index)
+        (data, new_min_index, new_max_index) = compress(data, r, min_index, max_index)
         #print "compressed to "+str(len(data))        
 
-    return data
+    return (data, new_min_index, new_max_index)
 
 def compress(data, ratio, min_index, max_index):
     result = []
     r = ratio
-    ext=None
     last=None
+    new_min_index=0
+    new_max_index=0
+    min = None
+    max = None
     for i, v in enumerate(data):
-        if i == max_index or i == min_index:
-            ext=v
+        if i == max_index:
+            max=v            
+        if i == min_index:
+            min=v
         if v:
             last=v
         if not i % r == 0:
-            if ext:
-                result.append(ext)
-                ext=None
+            if not min == None:
+                new_min_index = len(result)
+                result.append(min)
+                min = None
+            elif not max == None:
+                new_max_index = len(result)
+                result.append(max)
+                max = None
             else:
                 result.append(v if v else last)
             last=None
-    return result
+    return (result, new_min_index, new_max_index)
 
 
 

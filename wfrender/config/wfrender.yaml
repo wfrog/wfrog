@@ -3,12 +3,15 @@ context:
 renderer: !http    
     cookies: [ units ]
     root: !include
-        path: default/24hours.yaml
+        path: default/3hours.yaml
     renderers:
+        3hours.html: !include
+            path: default/3hours.yaml
         24hours.html: !include
-            path: default/24hours.yaml
+            path: default/24hours.yaml      
         30days.html: !include
-            path: default/30days.yaml
+            path: default/30days.yaml        
         365days.html: !include
             path: default/365days.yaml
+            
     

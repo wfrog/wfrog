@@ -11,3 +11,5 @@ renderer: !template
                     path: default/current.yaml
                 chart: !include
                     path: default/charts.yaml
+                    variables:
+                        interpolate: false                    
