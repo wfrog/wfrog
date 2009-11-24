@@ -29,7 +29,7 @@ class RenderEngine(object):
 
     root_renderer = None
     configurer = None
-    initial_context = { "units" : units.reference }
+    initial_context = { "version": "0.1", "units" : units.reference }
     initial_data = {}
     daemon = False
     output = False

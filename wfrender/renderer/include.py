@@ -21,6 +21,8 @@ import yaml
 import logging
 from os import path
 
+from Cheetah.Template import Template
+
 class IncludeRenderer(object):
     """
     Includes another yaml configuration file.
@@ -34,6 +36,7 @@ class IncludeRenderer(object):
 
     path = None
     renderer = None
+    variables = None
 
     logger = logging.getLogger("renderer.include")
 
@@ -41,7 +44,12 @@ class IncludeRenderer(object):
         if not self.renderer:
             dir_name = path.dirname(context['_yaml_config_file'])
             abs_path=path.join(dir_name, self.path)
-            config = yaml.load( file(abs_path, "r"))
+
+            if self.variables:
+                conf_str = str(Template(file=file(abs_path, "r"), searchList=[self.variables]))
+            else:
+                conf_str = file(abs_path, "r").read()
+            config = yaml.load(conf_str)
             self.renderer = config["renderer"]
 
         return self.renderer.render(data,context)

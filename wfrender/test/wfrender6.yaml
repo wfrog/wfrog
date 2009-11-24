@@ -1,2 +1,2 @@
 renderer: !template
-    path: test/hello.txt
+    path: test/${filename}.txt
