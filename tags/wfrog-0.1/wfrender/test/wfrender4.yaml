@@ -1,0 +1,80 @@
+context:
+    database: { url: 'localhost:/var/lib/firebird/2.0/data/wfrog.db' }
+    chart:
+        bgcolor: 70BDF5
+        color: indigo               
+        text: indigo
+        
+renderer: !http    
+    root: !template
+        path: templates/current-stats.html
+        mime: text/html
+        renderer: !multi
+            renderers:
+                days: !data
+                    source: !database 
+                        slice: hour
+                        span: 365
+                        
+                    renderer: !multi
+                        renderers:
+                            temp_chart: !chart                            
+                                series: 
+                                    temp.max:
+                                        color: '9BCDF1'
+                                        area: { to: temp.min }
+                                        max: { color: darkred, text: darkred, thickness: 0.5 }
+                                    temp.avg:                                                                         
+                                        last: { thickness: 5, style: 'o' }
+                                        order: 1
+                                        interpolate: true
+                                    temp.min:
+                                        color: '9BCDF1'
+                                        min: { color: blue, text: blue, thickness: 0.5 }
+                                    dew.avg:
+                                        color: darkcyan
+                                        thickness: 1
+                                        dash: 5
+                                        
+                                labels: temp.lbl
+                                zero: { color: gray, thickness: 0.5 }
+
+                            temp_current: !value
+                                key: temp
+                                serie: avg
+                                select: last
+                hours: !data
+                    source: !database 
+                        slice: hour
+                        span: 60
+                    renderer: !multi
+                        renderers:
+                            wind_chart: !chart                                
+                                series:
+                                    wind.avg:                                        
+                                        #marks: {serie: wind.dir, size: 10 } 
+                                        interpolate: true      
+                                    wind.max:
+                                        interpolate: true
+                                        order: -1
+                                        color: '9BCDF1'
+                                        area: { to: wind.avg }                                    
+                                        max: { color: darkred, text: darkred, thickness: 0.5 }
+                                labels: wind.lbl
+                                y_margin: [ 0, 1 ]
+                            wind_now: !windradar
+                                width: 125
+                                height: 125
+                            #    arrow: { show: true }   
+                            #    max: { color: EEAAAA, thickness: 4 }                             
+                            #    trace: { color: lightgray, size: 10, ratio: 3, length: 3 }
+                            #    beaufort: { color: lightgray, intensity: 0.3 }
+                            wind_stat: !windradar
+                                width: 200
+                                height: 200
+                                sectors: { color: lightgray }
+                                lines: { gust: EEAAAA, thickness: 1 }
+                                areas: {  gust: peachpuff }      
+                                
+                                
+                                
