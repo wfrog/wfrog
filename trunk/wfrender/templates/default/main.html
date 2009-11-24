@@ -163,6 +163,7 @@ $u
 </div>
 <div class="tabPane">
     <div class="leftCell" style="width:10px;">&nbsp;</div>
+    <div id="3hours" class="tab"><a href="3hours.html">3 Hours</a></div>    
     <div id="24hours" class="tab"><a href="24hours.html">24 Hours</a></div>
     <div id="30days" class="tab"><a href="30days.html">30 Days</a></div>
     <div id="365days" class="tab"><a href="365days.html">365 Days</a></div>
@@ -209,8 +210,10 @@ if(window.location.href.indexOf("30days.html") > -1) {
     document.getElementById("30days").className += ' selected';
 } else if(window.location.href.indexOf("365days.html") > -1) {
     document.getElementById("365days").className += ' selected';
-} else {
+} else if(window.location.href.indexOf("24hours.html") > -1) {
     document.getElementById("24hours").className += ' selected';
+} else {
+    document.getElementById("3hours").className += ' selected';
 }
 </script>
 </html>
