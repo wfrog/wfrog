@@ -2,16 +2,17 @@
 #def unitstr(m,u)
 #if $getVar('http', False)
 <a href="-set-?s=units&k=$m&v=$unit_roll($m,$u)">$u</a>
-#else 
+#else
 $u
 #end if
 #end def
+<html>
 <head>
-    <title>Weather Dashboard - wfrog</title>
+    <title>Weather Dashboard - wfrog $context.version</title>
     <style>
         body {
-            font-family: helvetica; 
-            font-size: 13px; 
+            font-family: helvetica;
+            font-size: 13px;
             color: #8D7641;
         }
         a {
@@ -31,25 +32,25 @@ $u
             margin: 3px;
             padding: 6px;
             float: left;
-        }    
+        }
         .nopad {
             padding: 0px;
         }
-        .pad {           
-            padding: 6px; 
+        .pad {
+            padding: 6px;
             padding-top: 10px;
             padding-bottom: 2px;
         }
-        .smallpad {           
-            padding: 4px;             
+        .smallpad {
+            padding: 4px;
             padding-bottom: 2px;
-        }        
+        }
         .line {
             padding-top: 3px;
             padding-bottom: 3px;
         }
         .header {
-            height: 64px;
+            height: 82px;
             padding-top: 10px;
             padding-bottom: 2px;
         }
@@ -60,11 +61,13 @@ $u
             float: left;
         }
         .rightCell {
-            float: right;
+            position: relative;
+            right: 0px;
+            text-align: right;
         }
         .leftpad {
             padding-left: 5;
-        }        
+        }
         .bigger {
             font-size: 140%;
         }
@@ -80,11 +83,11 @@ $u
         .tab {
             margin-bottom:3px;
             margin-left: 3px;
-            margin-right: 3px;   
+            margin-right: 3px;
             padding-left: 6px;
-            padding-right: 6px;         
+            padding-right: 6px;
             padding-top: 2px;
-            padding-bottom: 2px;    
+            padding-bottom: 2px;
             float: left;
             height: 16px;
             background: wheat;
@@ -104,34 +107,33 @@ $u
             line-height:18px;
         }
         .units {
-            float: right;         
-        }        
+            position: relative;
+            right: 0px;
+            text-align: right;
+        }
     </style>
 </head>
 <body>
 
 <div class="wide bordered line cell">
-            wfrog - Weather Dashboard <div class="rightCell">&#8986; <span class="value">$current.timestamp</span></div>
+            <div class="leftCell">wfrog $context.version - Weather Dashboard </div><div class="rightCell">&#8986; <span class="value">$current.timestamp</span></div>
 </div>
 
 <div class="bordered header cell">
-    <a class="verticallyCentered" href="http://www.wfrog.org"><img border="0" src="http://code.google.com/p/wfrog/logo" alt="wfrog"/></a>
+    <a href="http://www.wfrog.org"><img border="0" src="http://code.google.com/p/wfrog/logo" alt="wfrog"/></a>
 </div>
-<div class="bordered header cell">    
+<div class="bordered header cell">
     <div class="leftCell">
             <span class="symbol">&#9832;</span> <span class="bigger" ><span class="value">$rnd($current.temp1, 1)</span>&deg;</span>$unitstr('temp',$units.temp)<br>
             Humidity <span class="value">$rnd($current.hum1)</span> % <br>
             Pressure <span class="value">$rnd($current.press)</span> $unitstr('press',$units.press)
     </div>
     <div class="rightCell leftpad">
-        <div class="rightCell">
-            <span class="bigger">&#8962; &nbsp;</span>
-        </div><br>
-        <span class="value">$rnd($current.temp0,1)</span>&deg;$unitstr('temp',$units.temp) <br>
-        <div class="rightCell">
-            <span class="value">$rnd($current.hum0)</span> %<br>
+            <span class="bigger">&#8962; &nbsp;</span><br>
+            <span class="value">$rnd($current.temp0,1)</span>&deg;$unitstr('temp',$units.temp) <br>
+            <span class="value">$rnd($current.hum0)</span> %
         </div>
-    </div>        
+    </div>
 </div>
 <div class="bordered cell nopad">
     <div class="leftCell">
@@ -142,7 +144,7 @@ $u
         Gust <span class="value">$rnd($current.wind.gust, 1)</span> $unitstr('wind',$units.wind)<br>
         Rain <span class="value">$rnd($current.rain, 1)</span> $unitstr('rain',$units.rain)/h<br>
         <!-- UV Index <span class="value">0</span> -->
-    </div>    
+    </div>
 </div>
 <div class="tabPane">
     <div class="leftCell" style="width:10px;">&nbsp;</div>
@@ -152,35 +154,35 @@ $u
 </div>
 <div>
     <div class="bordered cell graph">
-        <span class="symbol">&#9832;</span> Temperature and Dew Point<div class="units">&deg;$unitstr('temp',$units.temp)</div><br>
+        <div class="leftCell"><span class="symbol">&#9832;</span> Temperature and Dew Point</div><div class="units">&deg;$unitstr('temp',$units.temp)</div>
         <img src="$chart.temp"/>
     </div>
     <div class="bordered cell graph">
-        <span class="symbol">&#8776;</span> Humidity<div class="units">%</div><br>
+        <div class="leftCell"><span class="symbol">&#8776;</span> Humidity</div><div class="units">%</div>
         <img src="$chart.hum"/>
     </div>
     <div class="bordered cell graph">
-        <span class="symbol">&#9878;</span> Pressure<div class="units">$unitstr('press',$units.press)</div><br>
+       <div class="leftCell"> <span class="symbol">&#9839;</span> Pressure</div><div class="units">$unitstr('press',$units.press)</div>
         <img src="$chart.press"/>
     </div>
 </div>
 <div class="leftCell">
     <div class="bordered cell graph"  style="clear: both">
-        <span class="symbol">&#9872;</span> Wind and Gusts<div class="units">$unitstr('wind',$units.wind)</div><br>
+        <div class="leftCell"><span class="symbol">&#8885;</span> Wind and Gusts</div><div class="units">$unitstr('wind',$units.wind)</div>
         <img src="$chart.wind"/>
     </div>
     <div class="bordered cell graph">
-        <span class="symbol">&#10037;</span> Wind Direction<br>
+        <div class="leftCell"><span class="symbol">&#10037;</span> Wind Direction</div>
         <img src="$chart.wind_dir"/>
     </div>
 </div>
 <div class="leftCell">
     <div class="bordered cell graph"  style="clear: both">
-        <span class="symbol">&#9748;</span> Rain<div class="units">$unitstr('rain',$units.rain)</div><br>
+        <div class="leftCell"><span class="symbol">&#9730;</span> Rain</div><div class="units">$unitstr('rain',$units.rain)</div>
         <img src="$chart.rain"/>
     </div>
     <div class="bordered cell graph">
-        <span class="symbol">&#9728;</span> UV Index<br>
+        <div class="leftCell"><span class="symbol">&#9728;</span> UV Index</div>
         <img src="$chart.uv"/>
     </div>
 </div>
@@ -191,9 +193,9 @@ $u
 if(window.location.href.indexOf("30days.html") > -1) {
     document.getElementById("30days").className += ' selected';
 } else if(window.location.href.indexOf("365days.html") > -1) {
-    document.getElementById("365days").className += ' selected';    
+    document.getElementById("365days").className += ' selected';
 } else {
     document.getElementById("24hours").className += ' selected';
 }
 </script>
-
+</html>

@@ -17,7 +17,6 @@
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from Cheetah.Template import Template
-from Cheetah.NameMapper import NotFound
 import logging
 
 def rnd(value, dec=0):
@@ -38,10 +37,9 @@ class TemplateRenderer(object):
     logger = logging.getLogger("renderer.template")
 
     def render(self,data={}, context={}):
-        print context
-        content = ""
+        content = {}
         if self.renderer:
-            content = self.renderer.render(data, context)        
+            content = self.renderer.render(data, context)
         self.logger.debug("Rendering with template "+self.path)
         content["rnd"]=rnd
         template = Template(file=file(self.path, "r"), searchList=[content, context])
