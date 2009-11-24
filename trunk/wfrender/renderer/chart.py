@@ -604,6 +604,8 @@ def interpolate(data):
     return result
 
 def compress_to(data, n, min_index, max_index):
+    new_min_index = min_index
+    new_max_index = max_index
     while len(data) > n:
         l = len(data)
         d = l-n        # how many values to remove
