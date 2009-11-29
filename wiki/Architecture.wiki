@@ -185,6 +185,7 @@ Database structure revisited:
 
 - no min/max timestamps
 - precision adjustements
+- no temp_min, temp_max values
 
 {{{
 CREATE TABLE METEO
@@ -192,8 +193,6 @@ CREATE TABLE METEO
   TIMESTAMP_UTC Timestamp NOT NULL,
   TIMESTAMP_LOCAL Timestamp NOT NULL,
   TEMP Numeric(3,1),
-  TEMP_MIN Numeric(3,1),
-  TEMP_MAX Numeric(3,1),
   HUM Numeric(3,1),
   WIND Numeric(4,1),
   WIND_DIR Smallint,
@@ -221,12 +220,9 @@ UPDATE RDB$RELATION_FIELDS set RDB$DESCRIPTION = 'UV INDEX'  where RDB$FIELD_NAM
 CREATE DESCENDING INDEX IDX_METEO1 ON METEO (TIMESTAMP_LOCAL);
 }}}
 
-TEMP_MIN / TEMP_MAX are still necessary. I've experienced temperature changes of 2/3 degrees in 15 min. periods.
-
-Row size is aprox. 45 bytes.
+Row size is aprox. 40 bytes.
 
 _End of Comment_
-
 
 
 = Project Structure =
