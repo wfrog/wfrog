@@ -179,7 +179,7 @@ class WxParser ():
         data['dew_point'] = round(DewPoint(data['temp'], data['hum'], 'vaDavisVP'), 1)
         
         ## Wind Chill
-        data['wind_chill'] = round(WindChill(data['temp'], data['wind']), 1)            
+        data['wind_chill'] = round(WindChill(data['temp'], data['wind']*3.6), 1)            
         
         ## Heat Index
         data['heat_index'] = round(HeatIndex(data['temp'], data['hum']), 1) 
