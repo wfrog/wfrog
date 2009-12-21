@@ -30,8 +30,9 @@ sudo apt-get install firebird2.1-super     # Firebird database 2.1 or
 #sudo apt-get install firebird2.0-super    # Firebird database 2.0 
 sudo apt-get install python-kinterbasdb    # Python binding for firebird
 sudo apt-get install python-cheetah        # Template engine
-sudo apt-get install python-pyusb          # USB
 sudo apt-get install python-lxml           # XML serialization 
+sudo apt-get install python-pyusb          # USB (only for WMRS200 station)
+sudo apt-get install python-serial         # Serial (only for WMR928NX station)
 }}}
 
 *Python eggs*
