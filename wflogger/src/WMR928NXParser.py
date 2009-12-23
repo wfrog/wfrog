@@ -24,7 +24,7 @@
 ## TODO: DOCUMENT MESSAGES' PROTOCOL
 
 import time, logging
-from uWxUtils import InToMm
+from uWxUtils import InToMm, StationToSeaLevelPressure
 from WxParser import WxParser
 from utils import write2xml
 
@@ -177,7 +177,6 @@ class WMR928NXParser (WxParser):
         """
         Pressure = real pressure - 600
         Offset - 600 = offset to add to real pressure
-        I.e: seal level pressure = real pressure + offset
         """
         batteryOK = (record[1] & 0x40) == 0
 
@@ -193,6 +192,14 @@ class WMR928NXParser (WxParser):
         offset = (((record[8] & 0xf0) >> 4) / 10.0) + self._decode_bcd(record[9]) + \
                  (self._decode_bcd(record[10]) * 100.0) - 600
         seaLevelPressure = pressure + offset
+
+        # Calculate seaLevelPressure by software
+        if 'thext.temp' in self._WxCurrent:
+            seaLevelPressure = round(StationToSeaLevelPressure(
+                                                   pressure,
+                                                   self.ALTITUDE, self._WxCurrent['thext.temp'], 
+                                                   self.MEAN_TEMP, 
+                                                   self._WxCurrent['thext.humidity'], 'paDavisVP'),1)
         
         weatherStatus = (record[7] & 0xf0) >> 4
         weatherStatusTxt = WxWeatherStatus.get(weatherStatus, str(weatherStatus))
