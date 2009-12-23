@@ -216,7 +216,7 @@ class WMR928NXParser (WxParser):
         self._WxCurrent['console.weatherStatusTxt'] = weatherStatusTxt
 
         # Report data
-        self._report_barometer(pressure)
+        self._report_barometer(seaLevelPressure)
 
         # Log
         if dewPoint == None:
