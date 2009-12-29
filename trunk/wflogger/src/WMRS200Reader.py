@@ -23,14 +23,13 @@
 #      http://www.sdic.ch/public/downloads/wmr200.zip
 
 ## TODO:  DOCUMENT WMRS200 usb protocol
-##        CONTROL DISCONNECTION AND RECONNECTION OF WEATHER STATION
-##        GENERATE CRITICAL LOG ENTRIES FOR LOW BATTERY
 
-import sys, usb, logging
+## DONE, WAITING VERIFICATION:
+##        CONTROL DISCONNECTION AND RECONNECTION OF WEATHER STATION
+
+import sys, usb, logging, time
 from WMRS200Parser import WMRS200Parser
 from threading import Thread
-import time
-import sys
 
 vendor_id  = 0xfde
 product_id = 0xca01
@@ -52,61 +51,79 @@ class WMRS200Reader (Thread):
 
     def run(self):
         self._logger.info("Thread started")
-        dev = self._search_device(vendor_id, product_id)
-        if dev == None:
-            self._logger.critical("WMRS200 not found (%04X %04X), Connected devices:" % (vendor_id, product_id))
-            for bus in usb.busses():
-                for dev in bus.devices:
-                    logging.critical("- %04X:%04X" % (dev.idVendor, dev.idProduct))
-            exit(1)
-
-        devh = dev.open()
-
-        if sys.platform in ['linux2']:
+        while True:
             try:
-                devh.claimInterface(0)
-            except usb.USBError:
-                devh.detachKernelDriver(0)
-                devh.claimInterface(0)
-        elif sys.platform in ['win32']:
-            #devh.claimInterface(0)
-            self._logger.critical('Windows is not yet supported: devh.claimInterface() fails')
-            print 'Windows is not yet supported: devh.claimInterface() fails'
-            exit(1)            
-        else:
-            self._logger.critical('Platform "%s" not yet supported' % sys.platform)
-            print 'Platform "%s" not yet supported' % sys.platform
-            exit(1)
-            
+                self._logger.info("USB inicialization")
+                dev = self._search_device(vendor_id, product_id)
+                if dev == None:
+                    raise Exception("USB WMRS200 not found (%04X %04X)" % (vendor_id, product_id))
 
-        # WMRS200 Init sequence
-        devh.controlMsg(usb.TYPE_CLASS + usb.RECIP_INTERFACE,       # requestType
-                        0x0000009,                                  # request
-                        [0x20,0x00,0x08,0x01,0x00,0x00,0x00,0x00],  # buffer
-                        0x0000200,                                  # value
-                        0x0000000,                                  # index 
-                        1000)                                       # timeout
+                self._logger.info("USB WMRS200 found")
+                devh = dev.open()
+                self._logger.info("USB WMRS200 open")
+
+                if sys.platform in ['linux2']:
+                    try:
+                        devh.claimInterface(0)
+                    except usb.USBError:
+                        devh.detachKernelDriver(0)
+                        devh.claimInterface(0)
+                elif sys.platform in ['win32']:
+                    #devh.claimInterface(0)
+                    self._logger.critical('Windows is not yet supported: devh.claimInterface() fails')
+                    print 'Windows is not yet supported: devh.claimInterface() fails'
+                    exit(1)
+                else:
+                    self._logger.critical('Platform "%s" not yet supported' % sys.platform)
+                    print 'Platform "%s" not yet supported' % sys.platform
+                    exit(1)
+                    
+                # WMRS200 Init sequence
+                devh.controlMsg(usb.TYPE_CLASS + usb.RECIP_INTERFACE,       # requestType
+                                0x0000009,                                  # request
+                                [0x20,0x00,0x08,0x01,0x00,0x00,0x00,0x00],  # buffer
+                                0x0000200,                                  # value
+                                0x0000000,                                  # index 
+                                1000)                                       # timeout
+
+                ## Do the actual work
+                self._logger.info("USB WMRS200 initialized")
+                self._run(devh)
+                
+            except Exception, e:
+                self._logger.exception("WMRS200 exception: %s" % str(e))
+
+            ## Disconnect USB
+            self._logger.critical("USB WMRS200 connection failure")
+            #try:
+            #    if devh != None:
+            #        devh.reset()
+            #except:
+            #    pass
+
+            ## Wait 10 seconds
+            time.sleep(10)
 
 
+    def _run(self, devh):
         input_buffer = []
-
         errors = 0
         while True:
             try:
                 packet = devh.interruptRead(usb.ENDPOINT_IN + 1,  # endpoint number 
                                             0x0000008,            # bytes to read
-                                            10000)                # timeout
+                                            10000)                # timeout (10 seconds)
+                errors = 0
             except Exception, e:
                 self._logger.exception("Exception reading interrupt: "+ str(e))
                 errors = errors + 1
+                if errors > 3: break   ## Maximum 3 consecutive errors before reconnection
                 time.sleep(3)
-                if errors > 10:
-                    exit(1)
-                
+
             if packet != None:
                 if len(packet) > 0:
                     input_buffer += packet[1:packet[0]+1]
-                    #logging.debug("USB RAW DATA: %s" % self._list2bytes(packet))
+                    #self._logger.debug("USB RAW DATA: %s" % self._list2bytes(packet))
 
             if len(input_buffer) > 20:
                 errors = 0

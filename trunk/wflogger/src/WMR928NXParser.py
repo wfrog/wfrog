@@ -22,6 +22,7 @@
 # - http://www.castro.aus.net/~maurice/weather/
 
 ## TODO: DOCUMENT MESSAGES' PROTOCOL
+##       GENERATE CRITICAL LOG ENTRIES FOR LOW BATTERY LEVEL
 
 import time, logging
 from uWxUtils import InToMm, StationToSeaLevelPressure
@@ -110,11 +111,11 @@ class WMR928NXParser (WxParser):
         yesterdayOver = not ((record[1] & 0x80) == 0)
 
         # results come in inches
-        rate = InToMm(self._decode_bcd(record[2]) + self._decode_bcd(record[3] & 0xf) * 100.0)
-        yesterday = InToMm(self._decode_bcd(record[6]) + self._decode_bcd(record[7]) * 100.0) 
-        total = InToMm(((self._decode_bcd(record[3] & 0xf0)) / 100.0) + \
+        rate = self._decode_bcd(record[2]) + self._decode_bcd(record[3] & 0xf) * 100.0
+        yesterday = self._decode_bcd(record[6]) + self._decode_bcd(record[7]) * 100.0
+        total = ((self._decode_bcd(record[3] & 0xf0)) / 100.0) + \
                        self._decode_bcd(record[4]) + \
-                       self._decode_bcd(record[5]) * 100.0)  
+                       self._decode_bcd(record[5]) * 100.0
 
         minuteT = self._decode_bcd(record[8])
         hourT = self._decode_bcd(record[9])
@@ -295,7 +296,7 @@ class WMR928NXParser (WxParser):
                                 write2xml(self._WxCurrent, self.CURRENT_CONDITIONS_ROOT, self.CURRENT_CONDITIONS_FILENAME)
                                 self._message_count = 0
                             except:
-                                logging.exception("Error writting WMRS200 current conditions file (%s)", 
+                                self._logger.exception("Error writting WMRS200 current conditions file (%s)", 
                                                   self.CURRENT_CONDITIONS_FILENAME)
             else:
                 self._logger.warning("Unknown record type: %s", self._list2bytes(record))

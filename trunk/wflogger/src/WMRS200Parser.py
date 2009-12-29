@@ -23,7 +23,7 @@
 ## TODO: DOCUMENT MESSAGES' PROTOCOL
 ##       Implement calibration parameter for rain sensor
 ##       WMRS100 projects implement a calibration for humidity sensor to obtain 100% value (necessary?)
-
+##       GENERATE CRITICAL LOG ENTRIES FOR LOW BATTERY LEVEL
 
 # Attention! 
 # In individual measures wind avg. value can be higher than wind gust.
@@ -115,8 +115,7 @@ class WMRS200Parser (WxParser):
     Byte Data   Comment
     0    00     Battery level in high nibble
     1    41     Identifier
-    2-3  ff 02  Rain ratlogging.basicConfig(level=logging.WARNING)
-e: byte 3 * 256 + byte 2, in inches/hour (verify time unit)
+    2-3  ff 02  Rain rate: byte 3 * 256 + byte 2, in inches/hour
     4-5  0c 00  Rain last hour: byte 5 * 256 + byte 4, in inches
     6-7  00 00  Rain last 24 hours: byte 7 * 256 + byte 6, in inches
     8-9  00 25  Total rain since reset date: byte 9 * 256 + byte 8, in inches
@@ -347,7 +346,7 @@ e: byte 3 * 256 + byte 2, in inches/hour (verify time unit)
                                 write2xml(self._WxCurrent, self.CURRENT_CONDITIONS_ROOT, self.CURRENT_CONDITIONS_FILENAME)
                                 self._message_count = 0
                             except:
-                                logging.exception("Error writting WMRS200 current conditions file (%s)", 
+                                self._logger.exception("Error writting WMRS200 current conditions file (%s)", 
                                                   self.CURRENT_CONDITIONS_FILENAME)
             else:
                 self._logger.warning("Unknown record type: %s", self._list2bytes(record))
