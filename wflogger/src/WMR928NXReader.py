@@ -16,14 +16,14 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-## TODO:  DOCUMENT WMRS200 usb protocol
+## TODO:  DOCUMENT WMRS928NX usb protocol
+
+## DONE, WAITING VERIFICATION:
 ##        CONTROL DISCONNECTION AND RECONNECTION OF WEATHER STATION
-##        GENERATE CRITICAL LOG ENTRIES FOR LOW BATTERY
 
-import serial, logging
+
+import serial, logging, time
 from threading import Thread
-
-# So far only tested on windows. 
 
 class WMR928NXReader (Thread):
     def __init__(self, wxData, config):
@@ -39,21 +39,38 @@ class WMR928NXReader (Thread):
     def run(self):
         self._logger.info("Thread started")
 
-        ser = serial.Serial()
-        ser.baudrate = 9600
-        ser.port = self.PORT_NUMBER
-        ser.timeout = 5
-        try:
-            ser.open()
-        except:
-            self._logger.critical("Cannot open port %d" % self.PORT_NUMBER)
-        ser.setRTS(True)                     
+        while True:
+            try:
+                self._logger.info("Opening serial port")
+                ## Open Serial port
+                ser = serial.Serial()
+                ser.baudrate = 9600
+                ser.port = self.PORT_NUMBER
+                ser.timeout = 5
+                ser.open()
+                ser.setRTS(True)
+                ## Do the actual work
+                self._logger.info("Serial port open")
+                self._run(ser)
+            except:
+                self._logger.exception("WMR928NX reader exception")
 
+            ## Close serial port connection
+            self._logger.critical("Serial port WMR928NX connection failure")
+            try:
+                ser.close()
+                ser = None
+            except:
+                pass
+            ## Wait 10 seconds
+            time.sleep(10)
+
+    def _run(self, ser):
         input_buffer = []
         while True:
             buffer = ser.read(100)
             
-            #logging.debug("USB RAW DATA: %s" % self._list2bytes(packet))
+            #self._logger.debug("USB RAW DATA: %s" % self._list2bytes(packet))
             if len(buffer) > 0:
                 input_buffer += map(lambda x: ord(x), buffer)
 
@@ -90,3 +107,4 @@ class WMR928NXReader (Thread):
 
                         # remove this message from the input queue
                         input_buffer = input_buffer[endSep:]
+

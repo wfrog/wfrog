@@ -143,7 +143,7 @@ VALUES (%s, %s, %g, %g, %s, %g, %s, %g, %g, %s, %g, %s, %s, %g, %g, %g, %s, %g, 
             bdd.disconnect()
             self._logger.debug("SQL executed: %s", sql)
         except:
-            logging.exception("Error writting current data to database")
+            self._logger.exception("Error writting current data to database")
             return False
         return True
 
@@ -163,7 +163,7 @@ WHERE TIMESTAMP_LOCAL >= '%s'""" % initial_date
             result = bdd.select(sql)
             bdd.disconnect()
         except:
-            logging.exception("Error calculating data")
+            self._loggerexception("Error calculating data")
             return {}
         
         A_tmin = None 
@@ -271,7 +271,7 @@ WHERE TIMESTAMP_LOCAL >= '%s'""" % initial_date
         try:
             write2xml(WxData, self.WxDATA_ROOT, self.WxDATA_FILENAME)
         except:
-            logging.exception("Error writting xml file (%s)", self.WxDATA_FILENAME)
+            self._logger.exception("Error writting xml file (%s)", self.WxDATA_FILENAME)
             return False
         return True
         
