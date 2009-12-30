@@ -19,12 +19,15 @@
 from xml.etree import ElementTree
 from time import struct_time, strftime
 from datetime import datetime
+from decimal import Decimal
 
 def format(obj, time_format):
     if isinstance(obj, int):
         return str(obj)
     elif isinstance(obj, float):
         return str(round(obj,1))
+    elif isinstance(obj, Decimal):
+        return str(obj)
     elif isinstance(obj, struct_time):
         return strftime(time_format, obj)
     elif isinstance(obj, (str, unicode)):
