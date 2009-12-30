@@ -16,7 +16,7 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-## TODO:  DOCUMENT WMRS928NX usb protocol
+## TODO:  DOCUMENT WMRS928NX serial protocol
 
 ## DONE, WAITING VERIFICATION:
 ##        CONTROL DISCONNECTION AND RECONNECTION OF WEATHER STATION
@@ -70,9 +70,10 @@ class WMR928NXReader (Thread):
         while True:
             buffer = ser.read(100)
             
-            #self._logger.debug("USB RAW DATA: %s" % self._list2bytes(packet))
             if len(buffer) > 0:
-                input_buffer += map(lambda x: ord(x), buffer)
+                n_buffer = map(lambda x: ord(x), buffer)
+                self._logger.debug("Serial RAW DATA: %s" % self._list2bytes(n_buffer))
+                input_buffer += n_buffer
 
                 if len(input_buffer) > 20:
                     # Using two bytes of 0xFF as record separators, extract as many
@@ -80,18 +81,23 @@ class WMR928NXReader (Thread):
                     while True:
                         # start by finding the first record separator in the input 
                         startSep = -1
-                        for i in range(len(input_buffer) - 2):
+                        for i in range(len(input_buffer)):
                             if input_buffer[i] == 0xff and input_buffer[i + 1] == 0xff:
                                 startSep = i
                                 break
                         if startSep < 0: 
                             break
 
-                        # find the next separator, which will indicate the end of the 1st record
+                        # find the next most right separator (FF FF), 
+                        # which will indicate the end of the 1st record
                         endSep = -1
-                        for i in range(startSep + 2, len(input_buffer) - 2):
+                        for i in range(startSep + 2, len(input_buffer)):
                             if input_buffer[i] == 0xff and input_buffer[i + 1] == 0xff:
-                                endSep = i;
+                                endSep = i
+                                while i + 2 <= len(input_buffer):
+                                    if input_buffer[i + 2] != 0xff:
+                                        break
+                                    endSep += 1
                                 break
                         if endSep < 0: 
                             break
