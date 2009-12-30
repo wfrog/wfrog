@@ -29,7 +29,7 @@ from utils import write2xml
 
 # Remove the dependency to mx.DateTime
 try:
-    kinterbasdb.init(type_conv=0)
+    kinterbasdb.init(type_conv=200) 
 except:
     pass
 
