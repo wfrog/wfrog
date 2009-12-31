@@ -20,7 +20,7 @@
 ##       Improve aggregation so that it is not necessary to query the database each time
 
 import time, logging
-from uWxUtils import StationToSeaLevelPressure, DewPoint, WindChill, HeatIndex
+from uWxUtils import DewPoint, WindChill, HeatIndex
 from threading import Lock
 
 class WxParser ():
