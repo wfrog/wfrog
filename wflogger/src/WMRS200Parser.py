@@ -218,20 +218,19 @@ class WMRS200Parser (WxParser):
         #qnhForecast_txt = WxForecast.get(forecast, str(qnhForecast))
 
         if self._WxCurrent.has_key('th1.temp') and self._WxCurrent.has_key('th1.humidity'):
-            pressure = round(StationToSeaLevelPressure(
-                                                   pressure,
-                                                   self.ALTITUDE, self._WxCurrent['th1.temp'], self.MEAN_TEMP, 
-                                                   self._WxCurrent['th1.humidity'], 'paDavisVP'),1)
+            seaLevelPressure = round(StationToSeaLevelPressure(
+                                         pressure, self.ALTITUDE, self._WxCurrent['th1.temp'], 
+                                         self.MEAN_TEMP, self._WxCurrent['th1.humidity'], 'paDavisVP'),1)
             # Current Data
-            self._WxCurrent['barometer.pressure'] = pressure
+            self._WxCurrent['barometer.pressure'] = seaLevelPressure
             self._WxCurrent['barometer.forecast'] = forecast
             self._WxCurrent['barometer.forecastTxt'] = forecastTxt
 
             # Report data
-            self._report_barometer(pressure)
+            self._report_barometer(seaLevelPressure)
 
             # Log
-            self._logger.info("Barometer Forecast: %s, Pressure: %d mb", forecastTxt, pressure)
+            self._logger.info("Barometer Forecast: %s, Absolute pressure: %.1f mb, Sea Level Pressure: %.1f", forecastTxt, pressure, seaLevelPressure)
 
     def _parse_temperature_record(self, record):
         """

@@ -93,13 +93,7 @@ class WMRS200Reader (Thread):
             except Exception, e:
                 self._logger.exception("WMRS200 exception: %s" % str(e))
 
-            ## Disconnect USB
             self._logger.critical("USB WMRS200 connection failure")
-            #try:
-            #    if devh != None:
-            #        devh.reset()
-            #except:
-            #    pass
 
             ## Wait 10 seconds
             time.sleep(10)
@@ -123,7 +117,7 @@ class WMRS200Reader (Thread):
             if packet != None:
                 if len(packet) > 0:
                     input_buffer += packet[1:packet[0]+1]
-                    #self._logger.debug("USB RAW DATA: %s" % self._list2bytes(packet))
+                    self._logger.debug("USB RAW DATA: %s" % self._list2bytes(packet))
 
             if len(input_buffer) > 20:
                 errors = 0
