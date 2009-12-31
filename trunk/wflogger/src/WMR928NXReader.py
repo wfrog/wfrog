@@ -18,9 +18,6 @@
 
 ## TODO:  DOCUMENT WMRS928NX serial protocol
 
-## DONE, WAITING VERIFICATION:
-##        CONTROL DISCONNECTION AND RECONNECTION OF WEATHER STATION
-
 
 import serial, logging, time
 from threading import Thread
@@ -38,15 +35,17 @@ class WMR928NXReader (Thread):
 
     def run(self):
         self._logger.info("Thread started")
-
         while True:
             try:
                 self._logger.info("Opening serial port")
                 ## Open Serial port
                 ser = serial.Serial()
-                ser.baudrate = 9600
-                ser.port = self.PORT_NUMBER
-                ser.timeout = 5
+                ser.setBaudrate(9600)
+                ser.setParity(serial.PARITY_NONE)
+                ser.setByteSize(serial.EIGHTBITS)
+                ser.setStopbits(serial.STOPBITS_ONE)
+                ser.setPort(self.PORT_NUMBER)
+                ser.setTimeout(60)  # 60s timeout
                 ser.open()
                 ser.setRTS(True)
                 ## Do the actual work
@@ -68,13 +67,27 @@ class WMR928NXReader (Thread):
     def _run(self, ser):
         input_buffer = []
         while True:
-            buffer = ser.read(100)
+            buffer = ser.read(10) # Read next 10 bytes and return
             
-            if len(buffer) > 0:
+            if len(buffer)== 0:
+                # 60s timeout expired without data received
+                self._logger.warning("No data received - reinitializing serial port")
+                try:
+                    ser.close()
+                    input_buffer = []
+                    time.sleep(10)
+                    ser.open()
+                    ser.setRTS(True)
+                    self._logger.warning("Serial port reinitialized")
+                except:
+                    pass
+            else:
+                # data received and added to input buffer
                 n_buffer = map(lambda x: ord(x), buffer)
                 self._logger.debug("Serial RAW DATA: %s" % self._list2bytes(n_buffer))
                 input_buffer += n_buffer
 
+                # obtain new messages when input_buffer contains at least 20 bytes to process 
                 if len(input_buffer) > 20:
                     # Using two bytes of 0xFF as record separators, extract as many
                     # full messages as possible and add them to the message queue.
@@ -91,10 +104,10 @@ class WMR928NXReader (Thread):
                         # find the next most right separator (FF FF), 
                         # which will indicate the end of the 1st record
                         endSep = -1
-                        for i in range(startSep + 2, len(input_buffer)):
+                        for i in range(startSep + 2, len(input_buffer) - 1):
                             if input_buffer[i] == 0xff and input_buffer[i + 1] == 0xff:
                                 endSep = i
-                                while i + 2 <= len(input_buffer):
+                                while i < len(input_buffer) - 2:
                                     if input_buffer[i + 2] != 0xff:
                                         break
                                     endSep += 1
