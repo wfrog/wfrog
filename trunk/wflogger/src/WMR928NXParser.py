@@ -25,7 +25,7 @@
 ##       GENERATE CRITICAL LOG ENTRIES FOR LOW BATTERY LEVEL
 
 import time, logging
-from uWxUtils import InToMm, StationToSeaLevelPressure
+from uWxUtils import StationToSeaLevelPressure
 from WxParser import WxParser
 from utils import write2xml
 
