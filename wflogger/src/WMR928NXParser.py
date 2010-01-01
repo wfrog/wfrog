@@ -140,7 +140,7 @@ class WMR928NXParser (WxParser):
     def _parse_wind_record(self, record):
         """
         """
-        # TODO: investigate meaning over variables
+        # TODO: investigate meaning other variables
         avrgOver = not ((record[1] & 0x20) == 0)
         gustOver = not ((record[1] & 0x10) == 0)
         batteryOK = ((record[1] & 0x40) == 0)
@@ -154,7 +154,7 @@ class WMR928NXParser (WxParser):
 
         windChill = self._decode_bcd(record[7])
         if not ((record[6] & 0x80) == 0):
-            chillsign *= -1.0
+            windChill *= -1.0
         
         # Current Data
         self._WxCurrent['wind.batteryOK'] = batteryOK

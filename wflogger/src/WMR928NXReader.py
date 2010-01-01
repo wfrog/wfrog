@@ -98,21 +98,18 @@ class WMR928NXReader (Thread):
                             if input_buffer[i] == 0xff and input_buffer[i + 1] == 0xff:
                                 startSep = i
                                 break
-                        if startSep < 0: 
+                        if startSep == -1: 
                             break
 
                         # find the next most right separator (FF FF), 
-                        # which will indicate the end of the 1st record
+                        # which will indicate the end of the record
                         endSep = -1
-                        for i in range(startSep + 2, len(input_buffer) - 1):
+                        for i in range(startSep + 2, len(input_buffer) - 2):
                             if input_buffer[i] == 0xff and input_buffer[i + 1] == 0xff:
                                 endSep = i
-                                while i < len(input_buffer) - 2:
-                                    if input_buffer[i + 2] != 0xff:
-                                        break
-                                    endSep += 1
+                            elif endSep != -1:                                  
                                 break
-                        if endSep < 0: 
+                        if endSep == -1: 
                             break
                         if startSep > 0: 
                             self._logger.debug("Ignored %d bytes in input", startSep)
