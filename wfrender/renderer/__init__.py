@@ -28,6 +28,7 @@ import multi
 import scheduler
 import template
 import value
+import meteoclimatic
 
 # Assert functions
 def is_renderer(obj):
@@ -75,3 +76,6 @@ class YamlTemplateRenderer(template.TemplateRenderer, yaml.YAMLObject):
 
 class YamlValueRenderer(value.ValueRenderer, yaml.YAMLObject):
     yaml_tag = u'!value'
+
+class YamlMeteoclimaticRenderer(meteoclimatic.MeteoclimaticRenderer, yaml.YAMLObject):
+    yaml_tag = u'!meteoclimatic'

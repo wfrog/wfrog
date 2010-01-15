@@ -22,12 +22,13 @@
 # - http://www.castro.aus.net/~maurice/weather/
 
 ## TODO: DOCUMENT MESSAGES' PROTOCOL
-##       GENERATE CRITICAL LOG ENTRIES FOR LOW BATTERY LEVEL
+##       GENERATE CRITICAL LOG ENTRIES FOR LOW BATTERY LEVEL (ONE ALARM PER DAY!)
+##       ALLOW CONFIG TO SPECIFY WHICH temp/hum SENSOR(S) SHOULD BE USED
 
-import time, logging
-from uWxUtils import StationToSeaLevelPressure
-from WxParser import WxParser
-from utils import write2xml
+import time
+import logging
+import WxParser
+import wfcommon.utils 
 
 CURRENT_CONDITIONS_UPDATE = 10
 CURRENT_CONDITIONS_FILENAME = "WMR928NX_current_conditions.xml"
@@ -35,11 +36,11 @@ CURRENT_CONDITIONS_ROOT = "WMR928NX"
 
 WxWeatherStatus = {0xc: 'Sunny', 0x6: 'Half cloudy', 0x2: 'Cloudy', 0x3: 'rainy'}
 
-class WMR928NXParser (WxParser):
+class WMR928NXParser (WxParser.WxParser):
     """
     """
     def __init__(self, config):
-        WxParser.__init__(self, config)
+        WxParser.WxParser.__init__(self, config)
         self._logger = logging.getLogger('WxLogger.WMR928NXParser')
         ## Configuration
         self.CURRENT_CONDITIONS_UPDATE = config.getint('WMR928NX', 'CURRENT_CONDITIONS_UPDATE')
@@ -193,14 +194,6 @@ class WMR928NXParser (WxParser):
         offset = (((record[8] & 0xf0) >> 4) / 10.0) + self._decode_bcd(record[9]) + \
                  (self._decode_bcd(record[10]) * 100.0) - 600
         seaLevelPressure = pressure + offset
-
-        # Calculate seaLevelPressure by software
-        if 'thext.temp' in self._WxCurrent:
-            seaLevelPressure = round(StationToSeaLevelPressure(
-                                                   pressure,
-                                                   self.ALTITUDE, self._WxCurrent['thext.temp'], 
-                                                   self.MEAN_TEMP, 
-                                                   self._WxCurrent['thext.humidity'], 'paDavisVP'),1)
         
         weatherStatus = (record[7] & 0xf0) >> 4
         weatherStatusTxt = WxWeatherStatus.get(weatherStatus, str(weatherStatus))
@@ -217,7 +210,7 @@ class WMR928NXParser (WxParser):
         self._WxCurrent['console.weatherStatusTxt'] = weatherStatusTxt
 
         # Report data
-        self._report_barometer(seaLevelPressure)
+        self._report_barometer_absolute(pressure)
 
         # Log
         if dewPoint == None:
@@ -293,7 +286,7 @@ class WMR928NXParser (WxParser):
                         if self._message_count  >= self.CURRENT_CONDITIONS_UPDATE:
                             try:
                                 self._WxCurrent['timestampt'] = time.strftime(self.TIME_FORMAT, time.localtime())
-                                write2xml(self._WxCurrent, self.CURRENT_CONDITIONS_ROOT, self.CURRENT_CONDITIONS_FILENAME)
+                                wfcommon.utils.write2xml(self._WxCurrent, self.CURRENT_CONDITIONS_ROOT, self.CURRENT_CONDITIONS_FILENAME)
                                 self._message_count = 0
                             except:
                                 self._logger.exception("Error writting WMRS200 current conditions file (%s)", 
