@@ -18,11 +18,18 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+# Before loading other modules add wfrog directory to sys.path to be able to use wfcommon 
+import os.path
+import sys
+if __name__ == "__main__": sys.path.append(os.path.abspath(sys.path[0] + '/..'))
+
 import config
 import copy
 import optparse
 import logging
 import units
+
 
 class RenderEngine(object):
     """Entry point of the rendering"""
@@ -53,7 +60,7 @@ class RenderEngine(object):
                     pairs = options.data_string.split(',')
                     for pair in pairs:
                         pieces = pair.split('=')
-                        assert(len(pieces)==2, "Key-value pair not in the form key=value: ", pair)
+                        assert len(pieces) == 2, "Key-value pair not in the form key=value: %s" % pair
                         self.initial_data[pieces[0].strip()] = pieces[1].strip()
 
                 if options.output:

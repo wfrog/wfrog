@@ -23,7 +23,8 @@
 ## TODO: DOCUMENT MESSAGES' PROTOCOL
 ##       Implement calibration parameter for rain sensor
 ##       WMRS100 projects implement a calibration for humidity sensor to obtain 100% value (necessary?)
-##       GENERATE CRITICAL LOG ENTRIES FOR LOW BATTERY LEVEL
+##       GENERATE CRITICAL LOG ENTRIES FOR LOW BATTERY LEVEL (ONE ALARM PER DAY!)
+##       ALLOW CONFIG TO SPECIFY WHICH temp/hum SENSOR(S) SHOULD BE USED
 
 # Attention! 
 # In individual measures wind avg. value can be higher than wind gust.
@@ -31,10 +32,10 @@
 # whereas wind avg has been calculated over a period of --probably-- several
 # minutes.
 
-import time, logging
-from uWxUtils import InToMm, StationToSeaLevelPressure
-from WxParser import WxParser
-from utils import write2xml
+import time
+import logging
+import WxParser
+import wfcommon.utils
 
 WxForecast = { 0:'PartlyCloudy', 1:'Rainy', 2:'Cloudy', 3:'Sunny', 4:'Snowy' }
 WxComfortLevel = { 0:'-', 1:'Good',  2:'Poor', 3:'Fair' }
@@ -45,9 +46,9 @@ THSensors = { 0:'thInt', 1:'th1', 2:'th2', 3:'th3', 4:'th4',
               5:'th5', 6:'th6', 7:'th7', 8:'th8', 9:'th9' }
 MainTHExtSensor = 'th1'
 
-class WMRS200Parser (WxParser):
+class WMRS200Parser (WxParser.WxParser):
     def __init__(self, config):
-        WxParser.__init__(self, config)
+        WxParser.WxParser.__init__(self, config)
         self._logger = logging.getLogger('WxLogger.WMRS200Parser')
         ## Configuration
         self.CURRENT_CONDITIONS_UPDATE = config.getint('WMRS200', 'CURRENT_CONDITIONS_UPDATE')
@@ -129,10 +130,10 @@ class WMRS200Parser (WxParser):
         batteryOk = (record[0] & 0x40) == 0
 
         # 1 inch = 25,4 mm
-        rate = InToMm((record[2] + record[3] * 256) * 0.01)
-        thisHour = InToMm((record[4] + record[5] * 256) * 0.01) 
-        thisDay = InToMm((record[6] + record[7] * 256) * 0.01) 
-        total = InToMm((record[8] + record[9] * 256) * 0.01)  
+        rate = (record[2] + record[3] * 256) * 0.01 * 25.4
+        thisHour = (record[4] + record[5] * 256) * 0.01 * 25.4
+        thisDay = (record[6] + record[7] * 256) * 0.01 * 25.4
+        total = (record[8] + record[9] * 256) * 0.01 * 25.4
 
         minuteT = record[10]
         hourT = record[11]
@@ -212,25 +213,24 @@ class WMRS200Parser (WxParser):
         forecast = record[3] >> 4
         forecastTxt = WxForecast.get(forecast, str(forecast))
             
-        ## Can't use WMRS200 qnhPressure (cannot set altitude)
-        #qnhPressure = (record[5] & (0x0f)) * 256 + record[4]
-        #qnhForecast = record[5] >> 4
-        #qnhForecast_txt = WxForecast.get(forecast, str(qnhForecast))
+        ## Can't use WMRS200 seaLevelPressure (cannot set altitude from wfrog)
+        seaLevelPressure = (record[5] & (0x0f)) * 256 + record[4]
+        slpForecast = record[5] >> 4
+        slpForecastTxt = WxForecast.get(slpForecast, str(slpForecast))
 
-        if self._WxCurrent.has_key('th1.temp') and self._WxCurrent.has_key('th1.humidity'):
-            seaLevelPressure = round(StationToSeaLevelPressure(
-                                         pressure, self.ALTITUDE, self._WxCurrent['th1.temp'], 
-                                         self.MEAN_TEMP, self._WxCurrent['th1.humidity'], 'paDavisVP'),1)
-            # Current Data
-            self._WxCurrent['barometer.pressure'] = seaLevelPressure
-            self._WxCurrent['barometer.forecast'] = forecast
-            self._WxCurrent['barometer.forecastTxt'] = forecastTxt
+        # Current Data
+        self._WxCurrent['barometer.pressure'] = seaLevelPressure
+        self._WxCurrent['barometer.forecast'] = forecast
+        self._WxCurrent['barometer.forecastTxt'] = forecastTxt
+        self._WxCurrent['barometer.seaLevelPressure'] = seaLevelPressure
+        self._WxCurrent['barometer.slpForecast'] = slpForecast
+        self._WxCurrent['barometer.slpForecastTxt'] = slpForecastTxt
 
-            # Report data
-            self._report_barometer(seaLevelPressure)
+        # Report data
+        self._report_barometer_absolute(pressure)
 
-            # Log
-            self._logger.info("Barometer Forecast: %s, Absolute pressure: %.1f mb, Sea Level Pressure: %.1f", forecastTxt, pressure, seaLevelPressure)
+        # Log
+        self._logger.info("Barometer Forecast: %s, Absolute pressure: %.1f mb, Sea Level Pressure: %.1f", forecastTxt, pressure, seaLevelPressure)
 
     def _parse_temperature_record(self, record):
         """
@@ -342,7 +342,7 @@ class WMRS200Parser (WxParser):
                         if self._message_count >= self.CURRENT_CONDITIONS_UPDATE:
                             try:
                                 self._WxCurrent['time'] = time.strftime(self.TIME_FORMAT, time.localtime())
-                                write2xml(self._WxCurrent, self.CURRENT_CONDITIONS_ROOT, self.CURRENT_CONDITIONS_FILENAME)
+                                wfcommon.utils.write2xml(self._WxCurrent, self.CURRENT_CONDITIONS_ROOT, self.CURRENT_CONDITIONS_FILENAME)
                                 self._message_count = 0
                             except:
                                 self._logger.exception("Error writting WMRS200 current conditions file (%s)", 

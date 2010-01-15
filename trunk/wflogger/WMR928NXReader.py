@@ -19,12 +19,14 @@
 ## TODO:  DOCUMENT WMRS928NX serial protocol
 
 
-import serial, logging, time
-from threading import Thread
+import serial
+import logging
+import time
+import threading
 
-class WMR928NXReader (Thread):
+class WMR928NXReader (threading.Thread):
     def __init__(self, wxData, config):
-        Thread.__init__(self)
+        threading.Thread.__init__(self)
         self._wxData = wxData
         self._logger = logging.getLogger('WxLogger.WMR928NXReader')
         ## Configuration

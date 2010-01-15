@@ -27,16 +27,18 @@
 ## DONE, WAITING VERIFICATION:
 ##        CONTROL DISCONNECTION AND RECONNECTION OF WEATHER STATION
 
-import sys, usb, logging, time
-from WMRS200Parser import WMRS200Parser
-from threading import Thread
+import sys 
+import usb 
+import logging 
+import time
+import threading
 
 vendor_id  = 0xfde
 product_id = 0xca01
 
-class WMRS200Reader (Thread):
+class WMRS200Reader (threading.Thread):
     def __init__(self, wxData, config):
-        Thread.__init__(self)
+        threading.Thread.__init__(self)
         self._wxData = wxData
         self._logger = logging.getLogger('WxLogger.WMRS200Reader')
 
@@ -151,8 +153,8 @@ class WMRS200Reader (Thread):
                         # Parse the message
                         try:
                             self._wxData.parse_record(input_buffer[startSep + 2 : endSep])
-                        except Exception, e:
-                            self._logger.exception(e.message)
+                        except:
+                            self._logger.exception("WMRS200 reader exception")
 
                     # remove this message from the input queue
                     input_buffer = input_buffer[endSep:]

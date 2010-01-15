@@ -17,10 +17,9 @@
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ## TODO: Prepare por null windchill and heatindex values
-##       Improve aggregation so that it is not necessary to query the database each time
 
 import time, logging
-from uWxUtils import DewPoint, WindChill, HeatIndex
+from wfcommon.WxUtils import DewPoint, WindChill, HeatIndex, StationToSeaLevelPressure
 from threading import Lock
 
 class WxParser ():
@@ -31,6 +30,8 @@ class WxParser ():
         self.ALTITUDE = config.getfloat('WxParser', 'ALTITUDE')
         self.MEAN_TEMP = config.getfloat('WxParser', 'MEAN_TEMP')
         ## Init internal data
+        self._temp_last = None
+        self._hum_last = None
         self._rain_last = None
         self._rain_last_time = None
         self._new_period()
@@ -38,30 +39,20 @@ class WxParser ():
     def _new_period(self):
         ## Temperature
         self._temp = []
-        self._temp_min = None
-        self._temp_min_time = None
-        self._temp_max = None
-        self._temp_max_time = None
         ## Humidity
         self._hum = []
-        self._hum_min = None
-        self._hum_min_time = None
-        self._hum_max = None
-        self._hum_max_time = None
         ## Wind
         self._wind = []
         self._wind_dir = []
         ## Wind gust
         self._wind_gust = 0.0
         self._wind_gust_dir = None
-        self._wind_gust_time = None
         ## Rain
         if self._rain_last != None:
             self._rain_first = self._rain_last
         else:    
             self._rain_first = None
         self._rain_rate = 0.0
-        self._rain_rate_time = None
         ## Pressure
         self._pressure = []
         ## UV
@@ -76,7 +67,6 @@ class WxParser ():
         self._rain_last = total
         if self._rain_rate < rate:
             self._rain_rate = rate
-            self._rain_rate_time = time.localtime()
         self._lock.release()
 
     def _report_wind(self, dirDeg, avgSpeed, gustSpeed):  
@@ -86,30 +76,28 @@ class WxParser ():
         if self._wind_gust < gustSpeed:
             self._wind_gust = gustSpeed
             self._wind_gust_dir = dirDeg
-            self._wind_gust_time = time.localtime()
         self._lock.release()
 
-    def _report_barometer(self, pressure):
+    def _report_barometer_sea_level(self, pressure):
         self._lock.acquire()
         self._pressure.append(pressure)
         self._lock.release()
+
+    def _report_barometer_absolute(self, pressure):
+        if self._temp_last != None and self._hum_last != None:
+            seaLevelPressure = round(StationToSeaLevelPressure(
+                                     pressure, self.ALTITUDE, self._temp_last, 
+                                     self.MEAN_TEMP, self._hum_last, 'paDavisVP'),1)
+            self._lock.acquire()
+            self._pressure.append(seaLevelPressure)
+            self._lock.release()
 
     def _report_temperature(self, temp, humidity):
         self._lock.acquire()
         self._temp.append(temp)
         self._hum.append(humidity)
-        if self._temp_min == None or self._temp_min > temp:
-            self._temp_min = temp
-            self._temp_min_time = time.localtime()
-        if self._temp_max == None or self._temp_max < temp:
-            self._temp_max = temp
-            self._temp_max_time = time.localtime()
-        if self._hum_min == None or self._hum_min > humidity:
-            self._hum_min = humidity
-            self._hum_min_time = time.localtime()
-        if self._hum_max == None or self._hum_max < humidity:
-            self._hum_max = humidity
-            self._hum_max_time = time.localtime()
+        self._temp_last = temp
+        self._hum_last = humidity
         self._lock.release()
 
     def _report_uv(self, uv_index):
@@ -141,35 +129,29 @@ class WxParser ():
             if n > max_n:
                 max_n = n
                 dom_wind_dir = d
-        
+
         data = {
             'temp': sum(self._temp)/len(self._temp),
-            'temp_min': self._temp_min,
-            'temp_min_time': self._temp_min_time,
-            'temp_max': self._temp_max,
-            'temp_max_time': self._temp_max_time,
             'hum': sum(self._hum)/len(self._hum),
-            'hum_min': self._hum_min,
-            'hum_min_time': self._hum_min_time,
-            'hum_max': self._hum_max,
-            'hum_max_time': self._hum_max_time,
             'wind': sum(self._wind)/len(self._wind),
             'wind_dir': dom_wind_dir,
-            #'wind_dir_str': f(data['wind_dir'])
-            'wind_gust': self._wind_gust,
-            'wind_gust_dir': self._wind_gust_dir, 
-            'wind_gust_time': self._wind_gust_time, 
+            'wind_gust_dir': self._wind_gust_dir
         }
+
+        # Wind gust cannot be smaller than wind average 
+        # (might happen due to different sampling periods)
+        if data['wind'] <= self._wind_gust:
+            data['wind_gust'] = self._wind_gust
+        else:
+            data['wind_gust'] = data['wind']
         
         ## Rain
         if self._rain_last > self._rain_first:
             data['rain'] = self._rain_last - self._rain_first
             data['rain_rate'] = self._rain_rate
-            data['rain_rate_time'] = self._rain_rate_time
         else:
             data['rain'] = 0.0
             data['rain_rate'] = 0.0
-            data['rain_rate_time'] = None
         
         ## QFF pressure (Sea Level Pressure)
         pressure = sum(self._pressure)/len(self._pressure)

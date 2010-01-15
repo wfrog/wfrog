@@ -16,7 +16,7 @@
 PATH=/usr/sbin:/usr/bin:/sbin:/bin
 NAME=wflogger
 DESC="wfrog logger - Weather Station Software "
-LOGGER_DIR=/opt/wfrog/wflogger/src
+LOGGER_DIR=/opt/wfrog/wflogger
 LOGGER=WxLogger.py
 LOGGER_ARGS=
 PIDFILE_LOGGER=/var/run/wflogger.pid
