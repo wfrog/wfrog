@@ -5,13 +5,17 @@
 
 -- Drop unnecessary fields
 
+DELETE FROM RDB$DEPENDENCIES WHERE RDB$DEPENDED_ON_NAME='METEO';
+
 ALTER TABLE METEO 
    DROP TEMP_MIN,
    DROP TEMP_MIN_TIME,
    DROP TEMP_MAX,
    DROP TEMP_MAX_TIME,
    DROP WIND_GUST_TIME,
-   DROP RAIN_RATE_TIME,
+   DROP RAIN_RATE_TIME;
+
+ALTER TABLE METEO
    ADD TMP1 NUMERIC(4,1),
    ADD TMP2 NUMERIC(4,1); 
 
@@ -21,8 +25,6 @@ COMMIT;
 -- requires creating temporal fields first.
 
 UPDATE METEO SET TMP1 = RAIN, TMP2 = RAIN_RATE;
-
-DELETE FROM RDB$DEPENDENCIES WHERE RDB$DEPENDED_ON_NAME='METEO';
 
 ALTER TABLE METEO 
    DROP RAIN,
@@ -58,8 +60,9 @@ UPDATE RDB$RELATION_FIELDS set RDB$DESCRIPTION = 'UV INDEX'  where RDB$FIELD_NAM
 
 COMMIT;
 
+
 -- Export and import to improve database structure and performance:
 --
 -- gbak -v -t -user SYSDBA -password "masterkey" localhost:/var/lib/firebird/2.1/data/wfrog.db wfrog.fbk 
--- gbak -rep -use_all_space -user SYSDBA -password "masterkey" wfrog.fbk localhost:/var/lib/firebird/2.1/data/wfrog.db
+-- gbak -v -rep -use_all_space -user SYSDBA -password "masterkey" wfrog.fbk localhost:/var/lib/firebird/2.1/data/wfrog.db
 
