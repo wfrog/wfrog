@@ -106,10 +106,18 @@ class WMRS200Reader (threading.Thread):
         errors = 0
         while True:
             try:
-                packet = devh.interruptRead(usb.ENDPOINT_IN + 1,  # endpoint number 
-                                            0x0000008,            # bytes to read
-                                            10000)                # timeout (10 seconds)
-                errors = 0
+                # Ignore USBError("No error") exceptions http://bugs.debian.org/476796
+                try:
+                    packet = devh.interruptRead(usb.ENDPOINT_IN + 1,  # endpoint number 
+                                                0x0000008,            # bytes to read
+                                                10000)                # timeout (10 seconds)
+                    errors = 0
+                except usb.USBError as e:
+                    if e.args == ('No error',): 
+                        self._logger.debug('USBError("No error") exception received. Ignoring...(http://bugs.debian.org/476796)')
+                        packet = None
+                    else:
+                        raise e
             except Exception, e:
                 self._logger.exception("Exception reading interrupt: "+ str(e))
                 errors = errors + 1
