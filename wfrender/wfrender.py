@@ -28,6 +28,7 @@ import config
 import copy
 import optparse
 import logging
+import logging.handlers
 import units
 
 
@@ -41,7 +42,17 @@ class RenderEngine(object):
     daemon = False
     output = False
 
+    ## Logging setup
+    LOG_FILENAME = '/var/log/wfrender.log'
+    LOG_SIZE = 512000
+    LOG_BACKUPS = 4
     logger = logging.getLogger("engine")
+    handler = logging.handlers.RotatingFileHandler(
+                      filename=LOG_FILENAME,  maxBytes=int(LOG_SIZE), backupCount=int(LOG_BACKUPS))
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.DEBUG)
 
     def __init__(self, configurer=None, main=False):
         """Creates the engine using a specific configurer or a yaml configurer if none specified"""
