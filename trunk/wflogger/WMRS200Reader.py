@@ -126,7 +126,7 @@ class WMRS200Reader (threading.Thread):
                 time.sleep(3)
 
             if packet != None:
-                if len(packet) > 0:
+                if len(packet) > 0 and packet[0] >= 1 and packet[0] <= 7:   ## Ignore packets with wrong lengths
                     input_buffer += packet[1:packet[0]+1]
                     self._logger.debug("USB RAW DATA: %s" % self._list2bytes(packet))
 
