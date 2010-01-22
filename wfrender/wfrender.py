@@ -46,7 +46,7 @@ class RenderEngine(object):
     LOG_FILENAME = '/var/log/wfrender.log'
     LOG_SIZE = 512000
     LOG_BACKUPS = 4
-    logger = logging.getLogger("engine")
+    logger = logging.getLogger()  ## get root logger so that all properties are transfered to all loggers
     handler = logging.handlers.RotatingFileHandler(
                       filename=LOG_FILENAME,  maxBytes=int(LOG_SIZE), backupCount=int(LOG_BACKUPS))
     formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
