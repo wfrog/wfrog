@@ -16,24 +16,25 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-## TODO: Prepare por null windchill and heatindex values
-
-import time, logging
-from wfcommon.WxUtils import DewPoint, WindChill, HeatIndex, StationToSeaLevelPressure
-from threading import Lock
+import time
+import logging
+import datetime
+import wfcommon.WxUtils
+import threading
 
 class WxParser ():
     def __init__(self, config):
-        self._lock = Lock()
+        self._lock = threading.Lock()
         self._logger = logging.getLogger('WxLogger.WxParser')
         ## Configuration
         self.ALTITUDE = config.getfloat('WxParser', 'ALTITUDE')
-        self.MEAN_TEMP = config.getfloat('WxParser', 'MEAN_TEMP')
+        self.DATABASE = config.get('WxProcess', 'DATABASE')
         ## Init internal data
         self._temp_last = None
         self._hum_last = None
         self._rain_last = None
-        self._rain_last_time = None
+        self._mean_temp = None   # Last 12 hours mean temp
+        self._mean_temp_last_time = None
         self._new_period()
         
     def _new_period(self):
@@ -71,7 +72,7 @@ class WxParser ():
 
     def _report_wind(self, dirDeg, avgSpeed, gustSpeed):  
         self._lock.acquire()
-        self._wind_dir.append(dirDeg)
+        self._wind_dir.append((avgSpeed, dirDeg))  # Keep vector to calculate composite wind direction
         self._wind.append(avgSpeed)
         if self._wind_gust < gustSpeed:
             self._wind_gust = gustSpeed
@@ -83,12 +84,34 @@ class WxParser ():
         self._pressure.append(pressure)
         self._lock.release()
 
+    def _get_mean_temp(self, current_temp):  # Last 12 hours mean temp
+        if self._mean_temp != None:
+            if (datetime.datetime.now()-self._mean_temp_last_time).seconds < 3600: # New value each hour
+                return self._mean_temp
+        try:
+            sql = "SELECT AVG(TEMP) FROM METEO WHERE TIMESTAMP_LOCAL >= '%s'" % (
+                  datetime.datetime.now() - datetime.timedelta(hours=12)).strftime('%Y.%m.%d %H:%M')
+            db = wfcommon.database.FirebirdDB(self.DATABASE)
+            db.connect()
+            [(self._mean_temp,)] = db.select(sql)
+            db.disconnect()
+            self._mean_temp_last_time = datetime.datetime.now()
+            self._logger.info("Calculating last 12 hours mean temp: %4.1f" % self._mean_temp)
+            return self._mean_temp
+        except Exception, e:
+            self._logger.exception("Error calculating last 12 hours mean temp: %s, returning current temperature" % str(e))
+            return current_temp
+        
     def _report_barometer_absolute(self, pressure):
         if self._temp_last != None and self._hum_last != None:
-            seaLevelPressure = round(StationToSeaLevelPressure(
-                                     pressure, self.ALTITUDE, self._temp_last, 
-                                     self.MEAN_TEMP, self._hum_last, 'paDavisVP'),1)
             self._lock.acquire()
+            seaLevelPressure = wfcommon.WxUtils.StationToSeaLevelPressure(
+                                  pressure, 
+                                  self.ALTITUDE, 
+                                  self._temp_last, 
+                                  self._get_mean_temp(self._temp_last), 
+                                  self._hum_last, 
+                                  'paDavisVP')
             self._pressure.append(seaLevelPressure)
             self._lock.release()
 
@@ -109,32 +132,42 @@ class WxParser ():
     def get_data(self):
         self._lock.acquire()
         data = None
-        if len(self._temp) == 0 \
-           or len(self._wind) == 0 \
-           or self._rain_first == None \
-           or len(self._pressure) == 0:
+        if len(self._temp) == 0:
             self._lock.release()
+            self._logger.warning('Missing temperature/humidity data')
+            return None
+        if len(self._wind) == 0:
+            self._lock.release()
+            self._logger.warning('Missing wind data')
+            return None
+        if self._rain_first == None:
+            self._lock.release()
+            self._logger.warning('Missing rain data')
+            return None
+        if len(self._pressure) == 0:
+            self._lock.release()
+            self._logger.warning('Missing pressure data')
             return None
         
         # Calculate wind dominant direction (simple algorithm)
-        histo = {}
-        for d in self._wind_dir:
-            if not histo.has_key(d):
-                histo[d]=1
-            else:
-                histo[d]+=1
-        max_n = 0
-        dom_wind_dir = 0
-        for d, n in histo.iteritems():
-            if n > max_n:
-                max_n = n
-                dom_wind_dir = d
+        #histo = {}
+        #for d in self._wind_dir:
+        #    if not histo.has_key(d):
+        #        histo[d]=1
+        #    else:
+        #        histo[d]+=1
+        #max_n = 0
+        #dom_wind_dir = 0
+        #for d, n in histo.iteritems():
+        #    if n > max_n:
+        #        max_n = n
+        #        dom_wind_dir = d
 
         data = {
             'temp': sum(self._temp)/len(self._temp),
             'hum': sum(self._hum)/len(self._hum),
             'wind': sum(self._wind)/len(self._wind),
-            'wind_dir': dom_wind_dir,
+            'wind_dir': wfcommon.WxUtils.WindPredominantDirection(self._wind_dir),
             'wind_gust_dir': self._wind_gust_dir
         }
 
@@ -158,13 +191,7 @@ class WxParser ():
         data['sea_level_pressure'] = pressure
         
         ## Dew Point
-        data['dew_point'] = round(DewPoint(data['temp'], data['hum'], 'vaDavisVP'), 1)
-        
-        ## Wind Chill
-        data['wind_chill'] = round(WindChill(data['temp'], data['wind']*3.6), 1)            
-        
-        ## Heat Index
-        data['heat_index'] = round(HeatIndex(data['temp'], data['hum']), 1) 
+        data['dew_point'] = round(wfcommon.WxUtils.DewPoint(data['temp'], data['hum'], 'vaDavisVP'), 1)
         
         ## UV
         if self._uv_index != None:
