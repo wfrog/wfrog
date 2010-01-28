@@ -74,10 +74,10 @@ VALUES (%s, %s, %g, %g, %g, %s, %g, %s, %g, %g, %g, %g, %s)
        data['sea_level_pressure'],
        self._get_uv_index(data))
         try:
-            bdd = wfcommon.database.FirebirdDB(self.DATABASE)
-            bdd.connect()
-            bdd.execute(sql)
-            bdd.disconnect()
+            db = wfcommon.database.FirebirdDB(self.DATABASE)
+            db.connect()
+            db.execute(sql)
+            db.disconnect()
             self._logger.debug("SQL executed: %s", sql)
         except:
             self._logger.exception("Error writting current data to database")
