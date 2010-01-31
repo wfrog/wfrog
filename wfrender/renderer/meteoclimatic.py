@@ -29,26 +29,30 @@ class MeteoclimaticRenderer(object):
     Renders the data chunk to send to www.meteoclimatic.com.
 
     Properties
-
+        id: meteoclimatic station ID
     """
 
     logger = logging.getLogger("renderer.meteoclimatic")
 
     def render(self, data={}, context={}):
-        now = time.localtime()
-        db = wfcommon.database.FirebirdDB(context['database']['url'])
-        db.connect()
-        ## Current data
-        data_block_1 = self._calculateCurrentData(db)
-        ## Today data
-        data_block_2 = self._calculateAggregData(db, 'D','%s.%s.%s'%(now.tm_year, now.tm_mon, now.tm_mday))
-        ## Current month
-        data_block_3 = self._calculateAggregData(db, 'M','%s.%s.1'%(now.tm_year, now.tm_mon))
-        ## Current year
-        data_block_4 = self._calculateAggregData(db, 'Y','%s.1.1'%(now.tm_year))
-        db.disconnect()
-        return ['text/plain', "*VER=DATA2*COD=%s%s%s%s%s*EOT*" % (
-                self.id, data_block_1, data_block_2, data_block_3, data_block_4)]
+        try:
+            now = time.localtime()
+            db = wfcommon.database.FirebirdDB(context['database']['url'])
+            db.connect()
+            ## Current data
+            data_block_1 = self._calculateCurrentData(db)
+            ## Today data
+            data_block_2 = self._calculateAggregData(db, 'D','%s.%s.%s'%(now.tm_year, now.tm_mon, now.tm_mday))
+            ## Current month
+            data_block_3 = self._calculateAggregData(db, 'M','%s.%s.1'%(now.tm_year, now.tm_mon))
+            ## Current year
+            data_block_4 = self._calculateAggregData(db, 'Y','%s.1.1'%(now.tm_year))
+            db.disconnect()
+            return ['text/plain', "*VER=DATA2*COD=%s%s%s%s%s*EOT*" % (
+                    self.id, data_block_1, data_block_2, data_block_3, data_block_4)]
+        except Exception, e:
+            self.logger.WARNING("Error rendering metoclimatic data: " % str(e))
+            return ['text/plain', "*VER=DATA2*COD=%s*EOT*" % self.id]
 
     def _calculateCurrentData(self, db):
         sql = """
@@ -58,7 +62,7 @@ ORDER BY TIMESTAMP_UTC DESC
         """
         [(UPD, TMP, WND, AZI, BAR, HUM)] = db.select(sql)
         return "*UPD=%s*TMP=%s*WND=%s*AZI=%s*BAR=%s*HUM=%s*SUN=" % (
-               UPD.strftime("%d/%m/%Y %H:%M"), TMP,  WND * 3.6, AZI, BAR, HUM)
+               "%d/%d/%d %d:%d" % UPD[:5], TMP,  WND * 3.6, AZI, BAR, HUM)
 
     def _calculateAggregData(self, db, time_span, date_from):
         sql = """
@@ -70,6 +74,7 @@ WHERE TIMESTAMP_LOCAL >= '%s'
         return "*%sHTM=%s*%sLTM=%s*%sHHM=%s*%sLHM=%s*%sHBR=%s*%sLBR=%s*%sGST=%s*%sPCP=%s" % (
                time_span, HTM, time_span, LTM, time_span, HHM, time_span, LHM,
                time_span, HBR, time_span, LBR, time_span, GST * 3.6, time_span, PCP )
+
 
 
 

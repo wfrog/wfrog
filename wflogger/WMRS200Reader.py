@@ -112,7 +112,7 @@ class WMRS200Reader (threading.Thread):
                                                 0x0000008,            # bytes to read
                                                 10000)                # timeout (10 seconds)
                     errors = 0
-                except usb.USBError as e:
+                except usb.USBError, e:
                     if e.args == ('No error',): 
                         self._logger.debug('USBError("No error") exception received. Ignoring...(http://bugs.debian.org/476796)')
                         packet = None
