@@ -22,7 +22,8 @@
 
 import kinterbasdb
 
-kinterbasdb.init(type_conv=199) # Set type conversion (datetime / floats)
+kinterbasdb.init(type_conv=0) # Set type conversion (datetime / floats) old python 2.5
+#kinterbasdb.init(type_conv=199) # Set type conversion (datetime / floats)
 #kinterbasdb.init(type_conv=200) # Set type conversion (datetime / decimal)
 
 class FirebirdDB():
