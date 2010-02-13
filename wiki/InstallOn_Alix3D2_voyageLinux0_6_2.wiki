@@ -1,5 +1,9 @@
 #summary How to setup voyagelinux0.6.2 and wfrog on a ALIX3D2 board (PC Engines)
 
+<p align="center"><img src="http://wfrog.googlecode.com/svn/wiki/images/logo-web.png"/></p>
+
+<wiki:toc/>
+
 = Introduction =
 
 Following is how I set up voyage linux 0.6.2 and wfrog working in a PC Engines ALIX 3D2 board in the hope it might be useful for other people. I suppose similar instructions apply for any other ALIX board. 
