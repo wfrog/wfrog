@@ -7,7 +7,7 @@
 
 = Architecture =
 
-As of wfrog 0.1, three processes are involved:
+Out-of-the-box, three processes are involved:
 
    # The Database.
    # The Logger. Reads data from the USB station, logs data into the database. It also maintains a XML file with current conditions.
@@ -44,7 +44,7 @@ sudo easy_install webcolors                # Color names for chart
 
 == Download ==
 
-  * Download the wfrog distribution from the [http://code.google.com/p/wfrog/downloads/list download page] (as soon as 0.1 is released) or [http://code.google.com/p/wfrog/source/checkout checkout from subversion].
+  * Download the wfrog distribution from the [http://code.google.com/p/wfrog/downloads/list download page] or [http://code.google.com/p/wfrog/source/checkout checkout from subversion].
 
 == Prepare Database ==
 
@@ -105,11 +105,11 @@ If you create `wfrender.conf` from `wfrender.yaml`, you will also need to copy t
 
 == Logger ==
 
-==== Configuration ====
+=== Configuration ===
 
   * Adapt values in `wflogger/src/WxLogger.cfg` (use the database URL you create above)
 
-==== Starting the Logger ====
+=== Starting the Logger ===
 
 {{{
 cd wflogger/src
