@@ -56,4 +56,8 @@ The following must be observed:
 
 == HTTP Transport ==
 
-With this transport, the event producer process performs a HTTP POST request on the event consumer process. The payload of the POST request is the XML message. 
+With this transport, the event producer process performs a HTTP POST request on the event consumer process. The payload of the POST request is the XML message.
+
+= Reference Implementation =
+
+The [http://wfrog.org wfrog] project provides the reference implementation of WESTEP. It is developed in python.
