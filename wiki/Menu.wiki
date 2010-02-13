@@ -1,8 +1,6 @@
 [Documentation Usage and Installation Guide]
-
-Installation
+*Installation*
   * [InstallOnVoyageLinux Installation on Voyage Linux]
   * [InstallOn_Alix3D2_voyageLinux0_6_2 Preparing an ALIX3D2 with Voyage Linux]
-
-Design Discussions
+*Design Discussions*
   * [Architecture]
