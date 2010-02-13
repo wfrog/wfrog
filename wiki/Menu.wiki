@@ -1,5 +1,5 @@
 *Documentation*
-  *[Documentation Usage and Gerneal Installation Guide]
+  * [Documentation Usage and General Installation Guide]
 
 *Platform-Specific Installation*
   * [InstallOnVoyageLinux Installation on Voyage Linux]
