@@ -1,4 +1,5 @@
 #summary Online stations exposed with wfrog
+#labels Featured
 
 Users are invited to submit as comment to this page the URL of their stations to appear in this list.
 
