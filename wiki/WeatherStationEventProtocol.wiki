@@ -27,6 +27,16 @@ The following annotated XML schema fully describes the XML format.
 
 *TBD*
 
+== Extensions ==
+
+WESTEP supports proprietary extensions on the form of additional event types and additional elements anywhere in the standard event messages, provided that they appear in a distinct namespace.
+
+== Restrictions to the XML standards ==
+
+The following restrictions apply:
+ * XML messages MUST use the standard WESTEP schema as default namespace and not use the prefixed form. This allows for easier integration and optimizations. Consumers sticking to the standard can drop all messages and elements having a namespace prefix, since they always are extensions.
+ * When using streaming transports (see below), the XML messages MUST be terminated by one empty line and not contains empty lines themselves.
+
 = WESTEP Transport =
 
 In the current version of the specification, the following transports are specified:
@@ -36,7 +46,7 @@ In the current version of the specification, the following transports are specif
 
 == STDIO Transport ==
 
-With this transport, the producer and consumer processes usually run on the same machine and communicate through OS pipes. The producers issues a stream of XML messages separated by an empty line on its standard output. The consumer receives this stream on its standard input.
+With this transport, the producer and consumer processes usually run on the same machine and communicate through OS pipes. The producers issues a stream of XML messages terminated by an empty line on its standard output. The consumer receives this stream on its standard input.
 
 The following must be observed:
  * The XML messages MUST not contain empty lines. This is a restriction over XML.
