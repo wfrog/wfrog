@@ -1,0 +1,7 @@
+#summary Online stations exposed with wfrog
+
+Users are invited to submit as comment to this page the URL of their stations to appear in this list.
+
+¦¦ *Location* ¦¦ *Remarks* ¦¦
+¦¦ [http://www.mallorcaweb.net/jpuigsegur/wfrog/24hours.html Sant Joan, Mallorca, Spain] ¦¦ Uses FTP renderer ¦¦
+¦¦ [http://www.windmaster.ch/meteo/ Cortaillod, Neuchâtel, Switzerland] ¦¦ Uses HTTP renderer. Logging is currently stale because of broken sensor... ¦¦
