@@ -1,4 +1,4 @@
-#How to install voyagelinux0.6.2 and wfrog on a ALIX3D2 board (PC Engines)
+#summary How to setup voyagelinux0.6.2 and wfrog on a ALIX3D2 board (PC Engines)
 
 = Introduction =
 
