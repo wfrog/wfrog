@@ -13,7 +13,7 @@ Station vendors also have benefits in providing WESTEP drivers. They open their 
 
 = Principles =
 
-The protocol relies on two layers:
+WESTEP (WEather STation Event Protocol) relies on two layers:
   * *WESTEP Format*. This is the XML language itself.
   * *WESTEP Transport*. This is how the XML messages are exchanged accross software components.
 
