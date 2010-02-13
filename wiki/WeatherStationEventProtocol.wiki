@@ -1,7 +1,7 @@
 #summary Specification of WESTEP, an XML protocol for weather station events.
 #labels Phase-Design
 
-%TOC%
+<wiki:toc/>
 
 = Introduction =
 
