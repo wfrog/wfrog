@@ -11,6 +11,8 @@ On an other hand, independent software providers work on weather software gainin
 
 This document specifies an XML language and streaming rules for events that a weather station typically issues. This allows for software providers to integrate their software with a wider range of weather station models, provided it exists a WESTEP driver for them. A WESTEP driver is a piece of software receiving data from the weather station and transforming it to XML events.
 
+Note that is protocol is NOT dedicated to upload current weather conditions to a website like weatherunderground.com. The purpose is to allow for building lightweight drivers that transform and send the sensor events as soon as they arrive from the station, i.e. separately.
+
 Station vendors also have benefits in providing WESTEP drivers. They open their users to more choice and acceptance of their products.
 
 = Principles =
