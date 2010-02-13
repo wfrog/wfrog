@@ -16,14 +16,14 @@ Station vendors also have benefits in providing WESTEP drivers. They open their 
 = Principles =
 
 WESTEP (WEather STation Event Protocol) relies on two layers:
-  * *WESTEP Format*. This is the XML language itself.
-  * *WESTEP Transport*. This is how the XML messages are exchanged accross software components.
+  * *Format*. This is the XML language itself.
+  * *Transport*. This is how the XML messages are exchanged accross software components.
 
 We call 'producer' the process sending the event. It is usually a driver, but can also be an intermediate (routing, transformation, ...).
 
 We call 'consumer' the process receiving the event. It is usually a weather software like a datalogger, but can also be an intermediate (routing, transformation, ...).
 
-= WESTEP Format =
+= Format =
 
 The following annotated XML schema fully describes the XML format.
 
@@ -39,7 +39,7 @@ The following restrictions apply:
  * XML messages MUST use the standard WESTEP schema as default namespace and not use the prefixed form. This allows for easier integration and optimizations. Consumers sticking to the standard can drop all messages and elements having a namespace prefix, since they always are extensions.
  * When using streaming transports (see below), the XML messages MUST be terminated by one empty line and not contains empty lines themselves.
 
-= WESTEP Transport =
+= Transport =
 
 In the current version of the specification, the following transports are specified:
 
