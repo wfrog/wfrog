@@ -68,7 +68,7 @@ $ dpkg-reconfigure tzdata
 
 It is important that our clock is correctly synchronized, so that the measures are correctly written to the database. 
 
-==Deactivate mfgtp to prevent clock innacuracy==
+===Deactivate mfgtp to prevent clock innacuracy===
 
 It seems that some voyage linux use a clock driver that is not exact. In my case I experienced 20 / 30 minutes drifts per day. The solution is to deactivate mfgtp. Quoting from http://www.mail-archive.com/voyage-linux@list.voyage.hk/msg02834.html:
 
@@ -100,7 +100,7 @@ pit
 
 And now the clock is accurate enough to install ntpd service to synchronize our clock with ntp servers.
 
-== Install nptd service ===
+=== Install nptd service ===
 
 Install this service using:
 
