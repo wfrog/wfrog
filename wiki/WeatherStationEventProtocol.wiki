@@ -1,6 +1,8 @@
 #summary Specification of WESTEP, an XML protocol for weather station events.
 #labels Phase-Design
 
+%TOC%
+
 = Introduction =
 
 Consumer weather stations become wide-spread and in this area the software bundled with weather is often proprietary, limited to an operating system and provides poor support for integrating with other software.
