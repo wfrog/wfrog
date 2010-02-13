@@ -1,4 +1,4 @@
-#summary Specification of WESTEP 1.0, an XML protocol for weather station events.
+#summary {UNDER WORK} Specification of WESTEP 1.0, an XML protocol for weather station events.
 #labels Phase-Design
 
 <wiki:toc/>
