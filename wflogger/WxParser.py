@@ -28,7 +28,7 @@ class WxParser ():
         self._logger = logging.getLogger('WxLogger.WxParser')
         ## Configuration
         self.ALTITUDE = config.getfloat('WxParser', 'ALTITUDE')
-        self.DATABASE = config.get('WxProcess', 'DATABASE')
+        self.DATABASE = dict(config.items('Database'))
         ## Init internal data
         self._temp_last = None
         self._hum_last = None
@@ -91,7 +91,7 @@ class WxParser ():
         try:
             sql = "SELECT AVG(TEMP) FROM METEO WHERE TIMESTAMP_LOCAL >= '%s'" % (
                   datetime.datetime.now() - datetime.timedelta(hours=12)).strftime('%Y.%m.%d %H:%M')
-            db = wfcommon.database.FirebirdDB(self.DATABASE)
+            db = wfcommon.database.DBFactory(self.DATABASE)
             db.connect()
             [(self._mean_temp,)] = db.select(sql)
             db.disconnect()

@@ -1,5 +1,5 @@
-## Copyright 2009 Jordi Puigsegur <jordi.puigsegur@gmail.com>
-##                Laurent Bovet <lbovet@windmaster.ch>
+## Copyright 2009 Laurent Bovet <lbovet@windmaster.ch>
+##                Jordi Puigsegur <jordi.puigsegur@gmail.com>
 ##
 ##  This file is part of WFrog
 ##
@@ -16,48 +16,196 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import datetime
+import decimal
+
+try:
+    import kinterbasdb
+    if __name__ == '__main__': print "firebird driver present"
+except ImportError:
+    kinterbasdb = None
+
+if kinterbasdb:
+    try:
+        kinterbasdb.init(type_conv=199) # Set type conversion (datetime / floats)
+        if __name__ == '__main__': print "firebird conversion 199"
+        #kinterbasdb.init(type_conv=200) # Set type conversion (datetime / decimal)
+    except:
+        kinterbasdb.init(type_conv=0) # Set type conversion (time tuple / floats) old python 2.5
+        if __name__ == '__main__': print "firebird conversion 0"
+
+try:
+    import MySQLdb
+    if __name__ == '__main__': print "mysql driver present"
+except ImportError:
+    MySQLdb = None
+
+
+# Converts time tuples (old Firebird format) to datetime
+# and Decimal into floats. 
+# Working with Decimal numbers needs to be studied ...
+
+def adjust(obj):
+    try:
+        if isinstance(obj, tuple):
+            if len(obj) == 7:
+                return datetime.datetime(*obj)
+        elif isinstance(obj, decimal.Decimal):
+            return float(obj)
+        else:
+            return obj
+    except:
+        return obj
+
+
+class DB():
+    dbObject = None
+    
+    def __init__(self):
+        raise Exception("Method cannot be called")
+
+    def connect(self):
+        raise Exception("Method cannot be called")
+
+    def select(self, sql):
+        if self.dbObject == None:
+            raise Exception("Not connected to a Database")
+        cursor = self.dbObject.cursor()
+        cursor.execute(sql)
+        l = []
+        for e in cursor.fetchall():
+            # Add record to response changing datatypes if necessary
+            l.append(tuple(map(adjust, e))) 
+        cursor.close()
+        self.dbObject.commit()
+        return l
+
+    def execute(self, sql):
+        if self.dbObject == None:
+            raise Exception("Not connected to a Database")
+        cursor = self.dbObject.cursor()
+        cursor.execute(sql)
+        cursor.close()
+        self.dbObject.commit()
+
+    def disconnect(self):
+        try:
+            self.dbObject.close()
+            self.dbObject = None
+        except:
+            pass
 
 
 ## Firebird database driver
 
-import kinterbasdb
+class FirebirdDB(DB):
+    def __init__(self, db, user='sysdba', password='masterkey', charset='ISO8859_1'):
 
-kinterbasdb.init(type_conv=0) # Set type conversion (datetime / floats) old python 2.5
-#kinterbasdb.init(type_conv=199) # Set type conversion (datetime / floats)
-#kinterbasdb.init(type_conv=200) # Set type conversion (datetime / decimal)
-
-class FirebirdDB():
-    def __init__(self, bdd, user='sysdba', password='masterkey', charset='ISO8859_1'):
-        self._bdd = bdd
-        self._user = user
-        self._password = password
-        self._charset = charset
+        self.db = db
+        self.user = user
+        self.password = password
+        self.charset = charset
     
     def connect(self):
-        self._db = kinterbasdb.connect(dsn=self._bdd, 
-                                       user=self._user,
-                                       password=self._password, 
-                                       charset=self._charset)
+        if self.dbObject != None:
+            raise Exception("Firebird: already connected to %s" % self.db)
+        self.dbObject = kinterbasdb.connect(dsn=self.db, 
+                                            user=self.user,
+                                            password=self.password, 
+                                            charset=self.charset)
 
-    def select(self, sql):
-        cursor = self._db.cursor()
-        cursor.execute(sql)
-        l = []
-        for e in cursor.fetchall():
-            l.append(e)
-        cursor.close()
-        self._db.commit()
-        return l
+## MySQL database driver
 
-    def execute(self, sql):
-        cursor = self._db.cursor()
-        cursor.execute(sql)
-        cursor.close()
-        self._db.commit()
+class MySQLDB(DB):
+    def __init__(self, db,  host, port=3306, user='root', password='root'):
+        self.host = host
+        self.port = port
+        self.db = db
+        self.user = user
+        self.password = password
 
-    def disconnect(self):
-        try:
-            self._db.close()
-        except:
-            pass
+    def connect(self):
+        if self.dbObject != None:
+            raise Exception("MySQL: already connected to %s" % self.db)
+        self.dbObject = MySQLdb.connect(host=self.host,
+                                        port=self.port,
+                                        user=self.user,
+                                        passwd=self.password,
+                                        db=self.db)
+
+
+## Database driver factory
+
+def DBFactory(configuration):
+    if 'type' not in configuration: raise(Exception('DBFactory: database type not specified'))
+    type = configuration['type'].lower()
+
+    if type == 'firebird':
+        if 'database' not in configuration:
+            raise(Exception('DBFactory: Firebird database connection string not specified'))
+        database = configuration['database']
+        if 'user' not in configuration:
+            user = 'SYSDBA'
+        else:
+            user = configuration['user']
+        if 'password' not in configuration:
+            password = 'masterkey'
+        else:
+            password = configuration['password']
+        if 'charset' not in configuration:
+            charset = 'ISO8859_1'
+        else:
+            charset = configuration['charset']    
+    
+        return FirebirdDB(database, user, password, charset)
+
+    elif type == 'mysql':
+        if 'database' not in configuration:
+            raise(Exception('DBFactory: MySql database name not specified'))
+        database = configuration['database']
+        if 'host' not in configuration:
+            raise(Exception('DBFactory: MySql database name not specified'))
+        host = configuration['host']
+        if 'port' not in configuration:
+            port = 3306
+        else:
+            port = int(configuration['port'])
+        if 'user' not in configuration:
+            user = 'root'
+        else:
+            user = configuration['user']
+        if 'password' not in configuration:
+            password = 'root'
+        else:
+            password = configuration['password']
+    
+        return  MySQLDB(database, host, port, user, password)
+
+    else:
+        raise(Exception('database type %s not supported' % configuration))
+        
+
+if __name__ == '__main__':
+
+    if kinterbasdb:
+        firebird_test = {'type' : 'firebird',
+                         'database' : 'localhost:/var/lib/firebird/2.0/data/wfrog.db',
+                         'user' : 'sysdba',
+                         'password' : 'masterkey'}
+        db = DBFactory(firebird_test)
+        db.connect()
+        print db.select("SELECT COUNT(*) FROM METEO")
+        db.disconnect()
+
+    if MySQLdb:
+        mysql_test = {'type' : 'mysql',
+                      'database' : 'wfrog',
+                      'host' : 'localhost',
+                      'port' : 3306,
+                      'user' : 'root',
+                      'password' : 'root'}
+        db = DBFactory(mysql_test)
+        db.connect()
+        print db.select("SELECT COUNT(*) FROM METEO")
+        db.disconnect()
 
