@@ -135,8 +135,28 @@ class MySQLDB(DB):
 
 
 ## Database driver factory
+## 
 
 def DBFactory(configuration):
+    """
+    Expects a python dictionary with the database configuration and returns
+    its corresponding database object.
+ 
+    Two types of database are available:
+    1) firebird
+       {'type' : 'firebird',
+        'database' : 'localhost:/var/lib/firebird/2.0/data/wfrog.db',
+        'user' : 'sysdba',
+        'password' : 'masterkey'}
+    2) mysql
+       {'type' : 'mysql',
+        'database' : 'wfrog',
+        'host' : 'localhost',
+        'port' : 3306,
+        'user' : 'root',
+        'password' : 'root'}
+    """
+
     if 'type' not in configuration: raise(Exception('DBFactory: database type not specified'))
     type = configuration['type'].lower()
 
