@@ -33,7 +33,7 @@ class WxProcess (threading.Thread):
         self._wxData = wxData
         self._logger = logging.getLogger('WxLogger.WxProcess')
         ##Configuration
-        self.DATABASE = config.get('WxProcess', 'DATABASE')
+        self.DATABASE = dict(config.items('Database'))
         self.SAMPLE_PERIOD = config.getint('WxProcess', 'SAMPLE_PERIOD')  
         self.TIME_FORMAT = config.get('WxLogger', 'TIME_FORMAT')
 
@@ -74,7 +74,7 @@ VALUES (%s, %s, %g, %g, %g, %s, %g, %s, %g, %g, %g, %g, %s)
        data['sea_level_pressure'],
        self._get_uv_index(data))
         try:
-            db = wfcommon.database.FirebirdDB(self.DATABASE)
+            db = wfcommon.database.DBFactory(self.DATABASE)
             db.connect()
             db.execute(sql)
             db.disconnect()
