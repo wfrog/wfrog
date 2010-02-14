@@ -3,8 +3,9 @@
 
 Users are invited to submit as comment to this page the URL of their stations to appear in this list.
 
-|| *Location* || *Remarks* ||
-|| [http://www.mallorcaweb.net/jpuigsegur/wfrog/24hours.html Sant Joan, Mallorca, Spain] || Uses FTP renderer ||
-|| [http://www.windmaster.ch/meteo/ Cortaillod, Neuchâtel, Switzerland] || Uses HTTP renderer. Logging is currently stale because of broken sensor... ||
+|| *Location* || *Weather Station* || *Remarks* ||
+|| [http://www.mallorcaweb.net/jpuigsegur/wfrog/24hours.html Sant Joan, Mallorca, Balearic Islands] || WMRS200 || Uses FTP renderer. Running on [http://www.pcengines.ch/alix.htm ALIX3D2] with [http://linux.voyage.hk/ voyage linux] 0.6.2 ||
+|| [http://www.windmaster.ch/meteo/ Cortaillod, Neuchâtel, Switzerland] || WMRS200 ||  Uses HTTP renderer. Logging is currently stale because of broken sensor... ||
+|| [http://www.mallorcaweb.net/jpuigsegur/wfrog/24hours.html La Jonquera, Catalonia] || WMR928NX || Uses FTP renderer ||
 
 <p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
