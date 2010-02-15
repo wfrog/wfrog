@@ -161,6 +161,8 @@ def DBFactory(configuration):
     type = configuration['type'].lower()
 
     if type == 'firebird':
+        if not kinterbasdb:
+            raise(Exception("DBFactory: kinterbasdb (Firebirds python's database driver) is not installed"))
         if 'database' not in configuration:
             raise(Exception('DBFactory: Firebird database connection string not specified'))
         database = configuration['database']
@@ -180,6 +182,8 @@ def DBFactory(configuration):
         return FirebirdDB(database, user, password, charset)
 
     elif type == 'mysql':
+        if not MySQLdb:
+            raise(Exception("DBFactory: MySQLdb (mysql python's database driver) is not installed"))
         if 'database' not in configuration:
             raise(Exception('DBFactory: MySql database name not specified'))
         database = configuration['database']
@@ -216,6 +220,8 @@ if __name__ == '__main__':
         db.connect()
         print db.select("SELECT COUNT(*) FROM METEO")
         db.disconnect()
+    else:
+        print "kinterbasdb (Firebird python's driver) is not installed"
 
     if MySQLdb:
         mysql_test = {'type' : 'mysql',
@@ -228,4 +234,6 @@ if __name__ == '__main__':
         db.connect()
         print db.select("SELECT COUNT(*) FROM METEO")
         db.disconnect()
+    else: 
+        print "MySQLdb (mysql python's driver) is not installed"
 
