@@ -118,7 +118,7 @@ The following must be observed:
 
 == HTTP Transport ==
 
-With this transport, the event producer process performs a HTTP POST request on the event consumer process. The payload of the POST request is the XML message.
+With this transport, the event producer process performs a HTTP POST request on the event consumer process. The payload of the POST request is the XML message. For optimzing resource consumption, supporting HTTP 1.1 keep-alive is recommended.
 
 = Reference Implementation =
 
