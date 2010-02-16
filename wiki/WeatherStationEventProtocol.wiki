@@ -27,7 +27,68 @@ We call 'consumer' the process receiving the event. It is usually a weather soft
 
 = Format =
 
-The following annotated XML schema fully describes the XML format.
+This section fully describes the XML format for the events.
+
+== XML Schema ==
+
+  * URL: (TBD)
+  * Documentation: 
+
+== Example ==
+
+The following XML messages are valid WESTEP events:
+
+{{{
+	<temp>
+		<station>3</station>
+		<sensor>2</sensor>
+		<value>23.0</value>
+	</temp>
+
+	<temp>
+		<value>24.2</value>
+	</temp>
+
+	<press>
+	  <value>1030</value>
+	  <code>QNH</code>
+	</press>
+
+	<press>
+	  <value>1026.2</value>
+	</press>
+
+	<hum>
+		<value>65</value>
+	</hum>
+
+	<rain>
+		<rate>0.0</rate>
+		<total>544.0</total>
+	</rain>
+
+	<wind>
+		<mean>
+			<speed>3.1</speed>
+			<dir>22.5</dir>
+		</mean>		
+	</wind>
+
+	<wind>
+		<mean>
+			<speed>3.1</speed>
+			<dir>31.6</dir>
+		</mean>
+		<gust>
+			<speed>4.5</speed>
+			<dir>22.5</dir>
+		</gust>		
+	</wind>
+
+	<uv>
+		<value>1</value>
+	</uv>
+}}}
 
 *TBD*
 
