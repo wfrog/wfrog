@@ -5,7 +5,7 @@
 
 = Introduction =
 
-Consumer weather stations become wide-spread and in this area the software bundled with weather is often proprietary, limited to an operating system and provides poor support for integrating with other software.
+Consumer weather stations become wide-spread and in this area the bundled software is often proprietary, limited to an operating system and provides poor support for integrating with other software.
 
 On an other hand, independent software providers work on weather software gaining popularity because they pay attention to what the users need (other features, other OS, open-source license, ...). However, each of them need to develop and test their own implementation of weather station drivers or integrate an existing one with the effort of adapting it to their model.
 
