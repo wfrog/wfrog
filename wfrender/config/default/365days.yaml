@@ -2,7 +2,7 @@ renderer: !template
     path: templates/default/main.html
     mime: text/html
     renderer: !data
-        source: !database 
+        source: !database
             slice: day
             span: 363
         renderer: !multi
@@ -12,4 +12,4 @@ renderer: !template
                 chart: !include
                     path: default/charts.yaml
                     variables:
-                        interpolate: false
+                        interpolate: off
