@@ -90,8 +90,6 @@ The following XML messages are valid WESTEP events:
     </uv>
 }}}
 
-*TBD*
-
 == Extensions ==
 
 WESTEP supports proprietary extensions on the form of additional event types and additional elements anywhere in the standard event messages, provided that they appear in a distinct namespace.
