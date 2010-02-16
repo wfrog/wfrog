@@ -1,4 +1,4 @@
-#summary {UNDER WORK} Specification of WESTEP 1.0, an XML protocol for weather station events.
+#summary {DRAFT} Specification of WESTEP 1.0, an XML protocol for weather station events.
 #labels Phase-Design
 
 <wiki:toc/>
@@ -31,7 +31,7 @@ This section fully describes the XML format for the events.
 
 == XML Schema ==
 
-  * URL: (TBD)
+  * URL: http://wfrog.googlecode.com/svn/trunk/xsd/westep.xsd
   * Documentation: 
 
 == Example ==
