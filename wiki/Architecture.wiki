@@ -153,41 +153,6 @@ The example also shows internal decoupling with a blocking queue and local creat
 = Data model =
 
 {{{
-CREATE TABLE METEO(
-  TIMESTAMP_UTC Timestamp NOT NULL,
-  TIMESTAMP_LOCAL Timestamp NOT NULL,
-  TEMP Numeric(3,1),
-  TEMP_MIN Numeric(3,1),
-  TEMP_MIN_TIME Timestamp,
-  TEMP_MAX Numeric(3,1),
-  TEMP_MAX_TIME Timestamp,
-  HUM Numeric(2,1),
-  WIND Numeric(4,1),
-  WIND_DIR Smallint,
-  WIND_GUST Numeric(4,1),
-  WIND_GUST_DIR Smallint,
-  WIND_GUST_TIME Timestamp,
-  DEW_POINT Numeric(3,1),
-  RAIN Numeric(5,1),
-  RAIN_RATE Numeric(5,1),
-  RAIN_RATE_TIME Timestamp,
-  PRESSURE Numeric(5,1),
-  UV_INDEX Smallint,
-  CONSTRAINT PK_METEO PRIMARY KEY (TIMESTAMP_UTC)
-);
-
-CREATE DESCENDING INDEX IDX_METEO1 ON METEO (TIMESTAMP_LOCAL);
-}}}
-
-_Comment by Jordi_
-
-Database structure revisited:
-
-- no min/max timestamps
-- precision adjustements
-- no temp_min, temp_max values
-
-{{{
 CREATE TABLE METEO
 (
   TIMESTAMP_UTC Timestamp NOT NULL,
@@ -222,7 +187,67 @@ CREATE DESCENDING INDEX IDX_METEO1 ON METEO (TIMESTAMP_LOCAL);
 
 Row size is aprox. 40 bytes.
 
-_End of Comment_
+
+=Database abstaction layer / datasoure refactoring==
+
+Proposal from Jordi following Laurent's proposal in [http://code.google.com/p/wfrog/issues/detail?id=15 issue num. 15] 
+
+==Storage abstraction class==
+
+Layer providing abstraction and unified access to wfrog's data storage. Initially we have database storage and therefore this module is responsible to create the SQLs etc. In the future we could have other storage implementations, e.g. csv flat files.
+
+The idea is that we will have a method to register one or several aggregators and then a run() or populate() method. This method would obtain the required data from the database and feed it to the registered aggregators which will process it on the fly.
+
+==Aggregator classes==
+
+Layer providing access to the meteorological data through aggregation. An aggregation object will be determined by the following initializating parameters:
+  * period: e.g. current_year, current_month, begin date-end date, begin datetime-end datetime, last n days, etc
+  * aggregation unit: e.g. year, month, day, minute, hour, etc.
+  * optional filters: eg. only data gathered between 00:00 and 08:00, when wind > 10/Km.h, etc.
+  * function: a set of min, max, avg, tendency, etc. to be calculated of each meteo variable
+  * values o variables to be calculated:  temperature, pressure, wind chill, etc etc. Some of them might exist in the database while others are the product of formulas.
+
+Aggregator objects would work, whenever possible, in an incremental way. Each aggregator will have a method data_since() which will be used by the storage abstraction layer to know which data has to be feeded to the aggregator on each run. Ideally, only new data since last run will have to be feeded.
+
+==Measure classes==
+
+There will be different classes for the measures coming from the station sensors:
+
+  * temperature  (or temperature(1), temperature(2), etc. if several sensors are recorded)
+  * humidity  (or humidity(1), humidity(2), etc. if several sensors are recorded)
+  * pressure
+  * wind speed (avg)
+  * wind dir (avg)
+  * wind speed (gust)
+  * wind dir (gust)
+  * rain
+  * rain rate
+
+and other measures calculated:
+
+  * wind chill
+  * heat index
+  * evaporation
+  * etc....
+
+==General schema==
+
+
+{{{
+DBFactory <--- Storage     <----Logger ----+
+DBObjects      Abstraction                 |
+                    |                      |
+                    +-- Meteo Aggregator <-+-- Render ,etc.
+                               |
+                               +-- Measures ---- Units
+}}}
+               
+The idea behind this schema is that each wfrog process (e.g. the renderer) will have a unique instance of the storage abstraction class. Each render will register one or several aggregators which in turn will have been initialized with several measures (whith a specific unit request). Whenever a http request is received or the scheduler determines it is time to run, then the storage abstraction is requested to read data from the database and update the aggregators which will calculate the results for each of the measures registered. Since this aggregators would be incremental, only new data will have to be sent to them, and won't be necessary to read all the records of the database each time.
+
+Maybe the instantiation of the storage abstraction class might be controlled by yaml and so have more control on the number of instances, which renders use each class, etc.
+
+The logger would attactk directly to the Storage Abstraction layer to register new data and use the aggregator to obtain the last 12 h. temperature (this is the only data used by the logger).
+
 
 
 = Project Structure =
