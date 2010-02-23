@@ -158,4 +158,9 @@
     		<documentation>Reports the UV index.</documentation>
     	</annotation></element>
 
+
+    <element name="rad" type="westep:ValueEvent">
+        <annotation>
+            <documentation>Reports the solar radiation in [W/m²]</documentation>
+        </annotation></element>
 </schema>
