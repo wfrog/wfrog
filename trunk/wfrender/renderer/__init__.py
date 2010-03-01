@@ -68,7 +68,7 @@ class YamlIncludeRenderer(include.IncludeRenderer, yaml.YAMLObject):
 class YamlMultiRenderer(multi.MultiRenderer, yaml.YAMLObject):
     yaml_tag = u'!multi'
 
-class YamlMultiRenderer(scheduler.SchedulerRenderer, yaml.YAMLObject):
+class YamlSchedulerRenderer(scheduler.SchedulerRenderer, yaml.YAMLObject):
     yaml_tag = u'!scheduler'
 
 class YamlTemplateRenderer(template.TemplateRenderer, yaml.YAMLObject):

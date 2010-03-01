@@ -19,7 +19,7 @@
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Before loading other modules add wfrog directory to sys.path to be able to use wfcommon 
+# Before loading other modules add wfrog directory to sys.path to be able to use wfcommon
 import os.path
 import sys
 if __name__ == "__main__": sys.path.append(os.path.abspath(sys.path[0] + '/..'))
@@ -51,7 +51,7 @@ class RenderEngine(object):
                       filename=LOG_FILENAME,  maxBytes=int(LOG_SIZE), backupCount=int(LOG_BACKUPS))
     formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     handler.setFormatter(formatter)
-    logger.addHandler(handler)
+#    logger.addHandler(handler)
     logger.setLevel(logging.DEBUG)
 
     def __init__(self, configurer=None, main=False):

@@ -65,7 +65,7 @@ class YamlConfigurer(object):
                 self.logger.debug("Loading extension module '"+ext+"'")
                 self.extensions[ext]=__import__(ext)
         if options.help_list:
-            print "\nElements you can use in the yaml config file:\n"
+            print "\n> Elements you can use in the yaml config file:\n"
             print "Renderers"
             print "---------\n"
             self.print_help(renderer)
@@ -79,13 +79,18 @@ class YamlConfigurer(object):
                     print "[" + ext + "]"
                     print
                     self.print_help(self.extensions[ext])
-            print "Use option -H ELEMENT for help on a particular element"
+            print "> Use option -H ELEMENT for help on a particular element"
             sys.exit()
         if options.help_element:
             element = options.help_element
             if element[0] is not '!':
                 element = '!' + element
-            desc = self.get_help_desc(renderer)
+            desc = {}
+            desc.update(self.get_help_desc(renderer))
+            desc.update(self.get_help_desc(datasource))
+            if len(desc) == 0:
+                for ext in self.extensions:
+                    desc.update(self.get_help_desc(self.extensions[ext]))
             if desc.has_key(element):
                 print
                 print element
