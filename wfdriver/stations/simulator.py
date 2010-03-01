@@ -16,21 +16,52 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import yaml
 import time
+import random
+import copy
 
-class RandomSimulator(yaml.YAMLObject):
-    yaml_tag = u'!random-simulator'
-    
-    def run(self, generate_event, consume_event):
+class RandomSimulator(object):
+
+    '''
+    Simulates a station. Issues events randomly with random variations.
+    '''
+
+    types = [ 'temp', 'press', 'hum', 'rain', 'wind', 'uv', 'rad' ]
+    init_values = [ 10, 1020, 65, 10, [ 3, 180], 5, 2 ]
+    range = [ 30, 100, 40, 20, [6, 360], 10, 4 ]
+
+    def new_value(self, current, init, range):
+        step = random.random()*(range/8.0) - range/16.0
+        dev = current-init # deviation from init
+        delta = round(step-dev/16.0,1) # encourage keeping around init
+        new = current + delta
+        # keep in range
+        if new < init -range/2.0:
+            new = init - range/2.0
+        if new > init + range/2.0:
+            new = init + range/2.0
+        return new
+
+    def run(self, generate_event, send_event):
+        current_values = copy.copy(self.init_values)
+
         while True:
-            e = generate_event('temp')
-            e.value = 34
-            
-            e.create_child('mean')
-            e.mean.value = 2
-                        
-            consume_event(e)
-            time.sleep(2) 
-           
-           
+            t = random.randint(0,len(self.types)-1)
+            type = self.types[t]
+            e = generate_event(type)
+
+            if type == 'wind':
+                current_values[t][0] = self.new_value(current_values[t][0], self.init_values[t][0], self.range[t][0])
+                current_values[t][1] = self.new_value(current_values[t][1], self.init_values[t][1], self.range[t][1])
+                e.create_child('mean')
+                e.mean.speed=current_values[t][0]
+                e.mean.dir=current_values[t][1]
+            else:
+                current_values[t] = self.new_value(current_values[t], self.init_values[t], self.range[t])
+                if type == 'rain':
+                    e.rate = current_values[t]
+                else:
+                    e.value = current_values[t]
+
+            send_event(e)
+            time.sleep(2)
