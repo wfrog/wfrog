@@ -206,7 +206,6 @@ class GoogleChartRenderer(object):
 
     thickness (G, S, M) [numeric]:
         Pixel thickness of the line.
-
     """
 
     series = None
@@ -412,7 +411,16 @@ class GoogleChartRenderer(object):
 
 class GoogleChartWindRadarRenderer(object):
     """
-    Renders wind data as a radar google chart URL
+    Renders wind data as a radar google chart URL.
+
+    [ Properties ]
+
+    series [dict]:
+        Defines which series data are rendered on the chart and
+        their options. Keys follow the format 'measure.serie', e.g.
+        'temp.avg'. Value contains a dictionary of rendering options. See
+        below the available options and their scope.
+
     """
 
     key = 'wind'

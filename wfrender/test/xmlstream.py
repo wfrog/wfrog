@@ -2,7 +2,6 @@ import sys
 import optparse
 from StringIO import StringIO
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-from lxml import etree, objectify
 from Queue import Queue
 from threading import Thread
 
@@ -33,7 +32,7 @@ def main():
 
     if options.source == 'stdin':
         listen_stdin()
-        
+
     if options.source == 'local':
         listen_local()
 
@@ -46,8 +45,8 @@ def logger_loop():
         event = event_queue.get(block=True)
         if(event == "stop"):
             break
-        print "Type: "+event.type+", Sensor: "+str(event.sensor)+", Value: "+str(event.value)
-  
+        print event.__dict__
+
 ##############################################
 # Example listening on stdin, e.g. for pipe communication
 
@@ -73,15 +72,22 @@ def listen_stdin():
 # Example listening on HTTP, good for remote communication
 
 class HTTPEventHandler(BaseHTTPRequestHandler):
+
+    protocol_version = 'HTTP/1.1'
+
     def do_POST(self):
         clen = self.headers.getheader('content-length')
         if clen:
             clen = int(clen)
-        else:        
+        else:
             self.send_error(411)
-        
+
         message = self.rfile.read(clen)
         process_message(message)
+
+        self.send_response(200)
+        self.send_header('Content-length', 0)
+        self.end_headers()
 
 def listen_http(port):
     HTTPServer(('', port), HTTPEventHandler).serve_forever()
@@ -97,26 +103,27 @@ def listen_local():
     event.type = "temp"
     event.sensor = 2
     event.value = 24
-    
+
     enqueue_event(event)
-    
+
     event = empty_event()
     event.type = "temp"
     event.sensor = 3
     event.value = 25
-    
+
     enqueue_event(event)
     enqueue_event("stop")
 
 ##############################################
 # Transform XML messages to events
 def process_message(message):
+    from lxml import objectify
     event = objectify.XML(message)
     event.type = event.tag
     enqueue_event(event)
-    
+
 # Put an event on the queue
-def enqueue_event(event):    
+def enqueue_event(event):
     event_queue.put(event, block=True, timeout=60)
-        
+
 main()
