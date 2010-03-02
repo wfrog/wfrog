@@ -200,9 +200,11 @@ The idea is that we will have a method to register one or several aggregators an
 
 ==Aggregator classes==
 
+_Comment by Laurent: This resembles to the current concept of 'datasource' in the current renderer implementation. I write below in italics further comments_
+
 Layer providing access to the meteorological data through aggregation. An aggregation object will be determined by the following initializating parameters:
-  * period: e.g. current_year, current_month, begin date-end date, begin datetime-end datetime, last n days, etc
-  * aggregation unit: e.g. year, month, day, minute, hour, etc.
+  * period: e.g. current_year, current_month, begin date-end date, begin datetime-end datetime, last n days, etc _corresponds to 'span' in current datasource concept_
+  * aggregation unit: e.g. year, month, day, minute, hour, etc. _correspond to 'slice' in current datasource concept_
   * optional filters: eg. only data gathered between 00:00 and 08:00, when wind > 10/Km.h, etc.
   * function: a set of min, max, avg, tendency, etc. to be calculated of each meteo variable
   * values o variables to be calculated:  temperature, pressure, wind chill, etc etc. Some of them might exist in the database while others are the product of formulas.
