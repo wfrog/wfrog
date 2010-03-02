@@ -260,6 +260,39 @@ Maybe the instantiation of the storage abstraction class might be controlled by 
 
 The logger would attack directly to the Storage Abstraction layer to register new data and use the aggregator to obtain the last 12 h. temperature (this is the only data used by the logger).
 
+== API ==
+
+Here is a proposal of class/method signatures for the agggregator and storage in a scenario where aggregator have control (in opposite to above where the storage trigger the aggregator updates).
+
+== Storage ==
+
+{{{
+class Storage:
+
+    def write_sample(self, sample)
+    
+    def traverse_samples(self, callback, from_timestamp=ever, to_timestamp=now)
+}}}
+
+A sample is a dictionary corresponding to the table/csv columns. e.g.
+
+{{{
+{ 'temp0': 4.5, 'hum': 45, 'wind': 3.5, 'wind_dir': 22.5, ... }
+}}}
+
+'callback' is a function taking a timestamp-enriched sample as parameter. 
+
+== Datasource ==
+
+The aggregator/datasource updates its state by traversing new samples and computing new slices accordingly.
+
+{{{
+class DataSource
+
+    def execute(self,data={}, context={})
+
+}}
+
 = Configuration =
 
 This is an example of what configuration files of wfrog 0.5 will resemble to. I tried to capture the following:
