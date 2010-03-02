@@ -354,14 +354,14 @@ logging:
 Proposal for the project structure. Taken from http://jcalderone.livejournal.com/39794.html and state-of-the-art on other projects.
 
 {{{
-trunk/           (will be copied to tags/wfrog-0.1 and targzipped for release)
+trunk/           (will be copied to tags/wfrog-0.x and targzipped for release)
    bin/          (bootstrap executable files)
      wfdriver
      wflogger
      wfrender
    wfdriver/
      -base python files-
-     stations/
+     station/
         wmrs200.py
         wmr98nx.py
      config/
