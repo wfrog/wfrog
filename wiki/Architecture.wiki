@@ -299,7 +299,7 @@ logging:
             address: webmaster@wfrog.org
         
 embed:
-    wfdriver: { config: ../wfdriver/config/embedded.yaml } # Run the
+    wfdriver: { config: ../wfdriver/config/wfdriver.yaml } # Run the
                                        # driver embedded in the logger
                                        # process. Hence the 'local'
                                        # transport.
