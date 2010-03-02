@@ -264,7 +264,7 @@ The logger would attack directly to the Storage Abstraction layer to register ne
 
 Here is a proposal of class/method signatures for the agggregator and storage in a scenario where aggregator have control (in opposite to above where the storage trigger the aggregator updates).
 
-== Storage ==
+=== Storage ===
 
 {{{
 class Storage:
@@ -282,7 +282,7 @@ A sample is a dictionary corresponding to the table/csv columns. e.g.
 
 'callback' is a function taking a timestamp-enriched sample as parameter. 
 
-== Datasource ==
+=== Datasource ===
 
 The aggregator/datasource updates its state by traversing new samples and computing new slices accordingly.
 
