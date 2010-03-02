@@ -260,7 +260,94 @@ Maybe the instantiation of the storage abstraction class might be controlled by 
 
 The logger would attack directly to the Storage Abstraction layer to register new data and use the aggregator to obtain the last 12 h. temperature (this is the only data used by the logger).
 
+= Configuration =
 
+This is an example of what configuration files of wfrog 0.5 will resemble to. I tried to capture the following:
+ * Unification of configuration format (yaml)
+ * Driver configuration, transport configuration (local, http)
+ * Common configuration (logging, database) with parametrization (process name as log filename).
+ * Embedding of driver and logger in same process (in wflogger)
+ * Aggregator-storage relation (with caching)
+
+{{{
+wfdriver/config/wfdriver.yaml
+-----------------------------
+
+station: !wmrs200 {}
+#station: !wmr928n { port: COM1 }
+output: !local {}           # Use a local channel to send events
+#output: !http { url: http://localhost:8888 }
+
+
+wflogger/config/wflogger.yaml
+-----------------------------
+
+context:
+    altitude: 430           # The context is propagated to the aggregator
+input: !local {}            # Use a local channel to receive events
+#input: !http { port: 8888 }
+output: !include { path: ../wfcommon/config/storage.yaml }  
+logging:
+    level: info
+    handlers:
+        default: !include 
+            path: ../wfcommon/config/loghandler.yaml
+            variables:
+                process: wflogger
+        smtp: !smtphandler
+            threshold: critical
+            address: webmaster@wfrog.org
+        
+embed:
+    wfdriver: { config: ../wfdriver/config/embedded.yaml } # Run the
+                                       # driver embedded in the logger
+                                       # process. Hence the 'local'
+                                       # transport.
+
+wfcommon/config/storage.yaml   
+----------------------------
+
+storage: !cache              # wraps the underlying storage in cache
+    storage: !mysql { url: mysql://blabla, user: admin, password: bla }
+    strategy: FIFO           # replace the oldest item first
+    size: 10000              # number of rows to cache
+#storage !csv { path: /var/log/wfrog.csv  }
+
+
+wfcommon/config/loghandler.yaml
+-------------------------------
+
+loghandler: !rotating
+    path: /var/log/${process}.log
+    size: 262144
+    backup: 2
+
+
+wfrender/config/wfrender.yaml
+-----------------------------
+
+storages: 
+    default: !include { path: ../wfcommon/config/storage.yaml }
+...
+    renderer: !data
+        datasource: !aggregator
+            storage: default
+            slice: day
+            span: 365
+            filters:
+                noon: !timefilter
+                    range: [ 12:00, 12:00 ]
+        renderer: ...
+...
+logging:
+    level: info
+    handlers:
+        default: !include 
+            path: ../wfcommon/config/loghandler.yaml 
+            variables:
+                process: wfrender
+
+}}}
 
 = Project Structure =
 
