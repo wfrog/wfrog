@@ -234,6 +234,8 @@ and other measures calculated:
 
 _L: This is covered by the new module driver. Check it out (see the simulator)_
 
+_J: What do you mean by this comment? Are wind chill or heat index going to be calculated on the driver instead of the logger? Maybe this should be further explained.
+
 ==General schema==
 
 
