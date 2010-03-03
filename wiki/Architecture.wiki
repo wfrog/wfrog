@@ -196,20 +196,18 @@ Proposal from Jordi following Laurent's proposal in [http://code.google.com/p/wf
 
 Layer providing abstraction and unified access to wfrog's data storage. Initially we have database storage and therefore this module is responsible to create the SQLs etc. In the future we could have other storage implementations, e.g. csv flat files.
 
-The idea is that we will have a method to register one or several aggregators and then a run() or populate() method. This method would obtain the required data from the database and feed it to the registered aggregators which will process it on the fly.
+The idea is that we will have a method to register one or several datasources and then a run() or populate() method. This method would obtain the required data from the database and feed it to the registered datasources which will process it on the fly.
 
-==Aggregator classes==
+==Datasource classes==
 
-_Comment by Laurent: This resembles to the current concept of 'datasource' in the current renderer implementation. I write below in italics further comments_
-
-Layer providing access to the meteorological data through aggregation. An aggregation object will be determined by the following initializating parameters:
-  * period: e.g. current_year, current_month, begin date-end date, begin datetime-end datetime, last n days, etc _L: corresponds to 'span' in current datasource concept_
-  * aggregation unit: e.g. year, month, day, minute, hour, etc. _L: correspond to 'slice' in current datasource concept_
+Layer providing access to the meteorological data through aggregation. A datasource object will be determined by the following initializating parameters:
+  * span: e.g. current_year, current_month, begin date-end date, begin datetime-end datetime, last n days, etc 
+  * slice: e.g. year, month, day, minute, hour, etc. 
   * optional filters: eg. only data gathered between 00:00 and 08:00, when wind > 10/Km.h, etc.
-  * function: a set of min, max, avg, tendency, etc. to be calculated of each meteo variable
-  * values o variables to be calculated:  temperature, pressure, wind chill, etc etc. Some of them might exist in the database while others are the product of formulas. _L: in the current datasource, this is the 'measure' list_
+  * formulas: a set of min, max, avg, tendency, etc. to be calculated of each meteo variable
+  * measures:  temperature, pressure, wind chill, etc etc. Some of them might exist in the database while others are the product of formulas. _L: in the current datasource, this is the 'measure' list_
 
-Aggregator objects would work, whenever possible, in an incremental way. Each aggregator will have a method data_since() which will be used by the storage abstraction layer to know which data has to be feeded to the aggregator on each run. Ideally, only new data since last run will have to be feeded.
+Datasource objects would work, whenever possible, in an incremental way. Each aggregator will have a method data_since() which will be used by the storage abstraction layer to know which data has to be feeded to the datasource on each run. Ideally, only new data since last run will have to be feeded.
 
 _L: I like this idea of incremental feed_
 
@@ -243,28 +241,28 @@ _L: This is covered by the new module driver. Check it out (see the simulator)_
 DBFactory <--- Storage     <----Logger ----+
 DBObjects      Abstraction                 |
                     |                      |
-                    +-- Meteo Aggregator <-+-- Render ,etc.
+                    +-- Datasources <-+-- Render ,etc.
                                |
                                +-- Measures ---- Units
 }}}
                
-The idea behind this schema is that each wfrog process (e.g. the renderer) will have a unique instance of the storage abstraction class. _I agree_ Each render will register one or several aggregators which in turn will have been initialized with several measures (whith a specific unit request). Whenever a http request is received or the scheduler determines it is time to run, then the storage abstraction is requested to read data from the database and update the aggregators which will calculate the results for each of the measures registered. Since this aggregators would be incremental, only new data will have to be sent to them, and won't be necessary to read all the records of the database each time.
+The idea behind this schema is that each wfrog process (e.g. the renderer) will have a unique instance of the storage abstraction class. _I agree_ Each render will register one or several datasources which in turn will have been initialized with several measures (whith a specific unit request). Whenever a http request is received or the scheduler determines it is time to run, then the storage abstraction is requested to read data from the database and update the datasrouce which will calculate the results for each of the measures registered. Since this datasources would be incremental, only new data will have to be sent to them, and won't be necessary to read all the records of the database each time.
 
-_L: I don't see how we can integrate this in the current renderer architecture, which is hierarchical. Currently, a HTTP request follows a given path in the renderer tree. It must not go through everything, only what is requested. Moreover, updating all aggregators potentially makes useless computing (if an aggregator slice is set to minutes when the page I request provides only hourly data). This is not a problem for FTP rendering, because one need to generate all, but it is for HTTP responsiveness._
+_L: I don't see how we can integrate this in the current renderer architecture, which is hierarchical. Currently, a HTTP request follows a given path in the renderer tree. It must not go through everything, only what is requested. Moreover, updating all datasources potentially makes useless computing (if a datasource slice is set to minutes when the page I request provides only hourly data). This is not a problem for FTP rendering, because one need to generate all, but it is for HTTP responsiveness._
 
-_I would prefer not giving the control to the storage but to each aggregator (or group of aggregators). All aggregators have a reference to the storage (which is unique to the process). The storage provides caching mechanism (through wrapping), in order to avoid fetching the same data for all aggregators (or group of) that are called in a same short time. This caching could even be used for writes in the case where the renderer and logger run in the same process. This way, most of the rendering requests will not make any call to the database!_
+_I would prefer not giving the control to the storage but to each datasource. All datasources have a reference to the storage (which is unique to the process). The storage may provide caching mechanism (through wrapping) in order to avoid fetching the same data for all datasources (or group of) that are called in a same short time. This caching could even be used for writes in the case where the renderer and logger run in the same process. This way, most of the rendering requests will not make any call to the database!_
 
-_There is also a tricky thing to solve with the aggregators being stateful: the concurrency. If we lock all aggregators during computing, concurrent requests are serialized. If we lock only the concerned aggregator, the bottleneck is limited_
+_There is also a tricky thing to solve with the datasources being stateful: the concurrency. If we lock all datasources during computing, concurrent requests are serialized. If we lock only the concerned datasource, the bottleneck is limited_
 
-_J: I see your point with the hierarchical architecture. Maybe we could run the calculations only for a subset of datasources / aggregators instead of all of them. One way could be to have a populate_datasources method in the Storage class, that takes a set of datasources and populates them. See the API modifications below.
+_J: I see your point with the hierarchical architecture. Maybe we could run the calculations only for a subset of datasources  instead of all of them. One way could be to have a populate_datasources method in the Storage class, that takes a set of datasources and populates them. See the API modifications below.
 
 Maybe the instantiation of the storage abstraction class might be controlled by yaml and so have more control on the number of instances, which renders use each class, etc.
 
-The logger would attack directly to the Storage Abstraction layer to register new data and use the aggregator to obtain the last 12 h. temperature (this is the only data used by the logger).
+The logger would attack directly to the Storage Abstraction layer to register new data and use the datasource to obtain the last 12 h. temperature (this is the only data used by the logger).
 
 == API ==
 
-Here is a proposal of class/method signatures for the agggregator and storage in a scenario where aggregator have control (in opposite to above where the storage trigger the aggregator updates).
+Here is a proposal of class/method signatures for the datasource and storage in a scenario where datasources have control (in opposite to above where the storage trigger the datasource updates).
 
 === Storage ===
 
@@ -285,7 +283,7 @@ A sample is a dictionary corresponding to the table/csv columns. e.g.
 'callback' is a function taking a timestamp-enriched sample as parameter. 
 
 
-_J: API modificaction proposal:
+_J: API modification proposal:
 
 {{{
 class Storage:
@@ -299,7 +297,7 @@ class Storage:
 
 === Datasource ===
 
-The aggregator/datasource updates its state by traversing new samples and computing new slices accordingly.
+The datasource updates its state by traversing new samples and computing new slices accordingly.
 
 {{{
 class DataSource
