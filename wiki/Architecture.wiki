@@ -207,7 +207,7 @@ Layer providing access to the meteorological data through aggregation. A datasou
   * formulas: a set of min, max, avg, tendency, etc. to be calculated of each meteo variable
   * measures:  temperature, pressure, wind chill, etc etc. Some of them might exist in the database while others are the product of formulas. _L: in the current datasource, this is the 'measure' list_
 
-Datasource objects would work, whenever possible, in an incremental way. Each aggregator will have a method data_since() which will be used by the storage abstraction layer to know which data has to be feeded to the datasource on each run. Ideally, only new data since last run will have to be feeded.
+Datasource objects would work, whenever possible, in an incremental way. Each datasource will have a method data_since() which will be used by the storage abstraction layer to know which data has to be feeded to the datasource on each run. Ideally, only new data since last run will have to be feeded.
 
 _L: I like this idea of incremental feed_
 
@@ -392,7 +392,7 @@ This is an example of what configuration files of wfrog 0.5 will resemble to. I 
  * Driver configuration, transport configuration (local, http)
  * Common configuration (logging, database) with parametrization (process name as log filename).
  * Embedding of driver and logger in same process (in wflogger)
- * Aggregator-storage relation (with caching)
+ * Datasource-storage relation (with caching)
 
 {{{
 wfdriver/config/wfdriver.yaml
@@ -408,7 +408,7 @@ wflogger/config/wflogger.yaml
 -----------------------------
 
 context:
-    altitude: 430           # The context is propagated to the aggregator
+    altitude: 430           # The context is propagated to the datasource
 input: !local {}            # Use a local channel to receive events
 #input: !http { port: 8888 }
 output: !include { path: ../wfcommon/config/storage.yaml }  
@@ -455,7 +455,7 @@ storages:
     default: !include { path: ../wfcommon/config/storage.yaml }
 ...
     renderer: !data
-        datasource: !aggregator
+        datasource: !datasource
             storage: default
             slice: day
             span: 365
