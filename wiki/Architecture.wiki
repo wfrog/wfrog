@@ -256,6 +256,8 @@ _I would prefer not giving the control to the storage but to each aggregator (or
 
 _There is also a tricky thing to solve with the aggregators being stateful: the concurrency. If we lock all aggregators during computing, concurrent requests are serialized. If we lock only the concerned aggregator, the bottleneck is limited_
 
+_J: I see your point with the hierarchical architecture. Maybe we could run the calculations only for a subset of datasources / aggregators instead of all of them. One way could be to have a execute_datasources method in the Storage class, that takes a set of datasources and populates them. See the API modifications below.
+
 Maybe the instantiation of the storage abstraction class might be controlled by yaml and so have more control on the number of instances, which renders use each class, etc.
 
 The logger would attack directly to the Storage Abstraction layer to register new data and use the aggregator to obtain the last 12 h. temperature (this is the only data used by the logger).
@@ -281,6 +283,19 @@ A sample is a dictionary corresponding to the table/csv columns. e.g.
 }}}
 
 'callback' is a function taking a timestamp-enriched sample as parameter. 
+
+
+_J: API modificaction proposal:
+
+{{{
+class Storage:
+
+    def write_sample(self, sample)
+    
+    def populate_datasources(self, datasources)
+
+}}}
+
 
 === Datasource ===
 
@@ -338,6 +353,38 @@ It is the same as the current datasource concept in the renderer of wfrog 0.2. I
                 }                
 
             }
+}}}
+
+
+_J: API modificaction proposal:
+
+{{{
+class DataSource
+
+    def __init__(self, variables, function, period, aggregation, filter=None)
+
+    def get_result(self)
+        """ 
+Returns data structure containing the computed series. First you need to 
+call Storage.populate_datasource
+"""
+  
+    def get_fromTimestamp(self)
+        """
+To be called by Storage to obtain the "from" timestamp when populating datasource
+"""
+
+    def get_toTimestamp(self)
+        """
+To be called by Storage to obtain the "to" timestamp when populating datasource
+"""
+
+    def push_Sample(self, sample)
+        """
+To be called by Storage when each sample from the database is read. It can be
+assumed that all samples will be read in an orderly form.
+"""
+
 }}}
 
 = Configuration =
