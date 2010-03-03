@@ -359,18 +359,28 @@ wfdriver/config/wfdriver.yaml
 
 station: !wmrs200 {}
 #station: !wmr928n { port: COM1 }
-output: !local {}           # Use a local channel to send events
-#output: !http { url: http://localhost:8888 }
+output: !local { name: events }    # Use a local channel to send events
+#output: !http-out { url: http://localhost:8888 }
 
 
 wflogger/config/wflogger.yaml
 -----------------------------
 
 context:
-    altitude: 430           # The context is propagated to the datasource
-input: !local {}            # Use a local channel to receive events
-#input: !http { port: 8888 }
-output: !include { path: ../wfcommon/config/storage.yaml }  
+    altitude: 430           # The context is propagated to the aggregator
+input: !local               # Use a local channel to receive events
+    name: events
+    object: !call
+#input: !http-in { port: 8888 }
+output: !multi
+    outputs:        
+        aggregator : !aggregator
+            period: 300
+            storage : !include { path: ../wfcommon/config/storage.yaml }  
+            #storage : !local { name: storage, object: path: ../wfcommon/config/storage.yaml }
+        current : !currentxml
+            path: /tmp/currentconditions.xml
+        
 logging:
     level: info
     handlers:
@@ -383,7 +393,7 @@ logging:
             address: webmaster@wfrog.org
         
 embed:
-    wfdriver: { config: ../wfdriver/config/wfdriver.yaml } # Run the
+    wfdriver: { config: ../wfdriver/config/embedded.yaml } # Run the
                                        # driver embedded in the logger
                                        # process. Hence the 'local'
                                        # transport.
@@ -414,7 +424,7 @@ storages:
     default: !include { path: ../wfcommon/config/storage.yaml }
 ...
     renderer: !data
-        datasource: !datasource
+        datasource: !aggregator
             storage: default
             slice: day
             span: 365
