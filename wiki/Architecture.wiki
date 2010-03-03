@@ -282,19 +282,6 @@ A sample is a dictionary corresponding to the table/csv columns. e.g.
 
 'callback' is a function taking a timestamp-enriched sample as parameter. 
 
-
-_J: API modification proposal:
-
-{{{
-class Storage:
-
-    def write_sample(self, sample)
-    
-    def populate_datasources(self, datasources)
-
-}}}
-
-
 === Datasource ===
 
 The datasource updates its state by traversing new samples and computing new slices accordingly.
@@ -354,36 +341,6 @@ It is the same as the current datasource concept in the renderer of wfrog 0.2. I
 }}}
 
 
-_J: API modificaction proposal:
-
-{{{
-class DataSource
-
-    def __init__(self, variables, function, period, aggregation, filter=None)
-
-    def get_result(self)
-        """ 
-Returns data structure containing the computed series. First you need to 
-call Storage.populate_datasource
-"""
-  
-    def get_fromTimestamp(self)
-        """
-To be called by Storage to obtain the "from" timestamp when populating datasource
-"""
-
-    def get_toTimestamp(self)
-        """
-To be called by Storage to obtain the "to" timestamp when populating datasource
-"""
-
-    def push_Sample(self, sample)
-        """
-To be called by Storage when each sample from the database is read. It can be
-assumed that all samples will be read in an orderly form.
-"""
-
-}}}
 
 = Configuration =
 
@@ -473,6 +430,7 @@ logging:
                 process: wfrender
 
 }}}
+
 
 = Project Structure =
 
