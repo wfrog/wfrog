@@ -256,7 +256,7 @@ _I would prefer not giving the control to the storage but to each aggregator (or
 
 _There is also a tricky thing to solve with the aggregators being stateful: the concurrency. If we lock all aggregators during computing, concurrent requests are serialized. If we lock only the concerned aggregator, the bottleneck is limited_
 
-_J: I see your point with the hierarchical architecture. Maybe we could run the calculations only for a subset of datasources / aggregators instead of all of them. One way could be to have a execute_datasources method in the Storage class, that takes a set of datasources and populates them. See the API modifications below.
+_J: I see your point with the hierarchical architecture. Maybe we could run the calculations only for a subset of datasources / aggregators instead of all of them. One way could be to have a populate_datasources method in the Storage class, that takes a set of datasources and populates them. See the API modifications below.
 
 Maybe the instantiation of the storage abstraction class might be controlled by yaml and so have more control on the number of instances, which renders use each class, etc.
 
