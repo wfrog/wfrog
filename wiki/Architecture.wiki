@@ -370,7 +370,7 @@ context:
     altitude: 430           # The context is propagated to the aggregator
 input: !service               # Use a local service to receive events
     name: events
-    object: !function
+    instance: !function
 #input: !http-in { port: 8888 }
 output: !multi
     outputs:        
