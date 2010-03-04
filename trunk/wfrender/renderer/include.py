@@ -16,10 +16,11 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import renderer
 import yaml
 import logging
 from os import path
+
+from functools import partial
 
 from Cheetah.Template import Template
 
@@ -40,7 +41,7 @@ class IncludeRenderer(object):
 
     logger = logging.getLogger("renderer.include")
 
-    def render(self, data={}, context={}):
+    def _call(self, data={}, context={}):
         if not self.renderer:
             dir_name = path.dirname(context['_yaml_config_file'])
             abs_path=path.join(dir_name, self.path)
@@ -53,3 +54,12 @@ class IncludeRenderer(object):
             self.renderer = config["renderer"]
 
         return self.renderer.render(data,context)
+
+    def __getattribute__(self, attr):
+        try:
+            return object.__getattribute__(self, attr)
+        except AttributeError:
+            if attr.startswith('__'):
+                raise AttributeError()
+            else:
+                return partial(object.__getattribute__(self,'_call'))
