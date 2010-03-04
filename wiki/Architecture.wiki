@@ -359,7 +359,7 @@ wfdriver/config/wfdriver.yaml
 
 station: !wmrs200 {}
 #station: !wmr928n { port: COM1 }
-output: !local { name: events }    # Use a local channel to send events
+output: !service { name: events }    # Use a local service to send events
 #output: !http-out { url: http://localhost:8888 }
 
 
@@ -368,9 +368,9 @@ wflogger/config/wflogger.yaml
 
 context:
     altitude: 430           # The context is propagated to the aggregator
-input: !local               # Use a local channel to receive events
+input: !service               # Use a local service to receive events
     name: events
-    object: !call
+    object: !function
 #input: !http-in { port: 8888 }
 output: !multi
     outputs:        
