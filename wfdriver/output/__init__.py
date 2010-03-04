@@ -27,10 +27,7 @@ import call
 
 class YamlStdioOutput(stdio.StdioOutput, yaml.YAMLObject):
     yaml_tag = '!stdio'
-
-class YamlMultiOutput(multi.MultiOutput, yaml.YAMLObject):
-    yaml_tag = '!multi'
-
+    
 class YamlHttpOutput(http.HttpOutput, yaml.YAMLObject):
     yaml_tag = '!http'
 

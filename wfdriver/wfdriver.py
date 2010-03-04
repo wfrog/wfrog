@@ -23,6 +23,7 @@ if __name__ == "__main__": sys.path.append(os.path.abspath(sys.path[0] + '/..'))
 
 import station
 import output
+import wfcommon.generic
 from output import stdio
 import optparse
 import logging
@@ -73,6 +74,9 @@ class Driver(object):
             print "Output"
             print "------\n"
             self.print_help(output)
+            print "Generic Elements"
+            print "----------------\n"
+            self.print_help(wfcommon.generic)            
             if options.extension_names:
                 print "Extensions"
                 print "----------\n"
@@ -89,6 +93,7 @@ class Driver(object):
             desc = {}
             desc.update(self.get_help_desc(station))
             desc.update(self.get_help_desc(output))
+            desc.update(self.get_help_desc(wfcommon.generic))
             if len(desc) == 0:
                 for ext in self.extensions:
                     desc.update(self.get_help_desc(self.extensions[ext]))

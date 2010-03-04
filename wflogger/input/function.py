@@ -16,19 +16,20 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import yaml
+import logging
+import wrapper
 
-import include
-import multi
-import service
+class FunctionInput(wrapper.ElementWrapper):
+    """
+    Input transmitting events received on an anonymous function calls.        
+    """
 
-# YAML mappings
+    listener = None
 
-class YamlIncludeElement(include.IncludeElement, yaml.YAMLObject):
-    yaml_tag = u'!include'
+    logger = logging.getLogger("input.function")
 
-class YamlMultiElement(multi.MultiElement, yaml.YAMLObject):
-    yaml_tag = u'!multi'
+    def _call(self, attr, *args, **keywords):        
+            
+        if self.listener:
+            listener.on_event(args[0])
 
-class YamlServiceElement(service.ServiceElement, yaml.YAMLObject):
-    yaml_tag = u'!service'

@@ -18,17 +18,9 @@
 
 import yaml
 
-import include
-import multi
-import service
+import function
 
 # YAML mappings
 
-class YamlIncludeElement(include.IncludeElement, yaml.YAMLObject):
-    yaml_tag = u'!include'
-
-class YamlMultiElement(multi.MultiElement, yaml.YAMLObject):
-    yaml_tag = u'!multi'
-
-class YamlServiceElement(service.ServiceElement, yaml.YAMLObject):
-    yaml_tag = u'!service'
+class YamlFunctionInput(function.FunctionInput, yaml.YAMLObject):
+    yaml_tag = u'!function'
