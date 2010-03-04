@@ -39,7 +39,7 @@ class TemplateRenderer(object):
     def render(self,data={}, context={}):
         content = {}
         if self.renderer:
-            content = self.renderer.render(data, context)
+            content = self.renderer.render(data=data, context=context)
         self.logger.debug("Rendering with template "+self.path)
         content["rnd"]=rnd
         template = Template(file=file(self.path, "r"), searchList=[content, context])

@@ -47,10 +47,10 @@ class RenderEngine(object):
     LOG_SIZE = 512000
     LOG_BACKUPS = 4
     logger = logging.getLogger()  ## get root logger so that all properties are transfered to all loggers
-    handler = logging.handlers.RotatingFileHandler(
-                      filename=LOG_FILENAME,  maxBytes=int(LOG_SIZE), backupCount=int(LOG_BACKUPS))
-    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-    handler.setFormatter(formatter)
+#    handler = logging.handlers.RotatingFileHandler(
+#                      filename=LOG_FILENAME,  maxBytes=int(LOG_SIZE), backupCount=int(LOG_BACKUPS))
+#    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+#    handler.setFormatter(formatter)
 #    logger.addHandler(handler)
     logger.setLevel(logging.DEBUG)
 
@@ -91,12 +91,12 @@ class RenderEngine(object):
                     self.logger.debug("Starting root rendering.")
                     current_context = copy.deepcopy(self.initial_context)
                     current_context.update(context)
-                    self.root_renderer.render(data, current_context)
+                    self.root_renderer.render(data=data, context=current_context)
             else:
                 self.logger.debug("Starting root rendering.")
                 current_context = copy.deepcopy(self.initial_context)
                 current_context.update(context)
-                return self.root_renderer.render(data, current_context)
+                return self.root_renderer.render(data=data, context=current_context)
         except KeyboardInterrupt:
             self.logger.info("Stopping daemon...")
             return

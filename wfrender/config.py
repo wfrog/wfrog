@@ -19,6 +19,7 @@
 import yaml
 import renderer
 import datasource
+import wfcommon.generic
 import optparse
 import sys
 import os
@@ -72,6 +73,9 @@ class YamlConfigurer(object):
             print "Data Sources"
             print "------------\n"
             self.print_help(datasource)
+            print "Generic Elements"
+            print "----------------\n"
+            self.print_help(wfcommon.generic)            
             if options.extension_names:
                 print "Extensions"
                 print "----------\n"
@@ -88,6 +92,7 @@ class YamlConfigurer(object):
             desc = {}
             desc.update(self.get_help_desc(renderer))
             desc.update(self.get_help_desc(datasource))
+            desc.update(self.get_help_desc(wfcommon.generic))
             if len(desc) == 0:
                 for ext in self.extensions:
                     desc.update(self.get_help_desc(self.extensions[ext]))

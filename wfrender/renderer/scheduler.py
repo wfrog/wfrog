@@ -16,7 +16,6 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import renderer
 import time
 import logging
 
@@ -43,12 +42,11 @@ class SchedulerRenderer(object):
     logger = logging.getLogger("renderer.scheduler")
 
     def render(self, data={}, context={}):
-        assert renderer.is_renderer(self.renderer), "'scheduler.renderer' must be set to a renderer"
         assert self.period is not None, "'scheduler.period' must be set"
 
         while self.alive:
             self.logger.debug("Rendering.")
-            self.renderer.render(data, context)
+            self.renderer.render(data=data, context=context)
             time.sleep(self.period)
 
     def close(self):

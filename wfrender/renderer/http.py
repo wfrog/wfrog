@@ -16,7 +16,6 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import renderer
 import string,cgi,time
 import threading
 import socket
@@ -61,10 +60,6 @@ class HttpRenderer(object):
     logger = logging.getLogger("renderer.http")
 
     def render(self, data={}, context={}):
-        assert renderer.is_dict(self.renderers) or renderer.is_renderer(self.root), \
-            "'http.renderers' must be set to a key/value dictionary or 'root' must be set to a renderer"
-        if self.renderers:
-            renderer.assert_renderer_dict('http.renderers', self.renderers)
 
         self.context = context
         self.context["http"] = True # Put in the context that we use the http render. It may be useful to know that in templates.
@@ -153,10 +148,10 @@ class HttpRendererHandler(BaseHTTPRequestHandler):
                     content += "<a href='"+renderer+"'>"+renderer+"</a><br>"
                 content += "</body></html>"
             else:
-                [ mime, content ] = root.render(data, context)
+                [ mime, content ] = root.render(data=data, context=context)
         else:
             if renderers is not None and renderers.has_key(name):
-                [ mime, content ] = renderers[name].render(data, context)
+                [ mime, content ] = renderers[name].render(data=data, context=context)
 
         if content:          
             self.send_response(200)

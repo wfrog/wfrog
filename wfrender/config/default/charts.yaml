@@ -1,5 +1,5 @@
 renderer: !multi
-    renderers:
+    children:
         temp: !chart
             interpolate: $interpolate
             series:

@@ -216,7 +216,6 @@ class GoogleChartRenderer(object):
     def render(self,data={}, context={}):
 
         assert self.series is not None, "'chart.series' must be set"
-        assert renderer.is_dict(self.series), "'chart.series' must be a key/value dictionary"
 
         converter = units.Converter(context["units"])
 
