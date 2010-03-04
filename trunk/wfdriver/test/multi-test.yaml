@@ -1,0 +1,8 @@
+station: !random-simulator {}
+output: !multi
+    children:
+        one: !service
+            name: out 
+            instance: !stdio {}
+        two: !service
+            name: out
