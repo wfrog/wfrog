@@ -16,7 +16,6 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import renderer
 from dict import merge
 
 class DataRenderer(object):
@@ -39,7 +38,6 @@ class DataRenderer(object):
     def render(self,data={}, context={}):
         assert self.source is not None, "'data.source' must be set"
         assert self.renderer is not None, "'data.renderer' must be set"
-        assert renderer.is_renderer(self.renderer), "'data.renderer' must be a renderer"
-        new_data = self.source.execute(data, context)
+        new_data = self.source.execute(data=data, context=context)
         merge(new_data, data)
-        return self.renderer.render(new_data, context)
+        return self.renderer.render(data=new_data, context=context)

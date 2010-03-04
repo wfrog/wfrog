@@ -64,7 +64,7 @@ class FtpRenderer(object):
         files= {}        
 
         for key in self.renderers.keys():
-            files[key] = self.renderers[key].render(data, context)
+            files[key] = self.renderers[key].render(data=data, context=context)
 
         errors = 0
         while True:

@@ -6,7 +6,7 @@ renderer: !template
             slice: day
             span: 363
         renderer: !multi
-            renderers:
+            children:
                 current: !include
                     path: default/current.yaml
                 chart: !include

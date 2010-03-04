@@ -18,16 +18,15 @@
 
 import yaml
 import logging
+import wrapper
 from os import path
-
-from functools import partial
 
 from Cheetah.Template import Template
 
-class IncludeRenderer(object):
+class IncludeElement(wrapper.ElementWrapper):
     """
     Includes another yaml configuration file.
-    The included file must define only one root object.  
+    The included file must define only one root element.  
 
     [ Properties ]
 
@@ -36,14 +35,17 @@ class IncludeRenderer(object):
     """
 
     path = None
-    renderer = None
+    target = None
     variables = None
 
-    logger = logging.getLogger("renderer.include")
+    logger = logging.getLogger("generic.include")
 
-    def _call(self, data={}, context={}):
-        if not self.renderer:
-            dir_name = path.dirname(context['_yaml_config_file'])
+    def _call(self, attr, *args, **keywords):        
+        
+        config_file = keywords['context']['_yaml_config_file']
+        
+        if not self.target:
+            dir_name = path.dirname(config_file)
             abs_path=path.join(dir_name, self.path)
 
             if self.variables:
@@ -51,15 +53,7 @@ class IncludeRenderer(object):
             else:
                 conf_str = file(abs_path, "r").read()
             config = yaml.load(conf_str)
-            self.renderer = config["renderer"]
+            self.target = config.values()[0]
 
-        return self.renderer.render(data,context)
-
-    def __getattribute__(self, attr):
-        try:
-            return object.__getattribute__(self, attr)
-        except AttributeError:
-            if attr.startswith('__'):
-                raise AttributeError()
-            else:
-                return partial(object.__getattribute__(self,'_call'))
+        self.logger.debug('Calling '+attr+' on ' + str(self.target))
+        return self.target.__getattribute__(attr).__call__(*args, **keywords)

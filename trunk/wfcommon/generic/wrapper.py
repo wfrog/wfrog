@@ -24,37 +24,8 @@ from functools import partial
 
 from Cheetah.Template import Template
 
-class IncludeRenderer(object):
-    """
-    Includes another yaml configuration file.
-    The included file must define only one root renderer.
-
-    [ Properties ]
-
-    path:
-        A path to the file to include relative to the main config file.
-    """
-
-    path = None
-    renderer = None
-    variables = None
-
-    logger = logging.getLogger("renderer.include")
-
-    def _call(self, data={}, context={}):
-        if not self.renderer:
-            dir_name = path.dirname(context['_yaml_config_file'])
-            abs_path=path.join(dir_name, self.path)
-
-            if self.variables:
-                conf_str = str(Template(file=file(abs_path, "r"), searchList=[self.variables]))
-            else:
-                conf_str = file(abs_path, "r").read()
-            config = yaml.load(conf_str)
-            self.renderer = config["renderer"]
-
-        return self.renderer.render(data,context)
-
+class ElementWrapper(object):
+    
     def __getattribute__(self, attr):
         try:
             return object.__getattribute__(self, attr)
@@ -62,4 +33,4 @@ class IncludeRenderer(object):
             if attr.startswith('__'):
                 raise AttributeError()
             else:
-                return partial(object.__getattribute__(self,'_call'))
+                return partial(object.__getattribute__(self, '_call'), attr)

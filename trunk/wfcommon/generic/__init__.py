@@ -23,8 +23,8 @@ import multi
 
 # YAML mappings
 
-class YamlIncludeRenderer(include.IncludeRenderer, yaml.YAMLObject):
+class YamlIncludeElement(include.IncludeElement, yaml.YAMLObject):
     yaml_tag = u'!include'
 
-class YamlMultiRenderer(multi.MultiRenderer, yaml.YAMLObject):
+class YamlMultieElement(multi.MultiElement, yaml.YAMLObject):
     yaml_tag = u'!multi'
