@@ -11,7 +11,7 @@
 ##  This program is distributed in the hope that it will be useful,
 ##  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##  GNU General Public License for more details.  
+##  GNU General Public License for more details.
 ##
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -27,22 +27,22 @@ class FtpRenderer(object):
 
     [ Properties ]
 
-    renderers:
+    renderers [dict]:
         Renderers providing the filenames to upload.
 
-    host:
+    host [string]:
         FTP site hostname.
 
-    port: (optional)
+    port [numeric] (optional):
         FTP site port. Defaults to 21.
 
-    directory: (optional)
+    directory [string] (optional):
         Location on the FTP site where the files will be uploaded.
 
-    username:
+    username [string]:
         FTP site username.
 
-    password:
+    password [string]:
         FTP site password.
     """
 
@@ -61,7 +61,7 @@ class FtpRenderer(object):
         assert self.username is not None, "'ftp.username' must be set"
         assert self.password is not None, "'ftp.password' must be set"
 
-        files= {}        
+        files= {}
 
         for key in self.renderers.keys():
             files[key] = self.renderers[key].render(data=data, context=context)
@@ -89,9 +89,9 @@ class FtpRenderer(object):
                 if errors < 3:
                     self.logger.warning("Error sending files by FTP (retrying in 5 secs.): %s" % str(e))
                     time.sleep(5)
-                else: 
+                else:
                     self.logger.error("Error sending files by FTP (aborting): %s" % str(e))
                     break
-                    
+
 
 

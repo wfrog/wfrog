@@ -1,1 +1,2 @@
 station: !random-simulator {}
+output: !http { url: 'http://localhost:8080/' }

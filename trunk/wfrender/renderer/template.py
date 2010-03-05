@@ -27,7 +27,19 @@ def rnd(value, dec=0):
 
 class TemplateRenderer(object):
     """
-    Executes a wrapped renderer and fills a template with the resulting data.
+    Executes a wrapped renderer and fills a Cheetah template with the
+    resulting data. The result of rendering is a list [ mime, document ].
+
+    [ Properties ]
+
+    renderer [renderer]:
+        The underlying renderer providing the data to render.
+
+    path [string]:
+        Path to the template file.
+
+    mime [string] (optional):
+        The mime type of the generated document. Defaults to 'text/plain'.
     """
 
     path = None

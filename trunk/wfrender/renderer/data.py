@@ -24,10 +24,10 @@ class DataRenderer(object):
 
     [ Properties ]
 
-    source:
+    source [datasource]:
         A data source performing the query and returning a data structure.
 
-    renderer:
+    renderer [renderer]:
         A renderer called after the query was performed.
         The data structure is passed as parameter.
     """
