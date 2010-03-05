@@ -28,8 +28,10 @@ class MeteoclimaticRenderer(object):
     """
     Renders the data chunk to send to www.meteoclimatic.com.
 
-    Properties
-        id: meteoclimatic station ID
+    [ Properties ]
+
+    id [string]:
+        meteoclimatic station ID.
     """
 
     logger = logging.getLogger("renderer.meteoclimatic")

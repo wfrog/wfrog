@@ -147,7 +147,7 @@ class GoogleChartRenderer(object):
     zero [dict] (optional):
         Draw an horizontal line at y=0. Makes sense when graph values
         can be negative. Contains rendering options. For default
-        rendering (a thin gray line), specify an empty dictionary {}.s
+        rendering (a thin gray line), specify an empty dictionary '{}'.
 
 
     [ Markers ]
@@ -155,19 +155,19 @@ class GoogleChartRenderer(object):
     In the scope of a data serie, one can specify markers highlighting
     some data points:
 
-    min:
+    min [dict] (optional):
         The minimum value of the serie.
 
-    max:
+    max [dict] (optional):
         The maximum value of the serie.
 
-    last:
+    last [dict] (optional):
         The last value of the serie.
 
 
     [ Rendering Options ]
 
-    Some options are of type 'color. Thhey can take either
+    Some options are of type 'color'. They can take either
         - an hexadecimal triplet string, e.g A3F500 (without dash and
           in upper case.
         - or a named color defined in the CSS specification, e.g 'blue',

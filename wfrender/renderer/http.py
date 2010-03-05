@@ -37,18 +37,18 @@ class HttpRenderer(object):
 
     [ Properties ]
 
-    root: (optional)
+    root [renderer] (optional):
         A renderer providing a result served on the base URI.
 
-    renderers: (optional)
+    renderers [dict] (optional):
         Must be set if root is not set. A key/value dictionary of
         renderers providing a results served on URIs corresponding to
         the key names.
 
-    port: (optional)
+    port [numeric] (optional):
         The listening TCP port. Defaults to 8080.
-        
-    cookies: (optional)
+
+    cookies [list] (optional):
         List of context sections overridable with a cookie using the -set- uri.
     """
 
@@ -94,14 +94,14 @@ class HttpRendererHandler(BaseHTTPRequestHandler):
         root = _HttpRendererSingleton.root
         context = copy.deepcopy(_HttpRendererSingleton.context)
         cookie_sections = _HttpRendererSingleton.cookies
-        
-        
+
+
         data = copy.deepcopy(_HttpRendererSingleton.data)
-        
+
         params = cgi.parse_qsl(urlparse.urlsplit(self.path).query)
         for p in params:
             data[p[0]] = p[1]
-        
+
         content = None
 
         name = urlparse.urlsplit(self.path).path.strip('/')
@@ -110,36 +110,36 @@ class HttpRendererHandler(BaseHTTPRequestHandler):
             if data.has_key("s") and data.has_key("k") and data.has_key("v"):
                 section = data["s"]
                 key = data["k"]
-                value = data["v"]                
+                value = data["v"]
                 if not cookie_sections.__contains__(section):
                     self.send_error(403,"Permission Denied")
-                    return       
+                    return
                 context[section][key]=value
                 cookie = Cookie.SimpleCookie()
-                
+
                 cookie[section+"."+key]=value
-                
+
                 self.send_response(302)
-                self.send_header('Location', self.headers["Referer"] if self.headers.has_key("Referer") else "/")                
+                self.send_header('Location', self.headers["Referer"] if self.headers.has_key("Referer") else "/")
                 self.wfile.write(cookie)
-                self.end_headers()                
+                self.end_headers()
 
                 return
             else:
                 self.send_error(500,"Missing parameters")
-                return        
-            
+                return
+
         cookie_str = self.headers.get('Cookie')
         if cookie_str:
-            cookie = Cookie.SimpleCookie(cookie_str)            
+            cookie = Cookie.SimpleCookie(cookie_str)
             for i in cookie:
                 parts = i.split('.')
-                if len(parts) == 2:             
+                if len(parts) == 2:
                     section = parts[0]
                     key = parts[1]
                     if cookie_sections.__contains__(section) and context[section].has_key(key):
                         context[section][key]=cookie[i].value
-            
+
         if name == "":
             if not root:
                 mime = "text/html"
@@ -153,7 +153,7 @@ class HttpRendererHandler(BaseHTTPRequestHandler):
             if renderers is not None and renderers.has_key(name):
                 [ mime, content ] = renderers[name].render(data=data, context=context)
 
-        if content:          
+        if content:
             self.send_response(200)
             self.send_header('Content-type', mime)
             self.end_headers()

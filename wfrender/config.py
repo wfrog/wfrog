@@ -66,7 +66,7 @@ class YamlConfigurer(object):
                 self.logger.debug("Loading extension module '"+ext+"'")
                 self.extensions[ext]=__import__(ext)
         if options.help_list:
-            print "\n> Elements you can use in the yaml config file:\n"
+            print "Elements you can use in the wfrender yaml config file.\n"
             print "Renderers"
             print "---------\n"
             self.print_help(renderer)

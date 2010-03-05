@@ -26,12 +26,11 @@ class SchedulerRenderer(object):
 
     [ Properties ]
 
-    renderer
+    renderer [renderer]:
         The renderer to call periodically.
 
-    period:
+    period [numeric]:
         The repeat period in seconds.
-
     """
 
     renderers = None
