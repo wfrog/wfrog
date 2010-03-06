@@ -37,14 +37,21 @@ class IncludeElement(wrapper.ElementWrapper):
     path = None
     target = None
     variables = None
+    wfrog_context = None
 
     logger = logging.getLogger("generic.include")
 
-    def _call(self, attr, *args, **keywords):        
-        
-        config_file = keywords['context']['_yaml_config_file']
-        
+    def _init(self, context=None):
+    
         if not self.target:
+            if context:
+                config_file = context['_yaml_config_file']
+            else:
+                if self.wfrog_context:
+                    config_file = self.wfrog_context['_yaml_config_file']
+                else:
+                    raise Exception('Context not passed to !include element')
+            
             dir_name = path.dirname(config_file)
             abs_path=path.join(dir_name, self.path)
 
@@ -54,6 +61,15 @@ class IncludeElement(wrapper.ElementWrapper):
                 conf_str = file(abs_path, "r").read()
             config = yaml.load(conf_str)
             self.target = config.values()[0]
+            
+            return self.target
+            
+    def _call(self, attr, *args, **keywords):                
+
+        if keywords.has_key('context'):
+            _init(keywords['context'])
+        else:
+            _init(context)
 
         self.logger.debug('Calling '+attr+' on ' + str(self.target))
-        return self.target.__getattribute__(attr).__call__(*args, **keywords)
+        return self.target.__getattr__(attr).__call__(*args, **keywords)

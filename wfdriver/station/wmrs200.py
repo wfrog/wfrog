@@ -400,9 +400,8 @@ class WMRS200Station(BaseStation):
         if ((record[7] >> 4) == 0x08):
             dewPoint = dewPoint * -1
 
-        # Report data
-        if sensorName == mainThExtSensor:
-            self._report_temperature(temp, humidity)
+
+        self._report_temperature(sensor, temp, humidity)
 
         # Log
         self._logger.info("Temperature %s  Temp.: %g C (%s), Humidity: %d %% (%s), Dew Point: %g C",
