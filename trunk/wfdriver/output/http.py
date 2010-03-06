@@ -18,6 +18,7 @@
 
 import httplib
 import urlparse
+import logging
 
 class HttpOutput(object):
     '''
@@ -31,6 +32,7 @@ class HttpOutput(object):
 
     connection = None
 
+    logger = logging.getLogger('output.http')
 
     def send_event(self, event):
         if self.connection == None:
@@ -42,13 +44,13 @@ class HttpOutput(object):
 
         try:
             self.connection.request('POST', self.url, str(event))
+            response = self.connection.getresponse()
+            response.read()
         except Exception, e:
             self.connection = None
-            print e
+            self.logger.critical(self.url+": "+str(e))
             return
-
-        response = self.connection.getresponse()
-        response.read()
-
+        
         if response.status != 200:
-            raise Exception('HTTP '+response.status+' '+response.reason)
+            self.logger.critical('HTTP '+response.status+' '+response.reason)
+            self.connection = None

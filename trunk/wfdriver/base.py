@@ -43,12 +43,14 @@ class BaseStation(object):
         event.value = pressure
         self.send_event(event)
 
-    def _report_temperature(self, temp, humidity):
+    def _report_temperature(self, temp, humidity, sensor):
         event = self.generate_event('temp')
+        event.sensor = sensor
         event.value = temp
         self.send_event(event)
 
         event = self.generate_event('hum')
+        event.sensor = sensor
         event.value = humidity
         self.send_event(event)
 

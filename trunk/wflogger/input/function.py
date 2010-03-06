@@ -31,5 +31,6 @@ class FunctionInput(wrapper.ElementWrapper):
     def _call(self, attr, *args, **keywords):        
             
         if self.listener:
-            listener.on_event(args[0])
+            self.logger.debug('Calling on_evtn on '+str(self.listener)
+            self.listener.on_event(args[0])
 

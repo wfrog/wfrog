@@ -26,10 +26,7 @@ import call
 # YAML Mappings
 
 class YamlStdioOutput(stdio.StdioOutput, yaml.YAMLObject):
-    yaml_tag = '!stdio'
+    yaml_tag = '!stdio-out'
     
 class YamlHttpOutput(http.HttpOutput, yaml.YAMLObject):
-    yaml_tag = '!http'
-
-class YamlCallOutput(call.CallOutput, yaml.YAMLObject):
-    yaml_tag = '!call'
+    yaml_tag = '!http-out'

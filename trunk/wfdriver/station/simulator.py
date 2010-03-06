@@ -50,6 +50,8 @@ class RandomSimulator(object):
             type = self.types[t]
             e = generate_event(type)
 
+            if type == 'temp' or type=='hum':
+                e.sensor = random.randint(0,1)
             if type == 'wind':
                 current_values[t][0] = self.new_value(current_values[t][0], self.init_values[t][0], self.range[t][0])
                 current_values[t][1] = self.new_value(current_values[t][1], self.init_values[t][1], self.range[t][1])

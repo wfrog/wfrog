@@ -1,2 +1,13 @@
 station: !random-simulator {}
-output: !http { url: 'http://localhost:8080/' }
+
+output: !http-out { url: 'http://localhost:8080/' }
+
+logging:
+    level: debug    
+    handlers:
+        default: 
+            handler: !include 
+                path: ../../wfcommon/config/loghandler.yaml
+                variables:
+                    process: wflogger
+

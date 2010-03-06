@@ -3,6 +3,6 @@ output: !multi
     children:
         one: !service
             name: out 
-            instance: !stdio {}
+            instance: !stdio-out {}
         two: !service
             name: out
