@@ -23,7 +23,6 @@ from pygooglechart import RadarChart
 from pygooglechart import SimpleLineChart
 from math import log
 import math
-import renderer
 import units
 import webcolors
 import re

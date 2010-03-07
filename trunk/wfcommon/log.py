@@ -71,9 +71,9 @@ def configure(options, config, context):
         level=logging.DEBUG
         console_handler = logging.StreamHandler()
         console_handler.setFormatter(formatter)
+        console_handler.setFormatter(formatter)
         logger.addHandler(console_handler)
-        handler.setFormatter(formatter)
-        
+                
     logger.setLevel(level)
 
     

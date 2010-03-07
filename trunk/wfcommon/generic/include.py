@@ -67,9 +67,9 @@ class IncludeElement(wrapper.ElementWrapper):
     def _call(self, attr, *args, **keywords):                
 
         if keywords.has_key('context'):
-            _init(keywords['context'])
+            self._init(keywords['context'])
         else:
-            _init(context)
+            self._init(context)
 
         self.logger.debug('Calling '+attr+' on ' + str(self.target))
         return self.target.__getattr__(attr).__call__(*args, **keywords)

@@ -17,20 +17,24 @@
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import wrapper
+import wfcommon.generic.wrapper
 
-class FunctionInput(wrapper.ElementWrapper):
+class FunctionInput(wfcommon.generic.wrapper.ElementWrapper):
     """
-    Input transmitting events received on an anonymous function calls.        
+    Input transmitting events received on an anonymous function call.        
     """
 
-    listener = None
+    send_event = None
 
     logger = logging.getLogger("input.function")
 
+    def run(self, send_event):
+        self.send_event = send_event
+
     def _call(self, attr, *args, **keywords):        
             
-        if self.listener:
-            self.logger.debug('Calling on_evtn on '+str(self.listener)
-            self.listener.on_event(args[0])
+        if self.send_event:
+            self.logger.debug('Calling send_event')
+            self.send_event(args[0])
 
+    

@@ -16,19 +16,26 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import yaml
+import logging
+import base
 
-import function
-import stdio
-import http
-
-# YAML mappings
-
-class YamlFunctionInput(function.FunctionInput, yaml.YAMLObject):
-    yaml_tag = u'!function'
-
-class YamlStdioInput(stdio.StdioInput, yaml.YAMLObject):
-    yaml_tag = u'!stdio-in'
-
-class YamlHttpInput(http.HttpInput, yaml.YAMLObject):
-    yaml_tag = u'!http-in'
+class DefaultAggregatorCollector(base.AggregatorCollector):
+    '''
+    Collects events and issues samples to an underlying storage on 
+    flush event.    
+    
+    [ Properties ]
+    
+    storage [storage]:
+        The underlying storage receiving the aggregated samples.
+    
+    '''
+    
+    storage = None
+    
+    def send_event(self, event):
+        #TODO: implement
+        if event._type == "_flush":
+            self.storage.write_sample("SAMPLE")
+        else:
+            print "Collected: "+str(event)

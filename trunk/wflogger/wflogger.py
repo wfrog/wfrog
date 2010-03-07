@@ -23,94 +23,125 @@ import os.path
 import sys
 if __name__ == "__main__": sys.path.append(os.path.abspath(sys.path[0] + '/..'))
 
-import station
-import output
+import input
+import collector
 import wfcommon.generic
-from output import stdio
+import wfcommon.storage
 import optparse
 import logging
+import time
 import wfcommon.log
 import wfcommon.config
+import wfdriver.wfdriver
+#import wfrender.wfrender
 from threading import Thread
 from Queue import Queue, Full
-import event
 
 def gen(type):
-    e = event.Event(type)
-    return e
+    return event.Event(type)
 
-class Driver(object):
+class FlushEvent(object):
+    _type = '_flush'
+    def __str__(self):
+        return "*FLUSH*"
 
-    logger = logging.getLogger('driver') 
+class Logger(object):
 
-    # default values
-    output = stdio.StdioOutput()
-    queue_size = 10
+    logger = logging.getLogger('logger')
 
-    def __init__(self, config_file=None):
+    queue_size=10
+    period = 300
+
+    embedded = {}
+
+    def __init__(self):
         
         # Prepare the configurer
         module_map = (
-            ( "Stations" , station ),
-            ( "Output" , output),
+            ( "Inputs" , input ),
+            ( "Collectors" , collector ),
+            ( "Storages" , wfcommon.storage ),
             ( "Generic Elements", wfcommon.generic)
         )
-        
-        if config_file:
-            embedded = True
-        else:
-            config_file = "config/wfdriver.yaml"
-            embedded = False
-        
-        configurer = wfcommon.config.Configurer(config_file, module_map)      
+        configurer = wfcommon.config.Configurer("config/wflogger.yaml", module_map)      
 
-        # Initialize the option parser        
+        # Initilize the option parser        
         opt_parser = optparse.OptionParser()
         configurer.add_options(opt_parser)
         wfcommon.log.add_options(opt_parser)
 
         # Parse the options and create object trees from configuration
         (options, args) = opt_parser.parse_args()
-                
         (config, context) = configurer.configure(options)
 
         # Configure the log
-        if not embedded:
-            wfcommon.log.configure(options, config, context)
+        wfcommon.log.configure(options, config, context)
 
-        # Initialize the driver from object trees
-        self.station = config['station']
-
-        if config.has_key('output'):
-            self.output = config['output']
+        # Initialize the logger from object trees
+        
+        self.input = config['input']
+        self.collector = config['collector']
+        
         if config.has_key('queue_size'):
             self.queue_size = config['queue_size']
+        if config.has_key('period'):
+            self.period = config['period']
+        if config.has_key('embed'):
+            self.embedded = config['embed']
 
         self.event_queue = Queue(self.queue_size)
 
-    def enqueue_event(self,event):
-        self.logger.debug('Enqueuing: '+str(event)+', Queue size: '+str(self.event_queue.qsize()))
+    def enqueue_event(self, event):
+        self.logger.debug('Queue size: '+str(self.event_queue.qsize()))
         try:
             self.event_queue.put(event, block=False)
         except Full:
             self.logger.critical('Consumer of events is dead or not consuming quickly enough')
 
+    def input_loop(self):
+        self.input.run(self.enqueue_event)
+
     def output_loop(self):
-        while True:
+        while True:   
             event = self.event_queue.get(block=True)
-            self.output.send_event(event)
+            self.collector.send_event(event)
+
+    def flush_loop(self):
+        while True:
+            time.sleep(self.period)
+            event = FlushEvent()
+            self.enqueue_event(event)
 
     def run(self):
-
+        
         # Start the logger thread
         logger_thread = Thread(target=self.output_loop)
         logger_thread.setDaemon(True)
         logger_thread.start()
 
-        self.station.run(gen, self.enqueue_event)
+        # Start the input thread
+        input_thread = Thread(target=self.input_loop)
+        input_thread.setDaemon(True)
+        input_thread.start()        
+
+        # Start the embedded processes
+        if self.embedded.has_key('wfdriver'):
+            driver = wfdriver.wfdriver.Driver(self.embedded['wfdriver']['config'])
+            driver_thread = Thread(target=driver.run)
+            driver_thread.setDaemon(True)
+            driver_thread.start()            
+        #if self.embedded.has_key('wfrender'):
+            #renderer = wfrender.wfrender.Driver(embedded['wfrender']['config'])
+            #renderer_thread = Thread(target=renderer.run)
+            #renderer_thread.setDaemon(True)
+            #renderer_thread.start()            
+
+        # Start the flush thread
+        self.flush_loop()
+
 
 if __name__ == "__main__":
-    driver = Driver()
+    driver = Logger()
     driver.logger.debug("Started main()")
     driver.run()
     driver.logger.debug("Finished main()")

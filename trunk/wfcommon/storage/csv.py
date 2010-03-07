@@ -16,19 +16,19 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import yaml
+import logging
 
-import function
-import stdio
-import http
-
-# YAML mappings
-
-class YamlFunctionInput(function.FunctionInput, yaml.YAMLObject):
-    yaml_tag = u'!function'
-
-class YamlStdioInput(stdio.StdioInput, yaml.YAMLObject):
-    yaml_tag = u'!stdio-in'
-
-class YamlHttpInput(http.HttpInput, yaml.YAMLObject):
-    yaml_tag = u'!http-in'
+class CsvStorage(object):
+    '''
+    Stores samples in a CSV file.
+    
+    [ Properties ]
+    
+    path [string]:
+        The path to the CSV file.
+    '''
+    
+    def write_sample(sample):
+        #TODO: implement
+        print "Writing Sample "+sample
+    

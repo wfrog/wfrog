@@ -16,19 +16,31 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import yaml
+import logging
 
-import function
-import stdio
-import http
+class XmlInput(object):
+    '''
+    Base class for inputs receiving events as WESTEP XML messages.
+    '''
+    
+    send_event = None
+    
+    logger = logging.getLogger("input.xml")
+    
+    def run(self, send_event):
+        self.send_event = send_event
+        self.do_run()
+    
+    def process_message(self, message):
+        from lxml import objectify
+        event = objectify.XML(message)
+        event._type = event.tag
+        self.logger.debug("Received: "+message)
+        self.send_event(event)
 
-# YAML mappings
-
-class YamlFunctionInput(function.FunctionInput, yaml.YAMLObject):
-    yaml_tag = u'!function'
-
-class YamlStdioInput(stdio.StdioInput, yaml.YAMLObject):
-    yaml_tag = u'!stdio-in'
-
-class YamlHttpInput(http.HttpInput, yaml.YAMLObject):
-    yaml_tag = u'!http-in'
+class AggregatorCollector(object):
+    '''
+    Base class for aggregators.
+    '''
+    pass
+    
