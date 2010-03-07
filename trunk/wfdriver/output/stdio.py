@@ -16,11 +16,14 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
+
 class StdioOutput(object):
     '''
     Send events to the standard output according to WESTEP's STDIO transport.
     '''
 
     def send_event(self, event):
-        print event
-        print
+        sys.stdout.write(str(event)+"\n\n")
+        sys.stdout.flush()
+        

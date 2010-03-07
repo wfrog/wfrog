@@ -18,17 +18,26 @@
 
 import logging
 import base
+from StringIO import StringIO
+import sys
 
 class StdioInput(base.XmlInput):
     """
     Receives events on standard input according to WESTEP'S STDIO transport.
     """
 
+    logger = logging.getLogger('input.stdio')
+
     def do_run(self):
+        self.logger.debug('Starting')
+        
         end = False
         buffer = StringIO()
-        while not end:
+        while True:
             line = sys.stdin.readline()
+            if not line:
+                break
+            self.logger.debug('Got line: '+line)
 
             if line.strip() == "":
                 message = buffer.getvalue().strip()
