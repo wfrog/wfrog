@@ -16,19 +16,25 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import yaml
+import logging
+import base
 
-import function
-import stdio
-import http
+class StdioInput(base.XmlInput):
+    """
+    Receives events on standard input according to WESTEP'S STDIO transport.
+    """
 
-# YAML mappings
+    def do_run(self):
+        end = False
+        buffer = StringIO()
+        while not end:
+            line = sys.stdin.readline()
 
-class YamlFunctionInput(function.FunctionInput, yaml.YAMLObject):
-    yaml_tag = u'!function'
-
-class YamlStdioInput(stdio.StdioInput, yaml.YAMLObject):
-    yaml_tag = u'!stdio-in'
-
-class YamlHttpInput(http.HttpInput, yaml.YAMLObject):
-    yaml_tag = u'!http-in'
+            if line.strip() == "":
+                message = buffer.getvalue().strip()
+                if not message == "": # skip additional emtpy lines
+                    self.process_message(buffer.getvalue())
+                buffer.close()
+                buffer = StringIO()
+            else:
+                buffer.write(line)        

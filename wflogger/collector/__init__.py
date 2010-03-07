@@ -18,17 +18,9 @@
 
 import yaml
 
-import function
-import stdio
-import http
+import aggregator
 
 # YAML mappings
 
-class YamlFunctionInput(function.FunctionInput, yaml.YAMLObject):
-    yaml_tag = u'!function'
-
-class YamlStdioInput(stdio.StdioInput, yaml.YAMLObject):
-    yaml_tag = u'!stdio-in'
-
-class YamlHttpInput(http.HttpInput, yaml.YAMLObject):
-    yaml_tag = u'!http-in'
+class YamlDefaultAggregatorCollector(aggregator.DefaultAggregatorCollector, yaml.YAMLObject):
+    yaml_tag = u'!default-aggregator'

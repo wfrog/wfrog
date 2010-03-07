@@ -18,17 +18,10 @@
 
 import yaml
 
-import function
-import stdio
-import http
+import csv
 
 # YAML mappings
 
-class YamlFunctionInput(function.FunctionInput, yaml.YAMLObject):
-    yaml_tag = u'!function'
+class YamlCsvStorage(csv.CsvStorage, yaml.YAMLObject):
+    yaml_tag = u'!csv'
 
-class YamlStdioInput(stdio.StdioInput, yaml.YAMLObject):
-    yaml_tag = u'!stdio-in'
-
-class YamlHttpInput(http.HttpInput, yaml.YAMLObject):
-    yaml_tag = u'!http-in'

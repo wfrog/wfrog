@@ -1,6 +1,6 @@
 station: !random-simulator {}
 
-output: !http-out { url: 'http://localhost:8080/' }
+output: !http-out { url: 'http://localhost:8888/' }
 
 logging:
     level: debug    
