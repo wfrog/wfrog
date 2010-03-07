@@ -28,7 +28,7 @@ class CsvStorage(object):
         The path to the CSV file.
     '''
     
-    def write_sample(sample):
+    def write_sample(self, sample, context={}):
         #TODO: implement
         print "Writing Sample "+sample
     

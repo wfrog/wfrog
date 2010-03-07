@@ -8,7 +8,7 @@ period: 10
 collector: !multi
     children:        
         aggregator : !default-aggregator           
-            storage : !include { path: ../wfcommon/config/storage.yaml }  
+            storage : !include { path: ../../wfcommon/config/storage.yaml }  
             #storage : !local { name: storage, object: path: ../wfcommon/config/storage.yaml }
 #        current : !currentxml
 #            path: /tmp/currentconditions.xml

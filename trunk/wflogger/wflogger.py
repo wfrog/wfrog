@@ -36,6 +36,7 @@ import wfdriver.wfdriver
 #import wfrender.wfrender
 from threading import Thread
 from Queue import Queue, Full
+import copy
 
 def gen(type):
     return event.Event(type)
@@ -53,6 +54,7 @@ class Logger(object):
     period = 300
 
     embedded = {}
+    context = None
 
     def __init__(self):
         
@@ -72,10 +74,10 @@ class Logger(object):
 
         # Parse the options and create object trees from configuration
         (options, args) = opt_parser.parse_args()
-        (config, context) = configurer.configure(options)
+        (config, self.context) = configurer.configure(options)
 
         # Configure the log
-        wfcommon.log.configure(options, config, context)
+        wfcommon.log.configure(options, config, self.context)
 
         # Initialize the logger from object trees
         
@@ -102,9 +104,10 @@ class Logger(object):
         self.input.run(self.enqueue_event)
 
     def output_loop(self):
+        context = copy.deepcopy(self.context)
         while True:   
             event = self.event_queue.get(block=True)
-            self.collector.send_event(event)
+            self.collector.send_event(event, context=context)
 
     def flush_loop(self):
         while True:

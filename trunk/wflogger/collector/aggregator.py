@@ -33,9 +33,9 @@ class DefaultAggregatorCollector(base.AggregatorCollector):
     
     storage = None
     
-    def send_event(self, event):
+    def send_event(self, event, context={}):
         #TODO: implement
         if event._type == "_flush":
-            self.storage.write_sample("SAMPLE")
+            self.storage.write_sample("SAMPLE", context=context)
         else:
             print "Collected: "+str(event)
