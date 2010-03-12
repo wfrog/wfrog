@@ -64,9 +64,9 @@ class BaseCollector(object):
                 self._report_barometer_sea_level(event.value) 
                 # Should be this: must be fixed: self._report_barometer_absolute(event.value, context['altitude'])
         elif event._type == 'temp':
-            self._report_temperature(event.value)
+            self._report_temperature(event.value, event.sensor)
         elif event._type == 'hum':
-            self._report_humidity(event.value)
+            self._report_humidity(event.value, event.sensor)
         elif event._type == 'uv':
             self._report_uv(event.value)
     

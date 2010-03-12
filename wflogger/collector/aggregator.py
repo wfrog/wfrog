@@ -92,13 +92,15 @@ class AggregatorCollector(base.BaseCollector):
     def _report_barometer_sea_level(self, pressure):
         self._pressure.append(pressure)
 
-    def _report_temperature(self, temp):
-        self._temp.append(temp)
-        self._temp_last = temp
+    def _report_temperature(self, temp, sensor):
+        if sensor == 1:
+            self._temp.append(temp)
+            self._temp_last = temp
 
-    def _report_humidity(self, humidity):
-        self._hum.append(humidity)
-        self._hum_last = humidity
+    def _report_humidity(self, humidity, sensor):
+        if sensor == 1:
+            self._hum.append(humidity)
+            self._hum_last = humidity
 
     def _report_uv(self, uv_index):
         if self._uv_index == None or self._uv_index < uv_index:

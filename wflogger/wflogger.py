@@ -50,7 +50,7 @@ class Logger(object):
     logger = logging.getLogger('datalogger')
 
     queue_size=10
-    tick = 10
+    tick = 60
 
     embedded = {}
     context = None
