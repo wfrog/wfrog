@@ -28,52 +28,59 @@ levels = {'debug': logging.DEBUG,
           'error': logging.ERROR,
           'critical': logging.CRITICAL}
 
-def add_options(opt_parser):
-    opt_parser.add_option("-d", "--debug", action="store_true", dest="debug", help="Issues all debug messages on the console.")
-    
-def configure(options, config, context):
+class LogConfigurer(object):
+    '''
+Logging Configuration
+---------------------
 
-    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-    
-    logger = logging.getLogger() # root logger
-    
-    level = logging.INFO
-    
-    if config.has_key('logging'):
-    
-        logging_config = config['logging']
-    
-        if logging_config.has_key('level'):
-            level = levels[logging_config['level']]
-       
-        if logging_config.has_key('format'):
-            formatter = logging.Formatter(logging_config['format'])               
-       
-        if logging_config.has_key('handlers'):
-            handlers_config = logging_config['handlers']
-            
-            for handler_config in handlers_config.values():
-                handler = handler_config['handler']
-                
-                # Hack to bypass !include element because log handlers are not class instances 
-                # (they don't provide __getattribute__
-                if hasattr(handler, '_init'):
-                    handler = handler._init(context)
-                
-                if handler_config.has_key('level'):
-                    handler.setLevel(levels[handler_config['level']])
-                
-                handler.setFormatter(formatter)
-                
-                logger.addHandler(handler)            
-    
-    if options.debug:
-        level=logging.DEBUG
-        console_handler = logging.StreamHandler()
-        console_handler.setFormatter(formatter)
-        console_handler.setFormatter(formatter)
-        logger.addHandler(console_handler)
-                
-    logger.setLevel(level)
+level [debug|info|error|critical]:
+    The root level of logging
+'''
 
-    
+    def add_options(self, opt_parser):
+        opt_parser.add_option("-d", "--debug", action="store_true", dest="debug", help="Issues all debug messages on the console.")
+
+    def configure(self, options, config, context):
+
+        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+
+        logger = logging.getLogger() # root logger
+
+        level = logging.INFO
+
+        if config.has_key('logging'):
+
+            logging_config = config['logging']
+
+            if logging_config.has_key('level'):
+                level = levels[logging_config['level']]
+
+            if logging_config.has_key('format'):
+                formatter = logging.Formatter(logging_config['format'])
+
+            if logging_config.has_key('handlers'):
+                handlers_config = logging_config['handlers']
+
+                for handler_config in handlers_config.values():
+                    handler = handler_config['handler']
+
+                    # Hack to bypass !include element because log handlers are not class instances
+                    # (they don't provide __getattribute__
+                    if hasattr(handler, '_init'):
+                        handler = handler._init(context)
+
+                    if handler_config.has_key('level'):
+                        handler.setLevel(levels[handler_config['level']])
+
+                    handler.setFormatter(formatter)
+
+                    logger.addHandler(handler)
+
+        if options.debug:
+            level=logging.DEBUG
+            console_handler = logging.StreamHandler()
+            console_handler.setFormatter(formatter)
+            console_handler.setFormatter(formatter)
+            logger.addHandler(console_handler)
+
+        logger.setLevel(level)

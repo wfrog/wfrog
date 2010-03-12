@@ -30,7 +30,6 @@ import wfcommon.storage
 import optparse
 import logging
 import time
-import wfcommon.log
 import wfcommon.config
 import wfdriver.wfdriver
 #import wfrender.wfrender
@@ -48,7 +47,7 @@ class FlushEvent(object):
 
 class Logger(object):
 
-    logger = logging.getLogger('logger')
+    logger = logging.getLogger('datalogger')
 
     queue_size=10
     period = 300
@@ -57,7 +56,7 @@ class Logger(object):
     context = None
 
     def __init__(self):
-        
+
         # Prepare the configurer
         module_map = (
             ( "Inputs" , input ),
@@ -65,25 +64,21 @@ class Logger(object):
             ( "Storages" , wfcommon.storage ),
             ( "Generic Elements", wfcommon.generic)
         )
-        configurer = wfcommon.config.Configurer("config/wflogger.yaml", module_map)      
+        configurer = wfcommon.config.Configurer("config/wflogger.yaml", module_map)
 
-        # Initilize the option parser        
+        # Initilize the option parser
         opt_parser = optparse.OptionParser()
         configurer.add_options(opt_parser)
-        wfcommon.log.add_options(opt_parser)
 
         # Parse the options and create object trees from configuration
         (options, args) = opt_parser.parse_args()
-        (config, self.context) = configurer.configure(options)
-
-        # Configure the log
-        wfcommon.log.configure(options, config, self.context)
+        (config, self.context) = configurer.configure(options, self)
 
         # Initialize the logger from object trees
-        
+
         self.input = config['input']
         self.collector = config['collector']
-        
+
         if config.has_key('queue_size'):
             self.queue_size = config['queue_size']
         if config.has_key('period'):
@@ -105,7 +100,7 @@ class Logger(object):
 
     def output_loop(self):
         context = copy.deepcopy(self.context)
-        while True:   
+        while True:
             event = self.event_queue.get(block=True)
             self.collector.send_event(event, context=context)
 
@@ -116,7 +111,7 @@ class Logger(object):
             self.enqueue_event(event)
 
     def run(self):
-        
+
         # Start the logger thread
         logger_thread = Thread(target=self.output_loop)
         logger_thread.setDaemon(True)
@@ -125,19 +120,19 @@ class Logger(object):
         # Start the input thread
         input_thread = Thread(target=self.input_loop)
         input_thread.setDaemon(True)
-        input_thread.start()        
+        input_thread.start()
 
         # Start the embedded processes
         if self.embedded.has_key('wfdriver'):
             driver = wfdriver.wfdriver.Driver(self.embedded['wfdriver']['config'])
             driver_thread = Thread(target=driver.run)
             driver_thread.setDaemon(True)
-            driver_thread.start()            
+            driver_thread.start()
         #if self.embedded.has_key('wfrender'):
             #renderer = wfrender.wfrender.Driver(embedded['wfrender']['config'])
             #renderer_thread = Thread(target=renderer.run)
             #renderer_thread.setDaemon(True)
-            #renderer_thread.start()            
+            #renderer_thread.start()
 
         # Start the flush thread
         self.flush_loop()

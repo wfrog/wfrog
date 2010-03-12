@@ -17,6 +17,7 @@
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+import log
 import yaml
 import inspect
 import sys
@@ -27,27 +28,31 @@ class Configurer(object):
     default_filename = None
     module_map = None
 
+    log_configurer = log.LogConfigurer()
     logger = logging.getLogger('config')
 
     def __init__(self, default_filename, module_map):
         self.default_filename = default_filename
         self.module_map = module_map
-        
+
     def add_options(self, opt_parser):
         opt_parser.add_option("-f", "--file", dest="config", default=self.default_filename,
                   help="Configuration file (in yaml). Defaults to '" + self.default_filename + "'", metavar="CONFIG_FILE")
-        opt_parser.add_option("-L", action="store_true", dest="help_list", help="Gives the list of possible config !elements in the yaml config file")
-        opt_parser.add_option("-H", dest="help_element", metavar="ELEMENT", help="Gives help about a config !element")
+        opt_parser.add_option("-H", action="store_true", dest="help_list", help="Gives help on the configuration file and the list of possible config !elements in the yaml config file")
+        opt_parser.add_option("-E", dest="help_element", metavar="ELEMENT", help="Gives help about a config !element")
         opt_parser.add_option("-e", "--extensions", dest="extension_names", metavar="MODULE1,MODULE2,...", help="Comma-separated list of modules containing custom configuration elements")
+        self.log_configurer.add_options(opt_parser)
 
-    def configure(self, options):
-        
+    def configure(self, options, component, log_conf=True):
+
         if options.extension_names:
             for ext in options.extension_names.split(","):
                 self.logger.debug("Loading extension module '"+ext+"'")
                 self.extensions[ext]=__import__(ext)
         if options.help_list:
-            print "\n Elements you can use in the yaml config file:\n"
+            print component.__doc__
+            # Adds logger documentation
+            print self.log_configurer.__doc__
             for (k,v) in self.module_map:
                 print k
                 print "-"*len(k) +"\n"
@@ -73,8 +78,8 @@ class Configurer(object):
                     desc.update(self.get_help_desc(self.extensions[ext]))
             if desc.has_key(element):
                 print
-                print element
-                print "    " + desc[element]
+                print element + " [" + desc[element][1] +"]"
+                print "    " + desc[element][0]
                 print
             else:
                 print "Element "+element+" not found or not documented"
@@ -82,12 +87,15 @@ class Configurer(object):
 
         config = yaml.load( file(options.config, "r") )
 
-        if config.has_key('context'):            
+        if config.has_key('context'):
             context = copy.deepcopy(config['context'])
         else:
             context = {}
-        
+
         context['_yaml_config_file'] = options.config
+
+        if log_conf:
+            self.log_configurer.configure(options, config, context)
 
         return ( config, context )
 
@@ -97,7 +105,7 @@ class Configurer(object):
         sorted.sort()
         for k in sorted:
             print k
-            print "    " + desc[k]
+            print "    " + desc[k][0]
             print
 
     def get_help_desc(self, module, summary=False):
@@ -108,10 +116,14 @@ class Configurer(object):
             self.logger.debug("Getting doc of "+element[0])
             # Gets the documentation of the first superclass
             fulldoc=inspect.getmro(element[1])[1].__doc__
+
             firstline=fulldoc.split(".")[0]
             self.logger.debug(firstline)
+
+            module_name = module.__name__.split('.')[-1]
+
             if summary:
-                desc[element[1].yaml_tag] = firstline
+                desc[element[1].yaml_tag] = [ firstline, module_name ]
             else:
-                desc[element[1].yaml_tag] = fulldoc
+                desc[element[1].yaml_tag] = [ fulldoc, module_name ]
         return desc
