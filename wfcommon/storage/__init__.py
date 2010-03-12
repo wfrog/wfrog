@@ -18,10 +18,10 @@
 
 import yaml
 
-import csv
+import csvfile
 
 # YAML mappings
 
-class YamlCsvStorage(csv.CsvStorage, yaml.YAMLObject):
+class YamlCsvStorage(csvfile.CsvStorage, yaml.YAMLObject):
     yaml_tag = u'!csv'
 

@@ -30,6 +30,8 @@ class RandomSimulator(object):
     init_values = [ 10, 1020, 65, 10, [ 3, 180], 5, 2 ]
     range = [ 30, 100, 40, 20, [6, 360], 10, 4 ]
 
+    rain_total = 55
+
     def new_value(self, current, init, range):
         step = random.random()*(range/8.0) - range/16.0
         dev = current-init # deviation from init
@@ -58,10 +60,15 @@ class RandomSimulator(object):
                 e.create_child('mean')
                 e.mean.speed=current_values[t][0]
                 e.mean.dir=current_values[t][1]
+                e.create_child('gust')
+                e.gust.speed=current_values[t][0] + random.randint(0,2)
+                e.gust.dir=current_values[t][1]                
             else:
                 current_values[t] = self.new_value(current_values[t], self.init_values[t], self.range[t])
                 if type == 'rain':
                     e.rate = current_values[t]
+                    e.total = self.rain_total
+                    self.rain_total = self.rain_total + random.randint(0,2)
                 else:
                     e.value = current_values[t]
 

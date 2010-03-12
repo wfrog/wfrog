@@ -18,24 +18,167 @@
 
 import logging
 import base
+import time
+import wfcommon.WxUtils
 
-class DefaultAggregatorCollector(base.AggregatorCollector):
+class AggregatorCollector(base.BaseCollector):
     '''
-    Collects events and issues samples to an underlying storage on 
-    flush event.    
+    Collects events, compute aggregated values incrementally and issues 
+    samples to an underlying storage on flush event.    
     
     [ Properties ]
     
     storage [storage]:
-        The underlying storage receiving the aggregated samples.
-    
+        The underlying storage receiving the aggregated samples.    
     '''
     
     storage = None
+  
+    _logger = logging.getLogger('collector.aggregator')
+
+    ## Init internal data
+    _temp_last = None
+    _hum_last = None
+    _rain_last = None
+    _mean_temp = None   # Last 12 hours mean temp
+    _mean_temp_last_time = None       
+        
+    initialized = False
+        
+    def init(self):
+        if not self.initialized:
+            self._new_period()
+            self.initialized = True
+        
+    def _new_period(self):
+        ## Temperature
+        self._temp = []
+        ## Humidity
+        self._hum = []
+        ## Wind
+        self._wind = []
+        self._wind_dir = []
+        ## Wind gust
+        self._wind_gust = 0.0
+        self._wind_gust_dir = None
+        ## Rain
+        if self._rain_last != None:
+            self._rain_first = self._rain_last
+        else:    
+            self._rain_first = None
+        self._rain_rate = 0.0
+        ## Pressure
+        self._pressure = []
+        ## UV
+        self._uv_index = None
+        ## Log
+        self._logger.info ('New period')
+
+
+    def _report_rain(self, total, rate):
+        if self._rain_first == None:
+            self._rain_first = total    
+        self._rain_last = total
+        if self._rain_rate < rate:
+            self._rain_rate = rate
+
+    def _report_wind(self, avgSpeed, dirDeg, gustSpeed, gustDir):  
+        self._wind_dir.append((avgSpeed, dirDeg))  # Keep vector to calculate composite wind direction
+        self._wind.append(avgSpeed)
+        if self._wind_gust < gustSpeed:
+            self._wind_gust = gustSpeed
+            self._wind_gust_dir = gustDir
+
+    def _report_barometer_sea_level(self, pressure):
+        self._pressure.append(pressure)
+
+    def _report_temperature(self, temp):
+        self._temp.append(temp)
+        self._temp_last = temp
+
+    def _report_humidity(self, humidity):
+        self._hum.append(humidity)
+        self._hum_last = humidity
+
+    def _report_uv(self, uv_index):
+        if self._uv_index == None or self._uv_index < uv_index:
+            self._uv_index = uv_index
     
-    def send_event(self, event, context={}):
-        #TODO: implement
-        if event._type == "_flush":
-            self.storage.write_sample("SAMPLE", context=context)
+    def get_data(self):
+        
+        data = {
+            'temp': None,
+            'hum': None,
+            'pressure' : None,
+            'wind': None,
+            'wind_dir': None,
+            'wind_gust' : None,
+            'wind_gust_dir': None,
+            'rain': None,
+            'rain_rate': None,
+            'uv_index' : None,
+            'dew_point' : None
+        }
+        
+        if len(self._temp) > 0:
+            
+            data['temp'] = round(sum(self._temp)/len(self._temp), 1)
         else:
-            print "Collected: "+str(event)
+            self._logger.warning('Missing temperature data')
+
+        if len(self._hum) > 0:
+            data['hum'] = round(sum(self._hum)/len(self._hum), 1)
+        else:
+            self._logger.warning('Missing humidity data')
+            
+        if len(self._wind) > 0:
+            data['wind'] = round(sum(self._wind)/len(self._wind), 1)
+            data['wind_dir'] = round(wfcommon.WxUtils.WindPredominantDirection(self._wind_dir), 1)
+            data['wind_gust_dir'] = round(self._wind_gust_dir, 1)            
+                
+            # Wind gust cannot be smaller than wind average 
+            # (might happen due to different sampling periods)
+            if data['wind'] <= self._wind_gust:
+                data['wind_gust'] = self._wind_gust
+            else:
+                data['wind_gust'] = round(data['wind'], 1)
+        else:
+            self._logger.warning('Missing wind data')            
+            
+        if self._rain_first is not None:
+            if self._rain_last > self._rain_first:
+                data['rain'] = round(self._rain_last - self._rain_first, 1)
+                data['rain_rate'] = round(self._rain_rate, 1)
+            else:
+                data['rain'] = 0.0
+                data['rain_rate'] = 0.0        
+        else:
+            self._logger.warning('Missing rain data')
+            
+        if len(self._pressure) > 0:
+            ## QFF pressure (Sea Level Pressure)
+            pressure = round(sum(self._pressure)/len(self._pressure), 1)
+            data['pressure'] = pressure
+        else:
+            self._logger.warning('Missing pressure data')            
+
+        if data['temp'] and data['hum']:
+            ## Dew Point
+            data['dew_point'] = round(wfcommon.WxUtils.DewPoint(data['temp'], data['hum'], 'vaDavisVP'), 1)
+            
+        ## UV
+        if self._uv_index != None:
+            data['uv_index'] = int(self._uv_index)
+
+        self._logger.debug('data = %s', data)
+   
+        return data    
+    
+    def flush(self, context):
+        sample = self.get_data()
+        self._new_period()
+        
+        sample['timestamp'] = time.localtime()
+            
+        self.storage.write_sample(sample, context=context)
+
