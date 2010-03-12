@@ -95,14 +95,16 @@ class CurrentConditionsXmlDataSource(object):
         except:
             pass  
 
-        try:        
+                
+        try:
             result['wind']['value'] = float(dom.getElementsByTagName('wind')[0].getElementsByTagName('avgSpeed')[0].childNodes[0].data)
             result['wind']['max'] = float(dom.getElementsByTagName('wind')[0].getElementsByTagName('gustSpeed')[0].childNodes[0].data)
-            result['wind']['deg'] = int(dom.getElementsByTagName('wind')[0].getElementsByTagName('dirDeg')[0].childNodes[0].data)
-            result['wind']['dir'] = dom.getElementsByTagName('wind')[0].getElementsByTagName('dirStr')[0].childNodes[0].data
+            result['wind']['deg'] = float(dom.getElementsByTagName('wind')[0].getElementsByTagName('dirDeg')[0].childNodes[0].data)
+            result['wind']['dir'] = round(result['wind']['deg'] / 22.5 )
             result['wind']['unit'] = "m/s"
         except:
             pass  
+
 
         try:
             result['info']['timestamp'] = datetime.strptime(dom.getElementsByTagName('time')[0].childNodes[0].data, "%Y-%m-%d %H:%M:%S")
