@@ -29,7 +29,6 @@ import wfcommon.generic
 from output import stdio
 import optparse
 import logging
-import wfcommon.log
 import wfcommon.config
 from threading import Thread
 from Queue import Queue, Full
@@ -41,42 +40,37 @@ def gen(type):
 
 class Driver(object):
 
-    logger = logging.getLogger('driver') 
+    logger = logging.getLogger('driver')
 
     # default values
     output = stdio.StdioOutput()
     queue_size = 10
 
     def __init__(self, config_file=None):
-        
+
         # Prepare the configurer
         module_map = (
             ( "Stations" , station ),
             ( "Output" , output),
             ( "Generic Elements", wfcommon.generic)
         )
-        
+
         if config_file:
             embedded = True
         else:
             config_file = "config/wfdriver.yaml"
             embedded = False
-        
-        configurer = wfcommon.config.Configurer(config_file, module_map)      
 
-        # Initialize the option parser        
+        configurer = wfcommon.config.Configurer(config_file, module_map)
+
+        # Initialize the option parser
         opt_parser = optparse.OptionParser()
         configurer.add_options(opt_parser)
-        wfcommon.log.add_options(opt_parser)
 
         # Parse the options and create object trees from configuration
         (options, args) = opt_parser.parse_args()
-                
-        (config, context) = configurer.configure(options)
 
-        # Configure the log
-        if not embedded:
-            wfcommon.log.configure(options, config, context)
+        (config, context) = configurer.configure(options, self, log_conf=not embedded)
 
         # Initialize the driver from object trees
         self.station = config['station']

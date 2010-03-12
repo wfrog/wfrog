@@ -8,8 +8,10 @@ TITLE3=3
 SPACE=4
 PROP=5
 BULLET=6
+HIDDEN=7
 
-prop_re = re.compile('^ +[a-z]+.*\[.*\].*:$')
+prop_re = re.compile('^ *[a-z]+.*\[.*\].*:$')
+hidden_re = re.compile('^ [^ ]+.*$')
 
 def parse_mark(line):
     if line.strip().startswith("---"):
@@ -22,6 +24,8 @@ def parse_mark(line):
         return PROP
     elif line.strip().startswith('- '):
         return BULLET
+    elif hidden_re.match(line):
+        return HIDDEN
     else:
         return 0
 
@@ -36,9 +40,9 @@ def format_text(line):
             count = count - 1
             if count > 0:
                 if open:
-                    formatted = formatted + '<tt>'
+                    formatted = formatted + '<i>'
                 else:
-                    formatted = formatted + '</tt>'
+                    formatted = formatted + '</i>'
                 open = not open
         line = formatted
     return line
@@ -60,10 +64,14 @@ def format(line, context={}):
         else:
             result = line
         result = result.strip()[:-1]
-        result = result.replace('[', '</b>[')
+        result = result.replace('[', '</b><tt>[')
+        result = result.replace(']', ']</tt>')
+
         return '<b>' + result + '<br>'
     elif parse_mark(line) == BULLET:
         return '<li>'+format_text(line.replace(' - ', ''))
+    elif parse_mark(line) == HIDDEN:
+        return ''
     else:
         return format_text(line)
 
@@ -95,11 +103,21 @@ def to_content(buffer, line, context):
         buffer.write(format(line))
         return (buffer, '', '', False)
     else:
-        buffer.write(format(line, context))
         if context['title-line']:
+
+            buffer.write('<h1>')
+            line = format(line, context)
+            if line.strip().find('[') > 0:
+                line = line.replace('[', '</h1><tt>[')
+                buffer.write(line)
+                buffer.write('</tt><p/>')
+            else:
+                buffer.write(line)
+                buffer.write('</h1>')
             context['title-line'] = False
-            return (buffer, '<h1>', '</h1>', True)
+            return (buffer, '', '', True)
         else:
+            buffer.write(format(line, context))
             return (buffer, '', '', False)
 
 def treat_line(buffer, line, output, context):
@@ -124,7 +142,7 @@ def write_footer(output):
 
 # TODO: footer
 # Lines to hide: space instead of ' > '
-def process(input, output, header=None, first_line_title=False):
+def process(input, output, header='', footer='', first_line_title=False):
 
     line = 1
     buffer = None
@@ -136,6 +154,7 @@ def process(input, output, header=None, first_line_title=False):
         line = input.readline()
         buffer = treat_line(buffer, line, output, context)
     treat_line(buffer, '', output, context)
+    output.write(footer)
     write_footer(output)
 
 
@@ -144,11 +163,14 @@ def main():
 
     opt_parser.add_option("-H", "--header", dest="header", default='',
                   help="Header on generated page", metavar="HTML")
+    opt_parser.add_option("-F", "--footer", dest="footer", default='',
+                  help="Footer on generated page", metavar="HTML")
+
     opt_parser.add_option("-t", "--first-line-title", action="store_true", dest="first_line_title", help="Makes the first non empty line a main title.")
 
     (options, args) = opt_parser.parse_args()
 
-    process(sys.stdin, sys.stdout, header=options.header, first_line_title=options.first_line_title)
+    process(sys.stdin, sys.stdout, header=options.header, footer=options.footer, first_line_title=options.first_line_title)
 
 if __name__ == "__main__":
     main()

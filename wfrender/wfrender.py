@@ -31,9 +31,17 @@ import logging
 import logging.handlers
 import units
 
-
 class RenderEngine(object):
-    """Entry point of the rendering"""
+    '''
+Root Elements
+-------------
+
+context [dict] (optional):
+    Contains context values propagated to all renderers during traversal.
+
+renderer [renderer]:
+    Root renderer executed at wfrender execution.
+'''
 
     root_renderer = None
     configurer = None
@@ -42,26 +50,16 @@ class RenderEngine(object):
     daemon = False
     output = False
 
-    ## Logging setup
-    LOG_FILENAME = '/var/log/wfrender.log'
-    LOG_SIZE = 512000
-    LOG_BACKUPS = 4
-    logger = logging.getLogger()  ## get root logger so that all properties are transfered to all loggers
-#    handler = logging.handlers.RotatingFileHandler(
-#                      filename=LOG_FILENAME,  maxBytes=int(LOG_SIZE), backupCount=int(LOG_BACKUPS))
-#    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-#    handler.setFormatter(formatter)
-#    logger.addHandler(handler)
-    logger.setLevel(logging.DEBUG)
+    logger = logging.getLogger('render')
 
     def __init__(self, configurer=None, main=False):
         """Creates the engine using a specific configurer or a yaml configurer if none specified"""
         if configurer:
             self.configurer = configurer
         else:
-            if main:
-                opt_parser = optparse.OptionParser()
-            self.configurer = config.YamlConfigurer(opt_parser)
+            opt_parser = optparse.OptionParser()
+            self.configurer = config.RendererConfigurer(opt_parser)
+
             if main:
                 opt_parser.add_option("-D", "--data", dest="data_string", help="Passes specific data value/pairs to renderers", metavar="key1=value1,key2=value2")
                 opt_parser.add_option("-O", dest="output", action="store_true", help="Outputs the result (if any) on standard output")
@@ -77,10 +75,10 @@ class RenderEngine(object):
                 if options.output:
                     self.output=True
 
-        self.reconfigure(options, args)
+        self.reconfigure(options, args, init=True)
 
-    def reconfigure(self, options=None, args=[]):
-        self.configurer.configure(self,options,args)
+    def reconfigure(self, options=None, args=[], init=False):
+        self.configurer.configure_engine(self,options, args, init)
 
     def process(self, data=initial_data, context={}):
 
