@@ -83,7 +83,7 @@ class Driver(object):
         self.event_queue = Queue(self.queue_size)
 
     def enqueue_event(self,event):
-        self.logger.debug('Enqueuing: '+str(event)+', Queue size: '+str(self.event_queue.qsize()))
+        self.logger.debug('Enqueuing: %s, Queue size: %d', event, self.event_queue.qsize())
         try:
             self.event_queue.put(event, block=False)
         except Full:
@@ -92,7 +92,10 @@ class Driver(object):
     def output_loop(self):
         while True:
             event = self.event_queue.get(block=True)
-            self.output.send_event(event)
+            try:
+                self.output.send_event(event)
+            except Exception:
+                self.logger.exception("Could not send event to " + str(self.output))
 
     def run(self):
 

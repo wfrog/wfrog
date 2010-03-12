@@ -19,8 +19,12 @@
 import yaml
 
 import aggregator
+import flush
 
 # YAML mappings
 
-class YamlDefaultAggregatorCollector(aggregator.DefaultAggregatorCollector, yaml.YAMLObject):
-    yaml_tag = u'!default-aggregator'
+class YamlAggregatorCollector(aggregator.AggregatorCollector, yaml.YAMLObject):
+    yaml_tag = u'!aggregator'
+
+class YamlFlushCollector(flush.FlushCollector, yaml.YAMLObject):
+    yaml_tag = u'!flush'

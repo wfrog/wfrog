@@ -40,17 +40,17 @@ import copy
 def gen(type):
     return event.Event(type)
 
-class FlushEvent(object):
-    _type = '_flush'
+class TickEvent(object):
+    _type = '_tick'
     def __str__(self):
-        return "*FLUSH*"
+        return "*TICK*"
 
 class Logger(object):
 
     logger = logging.getLogger('datalogger')
 
     queue_size=10
-    period = 300
+    tick = 10
 
     embedded = {}
     context = None
@@ -66,7 +66,7 @@ class Logger(object):
         )
         configurer = wfcommon.config.Configurer("config/wflogger.yaml", module_map)
 
-        # Initilize the option parser
+        # Initialize the option parser        
         opt_parser = optparse.OptionParser()
         configurer.add_options(opt_parser)
 
@@ -89,7 +89,7 @@ class Logger(object):
         self.event_queue = Queue(self.queue_size)
 
     def enqueue_event(self, event):
-        self.logger.debug('Queue size: '+str(self.event_queue.qsize()))
+        self.logger.debug('Queue size: %d', self.event_queue.qsize())
         try:
             self.event_queue.put(event, block=False)
         except Full:
@@ -102,12 +102,15 @@ class Logger(object):
         context = copy.deepcopy(self.context)
         while True:
             event = self.event_queue.get(block=True)
-            self.collector.send_event(event, context=context)
+            try:
+                self.collector.send_event(event, context=context)
+            except Exception:
+                self.logger.exception("Could not send event to "+str(self.collector))
 
-    def flush_loop(self):
+    def tick_loop(self):
         while True:
-            time.sleep(self.period)
-            event = FlushEvent()
+            time.sleep(self.tick)
+            event = TickEvent()
             self.enqueue_event(event)
 
     def run(self):
@@ -134,8 +137,8 @@ class Logger(object):
             #renderer_thread.setDaemon(True)
             #renderer_thread.start()
 
-        # Start the flush thread
-        self.flush_loop()
+        # Start the tick thread
+        self.tick_loop()
 
 
 if __name__ == "__main__":

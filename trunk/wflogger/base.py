@@ -17,6 +17,7 @@
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+import wfcommon.WxUtils
 
 class XmlInput(object):
     '''
@@ -38,9 +39,54 @@ class XmlInput(object):
         self.logger.debug("Received: "+message)
         self.send_event(event)
 
-class AggregatorCollector(object):
+class BaseCollector(object):
     '''
-    Base class for aggregators.
+    Base class for collectors.
     '''
-    pass
     
+    def send_event(self, event, context={}):
+
+        self.init()
+        
+        if event._type == "_flush":
+            self.flush(context)
+        elif event._type == 'rain':
+            self._report_rain(event.total, event.rate)
+        elif event._type == 'wind':
+            self._report_wind(event.mean.speed, event.mean.dir, event.gust.speed, event.gust.dir)
+        elif event._type == 'press':
+            if hasattr(event, 'code'):
+                if event.code == 'RAW' or event.code == 'QFE':
+                    self._report_barometer_absolute(event.value)
+                else:
+                    self._report_barometer_sea_level(event.value) 
+            else:
+                self._report_barometer_sea_level(event.value) 
+                # Should be this: must be fixed: self._report_barometer_absolute(event.value, context['altitude'])
+        elif event._type == 'temp':
+            self._report_temperature(event.value)
+        elif event._type == 'hum':
+            self._report_humidity(event.value)
+        elif event._type == 'uv':
+            self._report_uv(event.value)
+    
+    def _get_mean_temp(self, current_temp):  # Last 12 hours mean temp
+        if self._mean_temp != None:
+            if (datetime.datetime.now()-self._mean_temp_last_time).seconds < 3600: # New value each hour
+                return self._mean_temp
+            #TODO: Get last 12-hours mean temp from storage
+        
+        return current_temp
+        
+        
+    # TODO: Clean that !
+    def _report_barometer_absolute(self, pressure, altitude):
+        if self._temp_last != None and self._hum_last != None:
+            seaLevelPressure = wfcommon.WxUtils.StationToSeaLevelPressure(
+                                  pressure, 
+                                  altitude, 
+                                  self._temp_last, 
+                                  self._get_mean_temp(self._temp_last), 
+                                  self._hum_last, 
+                                  'paDavisVP')
+            self._report_barometer_sea_level(seaLevelPressure)

@@ -1,17 +1,20 @@
 context:
     altitude: 430           # The context is propagated to the aggregator
-#input: !service               # Use a local service to receive events
-#    name: events
-#    instance: !function {}
+input: !service               # Use a local service to receive events
+    name: events
+    instance: !function {}
 #input: !http-in { port: 8888 }
-input: !stdio-in {}
-period: 10
+#input: !stdio-in {}
 collector: !multi
     children:        
-        aggregator : !default-aggregator           
-            storage : !include { path: ../../wfcommon/config/storage.yaml }  
-            #storage : !local { name: storage, object: path: ../wfcommon/config/storage.yaml }
-#        current : !currentxml
-#            path: /tmp/currentconditions.xml
-#embed:
-#    wfdriver: { config: ../wfdriver/config/embedded.yaml }
+        aggregator : !flush
+            period: 20
+            collector: !aggregator           
+                storage : !include { path: ../../wfcommon/config/storage.yaml }  
+                #storage : !local { name: storage, object: path: ../wfcommon/config/storage.yaml }
+#        current : : !flush
+#            period: 10
+#            collector: !currentxml
+#                path: /tmp/currentconditions.xml
+embed:
+    wfdriver: { config: ../wfdriver/config/embedded.yaml }
