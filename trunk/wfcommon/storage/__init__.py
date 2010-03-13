@@ -19,9 +19,16 @@
 import yaml
 
 import csvfile
+import firebird
+import mysql
 
 # YAML mappings
 
 class YamlCsvStorage(csvfile.CsvStorage, yaml.YAMLObject):
     yaml_tag = u'!csv'
 
+class YamlFirebirdStorage(firebird.FirebirdStorage, yaml.YAMLObject):
+    yaml_tag = u'!firebird'
+
+class YamlMysqlStorage(mysql.MysqlStorage, yaml.YAMLObject):
+    yaml_tag = u'!mysql'

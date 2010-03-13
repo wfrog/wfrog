@@ -22,4 +22,4 @@ collector: !multi
 
 embed:
     wfdriver: { config: ../wfdriver/config/embedded.yaml }
-
+    wfrender: { config: ../wfrender/config/wfrender.yaml }

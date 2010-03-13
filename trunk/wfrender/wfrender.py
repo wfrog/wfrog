@@ -29,7 +29,7 @@ import copy
 import optparse
 import logging
 import logging.handlers
-import units
+import wfcommon.units
 
 class RenderEngine(object):
     '''
@@ -45,35 +45,33 @@ renderer [renderer]:
 
     root_renderer = None
     configurer = None
-    initial_context = { "version": "0.1", "units" : units.reference }
+    initial_context = { "version": "0.1", "units" : wfcommon.units.reference }
     initial_data = {}
     daemon = False
     output = False
 
     logger = logging.getLogger('render')
 
-    def __init__(self, configurer=None, main=False):
+    def __init__(self, config_file=None):
         """Creates the engine using a specific configurer or a yaml configurer if none specified"""
-        if configurer:
-            self.configurer = configurer
-        else:
-            opt_parser = optparse.OptionParser()
-            self.configurer = config.RendererConfigurer(opt_parser)
 
-            if main:
-                opt_parser.add_option("-D", "--data", dest="data_string", help="Passes specific data value/pairs to renderers", metavar="key1=value1,key2=value2")
-                opt_parser.add_option("-O", dest="output", action="store_true", help="Outputs the result (if any) on standard output")
-                (options, args) = opt_parser.parse_args()
+        opt_parser = optparse.OptionParser()
+        
+        self.configurer = config.RendererConfigurer(opt_parser, config_file)
 
-                if options.data_string:
-                    pairs = options.data_string.split(',')
-                    for pair in pairs:
-                        pieces = pair.split('=')
-                        assert len(pieces) == 2, "Key-value pair not in the form key=value: %s" % pair
-                        self.initial_data[pieces[0].strip()] = pieces[1].strip()
+        opt_parser.add_option("-D", "--data", dest="data_string", help="Passes specific data value/pairs to renderers", metavar="key1=value1,key2=value2")
+        opt_parser.add_option("-O", dest="output", action="store_true", help="Outputs the result (if any) on standard output")
+        (options, args) = opt_parser.parse_args()
 
-                if options.output:
-                    self.output=True
+        if options.data_string:
+            pairs = options.data_string.split(',')
+            for pair in pairs:
+                pieces = pair.split('=')
+                assert len(pieces) == 2, "Key-value pair not in the form key=value: %s" % pair
+                self.initial_data[pieces[0].strip()] = pieces[1].strip()
+
+        if options.output:
+            self.output=True
 
         self.reconfigure(options, args, init=True)
 
@@ -111,7 +109,7 @@ renderer [renderer]:
             self.daemon = False
 
 if __name__ == "__main__":
-    engine = RenderEngine(main=True)
+    engine = RenderEngine()
     result = engine.process()
     if engine.output:
         print str(result)

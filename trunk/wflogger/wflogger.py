@@ -32,7 +32,7 @@ import logging
 import time
 import wfcommon.config
 import wfdriver.wfdriver
-#import wfrender.wfrender
+import wfrender.wfrender
 from threading import Thread
 from Queue import Queue, Full
 import copy
@@ -131,11 +131,11 @@ class Logger(object):
             driver_thread = Thread(target=driver.run)
             driver_thread.setDaemon(True)
             driver_thread.start()
-        #if self.embedded.has_key('wfrender'):
-            #renderer = wfrender.wfrender.Driver(embedded['wfrender']['config'])
-            #renderer_thread = Thread(target=renderer.run)
-            #renderer_thread.setDaemon(True)
-            #renderer_thread.start()
+        if self.embedded.has_key('wfrender'):
+            renderer = wfrender.wfrender.RenderEngine(self.embedded['wfrender']['config'])
+            renderer_thread = Thread(target=renderer.process)
+            renderer_thread.setDaemon(True)
+            renderer_thread.start()
 
         # Start the tick thread
         self.tick_loop()
