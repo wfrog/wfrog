@@ -37,11 +37,8 @@ class AggregatorCollector(base.BaseCollector):
     logger = logging.getLogger('collector.aggregator')
 
     ## Init internal data
-    _temp_last = None
-    _hum_last = None
-    _rain_last = None
-    _mean_temp = None   # Last 12 hours mean temp
-    _mean_temp_last_time = None       
+
+    _rain_last = None 
         
     initialized = False
         
@@ -95,12 +92,10 @@ class AggregatorCollector(base.BaseCollector):
     def _report_temperature(self, temp, sensor):
         if sensor == 1:
             self._temp.append(temp)
-            self._temp_last = temp
 
     def _report_humidity(self, humidity, sensor):
         if sensor == 1:
             self._hum.append(humidity)
-            self._hum_last = humidity
 
     def _report_uv(self, uv_index):
         if self._uv_index == None or self._uv_index < uv_index:
