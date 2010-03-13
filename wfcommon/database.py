@@ -80,6 +80,22 @@ class DB():
         self.dbObject.commit()
         return l
 
+    def select_apply(self, sql, callback):
+        if self.dbObject == None:
+            raise Exception("Not connected to a Database")
+        cursor = self.dbObject.cursor()
+        cursor.execute(sql)
+        
+        try:
+            while True:
+                row = cursor.fetchone()      
+                if row is None:
+                    return
+                callback(tuple(map(adjust, row))) 
+        finally:
+            cursor.close()
+            self.dbObject.commit()
+
     def execute(self, sql):
         if self.dbObject == None:
             raise Exception("Not connected to a Database")

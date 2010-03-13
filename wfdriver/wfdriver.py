@@ -40,7 +40,7 @@ def gen(type):
 
 class Driver(object):
 
-    logger = logging.getLogger('driver')
+    logger = logging.getLogger('wfdriver')
 
     # default values
     output = stdio.StdioOutput()

@@ -47,7 +47,7 @@ class TickEvent(object):
 
 class Logger(object):
 
-    logger = logging.getLogger('datalogger')
+    logger = logging.getLogger('wflogger')
 
     queue_size=10
     tick = 60

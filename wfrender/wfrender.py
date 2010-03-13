@@ -50,7 +50,7 @@ renderer [renderer]:
     daemon = False
     output = False
 
-    logger = logging.getLogger('render')
+    logger = logging.getLogger('wfrender')
 
     def __init__(self, config_file=None):
         """Creates the engine using a specific configurer or a yaml configurer if none specified"""

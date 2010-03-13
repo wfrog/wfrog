@@ -17,6 +17,7 @@
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import time
+from datetime import datetime
 
 class DatabaseStorage(object):
     '''
@@ -53,13 +54,50 @@ class DatabaseStorage(object):
         try:
             self.db.connect()
             self.db.execute(sql)
-            self.db.disconnect()
             self.logger.debug("SQL executed: %s", sql)
         except:
             self.logger.exception("Error writting current data to database")
+        finally:
+            self.db.disconnect()
+
+    def traverse_samples(self, callback, from_time=datetime.fromtimestamp(0), to_time=datetime.now(), context={}):
+        if not self.initialized:
+            self.init()
+            self.initialized = True
+                    
+        statement = "SELECT TIMESTAMP_LOCAL," + \
+            " TEMP, HUM, WIND, WIND_DIR, WIND_GUST, WIND_GUST_DIR, DEW_POINT,"+ \
+            " RAIN, RAIN_RATE, PRESSURE, UV_INDEX FROM METEO " + \
+            " WHERE TIMESTAMP_LOCAL >= '%s' AND TIMESTAMP_LOCAL <= '%s' "+ \
+            " ORDER BY TIMESTAMP_LOCAL ASCENDING"
+            
+        sql = statement % ( from_time.strftime(self.time_format),
+            to_time.strftime(self.time_format))
+            
+        mapper = lambda(row) : callback( { 'local_timestamp' : row[0],
+            'temp' : row[1],
+            'hum' : row[2],
+            'wind' : row[3],
+            'wind_dir' : row[4],
+            'wind_gust' : row[5],
+            'wind_gust_dir' : row[6],
+            'dew_point' : row[7],
+            'rain' : row[8],
+            'rain_rate' : row[8],
+            'pressure' : row[10],
+            'uv_index' : row[11] } )
+        
+        try:
+            self.db.connect()
+            self.db.select_apply(sql, mapper)                        
+        except:
+            self.logger.exception("Error writting current data to database")
+        finally:
+            self.db.disconnect()        
 
     def format(self, value):
         if value is None:
             return 'NULL'
         else:
             return value
+
