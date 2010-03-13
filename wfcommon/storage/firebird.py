@@ -18,6 +18,34 @@
 
 import logging
 import wfcommon.base
+import wfcommon.database
 
 class FirebirdStorage(wfcommon.base.DatabaseStorage):
-    pass
+    '''
+    Stores sample data in a Firebird database table.
+    
+    [ Properties ]
+    
+    database [string] (optional):
+        Path to the database. Defaults 
+        to 'localhost:/var/lib/firebird/2.0/data/wfrog.db'
+        
+    user [string] (optional):
+        Database user. Defaults to 'sysdba'.
+        
+    password [string] (optional):
+        Database user password. Defaults to 'masterkey'.
+        
+    charset [string] (optional):
+        Character encoding in the database. Defaults to 'ISO8859_1'.    
+    '''
+    
+    database = 'localhost:/var/lib/firebird/2.0/data/wfrog.db'
+    user = 'sysdba'
+    password = 'masterkey'
+    charset = 'ISO8859_1'
+    
+    logger = logging.getLogger('storage.firebird')
+    
+    def init(self):
+        self.db = wfcommon.database.FirebirdDB(self.database, self.user, self.password, self.charset)

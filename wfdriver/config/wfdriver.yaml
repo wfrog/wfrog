@@ -10,5 +10,5 @@ logging:
             handler: !include 
                 path: ../../wfcommon/config/loghandler.yaml
                 variables:
-                    process: wflogger
+                    process: wfdriver
 

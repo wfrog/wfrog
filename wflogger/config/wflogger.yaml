@@ -2,7 +2,7 @@ context:
     altitude: 430               # The context is propagated to the aggregator
 
 input: !service
-    name: events  # Use a local service to receive events
+    name: events  # Use embedded wfdriver to receive events
     instance: !function {}
 #input: !http-in { port: 8888 }
 #input: !stdio-in {}
@@ -23,3 +23,13 @@ collector: !multi
 embed:
     wfdriver: { config: ../wfdriver/config/embedded.yaml }
     wfrender: { config: ../wfrender/config/wfrender.yaml }
+
+logging:
+    level: info    
+    handlers:
+        default:
+            level: info
+            handler: !include 
+                path: ../../wfcommon/config/loghandler.yaml
+                variables:
+                    process: wflogger

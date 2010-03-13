@@ -16,7 +16,6 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import database
 import time
 
 class DatabaseStorage(object):
@@ -24,16 +23,22 @@ class DatabaseStorage(object):
     Base class for database storages.
     '''
     
-    def __init__(configuration):
-        self.db = database.DBFactory(configuration)
-        
+    initialized = False
+       
+    time_format = '%Y-%m-%d %H:%M:%S'
+       
     def write_sample(self, sample, context={}):
-        sql = """
-INSERT INTO METEO (TIMESTAMP_UTC, TIMESTAMP_LOCAL, TEMP, HUM, WIND, WIND_DIR, WIND_GUST, WIND_GUST_DIR,  
-                   DEW_POINT, RAIN, RAIN_RATE, PRESSURE, UV_INDEX)               
-VALUES (%s, %s, %g, %g, %g, %s, %g, %s, %g, %g, %g, %g, %s)
-""" % ("'%s'" % time.strftime(self.TIME_FORMAT, time.gmtime()), 
-       "'%s'" % time.strftime(self.TIME_FORMAT, time.localtime()),
+        if not self.initialized:
+            self.init()
+            self.initialized = True
+    
+        statement =  "INSERT INTO METEO (TIMESTAMP_UTC, TIMESTAMP_LOCAL," + \
+            " TEMP, HUM, WIND, WIND_DIR, WIND_GUST, WIND_GUST_DIR, DEW_POINT,"+ \
+            " RAIN, RAIN_RATE, PRESSURE, UV_INDEX) "+ \
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        
+        sql = statement % ("'%s'" % time.strftime(self.time_format, time.gmtime()), 
+       "'%s'" % time.strftime(self.time_format, time.localtime()),
        self.format(sample['temp']), 
        self.format(sample['hum']), 
        self.format(sample['wind']),
