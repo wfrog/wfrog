@@ -1,5 +1,5 @@
 renderer: !template
-    path: templates/default/main.html
+    path: ../wfrender/templates/default/main.html
     mime: text/html
     renderer: !data
         source: !database

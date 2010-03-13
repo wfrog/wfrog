@@ -23,7 +23,7 @@ from pygooglechart import RadarChart
 from pygooglechart import SimpleLineChart
 from math import log
 import math
-import units
+import wfcommon.units
 import webcolors
 import re
 import copy
@@ -216,7 +216,7 @@ class GoogleChartRenderer(object):
 
         assert self.series is not None, "'chart.series' must be set"
 
-        converter = units.Converter(context["units"])
+        converter = wfcommon.units.Converter(context["units"])
 
         # merge builtin defaults, context and renderer config
         config = ChartConfig()
@@ -542,7 +542,7 @@ class GoogleChartWindRadarRenderer(object):
             chart.add_marker(3, -1, "v", _valid_color(bars_config.color), bars_config.thickness, -1)
 
         if config.beaufort:
-            chart.add_marker(0, "220:0.9", "@t"+str(int(round(units.MpsToBft(current_noscale)))), _valid_color(beaufort_config.color) + "%02x" % (beaufort_config.intensity*255), rmin(config.height, config.width)-config.size*5, -1)
+            chart.add_marker(0, "220:0.9", "@t"+str(int(round(wfcommon.units.MpsToBft(current_noscale)))), _valid_color(beaufort_config.color) + "%02x" % (beaufort_config.intensity*255), rmin(config.height, config.width)-config.size*5, -1)
 
         colors = ["00000000",
             _valid_color(tail_config.color),

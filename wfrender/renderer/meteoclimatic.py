@@ -17,8 +17,6 @@
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import math
-import renderer
-import units
 import logging
 import sys
 import time

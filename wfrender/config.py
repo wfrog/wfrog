@@ -36,14 +36,14 @@ import dict
 class RendererConfigurer(wfcommon.config.Configurer):
     """Returns a configuration read from a yaml file (default to wfrender.yaml in cwd)"""
 
-    DEFAULT_CONFIG = "config/wfrender.yaml"
-
     watcher_running = False
     builtins = [ "renderer", "datasource" ]
     extensions = {}
     logger=logging.getLogger("config")
 
-    def __init__(self, opt_parser):
+    embedded = False
+
+    def __init__(self, opt_parser, config_file=None):
         # Prepare the configurer
         module_map = (
             ( "Renderers" , renderer),
@@ -51,14 +51,21 @@ class RendererConfigurer(wfcommon.config.Configurer):
             ( "Storages" , wfcommon.storage ),
             ( "Generic Elements", wfcommon.generic)
         )
-        wfcommon.config.Configurer.__init__(self, self.DEFAULT_CONFIG, module_map)
+        
+        if config_file:
+            self.embedded = True
+        else:
+            config_file = "config/wfrender.yaml"
+            self.embedded = False
+        
+        wfcommon.config.Configurer.__init__(self, config_file, module_map)
         self.add_options(opt_parser)
         opt_parser.add_option("-r", "--reload-config", action="store_true", dest="reload_config", help="Reloads the yaml configuration if it changes during execution")
         opt_parser.add_option("-R", "--reload-modules", action="store_true", dest="reload_mod", help="Reloads the data source, renderer and extension modules if they change during execution")
         opt_parser.add_option("-c", "--command", dest="command", help="A command to execute after automatic reload. Useful to trigger events during development such as browser reload.")
 
     def configure_engine(self, engine, options, args, init):
-        (config, config_context) = self.configure(options, engine, log_conf=init)
+        (config, config_context) = self.configure(options, engine, log_conf=(not self.embedded and init))
 
         engine.root_renderer = config["renderer"]
 

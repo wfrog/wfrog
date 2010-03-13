@@ -16,7 +16,7 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import units
+import wfcommon.units
 import logging
 
 class ValueRenderer(object):
@@ -52,5 +52,5 @@ class ValueRenderer(object):
             if self.select == "value":
                 val_key = self.value if self.value else 'value'
                 self.logger.debug("Getting value for '"+self.key+"."+val_key+"'")
-                return units.Converter(context["units"]).convert(self.key, data[self.key][val_key])
+                return wfcommon.units.Converter(context["units"]).convert(self.key, data[self.key][val_key])
 

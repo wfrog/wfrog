@@ -17,7 +17,6 @@
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import ftplib
-import renderer
 import logging
 import time
 
@@ -56,7 +55,6 @@ class FtpRenderer(object):
     logger = logging.getLogger("renderer.ftp")
 
     def render(self, data={}, context={}):
-        renderer.assert_renderer_dict('renderers', self.renderers)
         assert self.host is not None, "'ftp.host' must be set"
         assert self.username is not None, "'ftp.username' must be set"
         assert self.password is not None, "'ftp.password' must be set"

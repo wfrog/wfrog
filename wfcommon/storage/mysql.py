@@ -16,15 +16,8 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import yaml
+import logging
+import wfcommon.base
 
-import stdio
-import http
-
-# YAML Mappings
-
-class YamlStdioOutput(stdio.StdioOutput, yaml.YAMLObject):
-    yaml_tag = '!stdio-out'
-    
-class YamlHttpOutput(http.HttpOutput, yaml.YAMLObject):
-    yaml_tag = '!http-out'
+class MysqlStorage(wfcommon.base.DatabaseStorage):
+    pass
