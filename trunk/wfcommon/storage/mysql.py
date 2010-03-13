@@ -18,6 +18,37 @@
 
 import logging
 import wfcommon.base
+import wfcommon.database
 
 class MysqlStorage(wfcommon.base.DatabaseStorage):
-    pass
+    '''
+    Stores sample data in a MySQL database table.
+    
+    [ Properties ]
+    
+    database [string] (optional):
+        Name of the database. defaults to 'wfrog'.
+        
+    host [string] (optional):
+        Database host. Defaults to 'localhost'.
+        
+    port [string] (optional):
+        Database TCP port.
+        
+    user [string] (optional):
+        Database usename. Defaults to 'root'.
+        
+    password [string] (optional):
+        Database user password. Defaults to 'root'.    
+    '''
+
+    database = 'wfrog'
+    host = 'localhost'
+    port = 3306
+    user = 'root'
+    password = 'root'
+
+    logger = logging.getLogger('storage.mysql')
+
+    def init(self):
+        self.db = wfcommon.database.MySQLDB(self.database, self.host, self.port, self.user, self.password)

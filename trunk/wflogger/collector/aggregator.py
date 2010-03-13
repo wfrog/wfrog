@@ -34,7 +34,7 @@ class AggregatorCollector(base.BaseCollector):
     
     storage = None
   
-    _logger = logging.getLogger('collector.aggregator')
+    logger = logging.getLogger('collector.aggregator')
 
     ## Init internal data
     _temp_last = None
@@ -72,7 +72,7 @@ class AggregatorCollector(base.BaseCollector):
         ## UV
         self._uv_index = None
         ## Log
-        self._logger.info ('New period')
+        self.logger.info ('New period')
 
 
     def _report_rain(self, total, rate):
@@ -126,12 +126,12 @@ class AggregatorCollector(base.BaseCollector):
             
             data['temp'] = round(sum(self._temp)/len(self._temp), 1)
         else:
-            self._logger.warning('Missing temperature data')
+            self.logger.warning('Missing temperature data')
 
         if len(self._hum) > 0:
             data['hum'] = round(sum(self._hum)/len(self._hum), 1)
         else:
-            self._logger.warning('Missing humidity data')
+            self.logger.warning('Missing humidity data')
             
         if len(self._wind) > 0:
             data['wind'] = round(sum(self._wind)/len(self._wind), 1)
@@ -145,7 +145,7 @@ class AggregatorCollector(base.BaseCollector):
             else:
                 data['wind_gust'] = round(data['wind'], 1)
         else:
-            self._logger.warning('Missing wind data')            
+            self.logger.warning('Missing wind data')            
             
         if self._rain_first is not None:
             if self._rain_last > self._rain_first:
@@ -155,14 +155,14 @@ class AggregatorCollector(base.BaseCollector):
                 data['rain'] = 0.0
                 data['rain_rate'] = 0.0        
         else:
-            self._logger.warning('Missing rain data')
+            self.logger.warning('Missing rain data')
             
         if len(self._pressure) > 0:
             ## QFF pressure (Sea Level Pressure)
             pressure = round(sum(self._pressure)/len(self._pressure), 1)
             data['pressure'] = pressure
         else:
-            self._logger.warning('Missing pressure data')            
+            self.logger.warning('Missing pressure data')            
 
         if data['temp'] and data['hum']:
             ## Dew Point
@@ -172,7 +172,7 @@ class AggregatorCollector(base.BaseCollector):
         if self._uv_index != None:
             data['uv_index'] = int(self._uv_index)
 
-        self._logger.debug('data = %s', data)
+        self.logger.debug('data = %s', data)
    
         return data    
     
@@ -181,6 +181,8 @@ class AggregatorCollector(base.BaseCollector):
         self._new_period()
         
         sample['timestamp'] = time.localtime()
+            
+        self.logger.debug("Flushing sample: "+repr(sample))
             
         self.storage.write_sample(sample, context=context)
 
