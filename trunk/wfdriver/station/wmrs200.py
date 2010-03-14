@@ -61,6 +61,7 @@ class WMRS200Station(BaseStation):
         return reduce(lambda a, b: a + b, map(lambda a: "%02X " % a, d))
 
     def _search_device(self, vendor_id, product_id):
+        import usb
         for bus in usb.busses():
             for dev in bus.devices:
                 if dev.idVendor == vendor_id and dev.idProduct == product_id:
@@ -121,6 +122,7 @@ class WMRS200Station(BaseStation):
             time.sleep(10)
 
     def _run(self, devh):
+        import usb
         ## Initialize internal data
         self._WMRS200_record_types = {
             0x41: (17, 'Rain', self._parse_rain_record),
