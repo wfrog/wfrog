@@ -1,4 +1,4 @@
-## Copyright 2009 Laurent Bovet <lbovet@windmaster.ch>
+## Copyright 2009 Laurent Bovet <laurent.bovet@windmaster.ch>
 ##                Jordi Puigsegur <jordi.puigsegur@gmail.com>
 ##
 ##  This file is part of WFrog
