@@ -22,7 +22,7 @@ import logging
 
 class HttpOutput(object):
     '''
-    Sends the events using HTTP post according to WESTEP's HTTP transport.
+    Sends the events using HTTP post according to WESTEP HTTP transport.
 
     [ Properties ]
 
