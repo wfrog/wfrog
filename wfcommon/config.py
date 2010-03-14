@@ -52,7 +52,8 @@ class Configurer(object):
                 self.logger.debug("Loading extension module '"+ext+"'")
                 self.extensions[ext]=__import__(ext)
         if options.help_list:
-            print component.__doc__
+            if component.__doc__ is not None:
+                print component.__doc__
             # Adds logger documentation
             print self.log_configurer.__doc__
             for (k,v) in self.module_map:
