@@ -19,7 +19,6 @@
 import logging
 import base
 import time
-import wfcommon.WxUtils
 from lxml import etree
 from lxml.builder import E
 
