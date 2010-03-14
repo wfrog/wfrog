@@ -17,10 +17,10 @@
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import wfcommon.base
+import base
 import wfcommon.database
 
-class MysqlStorage(wfcommon.base.DatabaseStorage):
+class MysqlStorage(base.DatabaseStorage):
     '''
     Stores sample data in a MySQL database table.
     

@@ -31,7 +31,7 @@ from threading import Thread
 import inspect
 import logging
 import traceback
-import dict
+import wfcommon.dict
 
 class RendererConfigurer(wfcommon.config.Configurer):
     """Returns a configuration read from a yaml file (default to wfrender.yaml in cwd)"""
@@ -69,7 +69,7 @@ class RendererConfigurer(wfcommon.config.Configurer):
 
         engine.root_renderer = config["renderer"]
 
-        engine.initial_context = dict.merge(engine.initial_context, config_context)
+        engine.initial_context = wfcommon.dict.merge(engine.initial_context, config_context)
 
         if ( options.reload_config or options.reload_mod) and not self.watcher_running:
             self.watcher_running = True

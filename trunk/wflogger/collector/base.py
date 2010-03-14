@@ -20,26 +20,6 @@ import logging
 import wfcommon.meteo
 import datetime
 
-class XmlInput(object):
-    '''
-    Base class for inputs receiving events as WESTEP XML messages.
-    '''
-    
-    send_event = None
-    
-    logger = logging.getLogger("input.xml")
-    
-    def run(self, send_event):
-        self.send_event = send_event
-        self.do_run()
-    
-    def process_message(self, message):
-        from lxml import objectify
-        event = objectify.XML(message)
-        event._type = event.tag
-        self.logger.debug("Received: "+message)
-        self.send_event(event)
-
 class Average(object):
     sum = 0
     count = 0
