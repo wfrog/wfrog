@@ -30,6 +30,7 @@ import optparse
 import logging
 import logging.handlers
 import wfcommon.units
+from wfcommon.config import wfrog_version
 
 class RenderEngine(object):
     '''
@@ -45,7 +46,7 @@ renderer [renderer]:
 
     root_renderer = None
     configurer = None
-    initial_context = { "version": "0.1", "units" : wfcommon.units.reference }
+    initial_context = { "version": wfrog_version, "units" : wfcommon.units.reference }
     initial_data = {}
     daemon = False
     output = False

@@ -23,6 +23,8 @@ import inspect
 import sys
 import copy
 
+wfrog_version = "0.5"
+
 class Configurer(object):
 
     default_filename = None
