@@ -27,8 +27,7 @@
 ##       GENERATE CRITICAL LOG ENTRIES FOR LOW BATTERY LEVEL (ONE ALARM PER DAY!)
 ##       ALLOW CONFIG TO SPECIFY WHICH temp/hum SENSOR(S) SHOULD BE USED
 
-import wfcommon.utils 
-import serial
+import wfcommon.utils
 import logging
 import time
 import threading
@@ -57,6 +56,7 @@ class WMR928NXStation(BaseStation):
         return(bcd & 0xf) + ((bcd & 0xf0) >> 4) * 10
 
     def run(self):
+        import serial
         # Initialize injected functions used by BaseStation
         self.generate_event = generate_event
         self.send_event = send_event        
