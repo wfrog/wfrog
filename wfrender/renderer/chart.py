@@ -56,8 +56,8 @@ class ChartConfig(object):
     height = 150
     bgcolor = '00000000'
     ymargin = [ 1, 1 ]
-    axes = 'on'
-    ticks = 'on'
+    axes = True
+    ticks = True
     legend = None
     legend_pos = 'b'
     nval = 100
@@ -70,7 +70,7 @@ class ChartConfig(object):
     fill = None # fill color of the arrow
     style = 'v' # for markers
     dash = None
-    interpolate = 'off' # line series interpolation of missing values.
+    interpolate = False # line series interpolation of missing values.
 
     # Series
     area = None
@@ -118,8 +118,8 @@ class GoogleChartRenderer(object):
         'temp.avg'. Value contains a dictionary of rendering options. See
         below the available options and their scope.
 
-    axes [on|off] (optional):
-        Display or not the axes. Defaults to 'on'.
+    axes [true|false] (optional):
+        Display or not the axes. Defaults to 'true'.
 
     height [numeric] (optional):
         Height in pixels of the generated graph image. Defaults to 125.
@@ -133,8 +133,8 @@ class GoogleChartRenderer(object):
         Maximum resolution of the graph, in order to avoid too much
         values in the Google Chart URL. Defaults to 100.
 
-    ticks [on|off] (optional):
-        Display or not the tick alon the axes. Defaults to 'on'.
+    ticks [true|false] (optional):
+        Display or not the tick alon the axes. Defaults to 'true'.
 
     width [numeric] (optional):
         Width in pixels of the generated graph image. Defaults to 250.
@@ -189,8 +189,8 @@ class GoogleChartRenderer(object):
         represents the length of dash elements, the second the space
         between them.
 
-    interpolate (G, S) [on|off]:
-        If 'on', draw a continuous line instead of blank for missing
+    interpolate (G, S) [true|false]:
+        If 'true', draw a continuous line instead of blank for missing
         values. This is useful when the chart resolution is finer than
         the sampling period.
 
@@ -260,7 +260,7 @@ class GoogleChartRenderer(object):
             if flat(serie_data):
                 continue
 
-            if serie_config.interpolate == 'on':
+            if serie_config.interpolate:
                 serie_data = interpolate(serie_data)
 
             # Compute min and max value for the serie and the whole chart
@@ -388,7 +388,7 @@ class GoogleChartRenderer(object):
         if self.labels:
             labels_data = data[self.labels.split('.')[0]]['series'][self.labels.split('.')[1]]
             labels_data = compress_to(labels_data, config.nval, None, None)[0]
-            if config.axes == 'on':
+            if config.axes:
                 density = 1.0 * len("".join(labels_data))*config.size  / config.width
 
                 if density > LABEL_DENSITY_THRESHOLD:
@@ -396,7 +396,7 @@ class GoogleChartRenderer(object):
                         if i % round(density) != 0:
                             labels_data[i] = ' '
                 chart.set_axis_labels(Axis.BOTTOM, labels_data)
-                chart.set_axis_style(1, _valid_color(config.text), config.size, 0, Axis.BOTH if config.ticks == 'on' else Axis.AXIS_LINES)
+                chart.set_axis_style(1, _valid_color(config.text), config.size, 0, Axis.BOTH if config.ticks else Axis.AXIS_LINES)
             else:
                 chart.set_axis_labels(Axis.BOTTOM, [])
                 chart.set_axis_style(1, _valid_color(config.text), config.size, 0, Axis.TICK_MARKS, _valid_color(config.bgcolor))
@@ -683,7 +683,7 @@ def flat(data):
             return False
     return True
 
-def interpolate(data):
+def interpolate(data):    
     result = copy.copy(data)
     (last, index, count) = (None, None, 0)
     for i,val in enumerate(data):

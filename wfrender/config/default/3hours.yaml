@@ -12,4 +12,4 @@ renderer: !template
                 chart: !include
                     path: default/charts.yaml
                     variables:
-                        interpolate: on
+                        interpolate: true
