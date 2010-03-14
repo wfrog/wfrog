@@ -14,4 +14,12 @@ renderer: !http
         365days.html: !include
             path: default/365days.yaml
             
-    
+logging:
+    level: info    
+    handlers:
+        default:
+            level: debug
+            handler: !include 
+                path: ../../wfcommon/config/loghandler.yaml
+                variables:
+                    process: wfrender
