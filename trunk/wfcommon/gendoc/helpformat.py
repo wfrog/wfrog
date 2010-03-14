@@ -134,7 +134,7 @@ def treat_line(buffer, line, output, context):
     return buffer
 
 def write_header(output):
-    output.write('<html><body>')
+    output.write('<html><head><title>wfrog - configuration</title></head><body>')
 
 
 def write_footer(output):

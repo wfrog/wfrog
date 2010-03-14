@@ -23,7 +23,7 @@ import sys
 
 class StdioInput(base.XmlInput):
     """
-    Receives events on standard input according to WESTEP'S STDIO transport.
+    Receives events on standard input according to WESTEP STDIO transport.
     """
 
     logger = logging.getLogger('input.stdio')

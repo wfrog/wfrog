@@ -20,7 +20,7 @@ import sys
 
 class StdioOutput(object):
     '''
-    Send events to the standard output according to WESTEP's STDIO transport.
+    Send events to the standard output according to WESTEP STDIO transport.
     '''
 
     def send_event(self, event):

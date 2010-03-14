@@ -56,7 +56,7 @@ class HTTPEventHandler(BaseHTTPRequestHandler):
 
 class HttpInput(base.XmlInput):
     """
-    Listen to HTTP events according to WESTEP'S HTTP transport.
+    Listen to HTTP events according to WESTEP HTTP transport.
 
     [ Properties ]
     
