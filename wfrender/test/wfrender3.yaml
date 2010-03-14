@@ -1,12 +1,12 @@
 context: {}
 renderer: !multi
     parallel: true
-    children:
+    renderers:
         one: !scheduler
-            period: 2
+            periodicity: 2
             renderer: !template
                 path: test/hello.txt
         two: !scheduler
-            period: 3
+            periodicity: 3
             renderer: !template
                 path: test/hello.txt

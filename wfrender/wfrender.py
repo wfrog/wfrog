@@ -19,7 +19,7 @@
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Before loading other modules add wfrog directory to sys.path to be able to use wfcommon
+# Before loading other modules add wfrog directory to sys.path to be able to use wfcommon 
 import os.path
 import sys
 if __name__ == "__main__": sys.path.append(os.path.abspath(sys.path[0] + '/..'))
@@ -29,55 +29,58 @@ import copy
 import optparse
 import logging
 import logging.handlers
-import wfcommon.units
-from wfcommon.config import wfrog_version
+import units
+
 
 class RenderEngine(object):
-    '''
-Root Elements
--------------
-
-context [dict] (optional):
-    Contains context values propagated to all renderers during traversal.
-
-renderer [renderer]:
-    Root renderer executed at wfrender execution.
-'''
+    """Entry point of the rendering"""
 
     root_renderer = None
     configurer = None
-    initial_context = { "version": wfrog_version, "units" : wfcommon.units.reference }
+    initial_context = { "version": "0.1", "units" : units.reference }
     initial_data = {}
     daemon = False
     output = False
 
-    logger = logging.getLogger('wfrender')
+    ## Logging setup
+    LOG_FILENAME = '/var/log/wfrender.log'
+    LOG_SIZE = 512000
+    LOG_BACKUPS = 4
+    logger = logging.getLogger()  ## get root logger so that all properties are transfered to all loggers
+    handler = logging.handlers.RotatingFileHandler(
+                      filename=LOG_FILENAME,  maxBytes=int(LOG_SIZE), backupCount=int(LOG_BACKUPS))
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.DEBUG)
 
-    def __init__(self, config_file=None):
+    def __init__(self, configurer=None, main=False):
         """Creates the engine using a specific configurer or a yaml configurer if none specified"""
+        if configurer:
+            self.configurer = configurer
+        else:
+            if main:
+                opt_parser = optparse.OptionParser()
+            self.configurer = config.YamlConfigurer(opt_parser)
+            if main:
+                opt_parser.add_option("-D", "--data", dest="data_string", help="Passes specific data value/pairs to renderers", metavar="key1=value1,key2=value2")
+                opt_parser.add_option("-O", dest="output", action="store_true", help="Outputs the result (if any) on standard output")
+                (options, args) = opt_parser.parse_args()
 
-        opt_parser = optparse.OptionParser()
-        
-        self.configurer = config.RendererConfigurer(opt_parser, config_file)
+                if options.data_string:
+                    pairs = options.data_string.split(',')
+                    for pair in pairs:
+                        pieces = pair.split('=')
+                        assert len(pieces) == 2, "Key-value pair not in the form key=value: %s" % pair
+                        self.initial_data[pieces[0].strip()] = pieces[1].strip()
 
-        opt_parser.add_option("-D", "--data", dest="data_string", help="Passes specific data value/pairs to renderers", metavar="key1=value1,key2=value2")
-        opt_parser.add_option("-O", dest="output", action="store_true", help="Outputs the result (if any) on standard output")
-        (options, args) = opt_parser.parse_args()
+                if options.output:
+                    self.output=True
 
-        if options.data_string:
-            pairs = options.data_string.split(',')
-            for pair in pairs:
-                pieces = pair.split('=')
-                assert len(pieces) == 2, "Key-value pair not in the form key=value: %s" % pair
-                self.initial_data[pieces[0].strip()] = pieces[1].strip()
+        self.reconfigure(options, args)
 
-        if options.output:
-            self.output=True
-
-        self.reconfigure(options, args, init=True)
-
-    def reconfigure(self, options=None, args=[], init=False):
-        self.configurer.configure_engine(self,options, args, init)
+    def reconfigure(self, options=None, args=[]):
+        self.configurer.configure(self,options,args)
 
     def process(self, data=initial_data, context={}):
 
@@ -88,12 +91,12 @@ renderer [renderer]:
                     self.logger.debug("Starting root rendering.")
                     current_context = copy.deepcopy(self.initial_context)
                     current_context.update(context)
-                    self.root_renderer.render(data=data, context=current_context)
+                    self.root_renderer.render(data, current_context)
             else:
                 self.logger.debug("Starting root rendering.")
                 current_context = copy.deepcopy(self.initial_context)
                 current_context.update(context)
-                return self.root_renderer.render(data=data, context=current_context)
+                return self.root_renderer.render(data, current_context)
         except KeyboardInterrupt:
             self.logger.info("Stopping daemon...")
             return
@@ -110,7 +113,7 @@ renderer [renderer]:
             self.daemon = False
 
 if __name__ == "__main__":
-    engine = RenderEngine()
+    engine = RenderEngine(main=True)
     result = engine.process()
     if engine.output:
         print str(result)

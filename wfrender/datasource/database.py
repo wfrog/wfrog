@@ -284,12 +284,12 @@ class DatabaseDataSource(object):
 
             for i in range(0, 16):
                 deg = 22.5*i
-                if sector_map.has_key(deg % 360):
-                    result_data['wind']['sectors']['avg'][i % 16] = result_data['wind']['sectors']['avg'][i % 16] + sector_map[deg % 360][0];
-                    result_data['wind']['sectors']['freq'][i % 16] = result_data['wind']['sectors']['freq'][i % 16] + sector_map[deg % 360][1];
+                if sector_map.has_key(deg):
+                    result_data['wind']['sectors']['avg'][i]=sector_map[deg][0];
+                    result_data['wind']['sectors']['freq'][i]=sector_map[deg][1];
 
-                if sector_gust_map.has_key(deg % 360):
-                    result_data['wind']['sectors']['max'][i % 16] = result_data['wind']['sectors']['max'][i % 16] + sector_gust_map[deg % 360];
+                if sector_gust_map.has_key(deg):
+                    result_data['wind']['sectors']['max'][i]=sector_gust_map[deg];
 
         result_data['wind']['sectors']['freq'] = normalize(result_data['wind']['sectors']['freq'])
 

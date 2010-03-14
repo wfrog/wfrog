@@ -23,11 +23,24 @@ import data
 import file
 import ftp
 import http
+import include
+import multi
 import scheduler
 import template
 import value
 import meteoclimatic
 
+# Assert functions
+def is_renderer(obj):
+    return obj is not None and dir(obj).__contains__('render')
+
+def is_dict(obj):
+    return obj is not None and dir(obj).__contains__('has_key')
+
+def assert_renderer_dict(name, obj):
+    assert is_dict(obj), "'"+name+"' is not a key/value dictionary"
+    for r in obj.keys():
+        assert is_renderer(obj[r]), "'"+name+"."+r+"' is not a renderer"
 
 # YAML mappings
 
@@ -49,7 +62,13 @@ class YamlFtpRenderer(ftp.FtpRenderer, yaml.YAMLObject):
 class YamlHttpRenderer(http.HttpRenderer, yaml.YAMLObject):
     yaml_tag = u'!http'
 
-class YamlSchedulerRenderer(scheduler.SchedulerRenderer, yaml.YAMLObject):
+class YamlIncludeRenderer(include.IncludeRenderer, yaml.YAMLObject):
+    yaml_tag = u'!include'
+
+class YamlMultiRenderer(multi.MultiRenderer, yaml.YAMLObject):
+    yaml_tag = u'!multi'
+
+class YamlMultiRenderer(scheduler.SchedulerRenderer, yaml.YAMLObject):
     yaml_tag = u'!scheduler'
 
 class YamlTemplateRenderer(template.TemplateRenderer, yaml.YAMLObject):

@@ -23,7 +23,8 @@ from pygooglechart import RadarChart
 from pygooglechart import SimpleLineChart
 from math import log
 import math
-import wfcommon.units
+import renderer
+import units
 import webcolors
 import re
 import copy
@@ -55,7 +56,7 @@ class ChartConfig(object):
     width = 250
     height = 150
     bgcolor = '00000000'
-    ymargin = [ 1, 1 ]
+    y_margin = [ 1, 1 ]
     axes = 'on'
     ticks = 'on'
     legend = None
@@ -67,10 +68,11 @@ class ChartConfig(object):
     thickness = 1.5
     text = '8d7641'
     size = 10 # for text and markers
-    fill = None # fill color of the arrow
+    fill = None
     style = 'v' # for markers
     dash = None
-    interpolate = 'off' # line series interpolation of missing values.
+    intensity = 0.5
+    interpolate = False
 
     # Series
     area = None
@@ -88,7 +90,6 @@ class ChartConfig(object):
     radius = 18 # max value for logarithmic scaling
     median = 2.5  # value in the middle of the graph
 
-    intensity = 0.5 # ratio of intensity for wind radar charts
     tail = None
     arrow = { }
     trace = None
@@ -110,101 +111,12 @@ class GoogleChartRenderer(object):
     """
     Renders the data as a google chart URL.
 
-    [ Properties ]
+    Properties
 
-    series [dict]:
+    series:
         Defines which series data are rendered on the chart and
-        their options. Keys follow the format 'measure.serie', e.g.
-        'temp.avg'. Value contains a dictionary of rendering options. See
-        below the available options and their scope.
+        their options.
 
-    axes [on|off] (optional):
-        Display or not the axes. Defaults to 'on'.
-
-    height [numeric] (optional):
-        Height in pixels of the generated graph image. Defaults to 125.
-
-    labels [string] (optional):
-        Defines which data must be used to render the chart labels on
-        the X axis. The value has the format 'measure.lbl', e.g.
-        'temp.label' to specify which data to use.
-
-    nval [numeric] (optional):
-        Maximum resolution of the graph, in order to avoid too much
-        values in the Google Chart URL. Defaults to 100.
-
-    ticks [on|off] (optional):
-        Display or not the tick alon the axes. Defaults to 'on'.
-
-    width [numeric] (optional):
-        Width in pixels of the generated graph image. Defaults to 250.
-
-    ymargin [pair of numeric] (optional):
-        Space to keep above and below the graph extreme values, in
-        graph units. Defaults to [1, 1].
-
-    zero [dict] (optional):
-        Draw an horizontal line at y=0. Makes sense when graph values
-        can be negative. Contains rendering options. For default
-        rendering (a thin gray line), specify an empty dictionary '{}'.
-
-
-    [ Markers ]
-
-    In the scope of a data serie, one can specify markers highlighting
-    some data points:
-
-    min [dict] (optional):
-        The minimum value of the serie.
-
-    max [dict] (optional):
-        The maximum value of the serie.
-
-    last [dict] (optional):
-        The last value of the serie.
-
-
-    [ Rendering Options ]
-
-    Some options are of type 'color'. They can take either
-        - an hexadecimal triplet string, e.g A3F500 (without dash and
-          in upper case.
-        - or a named color defined in the CSS specification, e.g 'blue',
-          'red', 'wheat', ...
-
-    Rendering options are always optional and can be used in
-    different scope:
-        - (G) the whole graph
-        - (S) a given data serie
-        - (M) a marker
-
-    bgcolor (G) [color]:
-        Background color of the graph.
-
-    color (G, S, M) [color]:
-        Foreground color of the line or bar.
-
-    dash (G, S) [pair of numeric]:
-        If present, write a dashed line for the serie. The first value
-        represents the length of dash elements, the second the space
-        between them.
-
-    interpolate (G, S) [on|off]:
-        If 'on', draw a continuous line instead of blank for missing
-        values. This is useful when the chart resolution is finer than
-        the sampling period.
-
-    order (S) [numeric]:
-        Defines in which orders series are drawn on the graph.
-
-    size (G, S, M) [numeric]:
-        Text size. Defaults to 10.
-
-    text (G, S, M) [color]:
-        Foreground color of the text.
-
-    thickness (G, S, M) [numeric]:
-        Pixel thickness of the line.
     """
 
     series = None
@@ -215,8 +127,9 @@ class GoogleChartRenderer(object):
     def render(self,data={}, context={}):
 
         assert self.series is not None, "'chart.series' must be set"
+        assert renderer.is_dict(self.series), "'chart.series' must be a key/value dictionary"
 
-        converter = wfcommon.units.Converter(context["units"])
+        converter = units.Converter(context["units"])
 
         # merge builtin defaults, context and renderer config
         config = ChartConfig()
@@ -256,11 +169,11 @@ class GoogleChartRenderer(object):
             serie_config.__dict__.update(serie)
             serie_data = data[key.split('.')[0]]['series'][key.split('.')[1]]
             measure = key.split('.')[0]
-
+            
             if flat(serie_data):
                 continue
-
-            if serie_config.interpolate == 'on':
+                          
+            if serie_config.interpolate:
                 serie_data = interpolate(serie_data)
 
             # Compute min and max value for the serie and the whole chart
@@ -349,12 +262,12 @@ class GoogleChartRenderer(object):
             index = index + 1
 
         # Compute vertical range
-
+        
         if config.axes:
             range_min_ref_units = 0
             if not chart_min == sys.maxint and not chart_max == -sys.maxint:
-                range_min = chart_min-config.ymargin[0]
-                range_max = chart_max+config.ymargin[1]
+                range_min = chart_min-config.y_margin[0]
+                range_max = chart_max+config.y_margin[1]
                 range_min_target_units = math.floor(converter.convert(measure, range_min))
                 range_max_target_units = math.ceil(converter.convert(measure, range_max))
                 range_min_ref_units = converter.convert_back(measure, range_min_target_units)
@@ -374,7 +287,7 @@ class GoogleChartRenderer(object):
             zero_config = ChartConfig()
             zero_config.__dict__.update(config.__dict__)
             zero_config.__dict__.update(config.zero)
-            chart.add_data([0]*2)
+            chart.add_data([0]*2)                        
             colors.append(_valid_color(zero_config.color))
             chart.set_line_style(index, zero_config.thickness)
 
@@ -409,16 +322,7 @@ class GoogleChartRenderer(object):
 
 class GoogleChartWindRadarRenderer(object):
     """
-    Renders wind data as a radar google chart URL.
-
-    [ Properties ]
-
-    series [dict]:
-        Defines which series data are rendered on the chart and
-        their options. Keys follow the format 'measure.serie', e.g.
-        'temp.avg'. Value contains a dictionary of rendering options. See
-        below the available options and their scope.
-
+    Renders wind data as a radar google chart URL
     """
 
     key = 'wind'
@@ -490,15 +394,15 @@ class GoogleChartWindRadarRenderer(object):
         # Prepare data
 
         max = config.median * 2
-
+        
         if data[self.key].has_key('value'):
             current_noscale = data[self.key]['value']
             last_gust_noscale = data[self.key]['max']
             pos = int(round(data[self.key]['deg'] * 16 / 360.0))
-            if pos == 16: pos = 0
+            if pos == 16: pos = 0          
             current = self.scale(current_noscale, config.median, config.radius)
             last_gust_scaled = self.scale(last_gust_noscale, config.median, config.radius)
-            arrow_thickness = 0.3+3.0*arrow_config.thickness*current/max
+            arrow_thickness = 0.3+3.0*arrow_config.thickness*current/max            
 
         if config.bars or config.areas or config.sectors:
             avg = []
@@ -542,7 +446,7 @@ class GoogleChartWindRadarRenderer(object):
             chart.add_marker(3, -1, "v", _valid_color(bars_config.color), bars_config.thickness, -1)
 
         if config.beaufort:
-            chart.add_marker(0, "220:0.9", "@t"+str(int(round(wfcommon.units.MpsToBft(current_noscale)))), _valid_color(beaufort_config.color) + "%02x" % (beaufort_config.intensity*255), rmin(config.height, config.width)-config.size*5, -1)
+            chart.add_marker(0, "220:0.9", "@t"+str(int(round(units.MpsToBft(current_noscale)))), _valid_color(beaufort_config.color) + "%02x" % (beaufort_config.intensity*255), rmin(config.height, config.width)-config.size*5, -1)
 
         colors = ["00000000",
             _valid_color(tail_config.color),
@@ -593,7 +497,7 @@ class GoogleChartWindRadarRenderer(object):
             chart.add_fill_range(_valid_color(arrow_config.fill), 6, 0)
 
         chart.set_colours( colors )
-
+        
         if config.axes:
             chart.set_axis_labels(Axis.BOTTOM, ['N', '', 'NE', '', 'E', '', 'SE', '', 'S', '', 'SW', '', 'W', '', 'NW', ''])
             chart.set_axis_style(0, _valid_color(config.text), config.size, 0, 'l', _valid_color(config.bgcolor));
@@ -610,7 +514,7 @@ class GoogleChartWindRadarRenderer(object):
         else:
             chart.set_line_style(5, 0)
             chart.set_line_style(6, 0)
-
+            
 
         chart.fill_solid(Chart.BACKGROUND, _valid_color(config.bgcolor))
 
@@ -679,7 +583,7 @@ def flat(data):
     if len(data)==0:
         return true
     for d in data:
-        if d and not d==0:
+        if d and not d==0: 
             return False
     return True
 
@@ -711,7 +615,7 @@ def compress_to(data, n, min_index, max_index):
         if r < 2:
             r = 2
         (data, new_min_index, new_max_index) = compress(data, r, min_index, max_index)
-        #print "compressed to "+str(len(data))
+        #print "compressed to "+str(len(data))        
 
     return (data, new_min_index, new_max_index)
 
@@ -725,7 +629,7 @@ def compress(data, ratio, min_index, max_index):
     max = None
     for i, v in enumerate(data):
         if i == max_index:
-            max=v
+            max=v            
         if i == min_index:
             min=v
         if v:

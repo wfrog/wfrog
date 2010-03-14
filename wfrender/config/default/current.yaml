@@ -2,7 +2,7 @@ renderer: !data
     source: !currentxml
         path: /tmp/current_conditions.xml
     renderer: !multi
-        children:
+        renderers:
             temp0: !value { key: temp0 }
             hum0: !value { key: hum0 }
             temp1: !value { key: temp1 }
@@ -11,7 +11,7 @@ renderer: !data
             rain: !value { key: rain }
             timestamp: !value { key: info, value: timestamp }
             wind: !multi
-                children:
+                renderers:
                     speed: !value { key: wind }
                     gust: !value { key: wind, value: max }
                     dir: !windradar

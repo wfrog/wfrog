@@ -16,16 +16,11 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-## TODO: Test exhaustively all functions from WxUtils. 
-##       So far only the ones used by WFROG have been tested.
+## Translation to Python of uWxUtils (http://www.softwx.com/weather/uwxutils.html)
+## by Jordi Puigsegur (jordi.puigsegur@gmail.com)
 
-import math
-
-
-###########################################################################################
-## 1) This first part of this file is a translation to Python of  
-##    uWxUtils (http://www.softwx.com/weather/uwxutils.html)      
-###########################################################################################
+## TODO: Test exhaustively all functions. So far only the ones used by WFROG have been
+## tested.
 
 ## ----------------------------------------------------------------------------------------
 ## This source code may be freely used, including for commercial purposes
@@ -43,22 +38,22 @@ import math
 ##    Sea Level Pressure (QFF)  Station Pressure adjusted for elevation, temperature and humidity
 ##
 ##  Notes about input parameters:
-##  currentTemp -     current instantaneous station temperature
-##  meanTemp -        average of current temp and the temperature 12 hours in
+##    currentTemp -   current instantaneous station temperature
+##    meanTemp -      average of current temp and the temperature 12 hours in
 ##                    the past. If the 12 hour temp is not known, simply pass
 ##                    the same value as currentTemp for the mean temp.
-##  humidity -        Value should be 0 to 100. For the pressure conversion
+##    humidity -      Value should be 0 to 100. For the pressure conversion
 ##                    functions, pass a value of zero if you do not want to
 ##                    the algorithm to include the humidity correction factor
 ##                    in the calculation. If you provide a humidity value
 ##                    > 0, then humidity effect will be included in the
 ##                    calculation.
-##  elevation -       This should be the geometric altitude of the station
+##   elevation -     This should be the geometric altitude of the station
 ##                    (this is the elevation provided by surveys and normally
 ##                    used by people when they speak of elevation). Some
 ##                    algorithms will convert the elevation internally into
 ##                    a geopotential altitude.
-##  sensorElevation - This should be the geometric altitude of the actual
+##    sensorElevation - This should be the geometric altitude of the actual
 ##                    barometric sensor (which could be different than the
 ##                    official station elevation).
 ##
@@ -254,39 +249,34 @@ def DewPoint(tempC, humidity, algorithm = DefaultVapAlgorithm):
 
 def WindChill(tempC, windSpeedKmph):
     """
-    Wind Chill
-    Params:
-        - tempC
-        - windSpeedKmph
-
-    Wind Chill algorithm is only valid for temperatures below 10C and wind speeds
-    above 4,8 Km/h. Outside this range a None value is returned.
+Wind Chill
+Params:
+    - tempC
+    - windSpeedKmph
     
-    see American Meteorological Society Journal
-    see http://www.msc.ec.gc.ca/education/windchill/science_equations_e.cfm
-    see http://www.weather.gov/os/windchill/index.shtml
-    """
+see American Meteorological Society Journal
+see http://www.msc.ec.gc.ca/education/windchill/science_equations_e.cfm
+see http://www.weather.gov/os/windchill/index.shtml
+"""
     if ((tempC >= 10.0) or (windSpeedKmph <= 4.8)):
-        return None
+        return tempC
     else:
         windPow = pow(windSpeedKmph, 0.16)
         return min([tempC, 13.12 + (0.6215 * tempC) - (11.37 * windPow) + (0.3965 * tempC * windPow)])
 
 def HeatIndex(tempC, humidity):
     """
-    Heat Index
-    Params:
-        - tempC
-        - humidity 
+Heat Index
+Params:
+    - tempC
+    - humidity 
+heat index algorithm is only valid for temps above 26.7C / 80F
 
-    Heat index algorithm is only valid for temps above 26.7C / 80F. 
-    Outside this range a None value is returned.
-
-    see http://www.hpc.ncep.noaa.gov/heat_index/hi_equation.html
-    """
+see http://www.hpc.ncep.noaa.gov/heat_index/hi_equation.html
+"""
     tempF = CToF(tempC)
     if (tempF < 80):
-        return None
+        return tempC
     else:
         tSqrd = tempF **2
         hSqrd = humidity ** 2
@@ -307,11 +297,7 @@ def Humidex(tempC, humidity):
 def GeopotentialAltitude(geometricAltitudeM): 
     return (earthRadius45 * 1000 * geometricAltitudeM) / ((earthRadius45 * 1000) + geometricAltitudeM)
 
-
-###########################################################################################
-## 2) Unit conversion functions, translated to Python from  
-##    uWxUtils (http://www.softwx.com/weather/uwxutils.html)      
-###########################################################################################
+## ************** Conversion Functions ******************
 
 def FToC(value): 
     return (((value * 1.0) - 32.0) * 5.0) / 9.0
@@ -349,101 +335,28 @@ def InToMm(value):
 def MmToIn(value): 
     return value / 25.4
 
-def MToKm(value): # Miles !
+def MToKm(value): 
     return value * 1.609344
 
-def KmToM(value): # Miles !
+def KmToM(value): 
     return value / 1.609344
 
+## ************* General Math Functions ****************
 
-
-###########################################################################################
-## 3) Wind calculations
-###########################################################################################
-
-WIND_DIRECTIONS = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW', 'N']
-
-
-# http://www.procdev.com/downloads/windcalcs.zip
-# http://www.webmet.com/met_monitoring/621.html
-
-def WindX(v,d):
-    """
-    Extract X component of wind speed 
-    (X and Y are standard rectangular coordinates, ie X = East, Y = North)
-    """ 
-    if d == None:
-        return 0
-    else:
-        return v * math.cos(2.0 * math.pi * (90.0 - d) / 360.0)
-
-def WindY(v,d):
-    """
-    Extract Y component of wind speed 
-    (X and Y are standard rectangular coordinates, ie X = East, Y = North)
-    """ 
-    if d == None:
-        return 0
-    else:
-        return v * math.sin(2.0 * math.pi * (90.0 - d) / 360.0)
-
-def WindSpeed(x,y):
-    """
-    Obtains composite wind speed from x and y speeds
-    """
-    return math.sqrt(x**2 + y**2) 
-
-
-def WindDir(x,y):
-    """
-    Obtains composite wind direction from x and y speeds
-    """
-    # Calculate polar coordinate angle
-    if x == 0:
-        if y > 0:
-            rAlpha = 90
-        elif y < 0:
-            rAlpha = -90
-        else:
-            rAlpha = 0
-    else:
-        if x > 0 and y > 0:
-            rAlpha = 180 / math.pi * math.atan(y/x)
-        elif x < 0 and y < 0:
-            rAlpha = 180 + 180 / math.pi * math.atan(y/x)
-        elif x > 0 and y < 0:
-            rAlpha = 180 / math.pi * math.atan(y/x)
-        else:
-            rAlpha = -180 + 180 / math.pi * math.atan(y/x)
-    # Convert to compass bearing
-    if rAlpha < 90:
-        return 90 - rAlpha
-    else:
-        return 450 - rAlpha
-
-
-def WindDirTxt(d):
-    """
-    Obtains textual representation of wind direction from a degree value (0 = 360 = N)
-    """
-    if d == None:
-        return ''
-    else:
-        return WIND_DIRECTIONS[int(round(d / 22.5))]
-
-
-def WindPredominantDirection(l):
-    """
-    Given a list of [(speed, dir)] returns predominant wind direction
-    obtained by wind speed vectors composition.
-    """
-    # Step 1: (speed, dir) -> (speed, speedX, speedY)
-    l1 = map(lambda (v,d): (WindX(v,d), WindY(v,d)), l)
-
-    # Step 2: Calculate averages of speed, speedX, and speedY
-    [avg_x, avg_y] = map(lambda L: sum(L)/len(L), zip(* l1))
-
-    # Step 3: return average speed, composite average speed and composite wind direction
-    return WindDir(avg_x, avg_y)
-
+### raise base to the given power (i.e. base**exponent)
+#def Power(base, exponent): 
+#    return base**exponent
+#    if exponent = 0.0:
+#        return 1.0;   ## n**0 = 1
+#    elif (base = 0.0) and (exponent > 0.0):
+#        return 0.0;   ## 0**n = 0, n > 0
+#    else:
+#        return Exp(exponent * Ln(base));
+#
+#def Power10(exponent):
+#    ln10 = 2.302585093; // Ln(10);
+#    if (exponent = 0.0):
+#        return 1.0;
+#    else:
+#        return Exp(exponent * ln10)
 

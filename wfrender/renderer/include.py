@@ -16,21 +16,40 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import renderer
 import yaml
 import logging
 from os import path
 
-from functools import partial
-
 from Cheetah.Template import Template
 
-class ElementWrapper(object):
-    
-    def __getattribute__(self, attr):
-        try:
-            return object.__getattribute__(self, attr)
-        except AttributeError:
-            if attr.startswith('__'):
-                raise AttributeError()
+class IncludeRenderer(object):
+    """
+    Includes another yaml configuration file.
+    The included file must define only one root renderer.
+
+    [ Properties ]
+
+    path:
+        A path to the file to include relative to the main config file.
+    """
+
+    path = None
+    renderer = None
+    variables = None
+
+    logger = logging.getLogger("renderer.include")
+
+    def render(self, data={}, context={}):
+        if not self.renderer:
+            dir_name = path.dirname(context['_yaml_config_file'])
+            abs_path=path.join(dir_name, self.path)
+
+            if self.variables:
+                conf_str = str(Template(file=file(abs_path, "r"), searchList=[self.variables]))
             else:
-                return partial(object.__getattribute__(self, '_call'), attr)
+                conf_str = file(abs_path, "r").read()
+            config = yaml.load(conf_str)
+            self.renderer = config["renderer"]
+
+        return self.renderer.render(data,context)

@@ -1,15 +1,15 @@
 renderer: !template
-    path: ../wfrender/templates/default/main.html
+    path: templates/default/main.html
     mime: text/html
     renderer: !data
-        source: !database
+        source: !database 
             slice: minute
             span: 180
         renderer: !multi
-            children:
+            renderers:
                 current: !include
                     path: default/current.yaml
                 chart: !include
                     path: default/charts.yaml
                     variables:
-                        interpolate: on
+                        interpolate: true

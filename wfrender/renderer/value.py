@@ -16,26 +16,12 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import wfcommon.units
+import units
 import logging
 
 class ValueRenderer(object):
     """
     Returns the main value as a string in the right units according to the context.
-
-    [ Properties ]
-
-    key [string]:
-        Refers to the dictionary key of the data part to render, e.g. 'temp'.
-
-    select [value|last] (optional):
-        Chooses what to render:
-        - value: the 'value' item under the data part. Default.
-        - last: the last element of the chosen serie (see the 'serie'
-          property).
-
-    serie [string] (optional):
-        The chosen serie name (e.g. 'avg') if 'select' is set to 'last'.
     """
 
     key = None
@@ -50,7 +36,7 @@ class ValueRenderer(object):
             return data[self.key]['series'][self.serie][len(data[self.key]['series'][self.serie])-1]
         else:
             if self.select == "value":
-                val_key = self.value if self.value else 'value'
+                val_key = self.value if self.value else 'value'                    
                 self.logger.debug("Getting value for '"+self.key+"."+val_key+"'")
-                return wfcommon.units.Converter(context["units"]).convert(self.key, data[self.key][val_key])
+                return units.Converter(context["units"]).convert(self.key, data[self.key][val_key])
 

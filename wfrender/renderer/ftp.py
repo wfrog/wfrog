@@ -11,12 +11,13 @@
 ##  This program is distributed in the hope that it will be useful,
 ##  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##  GNU General Public License for more details.
+##  GNU General Public License for more details.  
 ##
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import ftplib
+import renderer
 import logging
 import time
 
@@ -26,22 +27,22 @@ class FtpRenderer(object):
 
     [ Properties ]
 
-    renderers [dict]:
+    renderers:
         Renderers providing the filenames to upload.
 
-    host [string]:
+    host:
         FTP site hostname.
 
-    port [numeric] (optional):
+    port: (optional)
         FTP site port. Defaults to 21.
 
-    directory [string] (optional):
+    directory: (optional)
         Location on the FTP site where the files will be uploaded.
 
-    username [string]:
+    username:
         FTP site username.
 
-    password [string]:
+    password:
         FTP site password.
     """
 
@@ -55,14 +56,15 @@ class FtpRenderer(object):
     logger = logging.getLogger("renderer.ftp")
 
     def render(self, data={}, context={}):
+        renderer.assert_renderer_dict('renderers', self.renderers)
         assert self.host is not None, "'ftp.host' must be set"
         assert self.username is not None, "'ftp.username' must be set"
         assert self.password is not None, "'ftp.password' must be set"
 
-        files= {}
+        files= {}        
 
         for key in self.renderers.keys():
-            files[key] = self.renderers[key].render(data=data, context=context)
+            files[key] = self.renderers[key].render(data, context)
 
         errors = 0
         while True:
@@ -87,9 +89,9 @@ class FtpRenderer(object):
                 if errors < 3:
                     self.logger.warning("Error sending files by FTP (retrying in 5 secs.): %s" % str(e))
                     time.sleep(5)
-                else:
+                else: 
                     self.logger.error("Error sending files by FTP (aborting): %s" % str(e))
                     break
-
+                    
 
 

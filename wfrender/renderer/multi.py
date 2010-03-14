@@ -17,56 +17,58 @@
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import wrapper
 import time
 from threading import Thread
 
-class MultiElement(wrapper.ElementWrapper):
+class MultiRenderer(object):
     """
-    Wraps a list of children elements and delegates the method calls to 
-    them. The result of a method call is a dictionary containing the 
-    result of call to the method on each elements indexed by their names.
+    Wraps a list of renderers and delegates the rendering to them.
+    The result is a dictionary containing the result of each rende-
+    rer indexed by names.
+
+    This renderer is closable and will call close on each wrapped
+    renderer.
 
     [ Properties ]
 
-    children:
-        A dictionary in which keys are names and values are the children
-        objects the method calls are delegated to.
+    renderers:
+        A dictionary in which keys are names and values are the renderer
+        objects the rendering is delegated to.
 
     parallel: (optional)
-        Boolean value. True if the children must be called in parallel
+        Boolean value. True if the renderers must be called in parallel
         i.e. each in a separate thread.
-        Useful when using blocking childrens like schedulers or servers.
-        When true, this element returns nothing, it just launches the
-        threads for children method calls and returns.
+        Useful when using blocking renderers like schedulers or http.
+        When true, this renderer returns nothing, it just launches the
+        renderer threads and returns.
 
     """
 
-    children={}
+    renderers={}
     threads = []
     parallel = False
 
-    logger = logging.getLogger('generic.multi')
+    logger = logging.getLogger('renderer.multi')
 
-    def _call(self, attr, *args, **keywords):  
+    def render(self,data,context={}):
         result = {}
-        for name, r in self.children.iteritems():
+        for name, r in self.renderers.iteritems():
             
-            self.logger.debug("Calling "+attr+" on child "+name)
+            self.logger.debug("Rendering "+name)
             
             if self.parallel:
-                thread = Thread( target=lambda : r.__getattribute__(attr).__call__(*args, **keywords) )
+                thread = Thread( target=lambda : r.render(data, context) )
                 self.threads.append(thread)
                 thread.start()
             else:
-                result[name] = r.__getattribute__(attr).__call__(*args, **keywords)
+                result[name] = r.render(data, context)
 
         if self.parallel:
             try:
                 while True:
                     time.sleep(2)
             except KeyboardInterrupt:
-                self.logger.debug("^C received, closing childrens")
+                self.logger.debug("^C received, closing renderers")
                 self.close()
                 raise
 
@@ -78,7 +80,7 @@ class MultiElement(wrapper.ElementWrapper):
             return result
 
     def close(self):
-        for name, r in self.children.iteritems():
+        for name, r in self.renderers.iteritems():
             try:
                 r.close()
             except:
