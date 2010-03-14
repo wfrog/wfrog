@@ -16,19 +16,24 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import yaml
+import logging
 
-import simulator
-import wmrs200
-import wmr928nx
-
-# YAML mappings
-
-class YamlRandomSimulator(simulator.RandomSimulator, yaml.YAMLObject):
-    yaml_tag = u'!random-simulator'
-
-class YamlWMRS200Station(wmrs200.WMRS200Station, yaml.YAMLObject):
-    yaml_tag = u'!wmrs200'
-
-class YamlWMR928NXStation(wmr928nx.WMR928NXStation, yaml.YAMLObject):
-    yaml_tag = u'!wmr928nx'
+class XmlInput(object):
+    '''
+    Base class for inputs receiving events as WESTEP XML messages.
+    '''
+    
+    send_event = None
+    
+    logger = logging.getLogger("input.xml")
+    
+    def run(self, send_event):
+        self.send_event = send_event
+        self.do_run()
+    
+    def process_message(self, message):
+        from lxml import objectify
+        event = objectify.XML(message)
+        event._type = event.tag
+        self.logger.debug("Received: %s ", message)
+        self.send_event(event)

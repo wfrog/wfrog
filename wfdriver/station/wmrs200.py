@@ -52,18 +52,11 @@ vendor_id  = 0xfde
 product_id = 0xca01
 
 class WMRS200Station(BaseStation):
-    def __init__(self, config):
-        BaseStation.__init__(self, config)
-        self._logger = logging.getLogger('station.wmrs200')
+    '''
+    Station driver for the Oregon Scientific WMRS200. Reported to work with WMR100.
+    '''
 
-        ## Initialize internal data
-        self._WMRS200_record_types = {
-            0x41: (17, 'Rain', self._parse_rain_record),
-            0x42: (12, 'Temperature', self._parse_temperature_record),
-            0x46: (8, 'Barometer', self._parse_barometer_record),
-            0x47: (6, 'UV', self._parse_uv_record),
-            0x48: (11, 'Wind', self._parse_wind_record),
-            0x60: (12, 'Clock', self._parse_clock_record)}
+    logger = logging.getLogger('station.wmrs200')
 
     def _list2bytes(self, d):
         return reduce(lambda a, b: a + b, map(lambda a: "%02X " % a, d))
@@ -78,17 +71,17 @@ class WMRS200Station(BaseStation):
         # Initialize injected functions used by BaseStation
         self.generate_event = generate_event
         self.send_event = send_event
-        self._logger.info("Thread started")
+        self.logger.info("Thread started")
         while True:
             try:
-                self._logger.info("USB initialization")
+                self.logger.info("USB initialization")
                 dev = self._search_device(vendor_id, product_id)
                 if dev == None:
                     raise Exception("USB WMRS200 not found (%04X %04X)" % (vendor_id, product_id))
 
-                self._logger.info("USB WMRS200 found")
+                self.logger.info("USB WMRS200 found")
                 devh = dev.open()
-                self._logger.info("USB WMRS200 open")
+                self.logger.info("USB WMRS200 open")
 
                 if sys.platform in ['linux2']:
                     try:
@@ -98,11 +91,11 @@ class WMRS200Station(BaseStation):
                         devh.claimInterface(0)
                 elif sys.platform in ['win32']:
                     #devh.claimInterface(0)
-                    self._logger.critical('Windows is not yet supported: devh.claimInterface() fails')
+                    self.logger.critical('Windows is not yet supported: devh.claimInterface() fails')
                     print 'Windows is not yet supported: devh.claimInterface() fails'
                     exit(1)
                 else:
-                    self._logger.critical('Platform "%s" not yet supported' % sys.platform)
+                    self.logger.critical('Platform "%s" not yet supported' % sys.platform)
                     print 'Platform "%s" not yet supported' % sys.platform
                     exit(1)
 
@@ -115,18 +108,27 @@ class WMRS200Station(BaseStation):
                                 1000)                                       # timeout
 
                 ## Do the actual work
-                self._logger.info("USB WMRS200 initialized")
+                self.logger.info("USB WMRS200 initialized")
                 self._run(devh)
 
             except Exception, e:
-                self._logger.exception("WMRS200 exception: %s" % str(e))
+                self.logger.exception("WMRS200 exception: %s" % str(e))
 
-            self._logger.critical("USB WMRS200 connection failure")
+            self.logger.critical("USB WMRS200 connection failure")
 
             ## Wait 10 seconds
             time.sleep(10)
 
     def _run(self, devh):
+        ## Initialize internal data
+        self._WMRS200_record_types = {
+            0x41: (17, 'Rain', self._parse_rain_record),
+            0x42: (12, 'Temperature', self._parse_temperature_record),
+            0x46: (8, 'Barometer', self._parse_barometer_record),
+            0x47: (6, 'UV', self._parse_uv_record),
+            0x48: (11, 'Wind', self._parse_wind_record),
+            0x60: (12, 'Clock', self._parse_clock_record)}
+        
         input_buffer = []
         errors = 0
         while True:
@@ -139,13 +141,13 @@ class WMRS200Station(BaseStation):
                     errors = 0
                 except usb.USBError, e:
                     if e.args == ('No error',):
-                        self._logger.debug('USBError("No error") exception received. Ignoring...(http://bugs.debian.org/476796)')
+                        self.logger.debug('USBError("No error") exception received. Ignoring...(http://bugs.debian.org/476796)')
                         packet = None
                         time.sleep(1)
                     else:
                         raise e
             except Exception, e:
-                self._logger.exception("Exception reading interrupt: "+ str(e))
+                self.logger.exception("Exception reading interrupt: "+ str(e))
                 errors = errors + 1
                 if errors > 3: break   ## Maximum 3 consecutive errors before reconnection
                 time.sleep(3)
@@ -153,7 +155,7 @@ class WMRS200Station(BaseStation):
             if packet != None:
                 if len(packet) > 0 and packet[0] >= 1 and packet[0] <= 7:   ## Ignore packets with wrong lengths
                     input_buffer += packet[1:packet[0]+1]
-                    self._logger.debug("USB RAW DATA: %s" % self._list2bytes(packet))
+                    self.logger.debug("USB RAW DATA: %s" % self._list2bytes(packet))
 
             if len(input_buffer) > 20:
                 errors = 0
@@ -178,17 +180,17 @@ class WMRS200Station(BaseStation):
                     if endSep < 0:
                         break
                     if startSep > 0:
-                        self._logger.debug("Ignored %d bytes in input", startSep)
+                        self.logger.debug("Ignored %d bytes in input", startSep)
 
                     length = endSep - startSep - 2
                     if length == 0:
-                        self._logger.debug("Warning: zero length message in input")
+                        self.logger.debug("Warning: zero length message in input")
                     else:
                         # Parse the message
                         try:
                             self.parse_record(input_buffer[startSep + 2 : endSep])
                         except:
-                            self._logger.exception("WMRS200 reader exception")
+                            self.logger.exception("WMRS200 reader exception")
 
                     # remove this message from the input queue
                     input_buffer = input_buffer[endSep:]
@@ -203,24 +205,24 @@ class WMRS200Station(BaseStation):
 
         length = len(record)
         if length < 3:
-            self._logger.warning("Record: %s - bad checksum + wrong size", self._list2bytes(record))
+            self.logger.warning("Record: %s - bad checksum + wrong size", self._list2bytes(record))
         else:
             computedChecksum = reduce(lambda x,y: x + y, record[:-2])
             recordChecksum = (record[length - 1] << 8) + record[length - 2]
 
             if recordChecksum != computedChecksum:
-                self._logger.warning("Record: %s - bad checksum", self._list2bytes(record))
+                self.logger.warning("Record: %s - bad checksum", self._list2bytes(record))
             elif record[1] in self._WMRS200_record_types:
                 (expected_length, record_type, record_parser) = self._WMRS200_record_types[record[1]]
                 if expected_length != length:
-                    self._logger.warning("%s Record: %s - wrong length (expected %d, received %d)",
+                    self.logger.warning("%s Record: %s - wrong length (expected %d, received %d)",
                                          record_type, self._list2bytes(record), expected_length, length)
                     return
                 else:
-                    self._logger.debug("%s Record: %s", record_type, self._list2bytes(record))
+                    self.logger.debug("%s Record: %s", record_type, self._list2bytes(record))
                     record_parser(record)
             else:
-                self._logger.warning("Unknown record type: %s", self._list2bytes(record))
+                self.logger.warning("Unknown record type: %s", self._list2bytes(record))
 
     def _parse_clock_record(self, record):
         """
@@ -253,7 +255,7 @@ class WMRS200Station(BaseStation):
         consoleDate = "%d/%d/%d %d:%d" % (day, month, year, hour, minute)
 
         # Log
-        self._logger.info("Clock %s, power: %s, Powered: %s, Battery: %s, RF: %s",
+        self.logger.info("Clock %s, power: %s, Powered: %s, Battery: %s, RF: %s",
                           consoleDate, power, powered, batteryOK, rf)
 
     def _parse_rain_record(self, record):
@@ -292,7 +294,7 @@ class WMRS200Station(BaseStation):
         self._report_rain(total, rate)
 
         # Log
-        self._logger.info("Rain Battery Ok: %s, Rate %g, This Hr %g, This Day %g, Total %g since %4d/%2d/%2d %2d:%2d",
+        self.logger.info("Rain Battery Ok: %s, Rate %g, This Hr %g, This Day %g, Total %g since %4d/%2d/%2d %2d:%2d",
                           batteryOk, rate, thisHour, thisDay, total, yearT, monthT, dayT, hourT, minuteT)
 
     def _parse_wind_record(self, record):
@@ -324,7 +326,7 @@ class WMRS200Station(BaseStation):
         self._report_wind(dirDeg, avgSpeed, gustSpeed)
 
         # Log
-        self._logger.info("Wind batteryOk: %s, direction: %d (%g/%s), gust: %g m/s, avg. speed: %g m/s",
+        self.logger.info("Wind batteryOk: %s, direction: %d (%g/%s), gust: %g m/s, avg. speed: %g m/s",
                           batteryOk, dir, dirDeg, dirStr, gustSpeed, avgSpeed)
 
     def _parse_barometer_record(self, record):
@@ -361,7 +363,7 @@ class WMRS200Station(BaseStation):
         self._report_barometer_absolute(pressure)
 
         # Log
-        self._logger.info("Barometer Forecast: %s, Absolute pressure: %.1f mb, Sea Level Pressure: %.1f", forecastTxt, pressure, seaLevelPressure)
+        self.logger.info("Barometer Forecast: %s, Absolute pressure: %.1f mb, Sea Level Pressure: %.1f", forecastTxt, pressure, seaLevelPressure)
 
     def _parse_temperature_record(self, record):
         """
@@ -404,7 +406,7 @@ class WMRS200Station(BaseStation):
         self._report_temperature(sensor, temp, humidity)
 
         # Log
-        self._logger.info("Temperature %s  Temp.: %g C (%s), Humidity: %d %% (%s), Dew Point: %g C",
+        self.logger.info("Temperature %s  Temp.: %g C (%s), Humidity: %d %% (%s), Dew Point: %g C",
                           sensorName, temp, trendTxt, humidity, comfortLevelTxt, dewPoint)
 
     def _parse_uv_record(self, record):
@@ -426,4 +428,4 @@ class WMRS200Station(BaseStation):
         self._report_uv(uv)
 
         # Log
-        self._logger.info("UV  Battery Ok: %s  UV Index: %d" % (batteryOk, uv))
+        self.logger.info("UV  Battery Ok: %s  UV Index: %d" % (batteryOk, uv))
