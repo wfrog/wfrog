@@ -18,9 +18,12 @@
 
 import logging
 
+import os
 import os.path
 import csv
 import time
+from datetime import datetime
+import sys
 
 class CsvStorage(object):
     '''
@@ -63,5 +66,98 @@ class CsvStorage(object):
         self.logger.debug("Writing row: %s", sample_row)
         
         file.close()
-        
             
+            
+    def traverse_samples(self, callback, from_time=datetime.fromtimestamp(0), to_time=datetime.now(), context={}):        
+        from_timestamp = int(time.mktime(from_time.timetuple()))
+        file = self._position_cursor(from_timestamp)
+        to_timestamp = time.mktime(to_time.timetuple())
+        reader = csv.reader(file)
+        for line in reader:
+            if int(line[0]) < from_timestamp:
+                continue
+            if int(line[0]) > to_timestamp:
+                break
+            sample = {}
+            for i in range(0,len(line)-1):
+                sample[self.columns[i]] = line[i]
+            callback(sample, context)
+        
+    def _position_cursor(self, timestamp):
+        if not os.path.exists(self.path):
+            return None
+       
+        size = os.path.getsize(self.path)
+        
+        step = offset = size / 2
+        
+        file = open(self.path, 'r')
+            
+        while abs(step) > 1:
+
+            last_pos = file.tell()            
+            
+            if last_pos + offset < 0:                
+                break
+            
+            file.seek(offset, os.SEEK_CUR)                        
+                        
+            (current_timestamp, shift) = self._get_timestamp(file)            
+            
+            if current_timestamp is None:
+                file.seek(last_pos)
+                break
+            
+            pos = file.tell()
+                                  
+            if current_timestamp == timestamp:
+                break
+                    
+            if current_timestamp < timestamp:
+                step = abs(step) / 2
+            else:
+                step = - abs(step) / 2
+            
+            offset = step - shift
+            
+        return file
+                  
+    timestamp_length = 10
+                  
+    def _get_timestamp(self, file):
+        skip = file.readline()                
+        shift = len(skip) + len('\n')
+        timestamp_string = file.read(self.timestamp_length)        
+        if(timestamp_string.strip() == ''): # End of file
+            return (None, 0)
+        file.seek(-self.timestamp_length, os.SEEK_CUR)
+        return ( int(timestamp_string), shift)
+    
+    
+def dump(value, context):
+    print repr(value)
+    
+        
+if __name__ == '__main__':
+    
+    s = CsvStorage()
+    
+    s.path = '/tmp/wfrog.csv'
+    
+    timestamp = int(sys.argv[1])
+    
+    f = s._position_cursor(timestamp)
+    
+    if f is not None:
+        print f.readline()
+        f.close()
+    
+    s = CsvStorage()
+    
+    s.path = '/tmp/wfrog.csv'
+
+    format = "%Y-%m-%d %H:%M:%S"
+
+    s.traverse_samples(dump, from_time=datetime.strptime('2010-03-12 23:32:00', format) ,
+        to_time=datetime.strptime('2010-03-12 23:50:00', format))
+    
