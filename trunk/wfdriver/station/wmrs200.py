@@ -355,14 +355,6 @@ class WMRS200Station(BaseStation):
         slpForecast = record[5] >> 4
         slpForecastTxt = forecastMap.get(slpForecast, str(slpForecast))
 
-        # Current Data
-        self._current['barometer.pressure'] = seaLevelPressure
-        self._current['barometer.forecast'] = forecast
-        self._current['barometer.forecastTxt'] = forecastTxt
-        self._current['barometer.seaLevelPressure'] = seaLevelPressure
-        self._current['barometer.slpForecast'] = slpForecast
-        self._current['barometer.slpForecastTxt'] = slpForecastTxt
-
         # Report data
         self._report_barometer_absolute(pressure)
 
