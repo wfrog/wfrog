@@ -19,7 +19,7 @@
 import logging
 import base
 import time
-import wfcommon.WxUtils
+import wfcommon.meteo
 
 class AggregatorCollector(base.BaseCollector):
     '''
@@ -130,7 +130,7 @@ class AggregatorCollector(base.BaseCollector):
             
         if len(self._wind) > 0:
             data['wind'] = round(sum(self._wind)/len(self._wind), 1)
-            data['wind_dir'] = round(wfcommon.WxUtils.WindPredominantDirection(self._wind_dir), 1)
+            data['wind_dir'] = round(wfcommon.meteo.WindPredominantDirection(self._wind_dir), 1)
             data['wind_gust_dir'] = round(self._wind_gust_dir, 1)            
                 
             # Wind gust cannot be smaller than wind average 
@@ -161,7 +161,7 @@ class AggregatorCollector(base.BaseCollector):
 
         if data['temp'] and data['hum']:
             ## Dew Point
-            data['dew_point'] = round(wfcommon.WxUtils.DewPoint(data['temp'], data['hum'], 'vaDavisVP'), 1)
+            data['dew_point'] = round(wfcommon.meteo.DewPoint(data['temp'], data['hum'], 'vaDavisVP'), 1)
             
         ## UV
         if self._uv_index != None:

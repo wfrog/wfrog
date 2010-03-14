@@ -17,7 +17,7 @@
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import wfcommon.WxUtils
+import wfcommon.meteo
 import datetime
 
 class XmlInput(object):
@@ -128,7 +128,7 @@ class BaseCollector(object):
 
     def _report_barometer_absolute(self, pressure, context):
         if self._temp_last != None and self._hum_last != None:
-            seaLevelPressure = wfcommon.WxUtils.StationToSeaLevelPressure(
+            seaLevelPressure = wfcommon.meteo.StationToSeaLevelPressure(
                                   pressure, 
                                   context['altitude'], 
                                   self._temp_last, 
