@@ -1,0 +1,15 @@
+renderer: !template
+    path: templates/default/main.html
+    mime: text/html
+    renderer: !data
+        source: !database 
+            slice: day
+            span: 30
+        renderer: !multi
+            renderers:
+                current: !include
+                    path: default/current.yaml
+                chart: !include
+                    path: default/charts.yaml
+                    variables:
+                        interpolate: false                    

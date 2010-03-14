@@ -1,0 +1,5 @@
+
+renderer: !include
+    path: wfrender6.yaml
+    variables:
+        filename: hello
