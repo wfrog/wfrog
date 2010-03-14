@@ -35,7 +35,6 @@
 from base import BaseStation
 import time
 import logging
-import usb
 import logging
 import threading
 
@@ -68,6 +67,8 @@ class WMRS200Station(BaseStation):
                     return dev
 
     def run(self, generate_event, send_event):
+        import usb
+        
         # Initialize injected functions used by BaseStation
         self.generate_event = generate_event
         self.send_event = send_event
