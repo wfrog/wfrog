@@ -1,5 +1,5 @@
 ## Copyright 2009 Jordi Puigsegur <jordi.puigsegur@gmail.com>
-##                Laurent Bovet <lbovet@windmaster.ch>
+##                Laurent Bovet <laurent.bovet@windmaster.ch>
 ##
 ##  This file is part of WFrog
 ##
