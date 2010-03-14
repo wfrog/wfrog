@@ -280,7 +280,7 @@ class WMR928NXStation(BaseStation):
         weatherStatusTxt = weatherStatusMap.get(weatherStatus, str(weatherStatus))
     
         self._report_barometer_absolute(pressure)
-        self._report_temperature(0, temperature, humidity)        
+        self._report_temperature(temperature, humidity, 0)        
 
         # Log
         if dewPoint == None:
@@ -311,7 +311,7 @@ class WMR928NXStation(BaseStation):
         
         # Report data
         if not overUnder:
-            self._report_temperature(1, temp, humidity)
+            self._report_temperature(temp, humidity, 1)
 
         # Log
         self.logger.info("Temperature  Temp.: %g C, Humidity: %d %%, Dew Point: %g C",

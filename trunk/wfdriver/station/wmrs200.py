@@ -407,7 +407,7 @@ class WMRS200Station(BaseStation):
             dewPoint = dewPoint * -1
 
 
-        self._report_temperature(sensor, temp, humidity)
+        self._report_temperature(temp, humidity, sensor)
 
         # Log
         self.logger.info("Temperature %s  Temp.: %g C (%s), Humidity: %d %% (%s), Dew Point: %g C",
