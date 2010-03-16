@@ -13,7 +13,7 @@ Out-of-the-box, three processes are involved:
    # The Logger with embedded Driver. Reads data from the USB station, logs data into the database. It also maintains a XML file with current conditions.
    # The Renderer. Reads data from the database and/or the XML file and renders it on a web page, either served by an internal web server or sent on a FTP site.
 
-<pre>
+{{{
           +--------------+             +--------------+
           |   Station    |             |   Browser    |
           +--------------+             +--------------+
@@ -41,7 +41,7 @@ Out-of-the-box, three processes are involved:
                           |   Storage   |
                           |             |
                            `-----------'
-</pre>
+}}}
 
 = Installation Guide =
 
