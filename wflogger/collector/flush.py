@@ -26,42 +26,44 @@ class FlushEvent(object):
 
 class FlushCollector(object):
     '''
-    Forwards events to a wrapped collector and periodically issues
-    a 'flush event'.
-    
+    Forwards incoming events to a wrapped collector and periodically issues
+    a 'flush event'. Flush events are issued only together with a forwarded
+    event, there is no internal thread and no flushing occurs during periods
+    where no events are received.
+
     [ Properties ]
-            
+
     collector [collector]:
-        The wrapped collector the events are sent to.
-        
+        The wrapped collector the events are forwarded to.
+
     period [numeric] (optional):
-        Minimal number of seconds between flush events. Defaults to 300.
+        Minimum number of seconds between flush events. Defaults to 300.
     '''
-    
+
     period = 300
     collector = None
-    
+
     last_flush_time = None
-    
+
     logger = logging.getLogger('collector.flush')
-    
+
     def send_event(self, event, context={}):
         if self.collector == None:
             raise Exception('Attribute collector must be set')
-        
+
         current_time = time.time()
-        
+
         # Initialization. Do not flush at startup
         if self.last_flush_time == None:
             self.last_flush_time = current_time
-        
+
         # First flush if needed.
         if self.last_flush_time + self.period <= current_time:
             self.logger.debug('Flushing')
             self.last_flush_time = current_time
-            
+
             self.collector.send_event(FlushEvent(), context)
-        
+
         # Then send the event (but not the ticks).
         if not event._type == '_tick':
             self.collector.send_event(event, context)

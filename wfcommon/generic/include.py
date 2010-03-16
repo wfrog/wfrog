@@ -26,12 +26,12 @@ from Cheetah.Template import Template
 class IncludeElement(wrapper.ElementWrapper):
     """
     Includes another yaml configuration file.
-    The included file must define only one root element.  
+    The included file must define only one root element.
 
     [ Properties ]
 
-    path:
-        A path to the file to include relative to the main config file.
+    path [string]:
+        A path to the file to include. Relative to the main config file.
     """
 
     path = None
@@ -41,13 +41,13 @@ class IncludeElement(wrapper.ElementWrapper):
     logger = logging.getLogger("generic.include")
 
     def _init(self, context=None):
-    
+
         if not self.target:
             if context:
                 config_file = context['_yaml_config_file']
             else:
                 raise Exception('Context not passed to !include element')
-            
+
             dir_name = path.dirname(config_file)
             abs_path=path.join(dir_name, self.path)
 
@@ -57,10 +57,10 @@ class IncludeElement(wrapper.ElementWrapper):
                 conf_str = file(abs_path, "r").read()
             config = yaml.load(conf_str)
             self.target = config.values()[0]
-            
+
             return self.target
-            
-    def _call(self, attr, *args, **keywords):                
+
+    def _call(self, attr, *args, **keywords):
 
         if keywords.has_key('context'):
             self._init(keywords['context'])

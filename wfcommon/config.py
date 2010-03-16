@@ -54,8 +54,6 @@ class Configurer(object):
         if options.help_list:
             if component.__doc__ is not None:
                 print component.__doc__
-            # Adds logger documentation
-            print self.log_configurer.__doc__
             for (k,v) in self.module_map:
                 print k
                 print "-"*len(k) +"\n"
@@ -67,7 +65,9 @@ class Configurer(object):
                     print "[" + ext + "]"
                     print
                     self.print_help(self.extensions[ext])
-            print " Use option -H ELEMENT for help on a particular element"
+            # Adds logger documentation
+            print self.log_configurer.__doc__
+            print " Use option -H ELEMENT for help on a particular !element"
             sys.exit()
         if options.help_element:
             element = options.help_element

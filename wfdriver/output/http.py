@@ -26,7 +26,7 @@ class HttpOutput(object):
 
     [ Properties ]
 
-    url:
+    url [string]:
         Endpoint the events are sent to.
     '''
 
@@ -50,7 +50,7 @@ class HttpOutput(object):
             self.connection = None
             self.logger.critical(self.url+": "+str(e))
             return
-        
+
         if response.status != 200:
             self.logger.critical('HTTP '+response.status+' '+response.reason)
             self.connection = None

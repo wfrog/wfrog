@@ -46,6 +46,30 @@ class TickEvent(object):
         return "*TICK*"
 
 class Logger(object):
+    '''
+Root Elements
+-------------
+
+context [dict] (optional):
+    Contains context values propagated to input and collector.
+
+input [input]:
+    Source of events, usually a listening object receiving events
+    from the driver.
+
+collector [collector]:
+    Where events are forwarded to be logged. Events are forwarded
+    one-by-one, so no concurrency must be handled by the collector.
+
+embed [dict] (optional):
+    Dictionary specifying which module must be run embedded in the same
+    process as the logger. Keys can be 'wfdriver' or 'wfrender'. Values
+    are dictionaries with the following key-values:
+    - config: specifies the configuration file of the embedded module.
+
+logging [logging configuration] (optional):
+    See below the Logging Configuration section.
+'''
 
     logger = logging.getLogger('wflogger')
 
@@ -66,7 +90,7 @@ class Logger(object):
         )
         configurer = wfcommon.config.Configurer("config/wflogger.yaml", module_map)
 
-        # Initialize the option parser        
+        # Initialize the option parser
         opt_parser = optparse.OptionParser()
         configurer.add_options(opt_parser)
 

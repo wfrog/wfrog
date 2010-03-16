@@ -39,6 +39,20 @@ def gen(type):
     return e
 
 class Driver(object):
+    '''
+Root Elements
+-------------
+
+station [station]:
+    Weather station providing the events.
+
+output [output]:
+    Destination of events sent by this driver. Typically a WESTEP
+    connector if running standalone.
+
+logging [logging configuration] (optional):
+    See below the Logging Configuration section.
+'''
 
     logger = logging.getLogger('wfdriver')
 

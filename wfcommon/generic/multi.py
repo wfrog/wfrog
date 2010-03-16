@@ -23,23 +23,23 @@ from threading import Thread
 
 class MultiElement(wrapper.ElementWrapper):
     """
-    Wraps a list of children elements and delegates the method calls to 
-    them. The result of a method call is a dictionary containing the 
-    result of call to the method on each elements indexed by their names.
+    Wraps a list of children elements and delegates the method calls to
+    them. The result of a method call is a dictionary containing the
+    result of call to the method on each child indexed by its name.
 
     [ Properties ]
 
-    children:
+    children [dict]:
         A dictionary in which keys are names and values are the children
         objects the method calls are delegated to.
 
-    parallel: (optional)
-        Boolean value. True if the children must be called in parallel
-        i.e. each in a separate thread.
-        Useful when using blocking childrens like schedulers or servers.
+    parallel [true|false] (optional):
+        True if the children must be called in parallel i.e. each in a
+        separate thread.
+        Useful when using blocking childrens like schedulers or other
+        active components.
         When true, this element returns nothing, it just launches the
         threads for children method calls and returns.
-
     """
 
     children={}
@@ -48,12 +48,12 @@ class MultiElement(wrapper.ElementWrapper):
 
     logger = logging.getLogger('generic.multi')
 
-    def _call(self, attr, *args, **keywords):  
+    def _call(self, attr, *args, **keywords):
         result = {}
         for name, r in self.children.iteritems():
-            
+
             self.logger.debug("Calling "+attr+" on child "+name)
-            
+
             if self.parallel:
                 thread = Thread( target=lambda : r.__getattribute__(attr).__call__(*args, **keywords) )
                 self.threads.append(thread)

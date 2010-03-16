@@ -30,34 +30,35 @@ def element(parent, name):
 
 class XmlFileCollector(base.BaseCollector):
     '''
-    Writes the latest values in an XML file.
-    
+    Keep the latest event values and flush them in an XML file on
+    'flush events'. Should be wrapped in a !flush elements to receive
+    the 'flush events'.
+
     [ Properties ]
-    
+
     path [string]:
         Location of the XML file to write.
-    
     '''
-    
+
     path = None
     doc = None
     initialized = False
-    
-    
+
+
     logger = logging.getLogger('collector.xmlfile')
-    
+
     def init(self):
         if not self.initialized:
-            self.doc = E.current()        
+            self.doc = E.current()
             self.initialized = True
-       
+
     def _report_rain(self, total, rate):
         rain_elt = element(self.doc, 'rain')
         element(rain_elt, 'rate').text = str(rate)
-        
-    def _report_wind(self, avgSpeed, dirDeg, gustSpeed, gustDir):  
+
+    def _report_wind(self, avgSpeed, dirDeg, gustSpeed, gustDir):
         wind_elt = element(self.doc, 'wind')
-        
+
         element(wind_elt, 'avgSpeed').text = str(avgSpeed)
         element(wind_elt, 'dirDeg').text = str(dirDeg)
         element(wind_elt, 'gustSpeed').text = str(gustSpeed)
@@ -73,7 +74,7 @@ class XmlFileCollector(base.BaseCollector):
             temp_elt = element(self.doc, 'th1')
         else:
             return
-        
+
         element(temp_elt, 'temp').text = str(temp)
 
     def _report_humidity(self, humidity, sensor):
@@ -83,22 +84,22 @@ class XmlFileCollector(base.BaseCollector):
             hum_elt = element(self.doc, 'th1')
         else:
             return
-        
+
         element(hum_elt, 'humidity').text = str(humidity)
 
 
     def _report_uv(self, uv_index):
         return
-    
+
     def flush(self, context={}):
-        
+
         time_elt = element(self.doc, 'time')
         time_elt.text = time.strftime("%Y-%m-%d %H:%M:%S")
-        
+
         doc_string = etree.tostring(self.doc)
-        
+
         self.logger.debug("Flushing: %s", doc_string)
-        
-        file = open(self.path, 'w')        
-        file.write(doc_string)        
+
+        file = open(self.path, 'w')
+        file.write(doc_string)
         file.close()
