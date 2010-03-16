@@ -201,7 +201,7 @@ And indent the configuration below so that it is one level below the `render: !t
 
 See the [http://www.windmaster.ch/wfrog/doc Configuration Reference] for details on configuration elements.
 
-The elements used in the configuration file are described in the builtin help, e.g.:
+The configuration reference is also available in the builtin help, e.g.:
 
 {{{
 python wfrender.py --help             # General help
