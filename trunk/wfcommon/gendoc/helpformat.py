@@ -69,6 +69,9 @@ def format(line, context={}):
 
         return '<b>' + result + '<br>'
     elif parse_mark(line) == BULLET:
+        if line.find(':') > 0:
+            line = line.replace(' - ', ' - <b>')
+            line = line.replace(':', '</b>:')
         return '<li>'+format_text(line.replace(' - ', ''))
     elif parse_mark(line) == HIDDEN:
         return ''

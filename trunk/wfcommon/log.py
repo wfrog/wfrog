@@ -29,12 +29,16 @@ levels = {'debug': logging.DEBUG,
           'critical': logging.CRITICAL}
 
 class LogConfigurer(object):
-    '''
-Logging Configuration
+    '''Logging Configuration
 ---------------------
 
 level [debug|info|error|critical]:
     The root level of logging
+
+handlers [dict]:
+    Dictionary configuring handlers. Keys are free names, values are:
+    - handler: A python loghandler object, the actual log destination.
+    - level: Optional log level for this handler.
 '''
 
     def add_options(self, opt_parser):

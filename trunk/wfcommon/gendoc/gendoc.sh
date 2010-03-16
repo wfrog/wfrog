@@ -13,11 +13,11 @@ mkdir -p $DOC_DIR
 function gen_module()
 {
     module=$1
- 
+
      echo "--- $module ---"
-    
+
     mkdir -p $DOC_DIR/$module
-    
+
     python $WFROG_HOME/$module/$module.py -H | python helpformat.py -H "<small><a href='../index.html'>wfrog</a> > <b>$module</b> </small><h1>Configuration of $module</h1>" -F "$footer" > $DOC_DIR/$module/index.html
 
     for i in $(python $WFROG_HOME/$module/$module.py -H | grep "^\!.*" | cut -b2-); do
@@ -33,7 +33,7 @@ done
 cat << EOF > $DOC_DIR/index.html
 
 <html><head><title>wfrog - configuration</title></head><body>
-<small>wfrog</small>
+<small><b>wfrog</b> </small>
 
 <h1>Configuration of wfrog</h1>
 

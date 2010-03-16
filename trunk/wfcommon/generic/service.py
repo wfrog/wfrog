@@ -25,18 +25,17 @@ services = {}
 class ServiceElement(wrapper.ElementWrapper):
     """
     Provides a dictionary of objects global to the python process.
-    Objects are called if they are registered under a name.
+    Objects are registered under a name. Method calls to this element
+    are forwarded to the registered object if an instance has already
+    been registered. The call does nothing, otherwise. Calls never fail.
 
     [ Properties ]
 
     name [string]:
         Name under which an object is registered.
-        
+
     instance [object] (optional):
-        Object to register as a service. If absent, this element
-        makes a lookup of the service. If not found, it behaves silently
-        and does not fail on method calls.
-        
+        Object to register as a service.
     """
 
     name = None
@@ -44,12 +43,12 @@ class ServiceElement(wrapper.ElementWrapper):
 
     logger = logging.getLogger("generic.service")
 
-    def _call(self, attr, *args, **keywords):        
-    
+    def _call(self, attr, *args, **keywords):
+
         assert self.name is not None, "'service.name' must be set"
-        
+
         global services
-        
+
         if self.instance:
             if not services.__contains__(self.name):
                 self.logger.debug('Registering service '+str(self.instance)+" under '" + self.name +"'")

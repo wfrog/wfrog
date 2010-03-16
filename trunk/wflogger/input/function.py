@@ -21,7 +21,9 @@ import wfcommon.generic.wrapper
 
 class FunctionInput(wfcommon.generic.wrapper.ElementWrapper):
     """
-    Input transmitting events received on an anonymous function call.        
+    Input receiving events as method calls. On any method call on this
+    object, the first argument is considered being an event.
+    Usually used as a registered !service.
     """
 
     send_event = None
@@ -31,10 +33,10 @@ class FunctionInput(wfcommon.generic.wrapper.ElementWrapper):
     def run(self, send_event):
         self.send_event = send_event
 
-    def _call(self, attr, *args, **keywords):        
-            
+    def _call(self, attr, *args, **keywords):
+
         if self.send_event:
             self.logger.debug('Calling send_event')
             self.send_event(args[0])
 
-    
+

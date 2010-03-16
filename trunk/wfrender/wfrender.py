@@ -42,6 +42,9 @@ context [dict] (optional):
 
 renderer [renderer]:
     Root renderer executed at wfrender execution.
+
+logging [logging configuration] (optional):
+    See below the Logging Configuration section.
 '''
 
     root_renderer = None
@@ -57,7 +60,7 @@ renderer [renderer]:
         """Creates the engine using a specific configurer or a yaml configurer if none specified"""
 
         opt_parser = optparse.OptionParser()
-        
+
         self.configurer = config.RendererConfigurer(opt_parser, config_file)
 
         opt_parser.add_option("-D", "--data", dest="data_string", help="Passes specific data value/pairs to renderers", metavar="key1=value1,key2=value2")
