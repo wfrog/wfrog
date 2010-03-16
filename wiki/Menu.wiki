@@ -1,12 +1,13 @@
 *Documentation*
-   [Documentation Usage and General Installation Guide]
+[Documentation Usage and General Installation Guide]
+[Configuration Reference http://www.windmaster.ch/wfrog/doc/]
 
 *Platform-Specific Installation*
-   [InstallOnVoyageLinux Installation on Voyage Linux]
-   [InstallOn_Alix3D2_voyageLinux0_6_2 Preparing an ALIX3D2 with Voyage Linux]
+[InstallOnVoyageLinux Installation on Voyage Linux]
+[InstallOn_Alix3D2_voyageLinux0_6_2 Preparing an ALIX3D2 with Voyage Linux]
 
 *Community*
-   [SeeItInAction Online Stations]
+[SeeItInAction Online Stations]
 
 *Design Discussions*
-   [Architecture]
+[Architecture]
