@@ -4,7 +4,7 @@
 
 *Platform-Specific Installation*
   [InstallOnVoyageLinux Installation on Voyage Linux]
-  [InstallOn_Alix3D2_voyageLinux0_6_2 wfrog on ALIX3D2 and Voyage Linux]
+  [InstallOn_Alix3D2_voyageLinux0_6_2 wfrog on ALIX3D2 and Linux]
 
 *Community*
   [SeeItInAction Online Stations]
