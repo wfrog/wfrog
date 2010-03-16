@@ -134,7 +134,6 @@ In `wfrender.yaml`, add a `units:` section in the `context:` section. Example:
 
 {{{
 context:
-    database: { url: 'localhost:/var/lib/firebird/2.0/data/wfrog.db' }
     units: 
         temp: F
         press: mmHg
@@ -205,9 +204,9 @@ See the [http://www.windmaster.ch/wfrog/doc Configuration Reference] for details
 The elements used in the configuration file are described in the builtin help, e.g.:
 
 {{{
-python wfrender.py --help                # General help
-python wfrender.py -L                    # List and descriptions of !elements
-python wfrender.py -H ELEMENT            # Help on a specific element
+python wfrender.py --help             # General help
+python wfrender.py -H                 # List and descriptions of configuration !elements
+python wfrender.py -E ELEMENT         # Help on a specific element
 }}}
 
 <p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
