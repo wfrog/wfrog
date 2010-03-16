@@ -1,6 +1,6 @@
 *Documentation*
 [Documentation Usage and General Installation Guide]
-[Configuration Reference http://www.windmaster.ch/wfrog/doc/]
+[http://www.windmaster.ch/wfrog/doc/ Configuration Reference]
 
 *Platform-Specific Installation*
 [InstallOnVoyageLinux Installation on Voyage Linux]
