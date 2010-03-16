@@ -10,7 +10,7 @@
 Out-of-the-box, three processes are involved:
 
    # The Database.
-   # The Logger. Reads data from the USB station, logs data into the database. It also maintains a XML file with current conditions.
+   # The Logger with embedded Driver. Reads data from the USB station, logs data into the database. It also maintains a XML file with current conditions.
    # The Renderer. Reads data from the database and/or the XML file and renders it on a web page, either served by an internal web server or sent on a FTP site.
 
 = Installation Guide =
@@ -95,7 +95,7 @@ To customize the configuration, create the following config files:
 
 Get example content from the default config files, respectively:
 {{{
-/opt/wfrog/wflogger/src/WxLogger.cfg
+/opt/wfrog/wflogger/config/wflogger.yaml
 /opt/wfrog/wfrender/config/wfrender.yaml
 }}}
 
@@ -103,17 +103,23 @@ If you create `wfrender.conf` from `wfrender.yaml`, you will also need to copy t
 
 = User Manual =
 
-== Logger ==
+== Logger and Driver ==
 
 === Configuration ===
 
-  * Adapt values in `wflogger/src/WxLogger.cfg` (use the database URL you create above)
+Adapt values in 
+
+  *  `wfcommon/config/storage.yaml` (use the database URL you created above)
+  *  `wfdriver/config/wfdriver.yaml` (choose you station)
+  *  `wflogger/config/wflogger.yaml` (set the station altitude)
+
+See the [http://www.windmaster.ch/wfrog/doc Configuration Reference] for details on configuration elements.
 
 === Starting the Logger ===
 
 {{{
-cd wflogger/src
-python WxLogger.py
+cd wflogger
+python wflogger.py
 }}}
 
 == Renderer ==
@@ -194,7 +200,9 @@ And indent the configuration below so that it is one level below the `render: !t
 
 === Getting Help ===
 
-The yaml !elements used in the configuration file are described in the builtin help:
+See the [http://www.windmaster.ch/wfrog/doc Configuration Reference] for details on configuration elements.
+
+The elements used in the configuration file are described in the builtin help, e.g.:
 
 {{{
 python wfrender.py --help                # General help
