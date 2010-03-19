@@ -76,7 +76,7 @@ class CsvStorage(object):
         for line in reader:
             if int(line[0]) < from_timestamp:
                 continue
-            if int(line[0]) => to_timestamp:
+            if int(line[0]) >= to_timestamp:
                 break
             sample = {}
             for i in range(0,len(line)-1):
