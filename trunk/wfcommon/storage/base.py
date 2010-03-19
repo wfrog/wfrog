@@ -23,32 +23,32 @@ class DatabaseStorage(object):
     '''
     Base class for database storages.
     '''
-    
+
     initialized = False
-       
+
     time_format = '%Y-%m-%d %H:%M:%S'
-       
+
     def write_sample(self, sample, context={}):
         if not self.initialized:
             self.init()
             self.initialized = True
-    
+
         statement =  "INSERT INTO METEO (TIMESTAMP_UTC, TIMESTAMP_LOCAL," + \
             " TEMP, HUM, WIND, WIND_DIR, WIND_GUST, WIND_GUST_DIR, DEW_POINT,"+ \
             " RAIN, RAIN_RATE, PRESSURE, UV_INDEX) "+ \
             "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        
-        sql = statement % ("'%s'" % time.strftime(self.time_format, time.gmtime()), 
+
+        sql = statement % ("'%s'" % time.strftime(self.time_format, time.gmtime()),
        "'%s'" % time.strftime(self.time_format, time.localtime()),
-       self.format(sample['temp']), 
-       self.format(sample['hum']), 
+       self.format(sample['temp']),
+       self.format(sample['hum']),
        self.format(sample['wind']),
-       self.format(sample['wind_dir']), 
-       self.format(sample['wind_gust']), 
+       self.format(sample['wind_dir']),
+       self.format(sample['wind_gust']),
        self.format(sample['wind_gust_dir']),
        self.format(sample['dew_point']),
-       self.format(sample['rain']), 
-       self.format(sample['rain_rate']), 
+       self.format(sample['rain']),
+       self.format(sample['rain_rate']),
        self.format(sample['pressure']),
        self.format(sample['uv_index']))
         try:
@@ -64,16 +64,16 @@ class DatabaseStorage(object):
         if not self.initialized:
             self.init()
             self.initialized = True
-                    
+
         statement = "SELECT TIMESTAMP_LOCAL," + \
             " TEMP, HUM, WIND, WIND_DIR, WIND_GUST, WIND_GUST_DIR, DEW_POINT,"+ \
             " RAIN, RAIN_RATE, PRESSURE, UV_INDEX FROM METEO " + \
-            " WHERE TIMESTAMP_LOCAL >= '%s' AND TIMESTAMP_LOCAL <= '%s' "+ \
+            " WHERE TIMESTAMP_LOCAL >= '%s' AND TIMESTAMP_LOCAL < '%s' "+ \
             " ORDER BY TIMESTAMP_LOCAL ASCENDING"
-            
+
         sql = statement % ( from_time.strftime(self.time_format),
             to_time.strftime(self.time_format))
-            
+
         mapper = lambda(row) : callback( { 'local_timestamp' : row[0],
             'temp' : row[1],
             'hum' : row[2],
@@ -86,14 +86,14 @@ class DatabaseStorage(object):
             'rain_rate' : row[8],
             'pressure' : row[10],
             'uv_index' : row[11] } )
-        
+
         try:
             self.db.connect()
-            self.db.select_apply(sql, mapper)                        
+            self.db.select_apply(sql, mapper)
         except:
             self.logger.exception("Error writting current data to database")
         finally:
-            self.db.disconnect()        
+            self.db.disconnect()
 
     def format(self, value):
         if value is None:
