@@ -5,7 +5,7 @@ WFROG_HOME=../../
 version=$(grep wfrog_version $WFROG_HOME/wfcommon/config.py | cut -f2 -d'"')
 
 date=$(date +%F)
-footer="<br><hr><small><a href='http://www.wfrog.org'>wfrog</a> $version - %date</small>"
+footer="<br><hr><small><a href='http://www.wfrog.org'>wfrog</a> $version - $date</small>"
 
 DOC_DIR=doc
 
