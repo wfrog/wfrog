@@ -22,6 +22,9 @@ class DataRenderer(object):
     """
     Executes a data query and pass the result to a wrapped renderer.
 
+    render result [any]:
+        The result of the wrapped renderer.
+
     [ Properties ]
 
     source [datasource]:

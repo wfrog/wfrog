@@ -24,6 +24,9 @@ class FtpRenderer(object):
     """
     Send rendered files by FTP. Typically used with TemplateRenderer.
 
+    render result [none]:
+        Nothing is returned by this renderer.
+
     [ Properties ]
 
     renderers [dict]:

@@ -23,6 +23,9 @@ class ValueRenderer(object):
     """
     Returns the main value as a string in the right units according to the context.
 
+    render result [numeric]:
+        The selected value.
+
     [ Properties ]
 
     key [string]:

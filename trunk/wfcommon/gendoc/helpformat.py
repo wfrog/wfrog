@@ -12,6 +12,7 @@ HIDDEN=7
 
 prop_re = re.compile('^ *[a-z]+.*\[.*\].*:$')
 hidden_re = re.compile('^ [^ ]+.*$')
+inline_element = re.compile('(![a-z-]*)')
 
 def parse_mark(line):
     if line.strip().startswith("---"):
@@ -45,6 +46,13 @@ def format_text(line):
                     formatted = formatted + '</i>'
                 open = not open
         line = formatted
+
+    tokens = inline_element.split(line)
+    if len(tokens) > 1:
+        for i in range(0, len(tokens)-1):
+            if inline_element.match(tokens[i]):
+                tokens[i] = '<a href="'+tokens[i].replace('!','')+'.html">'+tokens[i]+'</a>'
+        line = ''.join(tokens)
     return line
 
 
@@ -109,7 +117,6 @@ def to_content(buffer, line, context):
         if context['title-line']:
 
             buffer.write('<h1>')
-            line = format(line, context)
             if line.strip().find('[') > 0:
                 line = line.replace('[', '</h1><tt>[')
                 buffer.write(line)

@@ -108,7 +108,10 @@ class ChartConfig(object):
 
 class GoogleChartRenderer(object):
     """
-    Renders the data as a google chart URL.
+    Renders the data as a google chart.
+
+    render result [string]:
+        The google chart URL.
 
     [ Properties ]
 
@@ -411,6 +414,9 @@ class GoogleChartWindRadarRenderer(object):
     """
     Renders wind data as a radar google chart URL.
 
+    render result [string]:
+        The google chart URL.
+
     [ Properties ]
 
     series [dict]:
@@ -419,6 +425,73 @@ class GoogleChartWindRadarRenderer(object):
         'temp.avg'. Value contains a dictionary of rendering options. See
         below the available options and their scope.
 
+    height [numeric] (optional):
+        Height in pixels of the generated graph image. Defaults to 125.
+
+    width [numeric] (optional):
+        Width in pixels of the generated graph image. Defaults to 250.
+
+
+    [ Rendering Options ]
+
+    Roughly, the same rendering options as !chart are available.
+    Additionally, the following options are specific to this renderer:
+
+    sectors [dict] (optional):
+        If present, shows pie sectors shaded according to the frequency
+        of wind in each direction. The dict contain the rendering options
+        for the sector painting, i.e. 'color' and 'intensity'.
+        Default to None.
+
+    radius [numeric] (optional):
+        Asymptotic limit value corresponding to maximum wind. This value
+        is used to compute the logarithmic scale.
+
+    median [numeric] (optional):
+        Value of wind speed that will be represented as a being in the
+        middle of the radar chart range. Together with 'radius', this
+        value defines the logarithmic scale for the wind speed.
+
+    arrow [dict] (optional):
+        If present, draws the wind direction arrow. The dict can contain
+        options 'color', 'thickness' and 'text'. The 'text' options, is
+        set to a color, shows the current wind value on the graph.
+
+    tail [dict] (optional):
+        Rendering options for the arrow tail. The dict can contain
+        options 'color' and 'thickness'.
+
+    trace [dict] (optional):
+        If present, draws crown bullets showing the last direction of
+        the wind. The dict can contain options 'color', 'size', 'length'
+        and 'ratio'. The length corresponds to the number of trace bullets
+        to draw. The ratio is proportional to the way bullet size fades out.
+
+    bars [dict] (optional):
+        Show bars for the wind values. The dict can contain 'color',
+        'gust' and 'thickness'.
+        The value 'color' is for average wind values and 'gust' is
+        the color for maximum wind values.
+
+    lines [dict] (optional):
+        Show lines for the wind values. The dict can contain 'color',
+        'gust' and 'thickness'.
+        The value 'color' is for average wind values and 'gust' is
+        the color for maximum wind values.
+
+    areas [dict] (optional):
+        Show shaded area for the wind values. The dict can contain 'color',
+        'gust'.
+        The value 'color' is for average wind values and 'gust' is
+        the color for maximum wind values.
+
+    beaufort [dict] (optional):
+        Show a the beaufort value in the radar chart as a large digit.
+        Options are 'color' and 'intensity'.
+
+    max [dict] (optional):
+        Show a marker for the maximum wind value on the chart. Options
+        are 'color', 'thickness', 'text' and 'size'.
     """
 
     key = 'wind'
@@ -683,7 +756,7 @@ def flat(data):
             return False
     return True
 
-def interpolate(data):    
+def interpolate(data):
     result = copy.copy(data)
     (last, index, count) = (None, None, 0)
     for i,val in enumerate(data):
