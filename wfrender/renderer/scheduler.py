@@ -21,8 +21,11 @@ import logging
 
 class SchedulerRenderer(object):
     """
-    Schedules a renderer to be repeatly called every X seconds.
-    This renderer runs indefinitely until close() is called.
+    Schedules a renderer to be called periodically.
+    This renderer runs indefinitely until 'close()' is called.
+
+    render result [none]:
+        Nothing is returned by this renderer.
 
     [ Properties ]
 
@@ -30,7 +33,7 @@ class SchedulerRenderer(object):
         The renderer to call periodically.
 
     period [numeric]:
-        The repeat period in seconds.
+        The period in seconds.
     """
 
     renderers = None

@@ -22,26 +22,30 @@ import logging
 
 class CurrentConditionsXmlDataSource(object):
     """
-    Reads data from a Current Conditions XML file
+    Reads data from a Current Conditions XML file.
+
+    [ Properties ]
+
+    path [string]:
+        The location of the XML file.
     """
 
     logger = logging.getLogger('data.currentxml')
 
-    def __init__(self, path):
-        self.path=path
+    path = None
 
     def execute(self,data={}, context={}):
-        
+
         result = {}
         result['temp1'] = {}
         result['temp1']['value'] = 99
         result['temp1']['unit'] = "C"
         result['hum1'] = {}
-        result['hum1']['value'] = 0  
+        result['hum1']['value'] = 0
         result['hum1']['unit'] = "%"
         result['temp0'] = {}
         result['temp0']['value'] = 99
-        result['temp0']['unit'] = "C"        
+        result['temp0']['unit'] = "C"
         result['hum0'] = {}
         result['hum0']['value'] = 0
         result['hum0']['unit'] = "%"
@@ -59,12 +63,12 @@ class CurrentConditionsXmlDataSource(object):
         result['wind']['unit'] = "m/s"
         result['info'] = {}
         result['info']['timestamp'] = datetime(2001, 01, 01)
-                   
+
         try:
             dom = xml.dom.minidom.parse(self.path)
         except:
             self.logger.exception("Could not parse "+self.path)
-        
+
         try:
             result['temp1']['value'] = float(dom.getElementsByTagName('th1')[0].getElementsByTagName('temp')[0].childNodes[0].data)
         except:
@@ -73,29 +77,29 @@ class CurrentConditionsXmlDataSource(object):
         try:
             result['hum1']['value'] = float(dom.getElementsByTagName('th1')[0].getElementsByTagName('humidity')[0].childNodes[0].data)
         except:
-            pass    
+            pass
 
         try:
             result['temp0']['value'] = float(dom.getElementsByTagName('thInt')[0].getElementsByTagName('temp')[0].childNodes[0].data)
         except:
-            pass  
+            pass
 
-        try:        
+        try:
             result['hum0']['value'] = float(dom.getElementsByTagName('thInt')[0].getElementsByTagName('humidity')[0].childNodes[0].data)
         except:
-            pass  
+            pass
 
-        try:        
+        try:
             result['press']['value'] = float(dom.getElementsByTagName('barometer')[0].getElementsByTagName('pressure')[0].childNodes[0].data)
         except:
-            pass  
+            pass
 
-        try:        
+        try:
             result['rain']['value'] = float(dom.getElementsByTagName('rain')[0].getElementsByTagName('rate')[0].childNodes[0].data)
         except:
-            pass  
+            pass
 
-                
+
         try:
             result['wind']['value'] = float(dom.getElementsByTagName('wind')[0].getElementsByTagName('avgSpeed')[0].childNodes[0].data)
             result['wind']['max'] = float(dom.getElementsByTagName('wind')[0].getElementsByTagName('gustSpeed')[0].childNodes[0].data)
@@ -103,13 +107,13 @@ class CurrentConditionsXmlDataSource(object):
             result['wind']['dir'] = round(result['wind']['deg'] / 22.5 )
             result['wind']['unit'] = "m/s"
         except:
-            pass  
+            pass
 
 
         try:
             result['info']['timestamp'] = datetime.strptime(dom.getElementsByTagName('time')[0].childNodes[0].data, "%Y-%m-%d %H:%M:%S")
         except:
-            pass  
+            pass
 
         return result
 

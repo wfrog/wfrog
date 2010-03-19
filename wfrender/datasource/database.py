@@ -29,7 +29,9 @@ class DatabaseConfig(object):
 
 class DatabaseDataSource(object):
     """
-    Queries a database for consolidated data.
+    Queries the default firebird database for grouped data.
+    Will be replaced in wfrog 0.6 by an implementation using the
+    'storage' abstraction.
     """
 
     logger = logging.getLogger("datasource.database")
@@ -349,7 +351,7 @@ class FirebirdDB():
                RETURNS CSTRING(255) FREE_IT \
                ENTRY_POINT 'IB_UDF_lpad' MODULE_NAME 'ib_udf'")
         except:
-            pass             
+            pass
         try:
             self._db.cursor().execute("DECLARE EXTERNAL FUNCTION Round \
                 INT BY DESCRIPTOR, INT BY DESCRIPTOR \

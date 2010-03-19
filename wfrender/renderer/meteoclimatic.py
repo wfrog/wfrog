@@ -24,7 +24,11 @@ import wfcommon.database
 
 class MeteoclimaticRenderer(object):
     """
-    Renders the data chunk to send to www.meteoclimatic.com.
+    Renders the data chunk to send to the meteoclimatic website.
+    See www.meteoclimatic.com.
+
+    render result [string]:
+        The generated chunk.
 
     [ Properties ]
 

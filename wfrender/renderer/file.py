@@ -23,6 +23,9 @@ class FileRenderer(object):
     Writes the result of the wrapped renderer to a file.
     Currently supports only text output.
 
+    render result [string]:
+        The path to the generated file.
+
     [ Properties ]
 
     path [string]:

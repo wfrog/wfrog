@@ -35,6 +35,9 @@ class HttpRenderer(object):
 
     This renderer runs indefinitely until close() is called.
 
+    render result [none]:
+        Nothing is returned by this renderer.
+
     [ Properties ]
 
     root [renderer] (optional):
