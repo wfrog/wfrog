@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.westep.org/2010/westep"
+	xmlns:westep="http://www.westep.org/2010/westep" elementFormDefault="qualified">
+
+	<annotation>
+		<documentation>Defines XML messages for WESTEP, the weather station event protocol.
+		</documentation>
+	</annotation>
+
+	<!-- Types -->
+
+	<complexType name="Event" abstract="true">
+		<annotation>
+			<documentation>Base type for all events.</documentation>
+		</annotation>
+		<sequence>
+			<element name="station" type="string" maxOccurs="1"
+				minOccurs="0">
+				<annotation>
+					<documentation>Identifies the station producing this event; This may be useful when events from several stations are gathered; Consumers MAY ignore this information.
+					</documentation>
+				</annotation>
+			</element>
+			<element name="sensor" type="int" maxOccurs="1" minOccurs="0">
+				<annotation>
+					<documentation>Identifies the sensor when the station has several sensors for the same type of event.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+
+	<complexType name="ValueEvent">
+		<annotation>
+			<documentation>Type for all events holding a single decimal value.
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="westep:Event">
+				<sequence>
+					<element name="value" type="decimal">
+						<annotation>
+							<documentation>The value provided by this event.</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="PressureEvent">
+		<annotation>
+			<documentation>Event reporting atmospheric pressure in [hPa].
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="westep:ValueEvent">
+				<sequence>
+					<element name="code" maxOccurs="1" minOccurs="0">
+						<annotation>
+							<documentation>RAW: Absolute pressure measured by the sensor, default / QFE: Station pressure, sensor Pressure adjusted for any difference between sensor elevation and official station elevation / QNH: Station pressure adjusted for elevation (assumes standard atmosphere) / QFF: Station pressure adjusted for elevation, temperature and humidity.
+							</documentation>
+						</annotation>
+						<simpleType>
+							<restriction base="string">
+								<enumeration value="RAW"></enumeration>
+								<enumeration value="QNH"></enumeration>
+								<enumeration value="QNE"></enumeration>
+								<enumeration value="QFE"></enumeration>
+							</restriction>
+						</simpleType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="RainEvent">
+		<annotation>
+			<documentation>Event reporting rain.</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="westep:Event">
+				<sequence>
+					<element name="rate" type="decimal">
+						<annotation>
+							<documentation>Rain rate at the time of event in [mm/h].</documentation>
+						</annotation></element>
+                    <element name="total" type="decimal">
+                    	<annotation>
+                    		<documentation>Total rain in [mm] measured by the sensor; Consumer assumes that when this value is reset, an event with total=0 will be emitted in order to keep a consistent track using deltas.  </documentation>
+                    	</annotation></element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+    <complexType name="WindMeasure">
+        <annotation>
+        	<documentation>Denotes a measure of wind speed and direction.</documentation>
+        </annotation>
+        <sequence>
+    		<element name="speed" type="decimal">
+    			<annotation>
+    				<documentation>Wind speed in [m/s].</documentation>
+    			</annotation></element>
+    		<element name="dir" type="decimal">
+    			<annotation>
+    				<documentation>Direction from where the wind comes in degrees from geographical north.</documentation>
+    			</annotation></element>
+    	</sequence>
+    </complexType>
+
+	<complexType name="WindEvent">
+		<annotation>
+			<documentation>Event reporting wind.</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="westep:Event">
+				<sequence>
+					<element name="mean" type="westep:WindMeasure">
+						<annotation>
+							<documentation>Mean wind during the sample period.</documentation>
+						</annotation></element>
+					<element name="gust" type="westep:WindMeasure" maxOccurs="1" minOccurs="0">
+						<annotation>
+							<documentation>Maximum wind gust during the sampling period.</documentation>
+						</annotation></element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+
+	<!-- Concrete Events -->
+
+	<element name="temp" type="westep:ValueEvent">
+		<annotation>
+			<documentation>Reports temperature in [°C]</documentation>
+		</annotation></element>
+	<element name="hum" type="westep:ValueEvent">
+		<annotation>
+			<documentation>Reports humidity in [%].</documentation>
+		</annotation></element>
+	<element name="press" type="westep:PressureEvent">
+		<annotation>
+			<documentation>Reports atmospheric pressure in [hPa]; The code specifies if a correction was applied; If no code is provided, the pressure reported is the raw pressure measured by the sensor, without altitude correction.</documentation>
+		</annotation></element>
+	<element name="rain" type="westep:RainEvent">
+		<annotation>
+			<documentation>Reports rain.</documentation>
+		</annotation></element>
+	<element name="wind" type="westep:WindEvent">
+		<annotation>
+			<documentation>Reports wind and gusts</documentation>
+		</annotation></element>
+    <element name="uv" type="westep:ValueEvent">
+    	<annotation>
+    		<documentation>Reports the UV index.</documentation>
+    	</annotation></element>
+
+
+    <element name="rad" type="westep:ValueEvent">
+        <annotation>
+            <documentation>Reports the solar radiation in [W/m²]</documentation>
+        </annotation></element>
+</schema>

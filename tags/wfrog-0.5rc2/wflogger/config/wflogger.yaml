@@ -1,0 +1,39 @@
+context:
+    altitude: 430 
+
+input: !service
+    name: events  # Use embedded wfdriver to receive events
+    instance: !function {}
+    
+#input: !http-in { port: 8888 }
+
+#input: !stdio-in {}
+
+collector: !multi
+    children:        
+        aggregator : !flush
+            period: 300
+            collector: !aggregator           
+                storage : !service         
+                    name: storage
+                    instance: !include { path: ../../wfcommon/config/storage.yaml }  
+        current : !flush
+            period: 10
+            collector: !xmlfile
+                path: /tmp/current_conditions.xml
+                storage : !service
+                    name: storage
+
+embed:
+    wfdriver: { config: ../../wfdriver/config/embedded.yaml }
+    # wfrender: { config: ../../wfrender/config/wfrender.yaml }
+
+logging:
+    level: info    
+    handlers:
+        default:
+            level: debug
+            handler: !include 
+                path: ../../wfcommon/config/loghandler.yaml
+                variables:
+                    process: wflogger
