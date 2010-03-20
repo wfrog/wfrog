@@ -84,7 +84,7 @@ logging [logging configuration] (optional):
         # Parse the options and create object trees from configuration
         (options, args) = opt_parser.parse_args()
 
-        (config, context) = configurer.configure(options, self, log_conf=not embedded)
+        (config, context) = configurer.configure(options, self, embedded)
 
         # Initialize the driver from object trees
         self.station = config['station']

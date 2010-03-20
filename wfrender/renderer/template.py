@@ -18,6 +18,7 @@
 
 from Cheetah.Template import Template
 import logging
+import os.path
 
 def rnd(value, dec=0):
     if value == round(value):
@@ -56,7 +57,14 @@ class TemplateRenderer(object):
         content = {}
         if self.renderer:
             content = self.renderer.render(data=data, context=context)
-        self.logger.debug("Rendering with template "+self.path)
+        
+        if context.has_key('_yaml_config_file'):        
+            dir_name = os.path.dirname(context['_yaml_config_file'] )
+            abs_path=os.path.join(dir_name, self.path)
+        else:
+            abs_path = self.path
+                
+        self.logger.debug("Rendering with template "+abs_path)
         content["rnd"]=rnd
-        template = Template(file=file(self.path, "r"), searchList=[content, context])
+        template = Template(file=file(abs_path, "r"), searchList=[content, context])
         return [ self.mime, str(template) ]

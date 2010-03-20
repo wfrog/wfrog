@@ -55,7 +55,7 @@ class RendererConfigurer(wfcommon.config.Configurer):
         if config_file:
             self.embedded = True
         else:
-            config_file = "config/wfrender.yaml"
+            config_file = path.join(path.abspath(sys.path[0]), "config/wfrender.yaml")
             self.embedded = False
         
         wfcommon.config.Configurer.__init__(self, config_file, module_map)
@@ -65,7 +65,7 @@ class RendererConfigurer(wfcommon.config.Configurer):
         opt_parser.add_option("-c", "--command", dest="command", help="A command to execute after automatic reload. Useful to trigger events during development such as browser reload.")
 
     def configure_engine(self, engine, options, args, init):
-        (config, config_context) = self.configure(options, engine, log_conf=(not self.embedded and init))
+        (config, config_context) = self.configure(options, engine, embedded=(self.embedded or not init))
 
         engine.root_renderer = config["renderer"]
 

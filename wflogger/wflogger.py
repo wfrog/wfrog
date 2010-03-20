@@ -78,6 +78,8 @@ logging [logging configuration] (optional):
 
     embedded = {}
     context = None
+    
+    config_file = None
 
     def __init__(self):
 
@@ -97,6 +99,8 @@ logging [logging configuration] (optional):
         # Parse the options and create object trees from configuration
         (options, args) = opt_parser.parse_args()
         (config, self.context) = configurer.configure(options, self)
+
+        self.config_file = configurer.config_file
 
         # Initialize the logger from object trees
 
@@ -149,14 +153,18 @@ logging [logging configuration] (optional):
         input_thread.setDaemon(True)
         input_thread.start()
 
+        dir_name = os.path.dirname(self.config_file)
+
         # Start the embedded processes
         if self.embedded.has_key('wfdriver'):
-            driver = wfdriver.wfdriver.Driver(self.embedded['wfdriver']['config'])
+            self.logger.debug("Starting embedded wfdriver")
+            driver = wfdriver.wfdriver.Driver(os.path.join(dir_name, self.embedded['wfdriver']['config']))
             driver_thread = Thread(target=driver.run)
             driver_thread.setDaemon(True)
             driver_thread.start()
         if self.embedded.has_key('wfrender'):
-            renderer = wfrender.wfrender.RenderEngine(self.embedded['wfrender']['config'])
+            self.logger.debug("Starting embedded wfrender")
+            renderer = wfrender.wfrender.RenderEngine(os.path.join(dir_name, self.embedded['wfrender']['config']))
             renderer_thread = Thread(target=renderer.process)
             renderer_thread.setDaemon(True)
             renderer_thread.start()
