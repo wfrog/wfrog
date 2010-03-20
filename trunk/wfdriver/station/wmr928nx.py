@@ -55,11 +55,12 @@ class WMR928NXStation(BaseStation):
     def _decode_bcd(self, bcd):
         return(bcd & 0xf) + ((bcd & 0xf0) >> 4) * 10
 
-    def run(self):
+    def run(self, generate_event, send_event):     
         import serial
         # Initialize injected functions used by BaseStation
         self.generate_event = generate_event
         self.send_event = send_event        
+        
         self.logger.info("Thread started")
         while True:
             try:

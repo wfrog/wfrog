@@ -33,19 +33,19 @@ class Configurer(object):
     log_configurer = log.LogConfigurer()
     logger = logging.getLogger('config')
 
-    def __init__(self, default_filename, module_map):
-        self.default_filename = default_filename
+    def __init__(self, config_file, module_map):
+        self.config_file = config_file
         self.module_map = module_map
 
     def add_options(self, opt_parser):
-        opt_parser.add_option("-f", "--file", dest="config", default=self.default_filename,
-                  help="Configuration file (in yaml). Defaults to '" + self.default_filename + "'", metavar="CONFIG_FILE")
+        opt_parser.add_option("-f", "--file", dest="config", default=self.config_file,
+                  help="Configuration file (in yaml). Defaults to '" + self.config_file + "'", metavar="CONFIG_FILE")
         opt_parser.add_option("-H", action="store_true", dest="help_list", help="Gives help on the configuration file and the list of possible config !elements in the yaml config file")
         opt_parser.add_option("-E", dest="help_element", metavar="ELEMENT", help="Gives help about a config !element")
         opt_parser.add_option("-e", "--extensions", dest="extension_names", metavar="MODULE1,MODULE2,...", help="Comma-separated list of modules containing custom configuration elements")
         self.log_configurer.add_options(opt_parser)
 
-    def configure(self, options, component, log_conf=True):
+    def configure(self, options, component, embedded=False):
 
         if options.extension_names:
             for ext in options.extension_names.split(","):
@@ -88,16 +88,20 @@ class Configurer(object):
                 print "Element "+element+" not found or not documented"
             sys.exit()
 
-        config = yaml.load( file(options.config, "r") )
+        if not embedded:
+            self.config_file = options.config
+            
+        self.logger.debug("Loading config file " + self.config_file)
+        config = yaml.load( file(self.config_file, "r") )
 
         if config.has_key('context'):
             context = copy.deepcopy(config['context'])
         else:
             context = {}
 
-        context['_yaml_config_file'] = options.config
+        context['_yaml_config_file'] = self.config_file
 
-        if log_conf:
+        if not embedded:
             self.log_configurer.configure(options, config, context)
 
         return ( config, context )

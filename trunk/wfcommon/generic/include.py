@@ -19,6 +19,7 @@
 import yaml
 import logging
 import wrapper
+import copy
 from os import path
 
 from Cheetah.Template import Template
@@ -38,6 +39,8 @@ class IncludeElement(wrapper.ElementWrapper):
     target = None
     variables = None
 
+    abs_path  = None
+
     logger = logging.getLogger("generic.include")
 
     def _init(self, context=None):
@@ -49,12 +52,12 @@ class IncludeElement(wrapper.ElementWrapper):
                 raise Exception('Context not passed to !include element')
 
             dir_name = path.dirname(config_file)
-            abs_path=path.join(dir_name, self.path)
+            self.abs_path=path.join(dir_name, self.path)
 
             if self.variables:
-                conf_str = str(Template(file=file(abs_path, "r"), searchList=[self.variables]))
+                conf_str = str(Template(file=file(self.abs_path, "r"), searchList=[self.variables]))
             else:
-                conf_str = file(abs_path, "r").read()
+                conf_str = file(self.abs_path, "r").read()
             config = yaml.load(conf_str)
             self.target = config.values()[0]
 
@@ -64,6 +67,9 @@ class IncludeElement(wrapper.ElementWrapper):
 
         if keywords.has_key('context'):
             self._init(keywords['context'])
+            context = copy.copy(keywords['context'])
+            context['_yaml_config_file'] = self.abs_path
+            keywords['context'] = context
         else:
             self._init()
 
