@@ -1,0 +1,4 @@
+#storage: !csv
+#    path: /tmp/wfrog.csv
+
+storage: !firebird {}
