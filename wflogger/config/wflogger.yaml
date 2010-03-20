@@ -25,8 +25,8 @@ collector: !multi
                     name: storage
 
 embed:
-    wfdriver: { config: ../wfdriver/config/embedded.yaml }
-    # wfrender: { config: ../wfrender/config/wfrender.yaml }
+    wfdriver: { config: ../../wfdriver/config/embedded.yaml }
+    # wfrender: { config: ../../wfrender/config/wfrender.yaml }
 
 logging:
     level: info    
