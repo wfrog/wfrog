@@ -1,5 +1,0 @@
-handler: !!python/object/new:logging.handlers.RotatingFileHandler 
-    kwds:
-        filename: /var/log/${process}.log
-        maxBytes: 262144
-        backupCount: 3

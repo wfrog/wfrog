@@ -1,2 +1,0 @@
-station: !random-simulator {}
-output: !call {}

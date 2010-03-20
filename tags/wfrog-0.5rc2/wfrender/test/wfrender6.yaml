@@ -1,2 +1,0 @@
-renderer: !template
-    path: test/${filename}.txt
