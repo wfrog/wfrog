@@ -278,7 +278,7 @@ class WMR928NXStation(BaseStation):
         seaLevelPressure = pressure + offset
         
         weatherStatus = (record[7] & 0xf0) >> 4
-        weatherStatusTxt = weatherStatusMap.get(weatherStatus, str(weatherStatus))
+        weatherStatusTxt = self.weatherStatusMap.get(weatherStatus, str(weatherStatus))
     
         self._report_barometer_absolute(pressure)
         self._report_temperature(temperature, humidity, 0)        
