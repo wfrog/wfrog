@@ -68,20 +68,30 @@ class CsvStorage(object):
         file.close()
 
 
-    def traverse_samples(self, callback, from_time=datetime.fromtimestamp(0), to_time=datetime.now(), context={}):
+    def samples(self, from_time=datetime.fromtimestamp(0), to_time=datetime.now(), context={}):
         from_timestamp = int(time.mktime(from_time.timetuple()))
         file = self._position_cursor(from_timestamp)
         to_timestamp = time.mktime(to_time.timetuple())
         reader = csv.reader(file)
-        for line in reader:
-            if int(line[0]) < from_timestamp:
-                continue
-            if int(line[0]) >= to_timestamp:
-                break
-            sample = {}
-            for i in range(0,len(line)-1):
-                sample[self.columns[i]] = line[i]
-            callback(sample, context)
+
+        try:
+            for line in reader:
+                if int(line[0]) < from_timestamp:
+                    continue
+                if int(line[0]) >= to_timestamp:
+                    break
+                sample = {}
+                for i in range(0,len(line)-1):
+                    if line[i] != '' and line[i] != None:
+                        if i > 1:
+                            sample[self.columns[i]] = float(line[i])
+                        else:
+                            sample[self.columns[i]] = line[i]
+                    else:
+                        sample[self.columns[i]] = None
+                yield sample
+        finally:
+            file.close()
 
     def _position_cursor(self, timestamp):
         if not os.path.exists(self.path):
@@ -153,6 +163,8 @@ if __name__ == '__main__':
 
     format = "%Y-%m-%d %H:%M:%S"
 
-    s.traverse_samples(dump, from_time=datetime.strptime('2010-03-12 23:32:00', format) ,
+    samples = s.samples(from_time=datetime.strptime('2010-03-12 23:32:00', format) ,
         to_time=datetime.strptime('2010-03-12 23:50:00', format))
 
+    for i in samples:
+        print repr(i)
