@@ -42,7 +42,7 @@ except ImportError:
 
 
 # Converts time tuples (old Firebird format) to datetime
-# and Decimal into floats. 
+# and Decimal into floats.
 # Working with Decimal numbers needs to be studied ...
 
 def adjust(obj):
@@ -60,7 +60,7 @@ def adjust(obj):
 
 class DB():
     dbObject = None
-    
+
     def __init__(self):
         raise Exception("Method cannot be called")
 
@@ -72,26 +72,14 @@ class DB():
             raise Exception("Not connected to a Database")
         cursor = self.dbObject.cursor()
         cursor.execute(sql)
-        l = []
-        for e in cursor.fetchall():
-            # Add record to response changing datatypes if necessary
-            l.append(tuple(map(adjust, e))) 
-        cursor.close()
-        self.dbObject.commit()
-        return l
 
-    def select_apply(self, sql, callback):
-        if self.dbObject == None:
-            raise Exception("Not connected to a Database")
-        cursor = self.dbObject.cursor()
-        cursor.execute(sql)
-        
         try:
             while True:
-                row = cursor.fetchone()      
-                if row is None:
-                    return
-                callback(tuple(map(adjust, row))) 
+                row = cursor.fetchone()
+                if row is not None:
+                    yield tuple(map(adjust, row))
+                else:
+                    break
         finally:
             cursor.close()
             self.dbObject.commit()
@@ -121,13 +109,13 @@ class FirebirdDB(DB):
         self.user = user
         self.password = password
         self.charset = charset
-    
+
     def connect(self):
         if self.dbObject != None:
             raise Exception("Firebird: already connected to %s" % self.db)
-        self.dbObject = kinterbasdb.connect(dsn=self.db, 
+        self.dbObject = kinterbasdb.connect(dsn=self.db,
                                             user=self.user,
-                                            password=self.password, 
+                                            password=self.password,
                                             charset=self.charset)
 
 ## MySQL database driver
@@ -151,13 +139,13 @@ class MySQLDB(DB):
 
 
 ## Database driver factory
-## 
+##
 
 def DBFactory(configuration):
     """
     Expects a python dictionary with the database configuration and returns
     its corresponding database object.
- 
+
     Two types of database are available:
     1) firebird
        {'type' : 'firebird',
@@ -193,8 +181,8 @@ def DBFactory(configuration):
         if 'charset' not in configuration:
             charset = 'ISO8859_1'
         else:
-            charset = configuration['charset']    
-    
+            charset = configuration['charset']
+
         return FirebirdDB(database, user, password, charset)
 
     elif type == 'mysql':
@@ -218,12 +206,12 @@ def DBFactory(configuration):
             password = 'root'
         else:
             password = configuration['password']
-    
+
         return  MySQLDB(database, host, port, user, password)
 
     else:
         raise(Exception('database type %s not supported' % configuration))
-        
+
 
 if __name__ == '__main__':
 
@@ -250,6 +238,6 @@ if __name__ == '__main__':
         db.connect()
         print db.select("SELECT COUNT(*) FROM METEO")
         db.disconnect()
-    else: 
+    else:
         print "MySQLdb (mysql python's driver) is not installed"
 

@@ -23,13 +23,13 @@ import datetime
 class Average(object):
     sum = 0
     count = 0
-    
+
     def add(self, value):
         if value is not None:
             self.sum = self.sum + value
             self.count = self.count + 1
-        
-    def get(self):
+
+    def value(self):
         if(self.count==0):
             return None
         else:
@@ -39,18 +39,18 @@ class BaseCollector(object):
     '''
     Base class for collectors.
     '''
-    
+
     _temp_last = None
     _hum_last = None
     _mean_temp = None
     _mean_temp_last_time = None
-    
+
     storage = None
-    
+
     def send_event(self, event, context={}):
 
         self.init()
-        
+
         if event._type == "_flush":
             self.flush(context)
         elif event._type == 'rain':
@@ -62,7 +62,7 @@ class BaseCollector(object):
                 if event.code == 'RAW' or event.code == 'QFE':
                     self._report_barometer_absolute(event.value)
                 else:
-                    self._report_barometer_sea_level(event.value) 
+                    self._report_barometer_sea_level(event.value)
             else:
                 self._report_barometer_absolute(event.value, context)
         elif event._type == 'temp':
@@ -72,27 +72,27 @@ class BaseCollector(object):
         elif event._type == 'hum':
             self._report_humidity(event.value, event.sensor)
             if event.sensor == 1:
-                self._hum_last = event.value            
+                self._hum_last = event.value
         elif event._type == 'uv':
             self._report_uv(event.value)
-    
+
     def _get_mean_temp(self, current_temp, context):  # Last 12 hours mean temp
-    
+
         if self.storage is None:
             return current_temp
-    
+
         if self._mean_temp != None:
             if (datetime.datetime.now()-self._mean_temp_last_time).seconds < 3600: # New value each hour
                 return self._mean_temp
         try:
-       
-            average = Average()
-            add_sample = lambda(sample) : average.add(sample['temp'])
-    
-            self.storage.traverse_samples(add_sample, datetime.datetime.now() - datetime.timedelta(hours=12), context=context)            
 
-            self._mean_temp = average.get()
-            
+            average = Average()
+
+            for sample in self.storage.samples(datetime.datetime.now() - datetime.timedelta(hours=12), context=context):
+                average.add(sample['temp'])
+
+            self._mean_temp = average.value()
+
             if self._mean_temp is None:
                 return current_temp
 
@@ -102,17 +102,17 @@ class BaseCollector(object):
         except Exception, e:
             self.logger.exception("Error calculating last 12 hours mean temp: %s, returning current temperature" % str(e))
             return current_temp
-        
+
         return current_temp
-        
+
 
     def _report_barometer_absolute(self, pressure, context):
         if self._temp_last != None and self._hum_last != None:
             seaLevelPressure = wfcommon.meteo.StationToSeaLevelPressure(
-                                  pressure, 
-                                  context['altitude'], 
-                                  self._temp_last, 
-                                  self._get_mean_temp(self._temp_last, context), 
-                                  self._hum_last, 
+                                  pressure,
+                                  context['altitude'],
+                                  self._temp_last,
+                                  self._get_mean_temp(self._temp_last, context),
+                                  self._hum_last,
                                   'paDavisVP')
             self._report_barometer_sea_level(seaLevelPressure)

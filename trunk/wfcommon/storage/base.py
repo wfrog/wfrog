@@ -60,7 +60,7 @@ class DatabaseStorage(object):
         finally:
             self.db.disconnect()
 
-    def traverse_samples(self, callback, from_time=datetime.fromtimestamp(0), to_time=datetime.now(), context={}):
+    def samples(self, from_time=datetime.fromtimestamp(0), to_time=datetime.now(), context={}):
         if not self.initialized:
             self.init()
             self.initialized = True
@@ -74,7 +74,7 @@ class DatabaseStorage(object):
         sql = statement % ( from_time.strftime(self.time_format),
             to_time.strftime(self.time_format))
 
-        mapper = lambda(row) : callback( { 'local_timestamp' : row[0],
+        mapper = lambda(row) : { 'local_timestamp' : row[0],
             'temp' : row[1],
             'hum' : row[2],
             'wind' : row[3],
@@ -85,13 +85,12 @@ class DatabaseStorage(object):
             'rain' : row[8],
             'rain_rate' : row[8],
             'pressure' : row[10],
-            'uv_index' : row[11] } )
+            'uv_index' : row[11] }
 
         try:
             self.db.connect()
-            self.db.select_apply(sql, mapper)
-        except:
-            self.logger.exception("Error writting current data to database")
+            for i in self.db.select(sql):
+                yield mapper(i)
         finally:
             self.db.disconnect()
 
