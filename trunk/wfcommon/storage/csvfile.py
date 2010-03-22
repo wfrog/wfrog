@@ -163,8 +163,8 @@ if __name__ == '__main__':
 
     format = "%Y-%m-%d %H:%M:%S"
 
-    samples = s.samples(from_time=datetime.strptime('2010-03-12 23:32:00', format) ,
-        to_time=datetime.strptime('2010-03-12 23:50:00', format))
+    samples = s.samples(from_time=datetime.strptime('2010-03-22 22:58:33', format) ,
+        to_time=datetime.strptime('2010-03-22 23:00:35', format))
 
     for i in samples:
         print repr(i)
