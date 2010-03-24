@@ -1,0 +1,6 @@
+<temp><sensor>1</sensor><value>13</value></temp>
+
+<hum><sensor>1</sensor><value>60</value></hum>
+
+<press><value>1050</value></press>
+
