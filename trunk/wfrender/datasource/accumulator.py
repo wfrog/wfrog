@@ -17,6 +17,12 @@
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import logging
+from wfcommon.formula.base import AverageFormula
+from wfcommon.formula.base import MinFormula
+from wfcommon.formula.base import MaxFormula
+from wfcommon.formula.base import SumFormula
+
 class AccumulatorDatasource(object):
     '''
     Calculates data from a storage in an iterative fashion by traversing
@@ -26,4 +32,23 @@ class AccumulatorDatasource(object):
 
     storage [storage]:
         The underlying storage to get samples.
-
+    '''    
+        
+    storage: None
+    slice: 'hour'    
+    span: 23
+    
+    last_timestamp = time.
+    
+    default_formulas = {
+        'temp': { 'avg' : AverageFormula('temp'), 'min' : MinFormula('temp'), 'max' : MaxFormula('temp') },
+        'hum' : { 'avg' : AverageFormula('hum') },
+        'press' : { 'avg' : AverageFormula('pressure') },
+        'rain' : { 'rate' : AverageFormula('rain_rate'), 'fall' : SumFormula('rain') },
+        'uv' : { 'index' : MaxFormula('uv_index') }
+    }
+            
+    logger = logging.getLogger("datasource.accumulator")
+    
+    def execute(self,data={}, context={}):
+        
