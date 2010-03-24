@@ -16,23 +16,35 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import yaml
+import wrapper
+import logging
+import time
 
-import include
-import multi
-import service
-import stopwatch
+class StopWatchElement(wrapper.ElementWrapper):
 
-# YAML mappings
+    measures = None
 
-class YamlIncludeElement(include.IncludeElement, yaml.YAMLObject):
-    yaml_tag = u'!include'
+    logger = logging.getLogger("generic.stopwatch")
 
-class YamlMultiElement(multi.MultiElement, yaml.YAMLObject):
-    yaml_tag = u'!multi'
+    target = None
 
-class YamlServiceElement(service.ServiceElement, yaml.YAMLObject):
-    yaml_tag = u'!service'
+    def _call(self, attr, *args, **keywords):
 
-class YamlStopWatchElement(stopwatch.StopWatchElement, yaml.YAMLObject):
-    yaml_tag = u'!stopwatch'
+        if self.measures is None:
+            self.measures = {}
+
+        start = time.clock()
+        result = self.target.__getattribute__(attr).__call__(*args, **keywords)
+        duration = time.clock() - start
+
+        if self.measures.has_key(attr):
+            measure = self.measures.get(attr)
+            measure = (duration, measure[1]+duration, measure[2]+1)
+        else:
+            measure = (duration, duration, 1)
+
+        self.measures[attr] = measure
+
+        self.logger.info(str(self.target)+"."+attr+": "+str(measure))
+
+        return result
