@@ -45,6 +45,15 @@ class StopWatchElement(wrapper.ElementWrapper):
 
         self.measures[attr] = measure
 
-        self.logger.info(str(self.target)+"."+attr+": "+str(measure))
+        obj_id = '{%x}' % id(self.target)
+
+        if hasattr(self.target, "yaml_tag"):
+            name = self.target.yaml_tag + obj_id
+        elif hasattr(self.target, "__class__"):
+            name = self.target.__class__.__name__ + obj_id
+        else:
+            name = str(self.target)
+        
+        self.logger.info(name+"."+attr+": call="+str(measure[0])+", sum="+str(measure[1])+", count="+str(measure[2]))
 
         return result
