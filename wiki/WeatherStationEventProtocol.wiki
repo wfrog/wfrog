@@ -93,13 +93,7 @@ The following XML messages are valid WESTEP events:
 
 == Extensions ==
 
-WESTEP supports proprietary extensions on the form of additional event types and additional elements anywhere in the standard event messages, provided that they appear in a distinct namespace.
-
-== Restrictions to the XML standards ==
-
-The following restrictions apply:
- * XML messages MUST use the standard WESTEP schema as default namespace and not use the prefixed form. This allows for easier integration and optimizations. Consumers sticking to the standard can drop all messages and elements having a namespace prefix, since they always are extensions.
- * When using streaming transports (see below), the XML messages MUST be terminated by one empty line and not contains empty lines themselves.
+WESTEP supports proprietary extensions on the form of additional event types and additional elements the standard event messages after the standard elements. Extension elements must appear in a distinct namespace. The extensibility mecanism remains to be defined in the schema.
 
 = Transport =
 
@@ -118,7 +112,7 @@ The following must be observed:
 
 == HTTP Transport ==
 
-With this transport, the event producer process performs a HTTP POST request on the event consumer process. The payload of the POST request is the XML message. For optimzing resource consumption, supporting HTTP 1.1 keep-alive is recommended.
+With this transport, the event producer process performs a HTTP POST request on the event consumer process. The payload of the POST request is the XML message. For optimizing resource consumption, supporting HTTP 1.1 keep-alive is recommended.
 
 = Reference Implementation =
 
