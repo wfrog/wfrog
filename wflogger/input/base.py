@@ -34,6 +34,6 @@ class XmlInput(object):
     def process_message(self, message):
         from lxml import objectify
         event = objectify.XML(message)
-        event._type = event.tag
+        event._type = event.tag.replace('{http://www.westep.org/2010/westep}','')
         self.logger.debug("Received: %s ", message)
         self.send_event(event)
