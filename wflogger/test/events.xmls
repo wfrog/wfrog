@@ -1,6 +1,13 @@
+<temp xmlns="http://www.westep.org/2010/westep">
+    <station>3</station>
+    <sensor>2</sensor>
+    <value>23.0</value>
+</temp>
+
+<p:press xmlns:p="http://www.westep.org/2010/westep" xmlns:q="http://www"><p:value>1050</p:value><q:uu>32</q:uu></p:press>
+
+<?xml version="1.0"?>
 <temp><sensor>1</sensor><value>13</value></temp>
 
 <hum><sensor>1</sensor><value>60</value></hum>
-
-<press><value>1050</value></press>
 
