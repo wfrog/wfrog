@@ -40,11 +40,6 @@ import copy
 def gen(type):
     return event.Event(type)
 
-class TickEvent(object):
-    _type = '_tick'
-    def __str__(self):
-        return "*TICK*"
-
 class Logger(object):
     '''
 Root Elements
@@ -74,7 +69,6 @@ logging [logging configuration] (optional):
     logger = logging.getLogger('wflogger')
 
     queue_size=10
-    tick = 60
 
     embedded = {}
     context = None
@@ -117,7 +111,7 @@ logging [logging configuration] (optional):
         self.event_queue = Queue(self.queue_size)
 
     def enqueue_event(self, event):
-        self.logger.debug('Queue size: %d', self.event_queue.qsize())
+        self.logger.debug("Got '%s' event. Queue size: %d", event._type, self.event_queue.qsize())
         try:
             self.event_queue.put(event, block=False)
         except Full:
@@ -134,12 +128,6 @@ logging [logging configuration] (optional):
                 self.collector.send_event(event, context=context)
             except Exception:
                 self.logger.exception("Could not send event to "+str(self.collector))
-
-    def tick_loop(self):
-        while True:
-            time.sleep(self.tick)
-            event = TickEvent()
-            self.enqueue_event(event)
 
     def run(self):
 
@@ -169,8 +157,9 @@ logging [logging configuration] (optional):
             renderer_thread.setDaemon(True)
             renderer_thread.start()
 
-        # Start the tick thread
-        self.tick_loop()
+        # Wait for ever
+        while True:
+            time.sleep(sys.maxint)
 
 
 if __name__ == "__main__":
