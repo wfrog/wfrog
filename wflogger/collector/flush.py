@@ -57,13 +57,12 @@ class FlushCollector(object):
         if self.last_flush_time == None:
             self.last_flush_time = current_time
 
-        # First flush if needed.
+        # Send the event
+        self.collector.send_event(event, context)
+
+        # Flush if needed.
         if self.last_flush_time + self.period <= current_time:
             self.logger.debug('Flushing')
             self.last_flush_time = current_time
 
             self.collector.send_event(FlushEvent(), context)
-
-        # Then send the event (but not the ticks).
-        if not event._type == '_tick':
-            self.collector.send_event(event, context)
