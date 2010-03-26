@@ -21,8 +21,20 @@ import urllib
 
 class XmlInput(object):
     '''
-    Base class for inputs receiving events as WESTEP XML messages.
+    validate [true|false] (optional):
+        Whether to validate or not the events against the WESTEP XML schema.
+        Validation errors are reported using the log system but do not discard
+        the event.
+        
+    namespace [string] (optional):
+        If validation is activated, specifie the default namespace of events.
+        Defaults to 'http://www.westep.org/2010/westep'.
+        
+    location [url] (optional):
+        If validation is activated, location of the WESTEP XML schema.
+        Defaults to 'http://wfrog.googlecode.com/svn/trunk/xsd/westep.xsd'.
     '''
+    _element_doc=True
     
     send_event = None
     
@@ -31,7 +43,7 @@ class XmlInput(object):
     validate = False
     schema = None
     namespace = 'http://www.westep.org/2010/westep'
-    schema_location = 'http://wfrog.googlecode.com/svn/trunk/xsd/westep.xsd'
+    location = 'http://wfrog.googlecode.com/svn/trunk/xsd/westep.xsd'
     
     def run(self, send_event):
         self.send_event = send_event
@@ -43,7 +55,7 @@ class XmlInput(object):
         if self.validate:
             from lxml import etree
             if self.schema is None:                
-                self.schema = etree.XMLSchema(file=urllib.urlopen(self.schema_location))
+                self.schema = etree.XMLSchema(file=urllib.urlopen(self.location))
             parsed_message = etree.fromstring(message)
             if not parsed_message.nsmap.has_key(None): #if no default namespace specified, set it
                 new_element = etree.Element(parsed_message.tag, attrib=parsed_message.attrib, nsmap={ None: self.namespace })

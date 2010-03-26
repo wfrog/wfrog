@@ -21,6 +21,16 @@ import logging
 import time
 
 class StopWatchElement(wrapper.ElementWrapper):
+    '''
+    Element wrapper measuring duration of calls to the wrapped object. 
+    The measures in seconds are output using the log system in level INFO.
+    
+    [ Properties ]
+    
+    target [object]:
+        The wrapped object.
+    
+    '''
 
     measures = None
 
