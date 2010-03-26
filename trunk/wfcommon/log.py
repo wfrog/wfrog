@@ -43,6 +43,7 @@ handlers [dict]:
 
     def add_options(self, opt_parser):
         opt_parser.add_option("-d", "--debug", action="store_true", dest="debug", help="Issues all debug messages on the console.")
+        opt_parser.add_option("-v", "--verbose", action="store_true", dest="verbose", help="Issues errors on the console.")
 
     def configure(self, options, config, context):
 
@@ -80,8 +81,11 @@ handlers [dict]:
 
                     logger.addHandler(handler)
 
-        if options.debug:
-            level=logging.DEBUG
+        if options.debug or options.verbose:
+            if options.debug:
+                level=logging.DEBUG
+            else:
+                level=logging.ERROR
             console_handler = logging.StreamHandler()
             console_handler.setFormatter(formatter)
             console_handler.setFormatter(formatter)
