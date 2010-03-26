@@ -1,9 +1,9 @@
 context:
     altitude: 430
 
-#input: !stdio-in {}
+input: !stdio-in { validate: true }
 
-input: !service {name: events, instance: !function {} }
+#input: !service {name: events, instance: !function {} }
 
 collector: !multi
     children:
@@ -15,5 +15,5 @@ collector: !multi
                         name: storage
                         instance: !include { path: ../../wfcommon/test/csv.yaml }
 
-embed:
-    wfdriver: { config: ../../wfdriver/test/csv.yaml }
+#embed:
+#    wfdriver: { config: ../../wfdriver/test/csv.yaml }

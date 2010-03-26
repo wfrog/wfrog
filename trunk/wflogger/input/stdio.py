@@ -37,13 +37,13 @@ class StdioInput(base.XmlInput):
             line = sys.stdin.readline()
             if not line:
                 break
-            self.logger.debug('Got line: '+line)
-
+            
             if line.strip() == "":
+                self.logger.debug('Got empty line')
                 message = buffer.getvalue().strip()
                 if not message == "": # skip additional emtpy lines
                     self.process_message(buffer.getvalue())
                 buffer.close()
                 buffer = StringIO()
             else:
-                buffer.write(line)        
+                buffer.write(line.strip())        

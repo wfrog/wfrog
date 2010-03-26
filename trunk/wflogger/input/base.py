@@ -17,6 +17,7 @@
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+import urllib
 
 class XmlInput(object):
     '''
@@ -27,13 +28,32 @@ class XmlInput(object):
     
     logger = logging.getLogger("input.xml")
     
+    validate = False
+    schema = None
+    namespace = 'http://www.westep.org/2010/westep'
+    schema_location = 'http://wfrog.googlecode.com/svn/trunk/xsd/westep.xsd'
+    
     def run(self, send_event):
         self.send_event = send_event
         self.do_run()
     
-    def process_message(self, message):
+    def process_message(self, message):        
         from lxml import objectify
-        event = objectify.XML(message)
-        event._type = event.tag.replace('{http://www.westep.org/2010/westep}','')
         self.logger.debug("Received: %s ", message)
+        if self.validate:
+            from lxml import etree
+            if self.schema is None:                
+                self.schema = etree.XMLSchema(file=urllib.urlopen(self.schema_location))
+            parsed_message = etree.fromstring(message)
+            if not parsed_message.nsmap.has_key(None): #if no default namespace specified, set it
+                new_element = etree.Element(parsed_message.tag, attrib=parsed_message.attrib, nsmap={ None: self.namespace })
+                new_element.extend(parsed_message.getchildren())
+                parsed_message = etree.fromstring(etree.tostring(new_element))
+            if not self.schema.validate(parsed_message):
+                log = self.schema.error_log
+                error = log.last_error
+                self.logger.error("XML validation error: %s", error)
+
+        event = objectify.XML(message)
+        event._type = event.tag.replace('{'+self.namespace+'}','')
         self.send_event(event)
