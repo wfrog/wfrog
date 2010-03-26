@@ -23,7 +23,7 @@ import inspect
 import sys
 import copy
 
-wfrog_version = "0.5rc2"
+wfrog_version = "0.5rc3"
 
 class Configurer(object):
 
@@ -122,7 +122,12 @@ class Configurer(object):
         for element in elements:
             self.logger.debug("Getting doc of "+element[0])
             # Gets the documentation of the first superclass
-            fulldoc=inspect.getmro(element[1])[1].__doc__
+            superclass = inspect.getmro(element[1])[1]
+            fulldoc=superclass.__doc__
+            
+            # Add the doc of the super-super-class if _element_doc is
+            if hasattr(inspect.getmro(superclass)[1], "_element_doc") and inspect.getmro(superclass)[1].__doc__  is not None:
+                fulldoc = fulldoc + inspect.getmro(superclass)[1].__doc__            
 
             firstline=fulldoc.split(".")[0]
             self.logger.debug(firstline)
