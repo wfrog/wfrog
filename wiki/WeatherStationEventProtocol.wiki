@@ -114,6 +114,12 @@ The following must be observed:
 
 With this transport, the event producer process performs a HTTP POST request on the event consumer process. The payload of the POST request is the XML message. For optimizing resource consumption, supporting HTTP 1.1 keep-alive is recommended.
 
+= Compliance =
+
+Any product vendor or software provider wanting to use the WESTEP name to show their compliance to the protocol must request authorization to the email address "compliance AT westep DOT org". 
+
+The compliance is then shown by specifying the supported protocol versions and transports. E.g. *WESTEP 1.0, 1.1 STDIO, HTTP* 
+
 = Reference Implementation =
 
 The [http://wfrog.org wfrog] project provides the reference implementation of WESTEP. It is developed in python.
