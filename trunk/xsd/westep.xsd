@@ -73,7 +73,7 @@
                                 assumed.</documentation>
                         </annotation>
                     </element>
-                    <!--  <any namespace="##any" minOccurs="0"/> -->
+                    <any namespace="##any" minOccurs="0"/>
                 </sequence>
             </extension>
         </complexContent>
