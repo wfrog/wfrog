@@ -41,7 +41,7 @@
 						<annotation>
 							<documentation>The value provided by this event.</documentation>
 						</annotation>
-					</element>
+					</element>                  
 				</sequence>
 			</extension>
 		</complexContent>
@@ -55,20 +55,12 @@
 		<complexContent>
 			<extension base="westep:ValueEvent">
 				<sequence>
-					<element name="code" maxOccurs="1" minOccurs="0">
-						<annotation>
-							<documentation>RAW: Absolute pressure measured by the sensor, default / QFE: Station pressure, sensor Pressure adjusted for any difference between sensor elevation and official station elevation / QNH: Station pressure adjusted for elevation (assumes standard atmosphere) / QFF: Station pressure adjusted for elevation, temperature and humidity.
-							</documentation>
-						</annotation>
-						<simpleType>
-							<restriction base="string">
-								<enumeration value="RAW"></enumeration>
-								<enumeration value="QNH"></enumeration>
-								<enumeration value="QNE"></enumeration>
-								<enumeration value="QFE"></enumeration>
-							</restriction>
-						</simpleType>
+					<element name="code" maxOccurs="1" minOccurs="0" type="westep:PressureCode">
+                        <annotation>
+                            <documentation>Specifies if the pressure is corrected or not. If absent, RAW is assumed.</documentation>
+                        </annotation>
 					</element>
+                    <!--  <any namespace="##any" minOccurs="0"/> -->                    
 				</sequence>
 			</extension>
 		</complexContent>
@@ -163,4 +155,21 @@
         <annotation>
             <documentation>Reports the solar radiation in [W/m²]</documentation>
         </annotation></element>
+
+    <simpleType name="PressureCode">
+        <annotation>
+            <documentation>RAW: Absolute pressure measured by the sensor, default <br/>
+QFE: Station pressure, sensor Pressure adjusted for any difference between sensor elevation and official station elevation<br/>
+QNH: Station pressure adjusted for elevation (assumes standard atmosphere)<br/>
+QFF: Station pressure adjusted for elevation, temperature and humidity.
+            </documentation>
+        </annotation>
+        <restriction base="string">
+            <enumeration value="RAW"></enumeration>
+            <enumeration value="QNH"></enumeration>
+            <enumeration value="QNE"></enumeration>
+            <enumeration value="QFE"></enumeration>
+        </restriction>
+    </simpleType>
+    
 </schema>
