@@ -56,16 +56,20 @@ class XmlInput(object):
             from lxml import etree
             if self.schema is None:                
                 self.schema = etree.XMLSchema(file=urllib.urlopen(self.location))
-            parsed_message = etree.fromstring(message)
+            parsed_message = etree.fromstring(message)            
+            
             if not parsed_message.nsmap.has_key(None): #if no default namespace specified, set it
                 new_element = etree.Element(parsed_message.tag, attrib=parsed_message.attrib, nsmap={ None: self.namespace })
                 new_element.extend(parsed_message.getchildren())
                 parsed_message = etree.fromstring(etree.tostring(new_element))
-            if not self.schema.validate(parsed_message):
-                log = self.schema.error_log
-                error = log.last_error
-                self.logger.error("XML validation error: %s", error)
-
+                
+            if parsed_message.tag.startswith('{'+self.namespace+'}'):
+                if not self.schema.validate(parsed_message):
+                    log = self.schema.error_log
+                    error = log.last_error
+                    self.logger.error("XML validation error: %s", error)
+            else:
+                self.logger.info('Element not in standard namespace, considered as extension: %s', parsed_message.tag)
         event = objectify.XML(message)
         event._type = event.tag.replace('{'+self.namespace+'}','')
         self.send_event(event)

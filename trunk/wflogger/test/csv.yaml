@@ -1,9 +1,9 @@
 context:
     altitude: 430
 
-#input: !stdio-in { validate: true }
+input: !stdio-in { validate: true }
 
-input: !service {name: events, instance: !function {} }
+#input: !service {name: events, instance: !function {} }
 
 collector: !multi
     children:
