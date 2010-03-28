@@ -69,7 +69,7 @@ class DatabaseStorage(object):
             " TEMP, HUM, WIND, WIND_DIR, WIND_GUST, WIND_GUST_DIR, DEW_POINT,"+ \
             " RAIN, RAIN_RATE, PRESSURE, UV_INDEX FROM METEO " + \
             " WHERE TIMESTAMP_LOCAL >= '%s' AND TIMESTAMP_LOCAL < '%s' "+ \
-            " ORDER BY TIMESTAMP_LOCAL ASCENDING"
+            " ORDER BY TIMESTAMP_LOCAL ASC"
 
         sql = statement % ( from_time.strftime(self.time_format),
             to_time.strftime(self.time_format))
