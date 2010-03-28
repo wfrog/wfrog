@@ -52,14 +52,12 @@ class CsvStorage(object):
             file.flush()
 
         sample_row = []
-        for key in self.columns:
-            if key == 'timestamp':
-                value = int(time.mktime(sample[key]))
-            elif key == 'localtime':
-                value = time.strftime('%Y-%m-%d %H:%M:%S', sample['timestamp'])
-            else:
-                value = sample[key]
-            sample_row.append(value)
+
+        now = time.localtime()
+        sample_row.append(int(time.mktime(now))) # timestamp
+        sample_row.append(time.strftime('%Y-%m-%d %H:%M:%S', now)) # localtime
+        for key in self.columns[2:]:
+            sample_row.append(sample[key])
 
         writer.writerow(sample_row)
 
@@ -79,14 +77,13 @@ class CsvStorage(object):
                 if int(line[0]) < from_timestamp:
                     continue
                 if int(line[0]) >= to_timestamp:
-                    break
+                    raise StopIteration
                 sample = {}
-                for i in range(0,len(line)-1):
+                sample['localtime'] = datetime.fromtimestamp(int(line[0]))
+
+                for i in range(2,len(line)-1):
                     if line[i] != '' and line[i] != None:
-                        if i > 1:
-                            sample[self.columns[i]] = float(line[i])
-                        else:
-                            sample[self.columns[i]] = line[i]
+                        sample[self.columns[i]] = float(line[i])
                     else:
                         sample[self.columns[i]] = None
                 yield sample
@@ -94,9 +91,6 @@ class CsvStorage(object):
             file.close()
 
     def _position_cursor(self, timestamp):
-        if not os.path.exists(self.path):
-            return None
-
         size = os.path.getsize(self.path)
         step = offset = size / 2
         file = open(self.path, 'r')

@@ -176,8 +176,6 @@ class AggregatorCollector(base.BaseCollector):
         sample = self.get_data()
         self._new_period()
 
-        sample['timestamp'] = time.localtime()
-
         self.logger.debug("Flushing sample: "+repr(sample))
 
         self.storage.write_sample(sample, context=context)
