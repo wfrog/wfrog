@@ -93,8 +93,7 @@ The following XML messages are valid WESTEP events:
 
 == Extensions ==
 
-WESTEP supports proprietary extensions on the form of additional event types and additional elements the standard event messages after the standard elements. Extension elements must appear in a distinct namespace. The extensibility mecanism remains to be defined in the schema.
-
+WESTEP supports proprietary extensions on the form of additional event types and additional elements the standard event messages after the standard elements. Extension elements must appear in a distinct namespace.
 = Transport =
 
 In the current version of the specification, the following transports are specified:
