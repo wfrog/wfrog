@@ -1,0 +1,19 @@
+context:
+    altitude: 430
+
+input: !stdio-in { validate: true }
+
+#input: !service {name: events, instance: !function {} }
+
+collector: !multi
+    children:
+        aggregator : !flush
+            period: 10
+            collector: !stopwatch
+                target: !aggregator
+                    storage : !service
+                        name: storage
+                        instance: !include { path: ../../wfcommon/test/csv.yaml }
+
+embed:
+    wfdriver: { config: ../../wfdriver/test/csv.yaml }
