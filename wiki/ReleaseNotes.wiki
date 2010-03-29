@@ -1,5 +1,5 @@
 *wfrog 0.5 - 28.03.2010*
-  Unified configuration, [http://www.westep.org WESTEP] compliance, CSV storage
+  Unified configuration, [http://www.westep.org WESTEP] compliance, new architecture
   * [http://code.google.com/p/wfrog/issues/list?can=1&q=label%3AMilestone-Release0.5&colspec=ID+Type+Status+Priority+Milestone+Owner+Summary&cells=tiles Fixed Issues]
   * The architecture has been reworked and now offers full extensibility through an homogeneous YAML configuration system.
   * MySQL and CSV file storages (only wflogger). 
