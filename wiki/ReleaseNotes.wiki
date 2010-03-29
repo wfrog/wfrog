@@ -2,7 +2,8 @@
   Unified configuration, [http://www.westep.org WESTEP] compliance, new architecture
   * [http://code.google.com/p/wfrog/issues/list?can=1&q=label%3AMilestone-Release0.5&colspec=ID+Type+Status+Priority+Milestone+Owner+Summary&cells=tiles Fixed Issues]
   * The architecture has been reworked and now offers full extensibility through an homogeneous YAML configuration system.
-  * MySQL and CSV file storages (only wflogger). 
+  * MySQL and CSV file storages (only wflogger).
+  * Generated [http://www.windmaster.ch/wfrog/doc/ Configuration Reference]
   * Changes in the YAML configuration:
     * The element !multi is now generic. Its children must not be named 'renderers' but 'children'.
     * The chart options that took 'on' or 'off' are now taking 'true or false', to be consistent.
