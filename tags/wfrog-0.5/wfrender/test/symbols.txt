@@ -1,0 +1,33 @@
+⬓
+⚐ Wind
+☂ Rain
+⚖ Pressure
+✵ Direction
+⌂ Inside
+⌀ Mean
+⌚ Time
+┅ Humidity
+░ Humidity
+☀ UV
+☔ Rain
+♨ temp
+ ⌯ Humidity
+
+&#11027;
+&#9872; Wind
+&#9730; Rain
+&#9878; Pressure
+&#10037; Direction
+&#8962; Inside
+&#8960; Mean
+&#8986; Time
+&#9477; Humidity
+&#9617; Humidity
+&#9728; UV
+&#9748; Rain
+&#9832; temp
+
+
+  ⌯
+F
+

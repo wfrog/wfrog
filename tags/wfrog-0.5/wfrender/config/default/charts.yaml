@@ -1,0 +1,63 @@
+renderer: !multi
+    children:
+        temp: !chart
+            interpolate: $interpolate
+            series:
+                temp.max:
+                    color: wheat
+                    area: { to: temp.min }
+                    max: { color: darkred, text: darkred, thickness: 0.5 }
+                temp.avg:
+                    order: 1
+                temp.min:
+                    color: wheat
+                    min: { color: darkslateblue, text: darkslateblue, thickness: 0.5 }
+                dew.avg:
+                    color: 8D7641
+                    thickness: 1
+                    dash: 2
+            labels: temp.lbl
+            zero: { color: 8D7641, thickness: 0.5 }
+        hum: !chart
+            interpolate: $interpolate
+            series:
+                hum.avg: {}
+            labels: hum.lbl
+            ymargin: [ 10, 5 ]
+        press: !chart
+            interpolate: $interpolate
+            series:
+                press.avg: {}
+            labels: press.lbl
+        rain: !chart
+            interpolate: $interpolate
+            series:
+                rain.fall: {}
+            labels: rain.lbl
+            ymargin: [ 0, 1 ]
+        uv: !chart
+            interpolate: $interpolate
+            series:
+                uv.index: {}
+            labels: uv.lbl
+        wind: !chart
+            interpolate: $interpolate
+            series:
+                wind.avg: {}
+                wind.max:
+                    order: -1
+                    color: tan
+                    thickness: 1
+                    area: { to: wind.avg, color: wheat }
+                    max: { color: darkred, text: darkred, thickness: 0.5 }
+            labels: wind.lbl
+            ymargin: [ 0, 1 ]
+        wind_dir: !windradar
+            width: 150
+            height: 150
+            sectors: { color: 00AF00, intensity: 1 }
+            lines: { gust: tan, thickness: 1 }
+            areas: {  gust: wheat }
+
+
+
