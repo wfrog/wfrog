@@ -1,5 +1,5 @@
 #summary Guide to install wfrog on a Voyage Linux system
-#labels Phase-Support,Featured
+#labels Phase-Support
 
 <p align="center"><img src="http://wfrog.googlecode.com/svn/wiki/images/logo-web.png"/></p>
 
