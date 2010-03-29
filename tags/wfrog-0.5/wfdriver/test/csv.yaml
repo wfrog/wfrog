@@ -1,4 +1,0 @@
-station: !random-simulator {}
-
-output: !service { name: events }
-
