@@ -1,6 +1,6 @@
 #summary Online stations exposed with wfrog
 
-Users are invited to submit as comment to this page the URL of their stations to appear in this list.
+Users are invited to submit as comment to this page the URL of their stations to make them appear in this list.
 
 || *Location* || *Weather Station* || *Remarks* ||
 || [http://www.mallorcaweb.net/jpuigsegur/wfrog/24hours.html Sant Joan, Mallorca, Balearic Islands] || WMRS200 || Uses FTP renderer. Running on [http://www.pcengines.ch/alix.htm ALIX3D2] with [http://linux.voyage.hk/ voyage linux] 0.6.2 ||
