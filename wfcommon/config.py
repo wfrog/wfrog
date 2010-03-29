@@ -23,7 +23,7 @@ import inspect
 import sys
 import copy
 
-wfrog_version = "0.5rc3"
+wfrog_version = "0.5"
 
 class Configurer(object):
 
