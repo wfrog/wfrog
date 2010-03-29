@@ -140,6 +140,7 @@ If you create `wfrender.conf` from `wfrender.yaml`, you will also need to copy t
 Adapt values in 
 
   *  `wfcommon/config/storage.yaml` (use the database URL you created above)
+  *  `wfcommon/config/loghandler.yaml` (where to write technical log files)
   *  `wfdriver/config/wfdriver.yaml` (choose you station)
   *  `wflogger/config/wflogger.yaml` (set the station altitude)
 
