@@ -1,15 +1,17 @@
+#labels Featured
 *wfrog 0.5 - 28.03.2010*
   Unified configuration, WESTEP compliance, CSV storage
   * [http://code.google.com/p/wfrog/issues/list?can=1&q=label%3AMilestone-Release0.5&colspec=ID+Type+Status+Priority+Milestone+Owner+Summary&cells=tiles Fixed Issues]
-  * The architecture has been reworked and now offers full extensibility.
+  * The architecture has been reworked and now offers full extensibility through an homogeneous YAML configuration system.
+  * MySQL and CSV file storages (only wflogger). 
   * Changes in the configuration:
     * The element !multi is now generic. Its children must not be named 'renderers' but 'children'.
     * The chart options that took 'on' or 'off' are now taking 'true or false', to be consistent.
     * The chart option y_margin is now ymargin, to be consistent as well.
     * Changed the !include and !template tags so that the paths are relative to the file where they appear and not from the current working directory.
 
-*wfrog-0.2 - 23.01.2010*
-  A stable new version with a simpler db structure and improved error control in the drivers
+*wfrog 0.2 - 23.01.2010*
+  A stable new version with a simpler db structure and improved error control in the drivers.
 
 *wfrog 0.1 - 24.11.2009*
   Simple but somewhat stable release 
