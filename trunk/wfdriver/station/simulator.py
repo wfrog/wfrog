@@ -27,8 +27,8 @@ class RandomSimulator(object):
     '''
 
     types = [ 'temp', 'press', 'hum', 'rain', 'wind', 'uv', 'rad' ]
-    init_values = [ 10, 1020, 65, 10, [ 3, 180], 5, 2 ]
-    range = [ 30, 100, 40, 20, [6, 360], 10, 4 ]
+    init_values = [ 10, 1020, 65, 10, [ 3, 180], 1, 2 ]
+    range = [ 30, 100, 40, 20, [6, 360], 5, 4 ]
 
     rain_total = 55
 
@@ -62,13 +62,15 @@ class RandomSimulator(object):
                 e.mean.dir=current_values[t][1]
                 e.create_child('gust')
                 e.gust.speed=current_values[t][0] + random.randint(0,2)
-                e.gust.dir=current_values[t][1]                
+                e.gust.dir=current_values[t][1]
             else:
                 current_values[t] = self.new_value(current_values[t], self.init_values[t], self.range[t])
                 if type == 'rain':
                     e.rate = current_values[t]
                     e.total = self.rain_total
                     self.rain_total = self.rain_total + random.randint(0,2)
+                elif type == 'uv':
+                    e.value = abs(int(current_values[t]))
                 else:
                     e.value = current_values[t]
 
