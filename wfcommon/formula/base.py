@@ -18,74 +18,80 @@
 
 import sys
 
-def value(dict, key):
+def get(dict, key):
     if dict.has_key(key):
         return dict[key]
-    else
+    else:
         return None
 
 class AverageFormula(object):
     '''
     Average.
     '''
-    def __init__(key):
+    def __init__(self, key):
         self.key = key
-    
+
     key = None
     sum = 0
     count = 0
-    
-    def append(sample):      
-        value = value(sample,key)
-        if value is not None
+
+    def append(self, sample):
+        value = get(sample, self.key)
+        if value is not None:
             self.sum = self.sum + value
-            self.count = self.count + 1    
-    
-    def value():
+            self.count = self.count + 1
+
+    def value(self):
         if self.count==0:
-            return 0
-        else
+            return None
+        else:
             return float(self.sum) / float(self.count)
-    
+
 
 class MinFormula(object):
     '''
     Minimum.
     '''
 
-    def __init__(key):
+    def __init__(self, key):
         self.key = key
 
     key = None
     min = sys.maxint
-    
-    def append(value):
-        value = value(sample,key)        
-        if value is not None        
+
+    def append(self, sample):
+        value = get(sample, self.key)
+        if value is not None:
             self.min = min(self.min, value)
-    
-    def value():
-        return self.min
+
+    def value(self):
+        if self.min == sys.maxint:
+            return None
+        else:
+            return self.min
 
 
 class MaxFormula(object):
     '''
     Maximum.
     '''
-    
-    def __init__(key):
+
+    def __init__(self, key):
         self.key = key
-    
+
     key = None
     max = -sys.maxint
-    
-    def append(value):
-        value = value(sample,key)
-        if value is not None        
+
+    def append(self, sample):
+        value = get(sample, self.key)
+        if value is not None:
             self.max = min(self.max, value)
-    
-    def value():
-        return self.max
+
+    def value(self):
+        if self.max == -sys.maxint:
+            return None
+        else:
+            return self.max
 
 
 class SumFormula(object):
@@ -93,16 +99,21 @@ class SumFormula(object):
     Sum.
     '''
 
-    def __init__(key):
+    def __init__(self, key):
         self.key = key
-        
+
     key = None
     sum = 0
-    
-    def append(value):
-        value = value(sample,key)
-        if value is not None        
+    empty = True
+
+    def append(self, sample):
+        value = get(sample, self.key)
+        if value is not None:
+            self.empty = False
             self.sum = self.sum + value
-    
-    def value():
-        return self.sum
+
+    def value(self):
+        if self.empty:
+            return None
+        else:
+            return self.sum
