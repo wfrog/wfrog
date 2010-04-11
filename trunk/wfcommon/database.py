@@ -31,9 +31,11 @@ if kinterbasdb:
         if __name__ == '__main__': print "firebird conversion 199"
         #kinterbasdb.init(type_conv=200) # Set type conversion (datetime / decimal)
     except:
-        kinterbasdb.init(type_conv=0) # Set type conversion (time tuple / floats) old python 2.5
-        if __name__ == '__main__': print "firebird conversion 0"
-
+        try:
+            kinterbasdb.init(type_conv=0) # Set type conversion (time tuple / floats) old python 2.5
+            if __name__ == '__main__': print "firebird conversion 0"
+        except:
+            pass
 try:
     import MySQLdb
     if __name__ == '__main__': print "mysql driver present"
