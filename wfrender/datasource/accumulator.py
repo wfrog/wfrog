@@ -175,8 +175,6 @@ class AccumulatorDatasource(object):
             to_time = datetime.datetime.now()
             use_cache = True
 
-        use_cache = True
-
         from_time = to_time - (self.get_slice_duration() * (self.span - 1) )
 
         if use_cache:
@@ -184,25 +182,26 @@ class AccumulatorDatasource(object):
 
             if self.last_timestamp < to_time - datetime.timedelta(0,self.period) or self.cached_series is None:
                 self.lock.acquire()
-                # TODO: add double check
-                try:
-                    if self.cached_slices is None:
-                        self.cached_slices = []
+                if self.last_timestamp < to_time - datetime.timedelta(0,self.period) or self.cached_series is None:
 
-                    last_timestamp, to_delete = self.update_slices(self.cached_slices, from_time, to_time, self.last_timestamp)
+                    try:
+                        if self.cached_slices is None:
+                            self.cached_slices = []
 
-                    self.cached_slices = self.cached_slices[to_delete:]
-                    self.logger.debug('Deleted %s slices', to_delete)
-                    self.logger.debug("Last timestamp: %s", self.last_timestamp)
+                        last_timestamp, to_delete = self.update_slices(self.cached_slices, from_time, to_time, self.last_timestamp)
 
-                    self.last_timestamp = last_timestamp
-                finally:
-                    # Replace the global lock by a per-instance lock
-                    current_lock = self.lock
-                    self.lock = threading.Lock()
-                    current_lock.release()
+                        self.cached_slices = self.cached_slices[to_delete:]
+                        self.logger.debug('Deleted %s slices', to_delete)
+                        self.logger.debug("Last timestamp: %s", self.last_timestamp)
 
-                self.cached_series = self.get_series(self.cached_slices)
+                        self.last_timestamp = last_timestamp
+                    finally:
+                        # Replace the global lock by a per-instance lock
+                        current_lock = self.lock
+                        self.lock = threading.Lock()
+                        current_lock.release()
+
+                    self.cached_series = self.get_series(self.cached_slices)
 
             return self.cached_series
 
