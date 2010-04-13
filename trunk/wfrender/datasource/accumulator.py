@@ -45,7 +45,7 @@ class AccumulatorDatasource(object):
     formats = { 'month': '%m',
                 'day': '%d',
                 'hour': '%H:00',
-                'minute': '%H:%M' ]
+                'minute': '%H:%M' }
 
     period = 120
 
@@ -62,7 +62,8 @@ class AccumulatorDatasource(object):
     logger = logging.getLogger("datasource.accumulator")
 
     last_timestamp = datetime.datetime.fromtimestamp(0)
-    cached_slices = []
+    cached_slices = None
+    cached_series = None
 
     lock = threading.Lock()
 
@@ -107,46 +108,48 @@ class AccumulatorDatasource(object):
         elif self.slice == 'month':
             return datetime.datetime(time.year, time.month+1 % 13, 1)
 
-    def create_slices(self, from_time, to_time):
+    def create_slices(self, slices, from_time, to_time):
         t = self.get_slice_start(from_time)
         while t < to_time:
             end = self.get_next_slice_start(t)
             self.logger.debug("Creating slice %s - %s", t, end)
             slice = self.Slice(self.formulas, t, end)
-            self.cached_slices.append(slice)
+            slices.append(slice)
             t = end
 
-    def get_labels(self):
+    def get_labels(self, slices):
         format = self.formats[self.slice]
+        return list(slice.from_time.strftime(format) for slice in slices)
 
-    def execute(self,data={}, context={}):
-        to_time = parse(data['time_end']) if data.has_key('time_end') else datetime.datetime.now()
-        from_time = to_time - (self.get_slice_duration() * (self.span - 1) )
+    def update_slices(self, slices, from_time, to_time, last_timestamp=None):
+        if len(slices) > 0:
+            slice_from_time = slices[-1].to_time
+        else:
+            slice_from_time = from_time
 
-        self.logger.debug("Last timestamp: %s", self.last_timestamp)
+        self.create_slices(slices, slice_from_time, to_time)
 
-        if self.last_timestamp < to_time - datetime.timedelta(0,self.period):
-            self.lock.acquire()
-            try:
-                if len(self.cached_slices) > 0:
-                    slice_from_time = self.cached_slices[-1].to_time
-                else:
-                    slice_from_time = from_time
+        if last_timestamp:
+            update_from_time = max(last_timestamp, from_time)
+        else:
+            update_from_time = from_time
+        self.logger.debug("Update from %s ", update_from_time)
+        s = 0
+        first = True
+        to_delete = 0
+        for sample in self.storage.samples(update_from_time, to_time):
+            # find the first slice receiving the samples
+            while slices[s].to_time < sample['localtime']:
+                if first:
+                    # count of obsolete slices to delete
+                    to_delete=s
+                s = s + 1
+            first = False
+            slices[s].add_sample(sample)
+            last_timestamp = sample['localtime']
+        return last_timestamp, to_delete
 
-                self.create_slices(slice_from_time, to_time)
-
-                update_from_time = max(self.last_timestamp, from_time)
-                self.logger.debug("Update from %s ", update_from_time)
-                s = 0
-                for sample in self.storage.samples(update_from_time, to_time):
-                    # find the first slice receiving the samples
-                    while self.cached_slices[s].to_time < sample['localtime']:
-                        s = s + 1
-                    self.cached_slices[s].add_sample(sample)
-                    self.last_timestamp = sample['localtime']
-                self.logger.debug("Last timestamp: %s", self.last_timestamp)
-            finally:
-                self.lock.release()
+    def get_series(self, slices):
 
         result = {}
 
@@ -155,14 +158,58 @@ class AccumulatorDatasource(object):
             result[k]['series']={}
             for key in v.keys():
                 result[k]['series'][key]=[]
-                result[k]['series'][key]=self.get_labels()
+                result[k]['series']['lbl']=self.get_labels(slices)
 
-        for slice in self.cached_slices:
+        for slice in slices:
             for k,v in slice.formulas.iteritems():
                 for key,formula in v.iteritems():
                     result[k]['series'][key].append(formula.value())
 
         return result
+
+    def execute(self,data={}, context={}):
+        if data.has_key('time_end'):
+            to_time = parse(data['time_end'])
+            use_cache = False
+        else:
+            to_time = datetime.datetime.now()
+            use_cache = True
+
+        use_cache = True
+
+        from_time = to_time - (self.get_slice_duration() * (self.span - 1) )
+
+        if use_cache:
+            self.logger.debug("Last timestamp: %s", self.last_timestamp)
+
+            if self.last_timestamp < to_time - datetime.timedelta(0,self.period) or self.cached_series is None:
+                self.lock.acquire()
+                # TODO: add double check
+                try:
+                    if self.cached_slices is None:
+                        self.cached_slices = []
+
+                    last_timestamp, to_delete = self.update_slices(self.cached_slices, from_time, to_time, self.last_timestamp)
+
+                    self.cached_slices = self.cached_slices[to_delete:]
+                    self.logger.debug('Deleted %s slices', to_delete)
+                    self.logger.debug("Last timestamp: %s", self.last_timestamp)
+
+                    self.last_timestamp = last_timestamp
+                finally:
+                    # Replace the global lock by a per-instance lock
+                    current_lock = self.lock
+                    self.lock = threading.Lock()
+                    current_lock.release()
+
+                self.cached_series = self.get_series(self.cached_slices)
+
+            return self.cached_series
+
+        else: # use_cache == False
+            slices = []
+            self.update_slices(slices, from_time, to_time)
+            return self.get_series(slices)
 
 def parse(isodate):
     if len(isodate) == 10:
