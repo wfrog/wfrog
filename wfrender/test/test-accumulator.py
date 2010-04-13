@@ -10,13 +10,13 @@ import wfcommon.storage.csvfile
 
 a = wfrender.datasource.accumulator.AccumulatorDatasource()
 
-a.slice = 'month'
-a.span = 2
+a.slice = 'day'
+a.span = 4
 a.storage = wfcommon.storage.csvfile.CsvStorage()
 a.storage.path = '../../wflogger/test/wfrog.csv'
 
-print repr(a.execute( data={ 'time_end': '2010-03-25' }))
+print repr(a.execute( data={ 'time_end': '2010-03-25Z12:00:00' }))
 
-print repr(a.execute( data={ 'time_end': '2010-03-26' }))
+print repr(a.execute( data={ 'time_end': '2010-03-26Z12:00:00' }))
 
-print repr(a.execute( data={ 'time_end': '2010-03-26' }))
+print repr(a.execute( data={ 'time_end': '2010-03-26Z12:00:00' }))
