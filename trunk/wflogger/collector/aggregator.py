@@ -132,7 +132,7 @@ class AggregatorCollector(base.BaseCollector):
         if len(self._wind) > 0:
             data['wind'] = round(sum(self._wind)/len(self._wind), 1)
             data['wind_dir'] = round(wfcommon.meteo.WindPredominantDirection(self._wind_dir), 1)
-            data['wind_gust_dir'] = round(self._wind_gust_dir, 1)
+            data['wind_gust_dir'] = self._wind_gust_dir
 
             # Wind gust cannot be smaller than wind average
             # (might happen due to different sampling periods)
