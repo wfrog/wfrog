@@ -29,18 +29,43 @@ import threading
 
 class AccumulatorDatasource(object):
     '''
-    Calculates data from a storage in an iterative fashion by traversing
+    Calculates data from a storage in an iterative way by traversing
     only recently added data.
 
     [ Properties ]
 
     storage [storage]:
         The underlying storage to get samples.
+
+    slice [month|day|hour|minute] (optional):
+        The unit of grouping for the calculated series.
+        Defaults to 'hour''
+
+    span [numeric] (optional):
+        Number of slices in the resulting series.
+        Defaults to 24.
+
+    period [numeric] (optional):
+        Number of seconds between two refreshes of the calculated data.
+        DEfaults to 120.
+
+    format [string] (optional):
+        Date/time format string for labels.
+        See Pythons's strftime function.
+
+    formulas [dict] (optional):
+        Specify what and how to calculate. Defines the structure of the
+        resulting data.
+        Dictionary keyed by the measure names ('temp', 'hum', ...). Values
+        are dictionaries keyed by the serie names ('avg', 'min', ...) and
+        containing 'formula' objects.
     '''
 
     storage = None
     slice = 'hour'
     span = 23
+
+    format = None
 
     formats = { 'month': '%m',
                 'day': '%d',
@@ -108,17 +133,11 @@ class AccumulatorDatasource(object):
         elif self.slice == 'month':
             return datetime.datetime(time.year, time.month+1 % 13, 1)
 
-    def create_slices(self, slices, from_time, to_time):
-        t = self.get_slice_start(from_time)
-        while t < to_time:
-            end = self.get_next_slice_start(t)
-            self.logger.debug("Creating slice %s - %s", t, end)
-            slice = self.Slice(self.formulas, t, end)
-            slices.append(slice)
-            t = end
-
     def get_labels(self, slices):
-        format = self.formats[self.slice]
+        if self.format is not None:
+            format = self.format
+           else:
+            format = self.formats[self.slice]
         return list(slice.from_time.strftime(format) for slice in slices)
 
     def update_slices(self, slices, from_time, to_time, last_timestamp=None):
@@ -127,8 +146,16 @@ class AccumulatorDatasource(object):
         else:
             slice_from_time = from_time
 
-        self.create_slices(slices, slice_from_time, to_time)
+        # Create the necessary slices
+        t = self.get_slice_start(from_time)
+        while t < to_time:
+            end = self.get_next_slice_start(t)
+            self.logger.debug("Creating slice %s - %s", t, end)
+            slice = self.Slice(self.formulas, t, end)
+            slices.append(slice)
+            t = end
 
+        # Fill them with samples
         if last_timestamp:
             update_from_time = max(last_timestamp, from_time)
         else:

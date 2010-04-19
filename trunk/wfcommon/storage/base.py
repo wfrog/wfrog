@@ -38,8 +38,9 @@ class DatabaseStorage(object):
             " RAIN, RAIN_RATE, PRESSURE, UV_INDEX) "+ \
             "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
-        sql = statement % ("'%s'" % time.strftime(self.time_format, time.gmtime()),
-       "'%s'" % time.strftime(self.time_format, time.localtime()),
+        timestamp = int(time.mktime(sample['localtime']))
+        sql = statement % ("'%s'" % datetime.utcfromtimestamp(timestamp).strftime(self.time_format),
+       "'%s'" % sample['localtime'].strftime(self.time_format),
        self.format(sample['temp']),
        self.format(sample['hum']),
        self.format(sample['wind']),

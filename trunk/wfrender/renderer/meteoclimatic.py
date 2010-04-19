@@ -36,6 +36,8 @@ class MeteoclimaticRenderer(object):
         meteoclimatic station ID.
     """
 
+    id = None
+
     logger = logging.getLogger("renderer.meteoclimatic")
 
     def render(self, data={}, context={}):
