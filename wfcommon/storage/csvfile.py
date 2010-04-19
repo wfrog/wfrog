@@ -53,7 +53,7 @@ class CsvStorage(object):
 
         sample_row = []
 
-        now = time.localtime()
+        now = sample['localtime']
         sample_row.append(int(time.mktime(now))) # timestamp
         sample_row.append(time.strftime('%Y-%m-%d %H:%M:%S', now)) # localtime
         for key in self.columns[2:]:

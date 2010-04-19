@@ -18,22 +18,8 @@
 
 import logging
 import wfcommon.meteo
+from wfcommon.formula.base import AverageFormula
 import datetime
-
-class Average(object):
-    sum = 0
-    count = 0
-
-    def add(self, value):
-        if value is not None:
-            self.sum = self.sum + value
-            self.count = self.count + 1
-
-    def value(self):
-        if(self.count==0):
-            return None
-        else:
-            return self.sum / self.count
 
 class BaseCollector(object):
     '''
@@ -86,13 +72,11 @@ class BaseCollector(object):
                 return self._mean_temp
         try:
 
-            average = Average()
+            average = AverageFormula('temp')
 
             for sample in self.storage.samples(datetime.datetime.now() - datetime.timedelta(hours=12), context=context):
-                average.add(sample['temp'])
-
+                average.add(sample)
             self._mean_temp = average.value()
-
             if self._mean_temp is None:
                 return current_temp
 
