@@ -31,8 +31,6 @@ import optparse
 import logging
 import time
 import wfcommon.config
-import wfdriver.wfdriver
-import wfrender.wfrender
 from threading import Thread
 from Queue import Queue, Full
 import copy
@@ -146,12 +144,14 @@ logging [logging configuration] (optional):
         # Start the embedded processes
         if self.embedded.has_key('wfdriver'):
             self.logger.debug("Starting embedded wfdriver")
+            import wfdriver.wfdriver
             driver = wfdriver.wfdriver.Driver(os.path.join(dir_name, self.embedded['wfdriver']['config']))
             driver_thread = Thread(target=driver.run)
             driver_thread.setDaemon(True)
             driver_thread.start()
-        if self.embedded.has_key('wfrender'):
+        if self.embedded.has_key('wfrender'):                        
             self.logger.debug("Starting embedded wfrender")
+            import wfrender.wfrender
             renderer = wfrender.wfrender.RenderEngine(os.path.join(dir_name, self.embedded['wfrender']['config']))
             renderer_thread = Thread(target=renderer.process)
             renderer_thread.setDaemon(True)
