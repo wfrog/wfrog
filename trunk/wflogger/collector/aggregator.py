@@ -18,7 +18,7 @@
 
 import logging
 import base
-import time
+import datetime
 import wfcommon.meteo
 
 class AggregatorCollector(base.BaseCollector):
