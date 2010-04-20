@@ -1,0 +1,5 @@
+from: !csv
+    path: ../wflogger/test/wfrog.csv
+
+to: !csv
+    path: /tmp/wfrog2.csv

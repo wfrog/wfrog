@@ -38,8 +38,9 @@ class DatabaseStorage(object):
             " RAIN, RAIN_RATE, PRESSURE, UV_INDEX) "+ \
             "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
-        timestamp = int(time.mktime(sample['localtime']))
-        sql = statement % ("'%s'" % datetime.utcfromtimestamp(timestamp).strftime(self.time_format),
+        timestamp = time.mktime(sample['localtime'].timetuple())
+        utc_time = datetime.datetime.utcfromtimestamp(timestamp)
+        sql = statement % ("'%s'" % utc_time.strftime(self.time_format),
        "'%s'" % sample['localtime'].strftime(self.time_format),
        self.format(sample['temp']),
        self.format(sample['hum']),
@@ -75,7 +76,7 @@ class DatabaseStorage(object):
         sql = statement % ( from_time.strftime(self.time_format),
             to_time.strftime(self.time_format))
 
-        mapper = lambda(row) : { 'local_timestamp' : row[0],
+        mapper = lambda(row) : { 'localtime' : datetime.datetime.strptime(row[0], self.time_format),
             'temp' : row[1],
             'hum' : row[2],
             'wind' : row[3],

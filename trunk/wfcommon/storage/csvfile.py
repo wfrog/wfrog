@@ -42,6 +42,7 @@ class CsvStorage(object):
     logger = logging.getLogger('storage.csv')
 
     def write_sample(self, sample, context={}):
+        self.logger.debug(sample)
         if os.path.exists(self.path):
             file = open(self.path, 'a')
             writer = csv.writer(file)
@@ -54,8 +55,8 @@ class CsvStorage(object):
         sample_row = []
 
         now = sample['localtime']
-        sample_row.append(int(time.mktime(now))) # timestamp
-        sample_row.append(time.strftime('%Y-%m-%d %H:%M:%S', now)) # localtime
+        sample_row.append(int(time.mktime(now.timetuple()))) # timestamp
+        sample_row.append(now.strftime('%Y-%m-%d %H:%M:%S')) # localtime
         for key in self.columns[2:]:
             sample_row.append(sample[key])
 
@@ -81,7 +82,7 @@ class CsvStorage(object):
                 sample = {}
                 sample['localtime'] = datetime.fromtimestamp(int(line[0]))
 
-                for i in range(2,len(line)-1):
+                for i in range(2,len(line)):
                     if line[i] != '' and line[i] != None:
                         sample[self.columns[i]] = float(line[i])
                     else:
