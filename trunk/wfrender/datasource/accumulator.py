@@ -22,6 +22,7 @@ from wfcommon.formula.base import AverageFormula
 from wfcommon.formula.base import MinFormula
 from wfcommon.formula.base import MaxFormula
 from wfcommon.formula.base import SumFormula
+from wfcommon.formula.wind import PredominantWindFormula
 
 import copy
 import datetime
@@ -75,10 +76,16 @@ class AccumulatorDatasource(object):
     period = 120
 
     default_formulas = {
-        'temp': { 'avg' : AverageFormula('temp'), 'min' : MinFormula('temp'), 'max' : MaxFormula('temp') },
+        'temp': { 'avg' : AverageFormula('temp'),
+                   'min' : MinFormula('temp'),
+                   'max' : MaxFormula('temp') },
         'hum' : { 'avg' : AverageFormula('hum') },
         'press' : { 'avg' : AverageFormula('pressure') },
-        'rain' : { 'rate' : AverageFormula('rain_rate'), 'fall' : SumFormula('rain') },
+           'wind' : { 'avg' : AverageFormula('wind'),
+                        'max' : MaxFormula('wind_gust'),
+                        'deg' : PredominantWindFormula('wind')  },
+        'rain' : { 'rate' : AverageFormula('rain_rate'),
+                   'fall' : SumFormula('rain') },
         'uv' : { 'index' : MaxFormula('uv_index') }
     }
 
@@ -136,7 +143,7 @@ class AccumulatorDatasource(object):
     def get_labels(self, slices):
         if self.format is not None:
             format = self.format
-           else:
+        else:
             format = self.formats[self.slice]
         return list(slice.from_time.strftime(format) for slice in slices)
 
