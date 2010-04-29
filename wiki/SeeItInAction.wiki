@@ -3,9 +3,9 @@
 Users are invited to submit as comment to this page the URL of their stations to make them appear in this list.
 
 || *Location* || *Weather Station* || *Remarks* ||
-|| [http://www.mallorcaweb.net/jpuigsegur/wfrog/24hours.html Sant Joan, Mallorca, Balearic Islands] || WMRS200 || Uses FTP renderer. Running on [http://www.pcengines.ch/alix.htm ALIX3D2] with [http://linux.voyage.hk/ voyage linux] 0.6.2 ||
+|| [http://www.mallorcaweb.net/jpuigsegur/wfrog/24hours.html Sant Joan, Mallorca, Balearic Islands] || WMRS200 || Uses FTP renderer. Running on [http://www.pcengines.ch/alix.htm ALIX3D2] with [http://linux.voyage.hk/ voyage linux] 0.6.2. Uploads online data to www.meteoclimatic.com  ||
 || [http://www.windmaster.ch/meteo/ Cortaillod, Neuchâtel, Switzerland] || WMRS200 ||  Uses HTTP renderer. ||
-|| [http://meteolajonquera.50webs.com/24hours.html La Jonquera, Catalonia] || WMR928NX || Uses FTP renderer ||
-|| [http://www.6tec.es/estacio/24hours.html (6tec enginyeria) Manacor, Balearic Islands] || WMRS200 || Uses FTP renderer. Running on [http://www.pcengines.ch/alix.htm ALIX3D2] with [http://linux.voyage.hk/ voyage linux] 0.6.2 ||
+|| [http://meteolajonquera.50webs.com/24hours.html La Jonquera, Catalonia] || WMR928NX || Uses FTP renderer. Running on [http://www.pcengines.ch/alix.htm ALIX3D2] with [http://linux.voyage.hk/ voyage linux] 0.6.2. Uploads online data to www.meteoclimatic.com ||
+|| [http://www.6tec.es/estacio/24hours.html (6tec enginyeria) Manacor, Balearic Islands] || WMRS200 || Uses FTP renderer. Running on [http://www.pcengines.ch/alix.htm ALIX3D2] with [http://linux.voyage.hk/ voyage linux] 0.6.2. Uploads online data to www.meteoclimatic.com  ||
 
 <p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
