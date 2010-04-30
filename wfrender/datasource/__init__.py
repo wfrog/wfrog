@@ -18,11 +18,15 @@
 
 import yaml
 
+import accumulator
 import database
 import xmlquery
 import simulator
 
 # YAML mappings
+
+class YamlAccumulatorDataSource(accumulator.AccumulatorDatasource, yaml.YAMLObject):
+    yaml_tag = u'!accumulator'
 
 class YamlSimulatorDataSource(simulator.SimulatorDataSource, yaml.YAMLObject):
     yaml_tag = u'!simulator'

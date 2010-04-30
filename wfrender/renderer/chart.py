@@ -16,6 +16,12 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+if __name__=="__main__":
+    import os.path
+    import sys
+    sys.path.append(os.path.abspath(sys.path[0] + '/../..'))
+
+
 from pygooglechart import Chart
 from pygooglechart import _check_colour
 from pygooglechart import Axis
@@ -419,12 +425,6 @@ class GoogleChartWindRadarRenderer(object):
 
     [ Properties ]
 
-    series [dict]:
-        Defines which series data are rendered on the chart and
-        their options. Keys follow the format 'measure.serie', e.g.
-        'temp.avg'. Value contains a dictionary of rendering options. See
-        below the available options and their scope.
-
     height [numeric] (optional):
         Height in pixels of the generated graph image. Defaults to 125.
 
@@ -564,6 +564,11 @@ class GoogleChartWindRadarRenderer(object):
 
         max = config.median * 2
 
+        if data[self.key].has_key('sectors'):
+            sector_data = data[self.key]['sectors']
+        else:
+            sector_data = self.calculate_sector_data(data[self.key]['series'])
+
         if data[self.key].has_key('value'):
             current_noscale = data[self.key]['value']
             last_gust_noscale = data[self.key]['max']
@@ -575,11 +580,11 @@ class GoogleChartWindRadarRenderer(object):
 
         if config.bars or config.areas or config.sectors:
             avg = []
-            for val in data[self.key]['sectors']['avg']:
+            for val in sector_data['avg']:
                 avg.append(self.scale(val, config.median, config.radius))
             avg.append(avg[0])
             gust = []
-            for val in data[self.key]['sectors']['max']:
+            for val in sector_data['max']:
                 gust.append(self.scale(val, config.median, config.radius))
             gust.append(gust[0])
         else:
@@ -629,8 +634,8 @@ class GoogleChartWindRadarRenderer(object):
         if config.sectors:
             for i in range(0,16):
                 sec = [0] * 16
-                avg = self.scale(data[self.key]['sectors']['avg'][i], config.median, config.radius)
-                freq_value = data[self.key]['sectors']['freq'][i]*255
+                avg = self.scale(sector_data['avg'][i], config.median, config.radius)
+                freq_value = sector_data['freq'][i]*255
                 freq_value = rmin(255, (1+2*sectors_config.intensity) * freq_value)
                 freq = "%02x" % int(freq_value)
                 start = i-0.5
@@ -694,6 +699,38 @@ class GoogleChartWindRadarRenderer(object):
             return value
         else:
             return (mean/log((max/mean-2)+1))*log(((max/mean-2)/mean)*value+1)
+
+    def calculate_sector_data(self, serie_data):
+        sector_data = {}
+        sector_data['lbl'] = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW']
+        sector_data['avg'] = 16 * [ 0.0 ]
+        sector_data['freq'] = 16 * [ 0.0 ]
+        sector_data['max'] = 16 * [ 0.0 ]
+
+        total_count=0
+        for i in range(len(serie_data['avg'])):
+            avg = serie_data['avg'][i]
+            max = serie_data['max'][i]
+            dir = serie_data['dir'][i]
+            if avg > 0 and dir is not None:
+                index = sector_data['lbl'].index(dir)
+                sector_data['freq'][index] = sector_data['freq'][index] + 1
+                total_count = total_count + 1
+                sector_data['avg'][index] = sector_data['avg'][index] + avg
+                if max > sector_data['max'][index]:
+                    sector_data['max'][index] = max
+
+        # divide sums to calculate averages
+        for i in range(len(sector_data['avg'])):
+            if sector_data['freq'][i] > 0:
+                sector_data['avg'][i] = sector_data['avg'][i] / sector_data['freq'][i]
+
+        # normalize frequencies
+        if total_count > 0:
+            for i in range(len(sector_data['freq'])):
+                   sector_data['freq'][i] = sector_data['freq'][i] / total_count
+
+        return sector_data
 
 def _axis_set_style(self, colour, font_size=None, alignment=None, drawing_control=None, tick_colour=None):
     _check_colour(colour)
@@ -818,5 +855,15 @@ def compress(data, ratio, min_index, max_index):
     return (result, new_min_index, new_max_index)
 
 
+if __name__=="__main__":
 
+    serie_data = {
+                    "lbl" : [ "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00" ],
+                    "avg" : [ 4, 3.8, None, 1, 1.2, .3, 0.2, 0, 1 , 1],
+                    "max" : [ 5, 6, None, 1.3, 1.3, .4, 0.2, 0, 1.2 , 1],
+                    "deg" : [ 318, None, 300, 310, 300, 300, 300, 345, 12, 60 ],
+                    "dir": [ 'NNW', None, 'NW', 'NW', 'NW', 'NW', 'N', 'NNE', 'NE', 'NE']
+                    }
 
+    r = GoogleChartWindRadarRenderer()
+    print r.calculate_sector_data(serie_data)
