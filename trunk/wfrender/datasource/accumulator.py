@@ -83,7 +83,7 @@ class AccumulatorDatasource(object):
         'press' : { 'avg' : AverageFormula('pressure') },
            'wind' : { 'avg' : AverageFormula('wind'),
                         'max' : MaxFormula('wind_gust'),
-                        'deg' : PredominantWindFormula('wind')  },
+                        'deg,dir' : PredominantWindFormula('wind')  },
         'rain' : { 'rate' : AverageFormula('rain_rate'),
                    'fall' : SumFormula('rain') },
         'uv' : { 'index' : MaxFormula('uv_index') }
@@ -191,13 +191,21 @@ class AccumulatorDatasource(object):
             result[k]={}
             result[k]['series']={}
             for key in v.keys():
-                result[k]['series'][key]=[]
+                subkeys = key.split(',')
+                for subkey in subkeys:
+                    result[k]['series'][subkey]=[]
                 result[k]['series']['lbl']=self.get_labels(slices)
 
         for slice in slices:
             for k,v in slice.formulas.iteritems():
                 for key,formula in v.iteritems():
-                    result[k]['series'][key].append(formula.value())
+                    value = formula.value()
+                    subkeys = key.split(',')
+                    print subkeys
+                    if len(subkeys) == 1:
+                        value = [ value ]
+                    for i in range(len(subkeys)):
+                        result[k]['series'][subkeys[i]].append(value[i])
 
         return result
 

@@ -46,8 +46,9 @@ class PredominantWindFormula(object):
 
     def value(self):
         if self.count==0:
-            return None
+            return (None, None)
         else:
             avgX = self.sumX / self.count
             avgY = self.sumY / self.count
-            return meteo.WindDir(avgX, avgY)
+            dir = meteo.WindDir(avgX, avgY)
+            return ( dir, meteo.WindDirTxt(dir) )
