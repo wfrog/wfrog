@@ -60,6 +60,9 @@ class AccumulatorDatasource(object):
         Dictionary keyed by the measure names ('temp', 'hum', ...). Values
         are dictionaries keyed by the serie names ('avg', 'min', ...) and
         containing 'formula' objects.
+        
+    caching [true|false] (optional):
+        Enable/disable caching for normal requests. Defaults to true.
     '''
 
     storage = None
@@ -91,6 +94,8 @@ class AccumulatorDatasource(object):
     }
 
     formulas = default_formulas
+
+    caching = True
 
     logger = logging.getLogger("datasource.accumulator")
 
@@ -213,7 +218,7 @@ class AccumulatorDatasource(object):
             use_cache = False
         else:
             to_time = datetime.datetime.now()
-            use_cache = True
+            use_cache = self.caching
 
         duration = self.get_slice_duration() 
         times = (self.span - 1)
