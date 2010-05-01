@@ -85,7 +85,7 @@ class MaxFormula(object):
     def append(self, sample):
         value = get(sample, self.key)
         if value is not None:
-            self.max = min(self.max, value)
+            self.max = max(self.max, value)
 
     def value(self):
         if self.max == -sys.maxint:

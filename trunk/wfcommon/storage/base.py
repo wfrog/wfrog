@@ -39,7 +39,7 @@ class DatabaseStorage(object):
             "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
         timestamp = time.mktime(sample['localtime'].timetuple())
-        utc_time = datetime.datetime.utcfromtimestamp(timestamp)
+        utc_time = datetime.utcfromtimestamp(timestamp)
         sql = statement % ("'%s'" % utc_time.strftime(self.time_format),
        "'%s'" % sample['localtime'].strftime(self.time_format),
        self.format(sample['temp']),
@@ -63,6 +63,9 @@ class DatabaseStorage(object):
             self.db.disconnect()
 
     def samples(self, from_time=datetime.fromtimestamp(0), to_time=datetime.now(), context={}):
+        
+        self.logger.debug("Getting samples for range: %s to %s", from_time, to_time)
+        
         if not self.initialized:
             self.init()
             self.initialized = True
@@ -76,7 +79,7 @@ class DatabaseStorage(object):
         sql = statement % ( from_time.strftime(self.time_format),
             to_time.strftime(self.time_format))
 
-        mapper = lambda(row) : { 'localtime' : datetime.datetime.strptime(row[0], self.time_format),
+        mapper = lambda(row) : { 'localtime' : row[0] if isinstance(row[0], datetime) else datetime.strptime(row[0], self.time_format),
             'temp' : row[1],
             'hum' : row[2],
             'wind' : row[3],
