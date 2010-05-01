@@ -2,9 +2,11 @@ renderer: !template
     path: ../../templates/default/main.html
     mime: text/html
     renderer: !data
-        source: !database
+        source: !accumulator
             slice: hour
-            span: 23
+            span: 24
+            storage: !include { path: ../../../wfcommon/config/storage.yaml }  
+                
         renderer: !multi
             children:
                 current: !include

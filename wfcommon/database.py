@@ -50,7 +50,7 @@ except ImportError:
 def adjust(obj):
     try:
         if isinstance(obj, tuple):
-            if len(obj) == 7:
+            if len(obj) == 7 or len(obj) == 6:
                 return datetime.datetime(*obj)
         elif isinstance(obj, decimal.Decimal):
             return float(obj)

@@ -70,7 +70,7 @@ class AccumulatorDatasource(object):
 
     formats = { 'month': '%m',
                 'day': '%d',
-                'hour': '%H:00',
+                'hour': '%H',
                 'minute': '%H:%M' }
 
     period = 120
@@ -79,6 +79,7 @@ class AccumulatorDatasource(object):
         'temp': { 'avg' : AverageFormula('temp'),
                    'min' : MinFormula('temp'),
                    'max' : MaxFormula('temp') },
+        'dew' : { 'avg': AverageFormula('dew_point')},
         'hum' : { 'avg' : AverageFormula('hum') },
         'press' : { 'avg' : AverageFormula('pressure') },
            'wind' : { 'avg' : AverageFormula('wind'),
@@ -147,14 +148,14 @@ class AccumulatorDatasource(object):
             format = self.formats[self.slice]
         return list(slice.from_time.strftime(format) for slice in slices)
 
-    def update_slices(self, slices, from_time, to_time, last_timestamp=None):
+    def update_slices(self, slices, from_time, to_time, context, last_timestamp=None):
         if len(slices) > 0:
             slice_from_time = slices[-1].to_time
         else:
             slice_from_time = from_time
 
         # Create the necessary slices
-        t = self.get_slice_start(from_time)
+        t = self.get_slice_start(slice_from_time)
         while t < to_time:
             end = self.get_next_slice_start(t)
             self.logger.debug("Creating slice %s - %s", t, end)
@@ -169,16 +170,14 @@ class AccumulatorDatasource(object):
             update_from_time = from_time
         self.logger.debug("Update from %s ", update_from_time)
         s = 0
-        first = True
         to_delete = 0
-        for sample in self.storage.samples(update_from_time, to_time):
+        for sample in self.storage.samples(update_from_time, to_time, context=context):
             # find the first slice receiving the samples
             while slices[s].to_time < sample['localtime']:
-                if first:
+                if slices[s].to_time < from_time:
                     # count of obsolete slices to delete
                     to_delete=s
                 s = s + 1
-            first = False
             slices[s].add_sample(sample)
             last_timestamp = sample['localtime']
         return last_timestamp, to_delete
@@ -201,7 +200,6 @@ class AccumulatorDatasource(object):
                 for key,formula in v.iteritems():
                     value = formula.value()
                     subkeys = key.split(',')
-                    print subkeys
                     if len(subkeys) == 1:
                         value = [ value ]
                     for i in range(len(subkeys)):
@@ -217,7 +215,10 @@ class AccumulatorDatasource(object):
             to_time = datetime.datetime.now()
             use_cache = True
 
-        from_time = to_time - (self.get_slice_duration() * (self.span - 1) )
+        duration = self.get_slice_duration() 
+        times = (self.span - 1)
+        delta= duration * times
+        from_time = to_time - delta
 
         if use_cache:
             self.logger.debug("Last timestamp: %s", self.last_timestamp)
@@ -230,7 +231,7 @@ class AccumulatorDatasource(object):
                         if self.cached_slices is None:
                             self.cached_slices = []
 
-                        last_timestamp, to_delete = self.update_slices(self.cached_slices, from_time, to_time, self.last_timestamp)
+                        last_timestamp, to_delete = self.update_slices(self.cached_slices, from_time, to_time, context, self.last_timestamp)
 
                         self.cached_slices = self.cached_slices[to_delete:]
                         self.logger.debug('Deleted %s slices', to_delete)
@@ -249,7 +250,7 @@ class AccumulatorDatasource(object):
 
         else: # use_cache == False
             slices = []
-            self.update_slices(slices, from_time, to_time)
+            self.update_slices(slices, from_time, to_time, context)
             return self.get_series(slices)
 
 def parse(isodate):
