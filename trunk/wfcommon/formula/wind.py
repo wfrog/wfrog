@@ -52,3 +52,93 @@ class PredominantWindFormula(object):
             avgY = self.sumY / self.count
             dir = meteo.WindDir(avgX, avgY)
             return ( dir, meteo.WindDirTxt(dir) )
+
+class WindSectorAverageFormula(object):
+    '''
+    Returns wind average histogram per sector as a sequence.
+    '''
+    def __init__(self, index):
+        self.index = index
+
+    index = None
+    sums = None
+    counts = [0]*16
+
+    def append(self, sample):
+        if self.sums is None:
+            self.sums = [0]*16
+            self.counts = [0]*16
+        speed_index = self.index
+        dir_index = self.index+1
+        speed = sample[speed_index]
+        dir = sample[dir_index]
+        if speed is not None and speed > 0 and dir is not None:
+            i = int(dir/22.5) % 16
+            self.sums[i] = self.sums[i] + speed
+            self.counts[i] = self.counts[i]+1
+
+    def value(self):
+        averages = [0]*16
+        for i in range(16):
+            if self.counts[i] > 0:
+                averages[i] = float(self.sums[i]) / self.counts[i]
+        return averages
+
+class WindSectorMaxFormula(object):
+    '''
+    Returns wind maximum histogram per sector as a sequence.
+    '''
+    def __init__(self, index):
+        self.index = index
+
+    index = None
+    values = None
+
+    def append(self, sample):
+        if self.values is None:
+            self.values = [0]*16
+        speed_index = self.index
+        dir_index = self.index+1
+        speed = sample[speed_index]
+        dir = sample[dir_index]
+        if speed is not None and speed > 0 and dir is not None:
+            i = int(dir/22.5) % 16
+            if speed >  self.values[i]:
+                self.values[i] = speed
+
+    def value(self):
+        if self.values is not None:
+            return self.values
+        else:
+            return [0]*16
+
+class WindSectorFrequencyFormula(object):
+    '''
+    Returns wind frequency histogram per sector as a sequence.
+    '''
+    def __init__(self, index):
+        self.index = index
+
+    index = None
+    sums = None
+    count = 0
+
+    def append(self, sample):
+        if self.sums is None:
+            self.sums = [0]*16
+            self.count = 0
+        speed_index = self.index
+        dir_index = self.index+1
+        speed = sample[speed_index]
+        dir = sample[dir_index]
+        if speed is not None and speed > 0 and dir is not None:
+            i = int(dir/22.5) % 16
+            self.sums[i] = self.sums[i] + 1.0
+            self.count = self.count + 1
+
+    def value(self):
+        freqs = [0]*16
+        if self.count > 0:
+            for i in range(16):
+                freqs[i] = self.sums[i] / self.count
+        return freqs
