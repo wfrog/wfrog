@@ -173,7 +173,7 @@ class AccumulatorDatasource(object):
 
         # Create the necessary slices
         t = self.get_slice_start(slice_from_time)
-        keys = self.storage.keys()
+        keys = self.storage.keys(context=context)
         while t < to_time:
             end = self.get_next_slice_start(t)
             self.logger.debug("Creating slice %s - %s", t, end)

@@ -62,7 +62,7 @@ class DatabaseStorage(object):
         finally:
             self.db.disconnect()
 
-    def keys(self):
+    def keys(self, context={}):
         return ['localtime',
                 'temp',
                 'hum',

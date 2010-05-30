@@ -66,7 +66,7 @@ class CsvStorage(object):
 
         file.close()
 
-    def keys(self):
+    def keys(self, context={}):
         return ['localtime',
                 'temp',
                 'hum',

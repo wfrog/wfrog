@@ -495,6 +495,7 @@ class GoogleChartWindRadarRenderer(object):
     """
 
     key = 'wind'
+    sector_key = 'sectors' # 'new' sector calculation from accumulator
 
     def render(self,data={}, context={}):
 
@@ -565,9 +566,12 @@ class GoogleChartWindRadarRenderer(object):
         max = config.median * 2
 
         if data[self.key].has_key('sectors'):
-            sector_data = data[self.key]['sectors']
+            sector_data = data[self.key]['sectors'] # 'old' sector from db datasource
         else:
-            sector_data = self.calculate_sector_data(data[self.key]['series'])
+            if data.has_key(self.sector_key): # 'new' sector data from accumulator
+                sector_data = self.calculate_accumulated_sector_data(data[self.sector_key]['series'])
+            else:
+                sector_data = self.calculate_cheap_sector_data(data[self.key]['series'])
 
         if data[self.key].has_key('value'):
             current_noscale = data[self.key]['value']
@@ -700,7 +704,7 @@ class GoogleChartWindRadarRenderer(object):
         else:
             return (mean/log((max/mean-2)+1))*log(((max/mean-2)/mean)*value+1)
 
-    def calculate_sector_data(self, serie_data):
+    def calculate_cheap_sector_data(self, serie_data):
         sector_data = {}
         sector_data['lbl'] = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW']
         sector_data['avg'] = 16 * [ 0.0 ]
@@ -731,6 +735,42 @@ class GoogleChartWindRadarRenderer(object):
                    sector_data['freq'][i] = sector_data['freq'][i] / total_count
 
         return sector_data
+
+    def calculate_accumulated_sector_data(self, serie_data):
+        sector_data = {}
+        sector_data['lbl'] = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW']
+        d_avg = sector_data['avg'] = 16 * [ 0.0 ]
+        d_freq = sector_data['freq'] = 16 * [ 0.0 ]
+        d_max = sector_data['max'] = 16 * [ 0.0 ]
+        avg_counts = 16 * [0.0]        
+        
+        count = len(serie_data['avg'])
+    
+        s_avg=serie_data['avg']
+        s_max=serie_data['max']
+        s_freq=serie_data['freq']
+        
+        for i in range(count):
+            for j in range(16):                  
+                if s_avg[i][j] > 0:
+                    d_avg[j] = d_avg[j]+s_avg[i][j]
+                    avg_counts[j] = avg_counts[j] + 1
+                if s_max[i][j] > d_max[j]:
+                    d_max[j] = s_max[i][j] 
+                d_freq[j] = d_freq[j] + s_freq[i][j] 
+
+        for i in range(16):
+            if avg_counts[i] > 0:
+                d_avg[i] = float(d_avg[i]) / avg_counts[i]
+            
+        sum_freq = sum(d_freq)
+        
+        if sum_freq > 0:
+            for i in range(16):
+                d_freq[i] = d_freq[i] / sum_freq
+            
+        return sector_data
+                
 
 def _axis_set_style(self, colour, font_size=None, alignment=None, drawing_control=None, tick_colour=None):
     _check_colour(colour)
@@ -866,4 +906,4 @@ if __name__=="__main__":
                     }
 
     r = GoogleChartWindRadarRenderer()
-    print r.calculate_sector_data(serie_data)
+    print r.calculate_cheap_sector_data(serie_data)

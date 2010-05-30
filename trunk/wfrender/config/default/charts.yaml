@@ -50,6 +50,8 @@ renderer: !multi
                     thickness: 1
                     area: { to: wind.avg, color: wheat }
                     max: { color: darkred, text: darkred, thickness: 0.5 }
+                    marks: 
+                        serie: wind.dir
             labels: wind.lbl
             ymargin: [ 0, 1 ]
         wind_dir: !windradar
