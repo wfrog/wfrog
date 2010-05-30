@@ -73,7 +73,7 @@ class WindSectorAverageFormula(object):
         speed = sample[speed_index]
         dir = sample[dir_index]
         if speed is not None and speed > 0 and dir is not None:
-            i = int(dir/22.5) % 16
+            i = int(round(dir/22.5)) % 16
             self.sums[i] = self.sums[i] + speed
             self.counts[i] = self.counts[i]+1
 
@@ -102,7 +102,7 @@ class WindSectorMaxFormula(object):
         speed = sample[speed_index]
         dir = sample[dir_index]
         if speed is not None and speed > 0 and dir is not None:
-            i = int(dir/22.5) % 16
+            i = int(round(dir/22.5)) % 16
             if speed >  self.values[i]:
                 self.values[i] = speed
 
@@ -132,7 +132,7 @@ class WindSectorFrequencyFormula(object):
         speed = sample[speed_index]
         dir = sample[dir_index]
         if speed is not None and speed > 0 and dir is not None:
-            i = int(dir/22.5) % 16
+            i = int(round(dir/22.5)) % 16
             self.sums[i] = self.sums[i] + 1.0
             self.count = self.count + 1
 
