@@ -62,10 +62,24 @@ class DatabaseStorage(object):
         finally:
             self.db.disconnect()
 
+    def keys(self):
+        return ['localtime',
+                'temp',
+                'hum',
+                'wind',
+                'wind_dir',
+                'wind_gust',
+                'wind_gust_dir',
+                'dew_point',
+                'rain',
+                'rain_rate',
+                'pressure',
+                'uv_index']
+
     def samples(self, from_time=datetime.fromtimestamp(0), to_time=datetime.now(), context={}):
-        
+
         self.logger.debug("Getting samples for range: %s to %s", from_time, to_time)
-        
+
         if not self.initialized:
             self.init()
             self.initialized = True
@@ -79,23 +93,12 @@ class DatabaseStorage(object):
         sql = statement % ( from_time.strftime(self.time_format),
             to_time.strftime(self.time_format))
 
-        mapper = lambda(row) : { 'localtime' : row[0] if isinstance(row[0], datetime) else datetime.strptime(row[0], self.time_format),
-            'temp' : row[1],
-            'hum' : row[2],
-            'wind' : row[3],
-            'wind_dir' : row[4],
-            'wind_gust' : row[5],
-            'wind_gust_dir' : row[6],
-            'dew_point' : row[7],
-            'rain' : row[8],
-            'rain_rate' : row[8],
-            'pressure' : row[10],
-            'uv_index' : row[11] }
-
         try:
             self.db.connect()
-            for i in self.db.select(sql):
-                yield mapper(i)
+            for row in self.db.select(sql):
+                if not isinstance(row[0], datetime):
+                       row[0] = datetime.strptime(row[0], self.time_format)
+                yield row
         finally:
             self.db.disconnect()
 

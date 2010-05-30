@@ -66,6 +66,19 @@ class CsvStorage(object):
 
         file.close()
 
+    def keys(self):
+        return ['localtime',
+                'temp',
+                'hum',
+                'wind',
+                 'wind_dir',
+                'wind_gust',
+                'wind_gust_dir',
+                'dew_point',
+                'rain',
+                'rain_rate',
+                'pressure',
+                'uv_index']
 
     def samples(self, from_time=datetime.fromtimestamp(0), to_time=datetime.now(), context={}):
         from_timestamp = int(time.mktime(from_time.timetuple()))
@@ -75,18 +88,20 @@ class CsvStorage(object):
 
         try:
             for line in reader:
-                if int(line[0]) < from_timestamp:
+                ts = int(line[0])
+                if ts < from_timestamp:
                     continue
-                if int(line[0]) >= to_timestamp:
+                if ts >= to_timestamp:
                     raise StopIteration
-                sample = {}
-                sample['localtime'] = datetime.fromtimestamp(int(line[0]))
+                sample = line[1:]
+                sample[0] = datetime.fromtimestamp(ts)
+                length = len(sample)
 
-                for i in range(2,len(line)):
-                    if line[i] != '' and line[i] != None:
-                        sample[self.columns[i]] = float(line[i])
+                for i in range(1,length):
+                    if sample[i] != '' and sample[i] != None:
+                        sample[i] = float(sample[i])
                     else:
-                        sample[self.columns[i]] = None
+                        sample[i] = None
                 yield sample
         finally:
             file.close()

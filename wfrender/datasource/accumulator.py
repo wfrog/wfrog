@@ -60,7 +60,7 @@ class AccumulatorDatasource(object):
         Dictionary keyed by the measure names ('temp', 'hum', ...). Values
         are dictionaries keyed by the serie names ('avg', 'min', ...) and
         containing 'formula' objects.
-        
+
     caching [true|false] (optional):
         Enable/disable caching for normal requests. Defaults to true.
     '''
@@ -106,10 +106,16 @@ class AccumulatorDatasource(object):
     lock = threading.Lock()
 
     class Slice(object):
-        def __init__(self, formulas, from_time, to_time):
+        def __init__(self, formulas, from_time, to_time, keys):
             self.formulas = copy.deepcopy(formulas)
             self.from_time = from_time
             self.to_time = to_time
+
+            # replace string keys with index for performance
+            for serie in self.formulas.values():
+                for formula in serie.values():
+                    if type(formula.index)==str:
+                        formula.index = keys.index(formula.index)
 
         def add_sample(self, sample):
             for serie in self.formulas.values():
@@ -161,10 +167,11 @@ class AccumulatorDatasource(object):
 
         # Create the necessary slices
         t = self.get_slice_start(slice_from_time)
+        keys = self.storage.keys()
         while t < to_time:
             end = self.get_next_slice_start(t)
             self.logger.debug("Creating slice %s - %s", t, end)
-            slice = self.Slice(self.formulas, t, end)
+            slice = self.Slice(self.formulas, t, end, keys)
             slices.append(slice)
             t = end
 
@@ -176,15 +183,17 @@ class AccumulatorDatasource(object):
         self.logger.debug("Update from %s ", update_from_time)
         s = 0
         to_delete = 0
+        localtime_index = self.storage.keys().index('localtime')
         for sample in self.storage.samples(update_from_time, to_time, context=context):
             # find the first slice receiving the samples
-            while slices[s].to_time < sample['localtime']:
+            sample_localtime = sample[localtime_index]
+            while slices[s].to_time < sample_localtime:
                 if slices[s].to_time < from_time:
                     # count of obsolete slices to delete
                     to_delete=s
                 s = s + 1
             slices[s].add_sample(sample)
-            last_timestamp = sample['localtime']
+            last_timestamp = sample_localtime
         return last_timestamp, to_delete
 
     def get_series(self, slices):
@@ -220,7 +229,7 @@ class AccumulatorDatasource(object):
             to_time = datetime.datetime.now()
             use_cache = self.caching
 
-        duration = self.get_slice_duration() 
+        duration = self.get_slice_duration()
         times = (self.span - 1)
         delta= duration * times
         from_time = to_time - delta

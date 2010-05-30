@@ -17,26 +17,26 @@
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from base import AverageFormula
-from base import get
 from wfcommon import meteo
 
 class PredominantWindFormula(object):
     '''
     Returns the direction in degrees of predominant wind.
     '''
-    def __init__(self, prefix):
-        self.prefix = prefix
+    def __init__(self, index):
+        self.index = index
 
-    prefix = None
-
+    index = None
     sumX = 0
     sumY = 0
-
     count = 0
 
+
     def append(self, sample):
-        speed = get(sample, self.prefix)
-        dir = get(sample, self.prefix+"_dir")
+        speed_index = self.index
+        dir_index = self.index+1
+        speed = sample[speed_index]
+        dir = sample[dir_index]
         if speed is not None and dir is not None:
             x = meteo.WindX(speed, dir)
             y = meteo.WindY(speed, dir)

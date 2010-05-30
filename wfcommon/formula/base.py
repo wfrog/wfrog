@@ -18,25 +18,19 @@
 
 import sys
 
-def get(dict, key):
-    if dict.has_key(key):
-        return dict[key]
-    else:
-        return None
-
 class AverageFormula(object):
     '''
     Average.
     '''
-    def __init__(self, key):
-        self.key = key
+    def __init__(self, index):
+        self.index = index
 
-    key = None
+    index = None
     sum = 0
     count = 0
 
     def append(self, sample):
-        value = get(sample, self.key)
+        value = sample[self.index]
         if value is not None:
             self.sum = self.sum + value
             self.count = self.count + 1
@@ -53,14 +47,14 @@ class MinFormula(object):
     Minimum.
     '''
 
-    def __init__(self, key):
-        self.key = key
+    def __init__(self, index):
+        self.index = index
 
-    key = None
+    index = None
     min = sys.maxint
 
     def append(self, sample):
-        value = get(sample, self.key)
+        value = sample[self.index]
         if value is not None:
             self.min = min(self.min, value)
 
@@ -76,14 +70,14 @@ class MaxFormula(object):
     Maximum.
     '''
 
-    def __init__(self, key):
-        self.key = key
+    def __init__(self, index):
+        self.index = index
 
-    key = None
+    index = None
     max = -sys.maxint
 
     def append(self, sample):
-        value = get(sample, self.key)
+        value = sample[self.index]
         if value is not None:
             self.max = max(self.max, value)
 
@@ -99,15 +93,15 @@ class SumFormula(object):
     Sum.
     '''
 
-    def __init__(self, key):
-        self.key = key
+    def __init__(self, index):
+        self.index = index
 
-    key = None
+    index = None
     sum = 0
     empty = True
 
     def append(self, sample):
-        value = get(sample, self.key)
+        value = sample[self.index]
         if value is not None:
             self.empty = False
             self.sum = self.sum + value
