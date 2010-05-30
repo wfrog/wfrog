@@ -23,6 +23,9 @@ from wfcommon.formula.base import MinFormula
 from wfcommon.formula.base import MaxFormula
 from wfcommon.formula.base import SumFormula
 from wfcommon.formula.wind import PredominantWindFormula
+from wfcommon.formula.wind import WindSectorAverageFormula
+from wfcommon.formula.wind import WindSectorMaxFormula
+from wfcommon.formula.wind import WindSectorFrequencyFormula
 
 import copy
 import datetime
@@ -85,9 +88,12 @@ class AccumulatorDatasource(object):
         'dew' : { 'avg': AverageFormula('dew_point')},
         'hum' : { 'avg' : AverageFormula('hum') },
         'press' : { 'avg' : AverageFormula('pressure') },
-           'wind' : { 'avg' : AverageFormula('wind'),
-                        'max' : MaxFormula('wind_gust'),
-                        'deg,dir' : PredominantWindFormula('wind')  },
+        'wind' : { 'avg' : AverageFormula('wind'),
+                   'max' : MaxFormula('wind_gust'),
+                   'deg,dir' : PredominantWindFormula('wind')  },
+        'sectors' : { 'avg' : WindSectorAverageFormula('wind'),
+                      'max' : WindSectorMaxFormula('wind_gust'),
+                      'freq' : WindSectorFrequencyFormula('wind') },
         'rain' : { 'rate' : AverageFormula('rain_rate'),
                    'fall' : SumFormula('rain') },
         'uv' : { 'index' : MaxFormula('uv_index') }
