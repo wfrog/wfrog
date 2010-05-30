@@ -58,8 +58,13 @@ class StorageCopy(object):
 
     def run(self):
 
+        keys = self.from_storage.keys()
+
         for sample in self.from_storage.samples():
-            self.to_storage.write_sample(sample)
+            sample_to_write = {}
+            for i in range(len(keys)):
+                sample_to_write[keys[i]] = sample[i]
+            self.to_storage.write_sample(sample_to_write)
 
 if __name__ == "__main__":
     driver = StorageCopy()
