@@ -55,7 +55,7 @@ class AccumulatorDatasource(object):
 
     format [string] (optional):
         Date/time format string for labels.
-        See Pythons's strftime function.
+        See Python strftime function.
 
     formulas [dict] (optional):
         Specify what and how to calculate. Defines the structure of the
@@ -173,7 +173,7 @@ class AccumulatorDatasource(object):
 
         # Create the necessary slices
         t = self.get_slice_start(slice_from_time)
-        keys = self.storage.keys(context=context)
+        keys = self.storage.keys()
         while t < to_time:
             end = self.get_next_slice_start(t)
             self.logger.debug("Creating slice %s - %s", t, end)
