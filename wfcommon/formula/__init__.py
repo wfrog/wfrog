@@ -18,8 +18,28 @@
 
 import yaml
 import base
+import wind
 
 class YamlAverageFormula(base.AverageFormula, yaml.YAMLObject):
     yaml_tag = u'!avg'
 
+class YamlMinFormula(base.MinFormula, yaml.YAMLObject):
+    yaml_tag = u'!min'
 
+class YamlMaxFormula(base.MaxFormula, yaml.YAMLObject):
+    yaml_tag = u'!max'
+
+class YamlSumFormula(base.SumFormula, yaml.YAMLObject):
+    yaml_tag = u'!sum'
+
+class YamlPredominantWindFormula(wind.PredominantWindFormula, yaml.YAMLObject):
+    yaml_tag = u'!predominant'
+
+class YamlWindSectorAverageFormula(wind.WindSectorAverageFormula, yaml.YAMLObject):
+    yaml_tag = u'!sector-avg'
+
+class YamlWindSectorMaxFormula(wind.WindSectorMaxFormula, yaml.YAMLObject):
+    yaml_tag = u'!sector-max'
+
+class YamlWindSectorFrequencyFormula(wind.WindSectorFrequencyFormula, yaml.YAMLObject):
+    yaml_tag = u'!sector-freq'

@@ -21,6 +21,7 @@ import yaml
 import csvfile
 import firebird
 import mysql
+import simulator
 
 # YAML mappings
 
@@ -32,3 +33,6 @@ class YamlFirebirdStorage(firebird.FirebirdStorage, yaml.YAMLObject):
 
 class YamlMysqlStorage(mysql.MysqlStorage, yaml.YAMLObject):
     yaml_tag = u'!mysql'
+
+class YamlSimulatorStorage(simulator.SimulatorStorage, yaml.YAMLObject):
+    yaml_tag = u'!simulator-storage'
