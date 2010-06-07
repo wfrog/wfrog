@@ -1,0 +1,4 @@
+station: !wmrs200 {}
+
+output: !service { name: events } 
+

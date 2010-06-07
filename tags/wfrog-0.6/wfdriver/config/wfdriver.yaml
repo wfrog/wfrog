@@ -1,0 +1,14 @@
+station: !random-simulator {}
+
+#output: !http-out { url: 'http://localhost:8888/' }
+output: !stdio-out {}
+
+logging:
+    level: debug    
+    handlers:
+        default: 
+            handler: !include 
+                path: ../../wfcommon/config/loghandler.yaml
+                variables:
+                    process: wfdriver
+
