@@ -1,3 +1,8 @@
+*wfrog 0.6 - 07.06.2010*
+  Main feature: Accumulator for rendering able to read from any storage.
+  * [http://code.google.com/p/wfrog/issues/list?can=1&q=label%3ARelease0.6 Fixed Issues]
+  * Now default storage is CSV, no database installation needed (unless you want it)
+
 *wfrog 0.5 - 28.03.2010*
   Unified configuration, [http://www.westep.org WESTEP] compliance, new architecture
   * [http://code.google.com/p/wfrog/issues/list?can=1&q=label%3AMilestone-Release0.5&colspec=ID+Type+Status+Priority+Milestone+Owner+Summary&cells=tiles Fixed Issues]
