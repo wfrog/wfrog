@@ -159,7 +159,7 @@ logging [logging configuration] (optional):
 
         # Wait for ever
         while True:
-            time.sleep(sys.maxint)
+            time.sleep(99999999)
 
 
 if __name__ == "__main__":
