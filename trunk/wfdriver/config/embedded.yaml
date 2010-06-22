@@ -1,4 +1,4 @@
-station: !wmrs200 {}
+station: !random-simulator {}
 
 output: !service { name: events } 
 
