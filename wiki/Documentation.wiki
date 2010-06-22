@@ -137,12 +137,12 @@ See the [http://www.windmaster.ch/wfrog/doc Configuration Reference] for details
 
 {{{
 cd wflogger
-python wflogger.py
+./wflogger.py
 }}}
 
 To start with debug output on the console:
 {{{
-python wflogger.py -d
+./wflogger.py -d
 }}}
 
 == Renderer ==
@@ -187,12 +187,12 @@ Supported units:
 
 {{{
 cd wfrender
-python wfrender.py
+./wfrender.py
 }}}
 
 To start with debug output on the console:
 {{{
-python wfrender.py -d
+./wfrender.py -d
 }}}
 
 
@@ -233,9 +233,9 @@ See the [http://www.windmaster.ch/wfrog/doc Configuration Reference] for details
 The configuration reference is also available in the builtin help, e.g.:
 
 {{{
-python wfrender.py --help             # General help
-python wfrender.py -H                 # List and descriptions of configuration !elements
-python wfrender.py -E ELEMENT         # Help on a specific element
+./wfrender.py --help             # General help
+./wfrender.py -H                 # List and descriptions of configuration !elements
+./wfrender.py -E ELEMENT         # Help on a specific element
 }}}
 
 <p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
