@@ -102,12 +102,12 @@ logging [logging configuration] (optional):
             return
         except AssertionError, e:
             if logging.root.level > logging.DEBUG:
-                self.logger.exception()
+                self.logger.exception(e)
                 return
             else:
                 raise
         except Exception, e:
-            self.logger.exception()
+            self.logger.exception(e)
             raise
         finally:
             self.daemon = False

@@ -82,7 +82,7 @@ class HttpRenderer(object):
             self.server.shutdown()
             raise KeyboardInterrupt()
         except Exception, e:
-            self.logger.exception()
+            self.logger.exception(e)
             raise
 
     def close(self):
