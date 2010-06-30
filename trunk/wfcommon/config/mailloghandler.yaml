@@ -1,0 +1,8 @@
+handler: !!python/object/new:wfcommon.maillog.mySMTPHandler
+    kwds:
+        mailhost: !!python/tuple [smtp.gmail.com, 587] 
+        fromaddr: myAccount@gmail.com
+        toaddrs: [myAccount@gmail.com, myOtherAccount@gmail.com]
+        subject: Critical wfrog message
+        credentials: !!python/tuple [myAccount@gmail.com, myPassword]
+

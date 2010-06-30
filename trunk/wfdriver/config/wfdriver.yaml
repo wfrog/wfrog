@@ -11,4 +11,8 @@ logging:
                 path: ../../wfcommon/config/loghandler.yaml
                 variables:
                     process: wfdriver
+        #mail:
+        #    level: critical
+        #    handler: !include
+        #        path: ../../wfcommon/config/mailloghandler.yaml
 

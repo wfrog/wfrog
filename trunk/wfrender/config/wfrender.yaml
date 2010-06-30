@@ -23,3 +23,8 @@ logging:
                 path: ../../wfcommon/config/loghandler.yaml
                 variables:
                     process: wfrender
+        #mail:
+        #    level: critical
+        #    handler: !include
+        #        path: ../../wfcommon/config/mailloghandler.yaml
+

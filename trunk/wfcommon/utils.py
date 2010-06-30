@@ -1,5 +1,5 @@
-## Copyright 2009 Jordi Puigsegur <jordi.puigsegur@gmail.com>
-##                Laurent Bovet <laurent.bovet@windmaster.ch>
+## Copyright 2010 Laurent Bovet <laurent.bovet@windmaster.ch>
+##                Jordi Puigsegur <jordi.puigsegur@gmail.com>
 ##
 ##  This file is part of WFrog
 ##
@@ -70,61 +70,4 @@ def write2xml(dictionary, root_tag, filename, time_format='%Y-%m-%d %H:%M:%S'):
     doc.write(f)
     f.close()    
 
-import smtplib
-import logging
-import logging.handlers
-import string
- 
-class mySMTPHandler(logging.handlers.SMTPHandler):
-    """
-    A customized handler class which sends an SMTP email for each
-    logging event, and supports TLS smtp servers, like gmail
-    """
- 
-    def __init__(self, mailhost, fromaddr, toaddrs, subject, credentials=None):
-        """
-        Initialize the handler.
- 
-        Initialize the instance with the from and to addresses and subject
-        line of the email. To specify a non-standard SMTP port, use the
-        (host, port) tuple format for the mailhost argument. To specify
-        authentication credentials, supply a (username, password) tuple
-        for the credentials argument. If TLS is required (gmail) it will
-        be activated automatically
-        """
-        logging.handlers.SMTPHandler.__init__(self, mailhost, fromaddr, toaddrs, subject, credentials)
- 
-    def emit(self, record):
-        """
-        Emit a record.
- 
-        Format the record and send it to the specified addressees.
-        """
-        try:
-            import smtplib
-            try:
-                from email.utils import formatdate
-            except ImportError:
-                formatdate = self.date_time
-            port = self.mailport
-            if not port:
-                port = smtplib.SMTP_PORT
-            smtp = smtplib.SMTP(self.mailhost, port)
-            msg = self.format(record)
-            msg = "From: %s\r\nTo: %s\r\nSubject: %s\r\nDate: %s\r\n\r\n%s" % (
-                            self.fromaddr,
-                            string.join(self.toaddrs, ","),
-                            self.getSubject(record),
-                            formatdate(), msg)
-            smtp.ehlo()
-            if smtp.has_extn('STARTTLS'):
-                smtp.starttls()
-            if self.username:
-                smtp.login(self.username, self.password)
-            smtp.sendmail(self.fromaddr, self.toaddrs, msg)
-            smtp.quit()
-        except (KeyboardInterrupt, SystemExit):
-            raise
-        except:
-            self.handleError(record)
 

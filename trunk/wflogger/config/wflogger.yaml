@@ -37,3 +37,9 @@ logging:
                 path: ../../wfcommon/config/loghandler.yaml
                 variables:
                     process: wflogger
+        #mail:
+        #    level: critical
+        #    handler: !include
+        #        path: ../../wfcommon/config/mailloghandler.yaml
+
+
