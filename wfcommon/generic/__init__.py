@@ -22,6 +22,7 @@ import include
 import multi
 import service
 import stopwatch
+import user
 
 # YAML mappings
 
@@ -33,6 +34,9 @@ class YamlMultiElement(multi.MultiElement, yaml.YAMLObject):
 
 class YamlServiceElement(service.ServiceElement, yaml.YAMLObject):
     yaml_tag = u'!service'
+
+class YamlUserChoiceElement(user.UserChoiceElement, yaml.YAMLObject):
+    yaml_tag = u'!user'
 
 class YamlStopWatchElement(stopwatch.StopWatchElement, yaml.YAMLObject):
     yaml_tag = u'!stopwatch'

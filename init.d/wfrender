@@ -21,7 +21,7 @@ RENDERER=wfrender.py
 RENDERER_ARGS=
 PIDFILE_RENDERER=/var/run/wfrender.pid
 SCRIPTNAME=/etc/init.d/wfrender
-CONFIG_FILE=/etc/wfrog/wfrender.conf
+CONFIG_FILE=/etc/wfrog/wfrender/config/wflogger.yaml
 
 # Exit if the package is not installed
 [ -x "$RENDERER_DIR/$RENDERER" ] || exit 0

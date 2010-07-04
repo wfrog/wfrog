@@ -1,6 +1,4 @@
-context:
-    database: { url: 'localhost:/var/lib/firebird/2.0/data/wfrog.db' }  
-renderer: !http    
+renderer: !http
     cookies: [ units ]
     root: !include
         path: default/24hours.yaml
@@ -8,18 +6,18 @@ renderer: !http
         3hours.html: !include
             path: default/3hours.yaml
         24hours.html: !include
-            path: default/24hours.yaml      
+            path: default/24hours.yaml
         30days.html: !include
-            path: default/30days.yaml        
+            path: default/30days.yaml
         365days.html: !include
             path: default/365days.yaml
-            
+
 logging:
-    level: info    
+    level: info
     handlers:
         default:
             level: debug
-            handler: !include 
+            handler: !include
                 path: ../../wfcommon/config/loghandler.yaml
                 variables:
                     process: wfrender

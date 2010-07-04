@@ -71,8 +71,10 @@ handlers [dict]:
 
                     # Hack to bypass !include element because log handlers are not class instances
                     # (they don't provide __getattribute__
+                    # do it recursively
                     if hasattr(handler, '_init'):
-                        handler = handler._init(context)
+                        while hasattr(handler, '_init'):
+                            handler = handler._init(context)
 
                     if handler_config.has_key('level'):
                         handler.setLevel(levels[handler_config['level']])

@@ -21,7 +21,7 @@ LOGGER=wflogger.py
 LOGGER_ARGS=
 PIDFILE_LOGGER=/var/run/wflogger.pid
 SCRIPTNAME=/etc/init.d/wflogger
-CONFIG_FILE=/etc/wfrog/wflogger.conf
+CONFIG_FILE=/etc/wfrog/wflogger/config/wflogger.yaml
 
 # Exit if the package is not installed
 [ -x "$LOGGER_DIR/$LOGGER" ] || exit 0
@@ -93,7 +93,7 @@ case "$1" in
     # 'force-reload' alias
     #
     log_daemon_msg "Restarting $DESC" "$NAME"
-    do_stop_logger    
+    do_stop_logger
     case "$?" in
       0|1)
         do_start_logger

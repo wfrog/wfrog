@@ -51,6 +51,13 @@ mainThExtSensor = 'th1'
 vendor_id  = 0xfde
 product_id = 0xca01
 
+name = "Oregon Scientific WMRS 200"
+
+def detect():
+    station = WMRS200Station()
+    if station._search_device(vendor_id, product_id) is not None:
+        return station
+
 class WMRS200Station(BaseStation):
     '''
     Station driver for the Oregon Scientific WMRS200. Reported to work with WMR100.
@@ -62,7 +69,11 @@ class WMRS200Station(BaseStation):
         return reduce(lambda a, b: a + b, map(lambda a: "%02X " % a, d))
 
     def _search_device(self, vendor_id, product_id):
-        import usb
+        try:
+            import usb
+        except Exception, e:
+            self.logger.warning(e)
+            return None
         for bus in usb.busses():
             for dev in bus.devices:
                 if dev.idVendor == vendor_id and dev.idProduct == product_id:
@@ -70,7 +81,7 @@ class WMRS200Station(BaseStation):
 
     def run(self, generate_event, send_event):
         import usb
-        
+
         # Initialize injected functions used by BaseStation
         self.generate_event = generate_event
         self.send_event = send_event
@@ -132,7 +143,7 @@ class WMRS200Station(BaseStation):
             0x47: (6, 'UV', self._parse_uv_record),
             0x48: (11, 'Wind', self._parse_wind_record),
             0x60: (12, 'Clock', self._parse_clock_record)}
-        
+
         input_buffer = []
         errors = 0
         while True:

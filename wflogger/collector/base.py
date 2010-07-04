@@ -84,7 +84,7 @@ class BaseCollector(object):
             self.logger.info("Calculated last 12 hours mean temp: %4.1f" % self._mean_temp)
             return self._mean_temp
         except Exception, e:
-            self.logger.exception("Error calculating last 12 hours mean temp: %s, returning current temperature" % str(e))
+            self.logger.warning("Error calculating last 12 hours mean temp: %s, returning current temperature" % str(e))
             return current_temp
 
         return current_temp
