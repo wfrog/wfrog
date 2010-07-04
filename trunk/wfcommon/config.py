@@ -23,7 +23,7 @@ import inspect
 import sys
 import copy
 
-wfrog_version = "0.6"
+wfrog_version = "0.7-svn"
 
 class Configurer(object):
 
@@ -90,7 +90,7 @@ class Configurer(object):
 
         if not embedded:
             self.config_file = options.config
-            
+
         self.logger.debug("Loading config file " + self.config_file)
         config = yaml.load( file(self.config_file, "r") )
 
@@ -103,6 +103,11 @@ class Configurer(object):
 
         if not embedded:
             self.log_configurer.configure(options, config, context)
+
+        if config.has_key('init'):
+            for k,v in config['init'].iteritems():
+                self.logger.debug("Initializing "+k)
+
 
         return ( config, context )
 
@@ -124,10 +129,10 @@ class Configurer(object):
             # Gets the documentation of the first superclass
             superclass = inspect.getmro(element[1])[1]
             fulldoc=superclass.__doc__
-            
+
             # Add the doc of the super-super-class if _element_doc is
             if hasattr(inspect.getmro(superclass)[1], "_element_doc") and inspect.getmro(superclass)[1].__doc__  is not None:
-                fulldoc = fulldoc + inspect.getmro(superclass)[1].__doc__            
+                fulldoc = fulldoc + inspect.getmro(superclass)[1].__doc__
 
             firstline=fulldoc.split(".")[0]
             self.logger.debug(firstline)

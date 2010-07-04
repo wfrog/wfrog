@@ -1,5 +1,10 @@
-handler: !!python/object/new:logging.handlers.RotatingFileHandler 
-    kwds:
-        filename: /var/log/${process}.log
-        maxBytes: 262144
-        backupCount: 3
+handler: !user
+    choices:
+        root: !include
+            path: ../../wfcommon/config/fileloghandler.yaml
+            variables:
+                filename: /var/log/${process}.log
+        default: !include
+            path: ../../wfcommon/config/fileloghandler.yaml
+            variables:
+                filename: ${process}.log

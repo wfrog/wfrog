@@ -21,14 +21,22 @@ import yaml
 import simulator
 import wmrs200
 import wmr928nx
+import auto
 
-# YAML mappings
+# YAML mappings and registration for auto-detect
 
-class YamlRandomSimulator(simulator.RandomSimulator, yaml.YAMLObject):
-    yaml_tag = u'!random-simulator'
+class YamlAutoDetectStation(auto.AutoDetectStation, yaml.YAMLObject):
+    yaml_tag = u'!auto'
 
 class YamlWMRS200Station(wmrs200.WMRS200Station, yaml.YAMLObject):
     yaml_tag = u'!wmrs200'
+auto.stations.append(wmrs200)
 
 class YamlWMR928NXStation(wmr928nx.WMR928NXStation, yaml.YAMLObject):
     yaml_tag = u'!wmr928nx'
+auto.stations.append(wmr928nx)
+
+class YamlRandomSimulator(simulator.RandomSimulator, yaml.YAMLObject):
+    yaml_tag = u'!random-simulator'
+auto.stations.append(simulator)
+

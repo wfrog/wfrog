@@ -20,11 +20,20 @@ import time
 import random
 import copy
 
+
+def detect():
+    return RandomSimulator()
+
+name = "Random Station Simulator"
+
+
 class RandomSimulator(object):
 
     '''
     Simulates a station. Issues events randomly with random variations.
     '''
+
+    debug_station = True
 
     types = [ 'temp', 'press', 'hum', 'rain', 'wind', 'uv', 'rad' ]
     init_values = [ 10, 1020, 65, 10, [ 3, 180], 1, 2 ]

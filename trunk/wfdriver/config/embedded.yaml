@@ -1,4 +1,6 @@
-station: !random-simulator {}
+station: !auto { }
 
-output: !service { name: events } 
+#station: !wmrs200 {}
+
+output: !service { name: events }
 

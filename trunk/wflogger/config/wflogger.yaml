@@ -1,22 +1,26 @@
 context:
-    altitude: 430 
+    altitude: 430
+
+init:
+    storage: !service
+        name: storage
+        instance: !include { path: ../../wfcommon/config/storage.yaml }
 
 input: !service
     name: events  # Use embedded wfdriver to receive events
     instance: !function {}
-    
+
 #input: !http-in { port: 8888 }
 
 #input: !stdio-in {}
 
 collector: !multi
-    children:        
+    children:
         aggregator : !flush
             period: 600
-            collector: !aggregator           
-                storage : !service         
+            collector: !aggregator
+                storage : !service
                     name: storage
-                    instance: !include { path: ../../wfcommon/config/storage.yaml }  
         current : !flush
             period: 10
             collector: !xmlfile
@@ -29,11 +33,11 @@ embed:
     # wfrender: { config: ../../wfrender/config/wfrender.yaml }
 
 logging:
-    level: info    
+    level: info
     handlers:
         default:
             level: debug
-            handler: !include 
+            handler: !include
                 path: ../../wfcommon/config/loghandler.yaml
                 variables:
                     process: wflogger
