@@ -173,7 +173,7 @@ class AccumulatorDatasource(object):
 
         # Create the necessary slices
         t = self.get_slice_start(slice_from_time)
-        keys = self.storage.keys()
+        keys = self.storage.keys(context=context)
         while t < to_time:
             end = self.get_next_slice_start(t)
             self.logger.debug("Creating slice %s - %s", t, end)
@@ -189,7 +189,7 @@ class AccumulatorDatasource(object):
         self.logger.debug("Update from %s ", update_from_time)
         s = 0
         to_delete = 0
-        localtime_index = self.storage.keys().index('localtime')
+        localtime_index = keys.index('localtime')
         for sample in self.storage.samples(update_from_time, to_time, context=context):
             # find the first slice receiving the samples
             sample_localtime = sample[localtime_index]
