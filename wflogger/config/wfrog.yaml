@@ -19,10 +19,16 @@ collector: !multi
                     name: storage
         current : !flush
             period: 10
-            collector: !xmlfile
-                path: /tmp/current_conditions.xml
-                storage : !service
-                    name: storage
+            collector: !user
+                choices:
+                    root: !xmlfile
+                        path: /var/lib/wfrog/wfrog-current.xml
+                        storage : !service
+                            name: storage
+                    default: !xmlfile
+                        path: wfrog-current.xml
+                        storage : !service
+                            name: storage          
 
 embed:
     wfdriver: { config: ../../wfdriver/config/embedded.yaml }

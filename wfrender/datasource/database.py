@@ -16,7 +16,6 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import kinterbasdb
 from StringIO import StringIO
 import sys
 import logging
@@ -328,11 +327,6 @@ def normalize(data):
         result.append(float(d)/s)
     return result
 
-try:
-    kinterbasdb.init(type_conv=0)
-except:
-    pass
-
 class FirebirdDB():
     def __init__(self, bdd, user='sysdba', password='masterkey', charset='ISO8859_1'):
         self._bdd = bdd
@@ -341,6 +335,14 @@ class FirebirdDB():
         self._charset = charset
 
     def connect(self):
+		
+        import kinterbasdb
+		
+        try:
+            kinterbasdb.init(type_conv=0)
+        except:
+            pass	
+		
         self._db = kinterbasdb.connect(dsn=self._bdd,
                                        user=self._user,
                                        password=self._password,

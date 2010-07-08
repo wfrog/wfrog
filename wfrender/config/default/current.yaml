@@ -1,6 +1,11 @@
 renderer: !data
-    source: !currentxml
-        path: /tmp/current_conditions.xml
+    source: !user
+        choices:
+            root: !currentxml
+                path: /var/lib/wfrog/wfrog-current.xml
+            default: !currentxml
+                path: wfrog-current.xml  
+        
     renderer: !multi
         children:
             temp0: !value { key: temp0 }
