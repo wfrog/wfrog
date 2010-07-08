@@ -30,7 +30,7 @@ collector: !multi
                         storage : !service
                             name: storage
                     default: !xmlfile
-                        path: wfrog-current.xml
+                        path: data/wfrog-current.xml
                         storage : !service
                             name: storage                            
 
