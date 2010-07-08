@@ -19,6 +19,7 @@
 import logging
 import wrapper
 import os
+import copy
 
 class UserChoiceElement(wrapper.ElementWrapper):
     """
