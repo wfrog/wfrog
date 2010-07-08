@@ -19,6 +19,7 @@
 import logging
 import base
 import time
+import os.path
 from lxml import etree
 from lxml.builder import E
 
@@ -98,7 +99,11 @@ class XmlFileCollector(base.BaseCollector):
 
         doc_string = etree.tostring(self.doc)
 
-        self.logger.debug("Flushing: %s", doc_string)
+        self.logger.debug("Flushing: %s to %s", doc_string, self.path)
+
+        dir = os.path.realpath(os.path.dirname(self.path))
+        if not os.path.exists(dir):
+            os.makedirs(dir)
 
         file = open(self.path, 'w')
         file.write(doc_string)
