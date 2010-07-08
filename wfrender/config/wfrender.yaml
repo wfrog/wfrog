@@ -1,3 +1,8 @@
+init:
+    storage: !service
+        name: storage
+        instance: !include { path: ../../wfcommon/config/storage.yaml }
+
 renderer: !http
     cookies: [ units ]
     root: !include

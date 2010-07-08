@@ -25,7 +25,7 @@ from functools import partial
 from Cheetah.Template import Template
 
 class ElementWrapper(object):
-    
+
     def __getattribute__(self, attr):
         try:
             return object.__getattribute__(self, attr)

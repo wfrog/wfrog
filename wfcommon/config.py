@@ -107,7 +107,10 @@ class Configurer(object):
         if config.has_key('init'):
             for k,v in config['init'].iteritems():
                 self.logger.debug("Initializing "+k)
-
+                try:
+                    v.init(context=context)
+                except AttributeError:
+                    pass # In case the element has not init method
 
         return ( config, context )
 

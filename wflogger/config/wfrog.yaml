@@ -10,26 +10,23 @@ input: !service
     name: events  # Use embedded wfdriver to receive events
     instance: !function {}
 
-#input: !http-in { port: 8888 }
-
-#input: !stdio-in {}
-
 collector: !multi
     children:
         aggregator : !flush
-            period: 600
+            period: 6
             collector: !aggregator
                 storage : !service
                     name: storage
         current : !flush
             period: 10
             collector: !xmlfile
-                path: /tmp/wfrog-current-conditions.xml
+                path: /tmp/current_conditions.xml
                 storage : !service
                     name: storage
 
 embed:
     wfdriver: { config: ../../wfdriver/config/embedded.yaml }
+    wfrender: { config: ../../wfrender/config/embedded.yaml }
 
 logging:
     level: info
@@ -39,10 +36,8 @@ logging:
             handler: !include
                 path: ../../wfcommon/config/loghandler.yaml
                 variables:
-                    process: wflogger
+                    process: wfrog
         #mail:
         #    level: critical
         #    handler: !include
         #        path: ../../wfcommon/config/mailloghandler.yaml
-
-

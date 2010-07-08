@@ -1,9 +1,13 @@
-storage: !csv
-    path: /tmp/wfrog.csv
+storage: !user
+    choices:
+        root: !csv
+            path: /var/lib/wfrog/wfrog.csv
+        default: !csv
+            path: data/wfrog.csv
 
 #storage: !firebird { database: 'localhost:/var/lib/firebird/2.0/data/wfrog.db',
 #                     user: sysdba,
-#                     password: masterkey } 
+#                     password: masterkey }
 
 #storage: !mysql { database: wfrog,
 #                  host: localhost,

@@ -47,6 +47,9 @@ class CsvStorage(object):
             file = open(self.path, 'a')
             writer = csv.writer(file)
         else:
+            dir = os.path.realpath(os.path.dirname(self.path))
+            if not os.path.exists(dir):
+                os.makedirs(dir)
             file = open(self.path, 'w')
             writer = csv.writer(file)
             writer.writerow(self.columns)
