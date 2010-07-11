@@ -13,7 +13,7 @@ input: !service
 collector: !multi
     children:
         aggregator : !flush
-            period: 6
+            period: 60
             collector: !aggregator
                 storage : !service
                     name: storage
