@@ -4,7 +4,7 @@ renderer: !data
             root: !currentxml
                 path: /var/lib/wfrog/wfrog-current.xml
             default: !currentxml
-                path: wfrog-current.xml  
+                path: data/wfrog-current.xml  
         
     renderer: !multi
         children:

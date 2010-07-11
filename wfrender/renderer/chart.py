@@ -577,7 +577,7 @@ class GoogleChartWindRadarRenderer(object):
             current_noscale = data[self.key]['value']
             last_gust_noscale = data[self.key]['max']
             pos = int(round(data[self.key]['deg'] * 16 / 360.0))
-            if pos == 16: pos = 0
+            if pos > 15: pos = 0
             current = self.scale(current_noscale, config.median, config.radius)
             last_gust_scaled = self.scale(last_gust_noscale, config.median, config.radius)
             arrow_thickness = 0.3+3.0*arrow_config.thickness*current/max
