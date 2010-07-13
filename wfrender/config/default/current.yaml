@@ -26,4 +26,4 @@ renderer: !data
                         width: 76
                         arrow: { show: yes }
                         tail: {color: tan }
-                        beaufort: { color: wheat, intensity: 0.5 }
+                        beaufort: { color: wheat, intensity: 0.9 }
