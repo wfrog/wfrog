@@ -1,0 +1,59 @@
+#!/usr/bin/python
+
+# This makes sure that users don't have to set up their environment
+# specially in order to run these programs from bin/.
+import sys, os, string, os.path
+WFROG_HOME='.'
+if string.find(os.path.abspath(sys.argv[0]), os.sep+'wfrog') != -1:
+    WFROG_HOME=os.path.normpath(os.path.join(os.path.abspath(sys.argv[0]), os.pardir, os.pardir))
+    sys.path.insert(0, WFROG_HOME)
+if hasattr(os, "getuid") and os.getuid() != 0:
+    sys.path.insert(0, os.path.abspath(os.getcwd()))
+
+import optparse
+import wflogger.wflogger
+import wfrender.wfrender
+
+os.chdir(WFROG_HOME)
+
+SETTINGS_FILE = 'settings.xml'
+GLOBAL_CONF_DIR = '/etc/wfrog/'
+# Replace with proper discovering of user data dir according to filesystem
+HOME_CONF_DIR = '~/.wfrog/'
+settings = None
+
+# detect settings
+if os.path.exists(HOME_CONF_DIR + SETTINGS_FILE):
+    settings = HOME_CONF_DIR + SETTINGS_FILE
+else:
+    if os.path.exists(GLOBAL_CONF_DIR + SETTINGS_FILE):
+        settings = GLOBAL_CONF_DIR + SETTINGS_FILE
+
+opt_parser = optparse.OptionParser(conflict_handler='resolve')
+
+opt_parser.add_option("--backend", action="store_true", dest="backend", help="Starts the logger and the driver only.")
+opt_parser.add_option("--renderer", action="store_true", dest="renderer", help="Starts the renderer only.")
+opt_parser.add_option("--customize", action="store_true", dest="customize", help="Prepare the config files for customizing wfrog.")
+
+candidate_logger = wflogger.wflogger.Logger(opt_parser)
+candidate_renderer = wfrender.wfrender.RenderEngine(opt_parser)
+
+(options, args) = opt_parser.parse_args()
+
+component = candidate_logger
+if options.backend:
+    config_file = 'wflogger/config/wflogger.yaml'
+else:
+    if options.renderer:
+        component = candidate_renderer
+        config_file = 'wfrender/config/wfrender.yaml'
+    else:
+        config_file = 'wflogger/config/wfrog.yaml'
+
+if os.path.exists(HOME_CONF_DIR + config_file):
+    config_file = HOME_CONF_DIR + config_file
+else:
+    if os.path.exists(GLOBAL_CONF_DIR + config_file):
+        config_file = GLOBAL_CONF_DIR + config_file
+
+component.run(config_file)

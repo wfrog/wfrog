@@ -43,7 +43,7 @@ class RendererConfigurer(wfcommon.config.Configurer):
 
     embedded = False
 
-    def __init__(self, opt_parser, config_file=None):
+    def __init__(self, opt_parser):
         # Prepare the configurer
         module_map = (
             ( "Renderers" , renderer),
@@ -51,21 +51,15 @@ class RendererConfigurer(wfcommon.config.Configurer):
             ( "Storages" , wfcommon.storage ),
             ( "Generic Elements", wfcommon.generic)
         )
-        
-        if config_file:
-            self.embedded = True
-        else:
-            config_file = path.join(path.abspath(sys.path[0]), "config/wfrender.yaml")
-            self.embedded = False
-        
-        wfcommon.config.Configurer.__init__(self, config_file, module_map)
+
+        wfcommon.config.Configurer.__init__(self, module_map)
         self.add_options(opt_parser)
         opt_parser.add_option("-r", "--reload-config", action="store_true", dest="reload_config", help="Reloads the yaml configuration if it changes during execution")
         opt_parser.add_option("-R", "--reload-modules", action="store_true", dest="reload_mod", help="Reloads the data source, renderer and extension modules if they change during execution")
         opt_parser.add_option("-c", "--command", dest="command", help="A command to execute after automatic reload. Useful to trigger events during development such as browser reload.")
 
-    def configure_engine(self, engine, options, args, init):
-        (config, config_context) = self.configure(options, engine, embedded=(self.embedded or not init))
+    def configure_engine(self, engine, options, args, init, config_file):
+        (config, config_context) = self.configure(options, engine, config_file, embedded=(self.embedded or not init))
 
         engine.root_renderer = config["renderer"]
 

@@ -47,6 +47,8 @@ logging [logging configuration] (optional):
     See below the Logging Configuration section.
 '''
 
+    logger = logging.getLogger('wfrender')
+
     root_renderer = None
     configurer = None
     initial_context = { "version": wfrog_version, "units" : wfcommon.units.reference }
@@ -54,18 +56,20 @@ logging [logging configuration] (optional):
     daemon = False
     output = False
 
-    logger = logging.getLogger('wfrender')
+    config_file = None
+    opt_parser = None
 
-    def __init__(self, config_file=None):
+    def __init__(self, opt_parser=optparse.OptionParser()):
         """Creates the engine using a specific configurer or a yaml configurer if none specified"""
 
-        opt_parser = optparse.OptionParser()
-
-        self.configurer = config.RendererConfigurer(opt_parser, config_file)
+        self.configurer = config.RendererConfigurer(opt_parser)
 
         opt_parser.add_option("-D", "--data", dest="data_string", help="Passes specific data value/pairs to renderers", metavar="key1=value1,key2=value2")
         opt_parser.add_option("-O", dest="output", action="store_true", help="Outputs the result (if any) on standard output")
-        (options, args) = opt_parser.parse_args()
+        self.opt_parser = opt_parser
+
+    def configure(self):
+        (options, args) = self.opt_parser.parse_args()
 
         if options.data_string:
             pairs = options.data_string.split(',')
@@ -79,10 +83,16 @@ logging [logging configuration] (optional):
 
         self.reconfigure(options, args, init=True)
 
-    def reconfigure(self, options=None, args=[], init=False):
-        self.configurer.configure_engine(self,options, args, init)
 
-    def process(self, data=initial_data, context={}):
+    def reconfigure(self, options=None, args=[], init=False):
+
+        self.configurer.configure_engine(self,options, args, init, self.config_file)
+
+    def process(self, config_file, data=initial_data, context={}):
+
+        self.config_file = config_file
+
+        self.configure()
 
         try:
             if self.daemon:
@@ -112,9 +122,12 @@ logging [logging configuration] (optional):
         finally:
             self.daemon = False
 
+    def run(self, config_file='config/wfrender.yaml'):
+        self.process(config_file)
+
 if __name__ == "__main__":
     engine = RenderEngine()
-    result = engine.process()
+    result = engine.run()
     if engine.output:
         print str(result)
     engine.logger.debug("Finished main()")
