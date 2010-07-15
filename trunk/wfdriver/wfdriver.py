@@ -75,7 +75,7 @@ logging [logging configuration] (optional):
         self.configurer.add_options(self.opt_parser)
 
     def configure(self, config_file, embedded):
-
+        
         # Parse the options and create object trees from configuration
         (options, args) = self.opt_parser.parse_args()
 
