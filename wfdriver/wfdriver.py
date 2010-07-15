@@ -59,8 +59,9 @@ logging [logging configuration] (optional):
     # default values
     output = stdio.StdioOutput()
     queue_size = 10
+    configurer = None
 
-    def __init__(self, config_file=None):
+    def __init__(self, opt_parser=optparse.OptionParser()):
 
         # Prepare the configurer
         module_map = (
@@ -69,22 +70,16 @@ logging [logging configuration] (optional):
             ( "Generic Elements", wfcommon.generic)
         )
 
-        if config_file:
-            embedded = True
-        else:
-            config_file = "config/wfdriver.yaml"
-            embedded = False
+        self.configurer = wfcommon.config.Configurer(module_map)
+        self.opt_parser = opt_parser
+        self.configurer.add_options(self.opt_parser)
 
-        configurer = wfcommon.config.Configurer(config_file, module_map)
-
-        # Initialize the option parser
-        opt_parser = optparse.OptionParser()
-        configurer.add_options(opt_parser)
+    def configure(self, config_file, embedded):
 
         # Parse the options and create object trees from configuration
-        (options, args) = opt_parser.parse_args()
+        (options, args) = self.opt_parser.parse_args()
 
-        (config, context) = configurer.configure(options, self, embedded)
+        (config, context) = self.configurer.configure(options, self, config_file, embedded)
 
         # Initialize the driver from object trees
         self.station = config['station']
@@ -111,7 +106,14 @@ logging [logging configuration] (optional):
             except Exception:
                 self.logger.exception("Could not send event to " + str(self.output))
 
-    def run(self):
+    def run(self, config_file=None):
+        if config_file:
+            embedded = True
+        else:
+            config_file = "config/wfdriver.yaml"
+            embedded = False
+
+        self.configure(config_file, embedded)
 
         # Start the logger thread
         logger_thread = Thread(target=self.output_loop)

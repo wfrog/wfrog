@@ -70,10 +70,11 @@ logging [logging configuration] (optional):
 
     embedded = {}
     context = None
-    
-    config_file = None
 
-    def __init__(self):
+    config_file = None
+    opt_parser = None
+
+    def __init__(self, opt_parser=optparse.OptionParser()):
 
         # Prepare the configurer
         module_map = (
@@ -82,17 +83,19 @@ logging [logging configuration] (optional):
             ( "Storages" , wfcommon.storage ),
             ( "Generic Elements", wfcommon.generic)
         )
-        configurer = wfcommon.config.Configurer("config/wflogger.yaml", module_map)
+        self.configurer = wfcommon.config.Configurer(module_map)
 
         # Initialize the option parser
-        opt_parser = optparse.OptionParser()
-        configurer.add_options(opt_parser)
+        self.configurer.add_options(opt_parser)
 
+        self.opt_parser = opt_parser
+
+    def configure(self, config_file):
         # Parse the options and create object trees from configuration
-        (options, args) = opt_parser.parse_args()
-        (config, self.context) = configurer.configure(options, self)
+        (options, args) = self.opt_parser.parse_args()
+        (config, self.context) = self.configurer.configure(options, self, config_file)
 
-        self.config_file = configurer.config_file
+        self.config_file = self.configurer.config_file
 
         # Initialize the logger from object trees
 
@@ -127,7 +130,8 @@ logging [logging configuration] (optional):
             except Exception:
                 self.logger.exception("Could not send event to "+str(self.collector))
 
-    def run(self):
+    def run(self, config_file="config/wflogger.yaml"):
+        self.configure(config_file)
 
         # Start the logger thread
         logger_thread = Thread(target=self.output_loop)
@@ -145,15 +149,15 @@ logging [logging configuration] (optional):
         if self.embedded.has_key('wfdriver'):
             self.logger.debug("Starting embedded wfdriver")
             import wfdriver.wfdriver
-            driver = wfdriver.wfdriver.Driver(os.path.join(dir_name, self.embedded['wfdriver']['config']))
-            driver_thread = Thread(target=driver.run)
+            driver = wfdriver.wfdriver.Driver(self.opt_parser)
+            driver_thread = Thread(target=driver.run, kwargs={'config_file':os.path.join(dir_name, self.embedded['wfdriver']['config'])})
             driver_thread.setDaemon(True)
             driver_thread.start()
-        if self.embedded.has_key('wfrender'):                        
+        if self.embedded.has_key('wfrender'):
             self.logger.debug("Starting embedded wfrender")
             import wfrender.wfrender
-            renderer = wfrender.wfrender.RenderEngine(os.path.join(dir_name, self.embedded['wfrender']['config']))
-            renderer_thread = Thread(target=renderer.process)
+            renderer = wfrender.wfrender.RenderEngine(self.opt_parser)
+            renderer_thread = Thread(target=renderer.run, kwargs={'config_file':os.path.join(dir_name, self.embedded['wfrender']['config'])} )
             renderer_thread.setDaemon(True)
             renderer_thread.start()
 
@@ -163,7 +167,7 @@ logging [logging configuration] (optional):
 
 
 if __name__ == "__main__":
-    driver = Logger()
-    driver.logger.debug("Started main()")
-    driver.run()
-    driver.logger.debug("Finished main()")
+    logger = Logger()
+    logger.logger.debug("Started main()")
+    logger.run()
+    logger.logger.debug("Finished main()")
