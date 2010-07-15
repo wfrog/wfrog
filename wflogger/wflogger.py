@@ -85,9 +85,8 @@ logging [logging configuration] (optional):
         )
         self.configurer = wfcommon.config.Configurer(module_map)
 
-        # Initialize the option parser
+        opt_parser = optparse.OptionParser(conflict_handler='resolve')
         self.configurer.add_options(opt_parser)
-
         self.opt_parser = opt_parser
 
     def configure(self, config_file):
@@ -157,7 +156,7 @@ logging [logging configuration] (optional):
             self.logger.debug("Starting embedded wfrender")
             import wfrender.wfrender
             renderer = wfrender.wfrender.RenderEngine(self.opt_parser)
-            renderer_thread = Thread(target=renderer.run, kwargs={'config_file':os.path.join(dir_name, self.embedded['wfrender']['config'])} )
+            renderer_thread = Thread(target=renderer.process, args=[os.path.join(dir_name, self.embedded['wfrender']['config']), True] )
             renderer_thread.setDaemon(True)
             renderer_thread.start()
 

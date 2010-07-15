@@ -58,6 +58,7 @@ logging [logging configuration] (optional):
 
     config_file = None
     opt_parser = None
+    embedded = False
 
     def __init__(self, opt_parser=optparse.OptionParser()):
         """Creates the engine using a specific configurer or a yaml configurer if none specified"""
@@ -68,8 +69,9 @@ logging [logging configuration] (optional):
         opt_parser.add_option("-O", dest="output", action="store_true", help="Outputs the result (if any) on standard output")
         self.opt_parser = opt_parser
 
-    def configure(self):
+    def configure(self, embedded):
         (options, args) = self.opt_parser.parse_args()
+        self.configurer.embedded = embedded
 
         if options.data_string:
             pairs = options.data_string.split(',')
@@ -88,11 +90,11 @@ logging [logging configuration] (optional):
 
         self.configurer.configure_engine(self,options, args, init, self.config_file)
 
-    def process(self, config_file, data=initial_data, context={}):
+    def process(self, config_file, embedded, data=initial_data, context={}):
 
         self.config_file = config_file
 
-        self.configure()
+        self.configure(embedded)
 
         try:
             if self.daemon:
@@ -122,12 +124,12 @@ logging [logging configuration] (optional):
         finally:
             self.daemon = False
 
-    def run(self, config_file='config/wfrender.yaml'):
-        self.process(config_file)
+    def run(self, config_file="config/wfrender.yaml"):
+        self.process(config_file, embedded=False)
 
 if __name__ == "__main__":
     engine = RenderEngine()
-    result = engine.run()
+    result = engine.process("config/wfrender.yaml", embedded=False)
     if engine.output:
         print str(result)
     engine.logger.debug("Finished main()")

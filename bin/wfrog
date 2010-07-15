@@ -34,6 +34,7 @@ opt_parser = optparse.OptionParser(conflict_handler='resolve')
 opt_parser.add_option("--backend", action="store_true", dest="backend", help="Starts the logger and the driver only.")
 opt_parser.add_option("--renderer", action="store_true", dest="renderer", help="Starts the renderer only.")
 opt_parser.add_option("--customize", action="store_true", dest="customize", help="Prepare the config files for customizing wfrog.")
+opt_parser.add_option("-f", "--file", dest="config_file", help="Configuration file (in yaml)", metavar="CONFIG_FILE")
 
 candidate_logger = wflogger.wflogger.Logger(opt_parser)
 candidate_renderer = wfrender.wfrender.RenderEngine(opt_parser)
@@ -42,13 +43,16 @@ candidate_renderer = wfrender.wfrender.RenderEngine(opt_parser)
 
 component = candidate_logger
 if options.backend:
-    config_file = 'wflogger/config/wflogger.yaml'
+    if not options.config_file:
+        config_file = 'wflogger/config/wflogger.yaml'
 else:
     if options.renderer:
         component = candidate_renderer
-        config_file = 'wfrender/config/wfrender.yaml'
+        if not options.config_file:
+            config_file = 'wfrender/config/wfrender.yaml'
     else:
-        config_file = 'wflogger/config/wfrog.yaml'
+        if not options.config_file:
+            config_file = 'wflogger/config/wfrog.yaml'
 
 if os.path.exists(HOME_CONF_DIR + config_file):
     config_file = HOME_CONF_DIR + config_file
