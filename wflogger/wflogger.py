@@ -85,7 +85,6 @@ logging [logging configuration] (optional):
         )
         self.configurer = wfcommon.config.Configurer(module_map)
 
-        opt_parser = optparse.OptionParser(conflict_handler='resolve')
         self.configurer.add_options(opt_parser)
         self.opt_parser = opt_parser
 
