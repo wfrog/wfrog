@@ -270,7 +270,8 @@ def WindChill(tempC, windSpeedKmph):
         return None
     else:
         windPow = pow(windSpeedKmph, 0.16)
-        return min([tempC, 13.12 + (0.6215 * tempC) - (11.37 * windPow) + (0.3965 * tempC * windPow)])
+        Result = min([tempC, 13.12 + (0.6215 * tempC) - (11.37 * windPow) + (0.3965 * tempC * windPow)])
+        return Result if Result < tempC else tempC
 
 def HeatIndex(tempC, humidity):
     """
@@ -299,7 +300,7 @@ def HeatIndex(tempC, humidity):
             Result -= ((13 - humidity)/4) * Sqrt((17 - Abs(tempf - 95))/17)
         elif ((humidity > 85) and (tempF >= 80) and (tempF <= 87)):
             Result += ((humidity - 85)/10) * ((87 - tempF)/5)
-    return FToC(Result);
+    return FToC(Result) if Result > tempF else tempC
 
 def Humidex(tempC, humidity): 
     return tempC + ((5/9) * (ActualVaporPressure(tempC, humidity, 'vaTetenNWS') - 10.0))
@@ -355,6 +356,8 @@ def MToKm(value): # Miles !
 def KmToM(value): # Miles !
     return value / 1.609344
 
+def msToKmh(value):
+    return value * 3.6
 
 
 ###########################################################################################
