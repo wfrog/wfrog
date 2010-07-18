@@ -49,11 +49,12 @@ class ValueRenderer(object):
     logger = logging.getLogger('renderer.value')
 
     def render(self,data,context={}):
-        if self.select == "last":
+        if self.select == "last": 
+            for k in data.keys():      ################### TO BE DELETED ############################
+                print k, ':', data[k]  ################### TO BE DELETED ############################
             return data[self.key]['series'][self.serie][len(data[self.key]['series'][self.serie])-1]
-        else:
-            if self.select == "value":
-                val_key = self.value if self.value else 'value'
-                self.logger.debug("Getting value for '"+self.key+"."+val_key+"'")
-                return wfcommon.units.Converter(context["units"]).convert(self.key, data[self.key][val_key])
+        elif self.select == "value":
+            val_key = self.value if self.value else 'value'
+            self.logger.debug("Getting value for '"+self.key+"."+val_key+"'")
+            return wfcommon.units.Converter(context["units"]).convert(self.key, data[self.key][val_key])
 

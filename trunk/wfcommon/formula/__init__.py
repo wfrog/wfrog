@@ -19,6 +19,7 @@
 import yaml
 import base
 import wind
+import temp
 
 class YamlAverageFormula(base.AverageFormula, yaml.YAMLObject):
     yaml_tag = u'!avg'
@@ -43,3 +44,9 @@ class YamlWindSectorMaxFormula(wind.WindSectorMaxFormula, yaml.YAMLObject):
 
 class YamlWindSectorFrequencyFormula(wind.WindSectorFrequencyFormula, yaml.YAMLObject):
     yaml_tag = u'!sector-freq'
+
+class YamlHeatIndexMaxFormula(temp.HeatIndexMaxFormula, yaml.YAMLObject):
+    yaml_tag = u'!heatindex'
+
+class YamlWindChillMinFormula(temp.WindChillMinFormula, yaml.YAMLObject):
+    yaml_tag = u'!windchill'

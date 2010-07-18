@@ -26,6 +26,8 @@ from wfcommon.formula.wind import PredominantWindFormula
 from wfcommon.formula.wind import WindSectorAverageFormula
 from wfcommon.formula.wind import WindSectorMaxFormula
 from wfcommon.formula.wind import WindSectorFrequencyFormula
+from wfcommon.formula.temp import WindChillMinFormula
+from wfcommon.formula.temp import HeatIndexMaxFormula
 
 import copy
 import datetime
@@ -122,6 +124,9 @@ class AccumulatorDatasource(object):
                 for formula in serie.values():
                     if type(formula.index)==str:
                         formula.index = keys.index(formula.index)
+                    # Index can be a list of indexes (e.g. heatIndex or WindChill)
+                    elif type(formula.index)==list:
+                        formula.index = map(lambda x: keys.index(x), formula.index)
 
         def add_sample(self, sample):
             for serie in self.formulas.values():
@@ -278,3 +283,4 @@ def parse(isodate):
         return datetime.datetime.strptime(isodate, "%Y-%m-%d")
     else:
         return datetime.datetime.strptime(isodate, "%Y-%m-%d"+isodate[10]+"%H:%M:%S")
+
