@@ -76,7 +76,9 @@ class ChartConfig(object):
     fill = None # fill color of the arrow
     style = 'v' # for markers
     dash = None
+    accumulate = False  # draw accumulated values
     interpolate = False # line series interpolation of missing values.
+    ignore_flat_series = True
 
     # Series
     area = None
@@ -143,7 +145,7 @@ class GoogleChartRenderer(object):
         values in the Google Chart URL. Defaults to 100.
 
     ticks [true|false] (optional):
-        Display or not the tick alon the axes. Defaults to 'true'.
+        Display or not the tick along the axes. Defaults to 'true'.
 
     width [numeric] (optional):
         Width in pixels of the generated graph image. Defaults to 250.
@@ -198,10 +200,18 @@ class GoogleChartRenderer(object):
         represents the length of dash elements, the second the space
         between them.
 
+    ignore_flat_series (G, S) [true|false]:
+        if 'true' (default value) do not draw series that are flat 
+        (i.e. all values are zero)
+
+    accumulate (G, S) [true|false]:
+        If 'true' the data is transformed to write its accumulated 
+        value. Useful when drawing accumulated rain.
+
     interpolate (G, S) [true|false]:
         If 'true', draw a continuous line instead of blank for missing
         values. This is useful when the chart resolution is finer than
-        the sampling period.
+        the sampling period. Ignored when accumulate = 'true'.
 
     order (S) [numeric]:
         Defines in which orders series are drawn on the graph.
@@ -266,10 +276,13 @@ class GoogleChartRenderer(object):
             serie_data = data[key.split('.')[0]]['series'][key.split('.')[1]]
             measure = key.split('.')[0]
 
-            if flat(serie_data):
-                continue
+            if serie_config.ignore_flat_series:
+                if flat(serie_data):
+                    continue
 
-            if serie_config.interpolate:
+            if serie_config.accumulate:
+                serie_data = accumulate(serie_data)
+            elif serie_config.interpolate:
                 serie_data = interpolate(serie_data)
 
             # Compute min and max value for the serie and the whole chart
@@ -837,8 +850,8 @@ def interpolate(data):
     result = copy.copy(data)
     (last, index, count) = (None, None, 0)
     for i,val in enumerate(data):
-        if not val:
-            if last:                         # ignore leading None(s)
+        if val is None:
+            if last is not None:             # ignore leading None(s)
                 if not index:                # if first None
                     index = i
                 count = count + 1
@@ -848,6 +861,15 @@ def interpolate(data):
                     result[j] = last + (j - index + 1)*(val - last)/float(count+1)
                 (index, count) = (None, 0)
             last = val
+    return result
+
+def accumulate(data):
+    result = []
+    acc = 0
+    for d in data:
+        if d is not None:
+            acc += d
+        result.append(acc)
     return result
 
 def compress_to(data, n, min_index, max_index):
@@ -878,7 +900,7 @@ def compress(data, ratio, min_index, max_index):
             max=v
         if i == min_index:
             min=v
-        if v:
+        if v is not None:
             last=v
         if not i % r == 0:
             if not min == None:
