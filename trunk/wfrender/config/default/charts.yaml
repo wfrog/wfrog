@@ -40,6 +40,7 @@ renderer: !multi
             series:
                 uv.index: {}
             labels: uv.lbl
+            ymargin: [ 0, 1 ]
         wind: !chart
             interpolate: $interpolate
             series:
