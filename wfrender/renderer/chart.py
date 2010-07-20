@@ -882,7 +882,7 @@ def compress_to(data, n, min_index, max_index):
         #print "compress "+str(l)+" to "+str(n)+" by "+str(r)
         if r < 2:
             r = 2
-        (data, new_min_index, new_max_index) = compress(data, r, min_index, max_index)
+        (data, new_min_index, new_max_index) = compress(data, r, new_min_index, new_max_index)
         #print "compressed to "+str(len(data))
 
     return (data, new_min_index, new_max_index)
@@ -891,28 +891,17 @@ def compress(data, ratio, min_index, max_index):
     result = []
     r = ratio
     last=None
-    new_min_index=0
-    new_max_index=0
-    min = None
-    max = None
+    new_min_index=None
+    new_max_index=None
     for i, v in enumerate(data):
-        if i == max_index:
-            max=v
-        if i == min_index:
-            min=v
         if v is not None:
+            if i == max_index:
+                new_max_index = len(result)
+            if i == min_index:
+                new_min_index = len(result)
             last=v
         if not i % r == 0:
-            if not min == None:
-                new_min_index = len(result)
-                result.append(min)
-                min = None
-            elif not max == None:
-                new_max_index = len(result)
-                result.append(max)
-                max = None
-            else:
-                result.append(v if v else last)
+            result.append(last)
             last=None
     return (result, new_min_index, new_max_index)
 
