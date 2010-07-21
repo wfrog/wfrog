@@ -891,17 +891,28 @@ def compress(data, ratio, min_index, max_index):
     result = []
     r = ratio
     last=None
-    new_min_index=None
-    new_max_index=None
+    new_min_index=0
+    new_max_index=0
+    min = None
+    max = None
     for i, v in enumerate(data):
+        if i == max_index:
+            max=v
+        if i == min_index:
+            min=v
         if v is not None:
-            if i == max_index:
-                new_max_index = len(result)
-            if i == min_index:
-                new_min_index = len(result)
             last=v
         if not i % r == 0:
-            result.append(last)
+            if not min == None:
+                new_min_index = len(result)
+                result.append(min)
+                min = None
+            elif not max == None:
+                new_max_index = len(result)
+                result.append(max)
+                max = None
+            else:
+                result.append(v if v is not None else last)
             last=None
     return (result, new_min_index, new_max_index)
 
