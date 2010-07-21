@@ -43,7 +43,7 @@ class AccumulatorDatasource(object):
     storage [storage]:
         The underlying storage to get samples.
 
-    slice [month|day|hour|minute] (optional):
+    slice [month|week|day|hour|minute] (optional):
         The unit of grouping for the calculated series.
         Defaults to 'hour''
 
@@ -77,6 +77,7 @@ class AccumulatorDatasource(object):
     format = None
 
     formats = { 'month': '%m',
+                'week': '%d/%m', 
                 'day': '%d',
                 'hour': '%H',
                 'minute': '%H:%M' }
@@ -140,6 +141,8 @@ class AccumulatorDatasource(object):
             return datetime.timedelta(0, 3600)
         elif self.slice == 'day':
             return datetime.timedelta(1)
+        elif self.slice == 'week':
+            return datetime.timedelta(7)
         elif self.slice == 'month':
             return datetime.timedelta(30)
 
@@ -149,6 +152,8 @@ class AccumulatorDatasource(object):
         elif self.slice == 'hour':
             return datetime.datetime(time.year, time.month, time.day, time.hour)
         elif self.slice == 'day':
+            return datetime.datetime(time.year, time.month, time.day)
+        elif self.slice == 'week':
             return datetime.datetime(time.year, time.month, time.day)
         elif self.slice == 'month':
             return datetime.datetime(time.year, time.month, 1)
@@ -160,8 +165,13 @@ class AccumulatorDatasource(object):
             return time+datetime.timedelta(0,3600)
         elif self.slice == 'day':
             return time+datetime.timedelta(1,0)
+        elif self.slice == 'week':
+            return time+datetime.timedelta(7,0)
         elif self.slice == 'month':
-            return datetime.datetime(time.year, time.month+1 % 13, 1)
+            if time.month == 12:
+                return datetime.datetime(time.year + 1, 1, 1)
+            else:
+                return datetime.datetime(time.year, time.month + 1, 1)
 
     def get_labels(self, slices):
         if self.format is not None:
