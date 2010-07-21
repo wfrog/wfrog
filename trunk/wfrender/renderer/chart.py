@@ -865,10 +865,13 @@ def interpolate(data):
 
 def accumulate(data):
     result = []
-    acc = 0
+    acc = None
     for d in data:
         if d is not None:
-            acc += d
+            if acc is None:
+                acc = 0
+            else:
+                acc += d
         result.append(acc)
     return result
 
