@@ -43,7 +43,7 @@ class AccumulatorDatasource(object):
     storage [storage]:
         The underlying storage to get samples.
 
-    slice [month|week|day|hour|minute] (optional):
+    slice [year|month|week|day|hour|minute] (optional):
         The unit of grouping for the calculated series.
         Defaults to 'hour''
 
@@ -76,7 +76,8 @@ class AccumulatorDatasource(object):
 
     format = None
 
-    formats = { 'month': '%m',
+    formats = { 'year': '%y',
+                'month': '%m',
                 'week': '%d/%m', 
                 'day': '%d',
                 'hour': '%H',
@@ -145,6 +146,8 @@ class AccumulatorDatasource(object):
             return datetime.timedelta(7)
         elif self.slice == 'month':
             return datetime.timedelta(30)
+        elif self.slice == 'year':
+            return datetime.timedelta(365)
 
     def get_slice_start(self, time):
         if self.slice == 'minute':
@@ -154,9 +157,12 @@ class AccumulatorDatasource(object):
         elif self.slice == 'day':
             return datetime.datetime(time.year, time.month, time.day)
         elif self.slice == 'week':
-            return datetime.datetime(time.year, time.month, time.day)
+            (year, week, dayweek) = time.isocalendar()
+            return iso_to_gregorian(year, week, 1)
         elif self.slice == 'month':
             return datetime.datetime(time.year, time.month, 1)
+        elif self.slice == 'year':
+            return datetime.datetime(time.year, 1, 1)
 
     def get_next_slice_start(self, time):
         if self.slice == 'minute':
@@ -166,12 +172,15 @@ class AccumulatorDatasource(object):
         elif self.slice == 'day':
             return time+datetime.timedelta(1,0)
         elif self.slice == 'week':
-            return time+datetime.timedelta(7,0)
+            (year, week, dayweek) = time.isocalendar()
+            return iso_to_gregorian(year, week, 1)+datetime.timedelta(7)
         elif self.slice == 'month':
             if time.month == 12:
                 return datetime.datetime(time.year + 1, 1, 1)
             else:
                 return datetime.datetime(time.year, time.month + 1, 1)
+        elif self.slice == 'year':
+            return datetime.datetime(time.year + 1, 1, 1)
 
     def get_labels(self, slices):
         if self.format is not None:
@@ -253,7 +262,7 @@ class AccumulatorDatasource(object):
         duration = self.get_slice_duration()
         times = (self.span - 1)
         delta= duration * times
-        from_time = to_time - delta
+        from_time = self.get_slice_start(to_time - delta)
 
         if use_cache:
             self.logger.debug("Last timestamp: %s", self.last_timestamp)
@@ -293,4 +302,16 @@ def parse(isodate):
         return datetime.datetime.strptime(isodate, "%Y-%m-%d")
     else:
         return datetime.datetime.strptime(isodate, "%Y-%m-%d"+isodate[10]+"%H:%M:%S")
+
+def iso_year_start(iso_year):
+    "The gregorian calendar date of the first day of the given ISO year"
+    fourth_jan = datetime.datetime(iso_year, 1, 4)
+    delta = datetime.timedelta(fourth_jan.isoweekday()-1)
+    return fourth_jan - delta 
+
+def iso_to_gregorian(iso_year, iso_week, iso_day):
+    "Gregorian calendar date for the given ISO year, week and day"
+    year_start = iso_year_start(iso_year)
+    return year_start + datetime.timedelta(iso_day-1, 0, 0, 0, 0, 0, iso_week-1)
+
 

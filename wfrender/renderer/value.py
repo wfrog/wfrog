@@ -50,8 +50,6 @@ class ValueRenderer(object):
 
     def render(self,data,context={}):
         if self.select == "last": 
-            for k in data.keys():      ################### TO BE DELETED ############################
-                print k, ':', data[k]  ################### TO BE DELETED ############################
             return data[self.key]['series'][self.serie][len(data[self.key]['series'][self.serie])-1]
         elif self.select == "value":
             val_key = self.value if self.value else 'value'
