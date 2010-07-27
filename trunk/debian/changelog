@@ -1,0 +1,5 @@
+wfrog (0.6-1) unstable; urgency=low
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- Laurent Bovet <laurent.bovet@windmaster.ch>  Tue, 27 Jul 2010 23:28:30 +0200
