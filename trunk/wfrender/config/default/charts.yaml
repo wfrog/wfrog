@@ -31,10 +31,11 @@ renderer: !multi
             labels: press.lbl
         rain: !chart
             interpolate: $interpolate
+            accumulate: true
             series:
                 rain.fall: {}
             labels: rain.lbl
-            ymargin: [ 0, 1 ]
+            ymargin: [ 0, 10 ]
         uv: !chart
             interpolate: $interpolate
             series:

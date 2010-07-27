@@ -78,7 +78,7 @@ class ChartConfig(object):
     dash = None
     accumulate = False  # draw accumulated values
     interpolate = False # line series interpolation of missing values.
-    ignore_flat_series = True
+    ignore_flat_series = False
 
     # Series
     area = None
@@ -199,10 +199,6 @@ class GoogleChartRenderer(object):
         If present, write a dashed line for the serie. The first value
         represents the length of dash elements, the second the space
         between them.
-
-    ignore_flat_series (G, S) [true|false]:
-        if 'true' (default value) do not draw series that are flat 
-        (i.e. all values are zero)
 
     accumulate (G, S) [true|false]:
         If 'true' the data is transformed to write its accumulated 
