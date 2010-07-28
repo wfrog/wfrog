@@ -78,7 +78,6 @@ class ChartConfig(object):
     dash = None
     accumulate = False  # draw accumulated values
     interpolate = False # line series interpolation of missing values.
-    ignore_flat_series = False
 
     # Series
     area = None
@@ -272,9 +271,8 @@ class GoogleChartRenderer(object):
             serie_data = data[key.split('.')[0]]['series'][key.split('.')[1]]
             measure = key.split('.')[0]
 
-            if serie_config.ignore_flat_series:
-                if flat(serie_data):
-                    continue
+            if flat(serie_data):  # Series with all data = None
+                continue
 
             if serie_config.accumulate:
                 serie_data = accumulate(serie_data)
@@ -838,7 +836,7 @@ def flat(data):
     if len(data)==0:
         return true
     for d in data:
-        if d and not d==0:
+        if d != None:
             return False
     return True
 
