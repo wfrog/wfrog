@@ -213,14 +213,16 @@ class WMR200Station(BaseStation):
         self._report_wind(dirDeg, avgSpeed, gustSpeed)
       elif type == 0xD4:
         self.decodeTimeStamp(record[2:7])
-        rate = record[8] 
-        self.logger.info("Rain Rate: %d mm/hr" % rate)
-        self.logger.info("Rain Hour: %d mm" % (record[9] * 256 + record[10]))
-        self.logger.info("Rain 24h: %.1f mm" % ((record[11] * 256 + record[12]) / 1000.0))
-        total = (record[13] * 256 + record[14]) / 1000.0 
-        self.logger.info("Rain Total: %.1f mm" % total)
+        rainRate = (record[7] * 256 + record[8]) / 1000.0
+        rainHour = (record[9] * 256 + record[10]) / 1000.0
+        rainDay = (record[11] * 256 + record[12]) / 1000.0
+        rainTotal = (record[13] * 256 + record[14]) / 1000.0
+        self.logger.info("Rain Rate: %.1f mm/hr" % rainRate)
+        self.logger.info("Rain Hour: %.1f mm" % rainHour)
+        self.logger.info("Rain 24h: %.1f mm" % rainDay)
+        self.logger.info("Rain Total: %.1f mm" % rainTotal)
         self.decodeTimeStamp(record[15:20]) 
-        self._report_rain(total, rate)
+        self._report_rain(rainTotal, rainRate)
       elif type == 0xD5:
         # Untested. I don't have a UV sensor.
         uv = record[7]
