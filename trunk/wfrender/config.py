@@ -58,8 +58,9 @@ class RendererConfigurer(wfcommon.config.Configurer):
         opt_parser.add_option("-R", "--reload-modules", action="store_true", dest="reload_mod", help="Reloads the data source, renderer and extension modules if they change during execution")
         opt_parser.add_option("-c", "--command", dest="command", help="A command to execute after automatic reload. Useful to trigger events during development such as browser reload.")
 
-    def configure_engine(self, engine, options, args, init, config_file):
-        (config, config_context) = self.configure(options, engine, config_file, embedded=(self.embedded or not init))
+    def configure_engine(self, engine, options, args, embedded, config_file, settings_file=None):
+
+        (config, config_context) = self.configure(options, engine, config_file, settings_file, embedded=embedded)
 
         engine.root_renderer = config["renderer"]
 
