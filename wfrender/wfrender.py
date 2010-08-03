@@ -83,16 +83,15 @@ logging [logging configuration] (optional):
         if options.output:
             self.output=True
 
-        self.reconfigure(options, args, init=True)
+        self.reconfigure(options, args, embedded)
 
 
-    def reconfigure(self, options=None, args=[], init=False):
+    def reconfigure(self, options=None, args=[], embedded=False):
+        self.configurer.configure_engine(self,options, args, embedded, self.config_file, self.settings_file)
 
-        self.configurer.configure_engine(self,options, args, init, self.config_file)
-
-    def process(self, config_file, embedded, data=initial_data, context={}):
-
+    def process(self, config_file, settings_file, embedded, data=initial_data, context={}):
         self.config_file = config_file
+        self.settings_file = settings_file
 
         self.configure(embedded)
 
@@ -124,8 +123,8 @@ logging [logging configuration] (optional):
         finally:
             self.daemon = False
 
-    def run(self, config_file="config/wfrender.yaml"):
-        self.process(config_file, embedded=False)
+    def run(self, config_file='config/wfrender.yaml', settings_file=None, embedded=False):
+        self.process(config_file, settings_file, embedded)
 
 if __name__ == "__main__":
     engine = RenderEngine()

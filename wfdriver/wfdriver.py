@@ -74,12 +74,12 @@ logging [logging configuration] (optional):
         self.opt_parser = opt_parser
         self.configurer.add_options(self.opt_parser)
 
-    def configure(self, config_file, embedded):
+    def configure(self, config_file, settings_file, embedded):
         
         # Parse the options and create object trees from configuration
         (options, args) = self.opt_parser.parse_args()
 
-        (config, context) = self.configurer.configure(options, self, config_file, embedded)
+        (config, context) = self.configurer.configure(options, self, config_file, settings_file, embedded)
 
         # Initialize the driver from object trees
         self.station = config['station']
@@ -106,14 +106,8 @@ logging [logging configuration] (optional):
             except Exception:
                 self.logger.exception("Could not send event to " + str(self.output))
 
-    def run(self, config_file=None):
-        if config_file:
-            embedded = True
-        else:
-            config_file = "config/wfdriver.yaml"
-            embedded = False
-
-        self.configure(config_file, embedded)
+    def run(self, config_file="config/wfdriver.yaml", settings_file=None, embedded=False):
+        self.configure(config_file, settings_file, embedded)
 
         # Start the logger thread
         logger_thread = Thread(target=self.output_loop)

@@ -21,6 +21,7 @@ import log
 import yaml
 import inspect
 import sys
+import os.path
 import copy
 
 wfrog_version = "0.7-svn"
@@ -37,15 +38,18 @@ class Configurer(object):
         self.module_map = module_map
 
     def add_options(self, opt_parser):
-        opt_parser.add_option("-f", "--file", dest="config",
+        opt_parser.add_option("-f", "--config", dest="config",
                   help="Configuration file (in yaml)", metavar="CONFIG_FILE")
+        opt_parser.add_option("-s", "--settings", dest="settings",
+                  help="Settings file (in yaml)", metavar="SETTINGS_FILE")
         opt_parser.add_option("-H", action="store_true", dest="help_list", help="Gives help on the configuration file and the list of possible config !elements in the yaml config file")
         opt_parser.add_option("-E", dest="help_element", metavar="ELEMENT", help="Gives help about a config !element")
         opt_parser.add_option("-e", "--extensions", dest="extension_names", metavar="MODULE1,MODULE2,...", help="Comma-separated list of modules containing custom configuration elements")
         self.log_configurer.add_options(opt_parser)
 
-    def configure(self, options, component, config_file, embedded=False):
+    def configure(self, options, component, config_file, settings_file=None, embedded=False):
         self.config_file = config_file
+        self.settings_file = settings_file
         if options.extension_names:
             for ext in options.extension_names.split(","):
                 self.logger.debug("Loading extension module '"+ext+"'")
@@ -90,11 +94,17 @@ class Configurer(object):
         if not embedded and options.config:
             self.config_file = options.config
 
-        self.logger.debug("Loading config file " + self.config_file)
         config = yaml.load( file(self.config_file, "r") )
 
-        if config.has_key('context'):
-            context = copy.deepcopy(config['context'])
+        if self.settings_file is None:
+            if options.settings is not None:
+                self.settings_file = options.settings
+            else:
+                self.settings_file = os.path.dirname(self.config_file)+'/../../wfcommon/config/default-settings.yaml'
+        settings = yaml.load( file(self.settings_file, 'r') )
+
+        if settings is not None:
+            context = copy.deepcopy(settings)
         else:
             context = {}
 
@@ -102,6 +112,11 @@ class Configurer(object):
 
         if not embedded:
             self.log_configurer.configure(options, config, context)
+
+        self.logger.debug("Loaded config file " + self.config_file)
+        self.logger.info("Loaded settings file " + self.settings_file)
+        self.logger.info('Loaded settings %s', repr(settings))
+
 
         if config.has_key('init'):
             for k,v in config['init'].iteritems():

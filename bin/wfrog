@@ -1,4 +1,23 @@
 #!/usr/bin/python
+## Copyright 2009 Laurent Bovet <laurent.bovet@windmaster.ch>
+##                Jordi Puigsegur <jordi.puigsegur@gmail.com>
+##
+##  This file is part of wfrog
+##
+##  wfrog is free software: you can redistribute it and/or modify
+##  it under the terms of the GNU General Public License as published by
+##  the Free Software Foundation, either version 3 of the License, or
+##  (at your option) any later version.
+##
+##  This program is distributed in the hope that it will be useful,
+##  but WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##  GNU General Public License for more details.
+##
+##  You should have received a copy of the GNU General Public License
+##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+''' Bootstrap script for running wfrog components from one place '''
 
 # This makes sure that users don't have to set up their environment
 # specially in order to run these programs from bin/.
@@ -14,32 +33,38 @@ import optparse
 import wflogger.wflogger
 import wfrender.wfrender
 
-os.chdir(WFROG_HOME)
-
-SETTINGS_FILE = 'settings.xml'
+SETTINGS_FILE = 'settings.yaml'
 GLOBAL_CONF_DIR = '/etc/wfrog/'
-# Replace with proper discovering of user data dir according to filesystem
-HOME_CONF_DIR = '~/.wfrog/'
+# Replace with proper discovering of user data dir according to os
+HOME_WFROG_DIR = '/home/shaman/.wfrog/'
 settings = None
 
 # detect settings
-if os.path.exists(HOME_CONF_DIR + SETTINGS_FILE):
-    settings = HOME_CONF_DIR + SETTINGS_FILE
+if os.path.exists(HOME_WFROG_DIR + SETTINGS_FILE):
+    settings = HOME_WFROG_DIR + SETTINGS_FILE
 else:
     if os.path.exists(GLOBAL_CONF_DIR + SETTINGS_FILE):
         settings = GLOBAL_CONF_DIR + SETTINGS_FILE
+    else:
+        if os.path.exists('./'+SETTINGS_FILE):
+            settings = os.path.abspath('./'+SETTINGS_FILE)
 
 opt_parser = optparse.OptionParser(conflict_handler='resolve')
 
 opt_parser.add_option("--backend", action="store_true", dest="backend", help="Starts the logger and the driver only.")
 opt_parser.add_option("--renderer", action="store_true", dest="renderer", help="Starts the renderer only.")
 opt_parser.add_option("--customize", action="store_true", dest="customize", help="Prepare the config files for customizing wfrog.")
-opt_parser.add_option("-f", "--file", dest="config_file", help="Configuration file (in yaml)", metavar="CONFIG_FILE")
+opt_parser.add_option('-w', '--cwd', action='store_true', dest='cwd', help='Use the current working directory for data instead of the default one.')
+opt_parser.add_option("-f", "--config", dest="config_file", help="Configuration file (in yaml)", metavar="CONFIG_FILE")
+opt_parser.add_option("-s", "--settings", dest="settings", help="Settings file (in yaml)", metavar="SETTINGS_FILE")
 
 candidate_logger = wflogger.wflogger.Logger(opt_parser)
 candidate_renderer = wfrender.wfrender.RenderEngine(opt_parser)
 
 (options, args) = opt_parser.parse_args()
+
+if options.settings:
+    settings = os.path.abspath(options.settings)
 
 component = candidate_logger
 if options.backend:
@@ -54,10 +79,27 @@ else:
         if not options.config_file:
             config_file = 'wflogger/config/wfrog.yaml'
 
-if os.path.exists(HOME_CONF_DIR + config_file):
-    config_file = HOME_CONF_DIR + config_file
+# detect configuration
+if os.path.exists(HOME_WFROG_DIR + config_file):
+    config_file = HOME_WFROG_DIR + config_file
 else:
     if os.path.exists(GLOBAL_CONF_DIR + config_file):
         config_file = GLOBAL_CONF_DIR + config_file
+    else:
+        if os.path.exists('./'+config_file):
+            config_file = os.path.abspath('./'+config_file)
+        else:
+            config_file = WFROG_HOME + '/' + config_file
 
-component.run(config_file)
+user = os.getenv('USER')
+if(user == None):
+    user = os.getenv('USERNAME')
+
+if not options.cwd and not user=='root':
+    try:
+        os.makedirs(HOME_WFROG_DIR)
+    except:
+        pass
+    os.chdir(HOME_WFROG_DIR)
+
+component.run(config_file, settings)
