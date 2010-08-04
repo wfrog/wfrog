@@ -66,7 +66,7 @@ logging [logging configuration] (optional):
         self.configurer = config.RendererConfigurer(opt_parser)
 
         opt_parser.add_option("-D", "--data", dest="data_string", help="Passes specific data value/pairs to renderers", metavar="key1=value1,key2=value2")
-        opt_parser.add_option("-O", dest="output", action="store_true", help="Outputs the result (if any) on standard output")
+        opt_parser.add_option("-O", dest="output", action="store_true", help="Outputs the renderer result (if any) on standard output")
         self.opt_parser = opt_parser
 
     def configure(self, embedded):

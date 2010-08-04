@@ -54,11 +54,18 @@ class RendererConfigurer(wfcommon.config.Configurer):
 
         wfcommon.config.Configurer.__init__(self, module_map)
         self.add_options(opt_parser)
-        opt_parser.add_option("-r", "--reload-config", action="store_true", dest="reload_config", help="Reloads the yaml configuration if it changes during execution")
-        opt_parser.add_option("-R", "--reload-modules", action="store_true", dest="reload_mod", help="Reloads the data source, renderer and extension modules if they change during execution")
-        opt_parser.add_option("-c", "--command", dest="command", help="A command to execute after automatic reload. Useful to trigger events during development such as browser reload.")
+        # deactivated because untested with new structure
+        # TODO: test and fix if needed
+#        opt_parser.add_option("-r", "--reload-config", action="store_true", dest="reload_config", help="Reloads the yaml configuration if it changes during execution")
+#        opt_parser.add_option("-M", "--reload-modules", action="store_true", dest="reload_mod", help="Reloads the data source, renderer and extension modules if they change during execution")
+#        opt_parser.add_option("-c", "--command", dest="command", help="A command to execute after automatic reload. Useful to trigger events during development such as browser reload.")
 
     def configure_engine(self, engine, options, args, embedded, config_file, settings_file=None):
+
+        # TODO: remove if above fixed
+        options.reload_mod=False
+        options.reload_config=False
+        options.command=False
 
         (config, config_context) = self.configure(options, engine, config_file, settings_file, embedded=embedded)
 
