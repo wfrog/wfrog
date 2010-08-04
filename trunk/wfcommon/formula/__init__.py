@@ -21,8 +21,14 @@ import base
 import wind
 import temp
 
+class YamlCountFormula(base.CountFormula, yaml.YAMLObject):
+    yaml_tag = u'!count'
+
 class YamlAverageFormula(base.AverageFormula, yaml.YAMLObject):
     yaml_tag = u'!avg'
+
+class YamlLastFormula(base.LastFormula, yaml.YAMLObject):
+    yaml_tag = u'!last'
 
 class YamlMinFormula(base.MinFormula, yaml.YAMLObject):
     yaml_tag = u'!min'

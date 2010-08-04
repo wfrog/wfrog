@@ -1,0 +1,56 @@
+renderer: !template
+    path: path: ../../templates/default/check.txt
+    mime: text/plain
+
+    renderer: !multi
+        children:
+            daily: !datatable
+                source: !accumulator
+                    slice: day
+                    format: '%Y-%m-%d'
+                    span: 10
+                    storage: !include { path: storage.yaml } 
+                    formulas:
+                        temp:
+                            avg: !avg { index: temp }
+                            min: !min { index: temp }
+                            max: !max { index: temp }
+                            count: !count { index: temp }
+                        hum: 
+                            avg: !avg { index: hum }
+                            min: !min { index: hum }
+                            max: !max { index: hum }
+                        press: 
+                            min: !avg { index: pressure }
+                            max: !avg { index: pressure }
+                            count: !count { index: pressure }
+                        wind: 
+                            max: !max { index: wind_gust }
+                            'deg,dir' : !predominant { index: wind }
+                            count: !count { index: wind }
+                        rain:
+                            rate: !max { index: rain_rate }
+                            fall: !sum { index: rain }
+                            count: !count { index: rain }
+                        measures:
+                            count: !count { index: localtime }
+                            last: !last { index: localtime }
+
+
+
+
+#            monthly: !data
+#                source: !accumulator
+#                    slice: month
+#                    span: 1
+#                    storage: !include { path: storage.yaml } 
+#                renderer: 
+
+#            yearly: !data
+#                source: !accumulator
+#                    slice: year
+#                    span: 1
+#                    storage: !include { path: storage.yaml } 
+#                renderer: 
+
+

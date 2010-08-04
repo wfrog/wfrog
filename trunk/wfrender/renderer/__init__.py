@@ -20,6 +20,7 @@ import yaml
 
 import chart
 import data
+import datatable
 import file
 import ftp
 import http
@@ -39,6 +40,9 @@ class YamlGoogleWindRadarChartRenderer(chart.GoogleChartWindRadarRenderer, yaml.
 
 class YamlDataRenderer(data.DataRenderer, yaml.YAMLObject):
     yaml_tag = u'!data'
+
+class YamlDataRenderer(datatable.DataTableRenderer, yaml.YAMLObject):
+    yaml_tag = u'!datatable'
 
 class YamlFileRenderer(file.FileRenderer, yaml.YAMLObject):
     yaml_tag = u'!file'

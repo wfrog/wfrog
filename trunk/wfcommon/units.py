@@ -101,13 +101,15 @@ conversions = {
 }
 
 def convert(measure, value, to_units, from_units=None):
-    val = value
-    if from_units: # convert to reference units
-        val = conversions[measure][from_units][1](val)
-    if not to_units:
-        return val 
-    return conversions[measure][to_units][0](val)
-   
+    try:
+        val = value
+        if from_units: # convert to reference units
+            val = conversions[measure][from_units][1](val)
+        if not to_units:
+            return val 
+        return conversions[measure][to_units][0](val)
+    except:
+        return val
 
 class Converter(object):
     
