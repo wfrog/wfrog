@@ -30,13 +30,21 @@ if hasattr(os, "getuid") and os.getuid() != 0:
     sys.path.insert(0, os.path.abspath(os.getcwd()))
 
 import optparse
+import wfcommon.customize
+import wfcommon.setup
 import wflogger.wflogger
 import wfrender.wfrender
 
 SETTINGS_FILE = 'settings.yaml'
 GLOBAL_CONF_DIR = '/etc/wfrog/'
-# Replace with proper discovering of user data dir according to os
-HOME_WFROG_DIR = '/home/shaman/.wfrog/'
+
+try:
+    from win32com.shell import shellcon, shell
+    HOME_WFROG_DIR = shell.SHGetFolderPath(0, shellcon.CSIDL_LOCAL_APPDATA, 0, 0)+'\\Wfrog'
+
+except ImportError: # quick semi-nasty fallback for non-windows/win32com case
+    HOME_WFROG_DIR = os.path.expanduser("~")+'/.wfrog/'
+
 settings = None
 
 # detect settings
@@ -51,9 +59,10 @@ else:
 
 opt_parser = optparse.OptionParser(conflict_handler='resolve')
 
-opt_parser.add_option("--backend", action="store_true", dest="backend", help="Starts the logger and the driver only.")
-opt_parser.add_option("--renderer", action="store_true", dest="renderer", help="Starts the renderer only.")
-opt_parser.add_option("--customize", action="store_true", dest="customize", help="Prepare the config files for customizing wfrog.")
+opt_parser.add_option("-B", "--backend", action="store_true", dest="backend", help="Starts the logger and the driver only.")
+opt_parser.add_option("-R", "--renderer", action="store_true", dest="renderer", help="Starts the renderer only.")
+opt_parser.add_option("-C", "--customize", action="store_true", dest="customize", help="Prepare the config files for customizing wfrog.")
+opt_parser.add_option("-S", "--setup", action="store_true", dest="setup", help="Define the settings interactively.")
 opt_parser.add_option('-w', '--cwd', action='store_true', dest='cwd', help='Use the current working directory for data instead of the default one.')
 opt_parser.add_option("-f", "--config", dest="config_file", help="Configuration file (in yaml)", metavar="CONFIG_FILE")
 opt_parser.add_option("-s", "--settings", dest="settings", help="Settings file (in yaml)", metavar="SETTINGS_FILE")
@@ -81,15 +90,16 @@ else:
 
 # detect configuration
 if os.path.exists(HOME_WFROG_DIR + config_file):
-    config_file = HOME_WFROG_DIR + config_file
+    config_dir = HOME_WFROG_DIR
 else:
     if os.path.exists(GLOBAL_CONF_DIR + config_file):
-        config_file = GLOBAL_CONF_DIR + config_file
+        config_dir = GLOBAL_CONF_DIR
     else:
         if os.path.exists('./'+config_file):
-            config_file = os.path.abspath('./'+config_file)
+            config_dir = os.path.abspath('.')
         else:
-            config_file = WFROG_HOME + '/' + config_file
+            config_dir = WFROG_HOME
+config_file = config_dir + '/'+config_file
 
 user = os.getenv('USER')
 if(user == None):
@@ -101,5 +111,16 @@ if not options.cwd and not user=='root':
     except:
         pass
     os.chdir(HOME_WFROG_DIR)
+
+if user == 'root':
+    customize_dir = GLOBAL_CONF_DIR
+else:
+    customize_dir = HOME_WFROG_DIR
+
+if options.customize:
+    wfcommon.customize.Customizer().customize(customize_dir)
+    sys.exit(0)
+if options.setup or settings is None:
+    settings = wfcommon.setup.SetupClient().setup_settings()
 
 component.run(config_file, settings)
