@@ -16,6 +16,8 @@ renderer: !http
             path: default/30days.yaml
         365days.html: !include
             path: default/365days.yaml
+        check: !include
+            path: default/check.yaml
 
 logging:
     level: info

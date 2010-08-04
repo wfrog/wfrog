@@ -18,6 +18,24 @@
 
 import sys
 
+class CountFormula(object):
+    '''
+    Counts number of measures.
+    '''
+    def __init__(self, index):
+        self.index = index
+
+    index = None
+    count = 0
+
+    def append(self, sample):
+        value = sample[self.index]
+        if value is not None:
+            self.count = self.count + 1
+
+    def value(self):
+        return self.count
+
 class AverageFormula(object):
     '''
     Average.
@@ -40,6 +58,26 @@ class AverageFormula(object):
             return None
         else:
             return float(self.sum) / float(self.count)
+
+
+class LastFormula(object):
+    '''
+    Keeps last sample value.
+    '''
+
+    def __init__(self, index):
+        self.index = index
+
+    index = None
+    last = None
+
+    def append(self, sample):
+        value = sample[self.index]
+        if value is not None:
+            self.last = value
+
+    def value(self):
+        return self.last
 
 
 class MinFormula(object):
