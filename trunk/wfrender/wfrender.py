@@ -89,7 +89,7 @@ logging [logging configuration] (optional):
     def reconfigure(self, options=None, args=[], embedded=False):
         self.configurer.configure_engine(self,options, args, embedded, self.config_file, self.settings_file)
 
-    def process(self, config_file, settings_file, embedded, data=initial_data, context={}):
+    def process(self, config_file, settings_file=None, embedded=False, data=initial_data, context={}):
         self.config_file = config_file
         self.settings_file = settings_file
 
