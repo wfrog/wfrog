@@ -16,17 +16,14 @@
 PATH=/usr/sbin:/usr/bin:/sbin:/bin
 NAME=wfrender
 DESC="wfrog renderer - Weather Station Software "
-RENDERER_DIR=/opt/wfrog/wfrender
-RENDERER=wfrender.py
-RENDERER_ARGS=
+RENDERER_DIR=/usr/lib/wfrog/bin
+RENDERER=wfrog
+RENDERER_ARGS=--renderer
 PIDFILE_RENDERER=/var/run/wfrender.pid
 SCRIPTNAME=/etc/init.d/wfrender
-CONFIG_FILE=/etc/wfrog/wfrender/config/wflogger.yaml
 
 # Exit if the package is not installed
 [ -x "$RENDERER_DIR/$RENDERER" ] || exit 0
-
-[ -e "$CONFIG_FILE" ] && RENDERER_ARGS="$RENDERER_ARGS -f $CONFIG_FILE"
 
 # Read configuration variable file if it is present
 [ -r /etc/default/$NAME ] && . /etc/default/$NAME

@@ -166,9 +166,11 @@ logging [logging configuration] (optional):
             renderer_thread.start()
 
         # Wait for ever
-        while True:
-            time.sleep(99999999)
-
+        try:
+            while True:
+                time.sleep(99999999)
+        except KeyboardInterrupt:
+            pass
 
 if __name__ == "__main__":
     logger = Logger()

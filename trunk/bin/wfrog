@@ -61,7 +61,7 @@ opt_parser = optparse.OptionParser(conflict_handler='resolve')
 
 opt_parser.add_option("-B", "--backend", action="store_true", dest="backend", help="Starts the logger and the driver only.")
 opt_parser.add_option("-R", "--renderer", action="store_true", dest="renderer", help="Starts the renderer only.")
-opt_parser.add_option("-C", "--customize", action="store_true", dest="customize", help="Prepare the config files for customizing wfrog.")
+opt_parser.add_option("-C", "--customize", action="store_true", dest="customize", help="Prepare the config files for customizing wfrog. Safe operation, it does not overwrite an existing custom config.")
 opt_parser.add_option("-S", "--setup", action="store_true", dest="setup", help="Define the settings interactively.")
 opt_parser.add_option('-w', '--cwd', action='store_true', dest='cwd', help='Use the current working directory for data instead of the default one.')
 opt_parser.add_option("-f", "--config", dest="config_file", help="Configuration file (in yaml)", metavar="CONFIG_FILE")
@@ -118,7 +118,7 @@ else:
     customize_dir = HOME_WFROG_DIR
 
 if options.customize:
-    wfcommon.customize.Customizer().customize(customize_dir)
+    wfcommon.customize.Customizer().customize(WFROG_HOME+'/', customize_dir, ['wfcommon', 'wfdriver', 'wflogger', 'wfrender'])
     sys.exit(0)
 if options.setup or settings is None:
     settings = wfcommon.setup.SetupClient().setup_settings()
