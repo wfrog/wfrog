@@ -32,7 +32,8 @@ import sys
 
 windDirMap = { 0:"N", 1:"NNE", 2:"NE", 3:"ENE", 4:"E", 5:"ESE", 6:"SE", 7:"SSE",
               8:"S", 9:"SSW", 10:"SW", 11:"WSW", 12:"W", 13:"WNW", 14:"NW", 15:"NWN" }
-forecastMap = { 0:"Partly Cloudy", 1:"Rainy", 2:"Cloudy", 3:"Sunny", 4:"Snowy" }
+forecastMap = { 0:"Partly Cloudy", 1:"Rainy", 2:"Cloudy", 3:"Sunny",
+		4:"Snowy", 5:"Unknown5", 6:"Unknown6", 7:"Unknown7" }
 
 vendor_id  = 0xfde
 product_id = 0xca01
@@ -231,9 +232,9 @@ class WMR200Station(BaseStation):
       elif type == 0xD6:
         self.decodeTimeStamp(record[2:7])
         pressure = (record[8] & 0xF) * 256 + record[7]
-        self.logger.info("Forecast1: %s" % forecastMap[(record[8] & 0xF0) >> 4])
+        self.logger.info("Forecast1: %s" % forecastMap[(record[8] & 0x70) >> 4])
         self.logger.info("Pressure1: %d hPa" % pressure)
-        self.logger.info("Forecast1: %s" % forecastMap[(record[10] & 0xF0) >> 4])
+        self.logger.info("Forecast2: %s" % forecastMap[(record[10] & 0x70) >> 4])
         self.logger.info("Pressure2: %d hPa" % ((record[10] & 0xF) * 256 + record[9]))
         self._report_barometer_absolute(pressure)
       elif type == 0xD7:
