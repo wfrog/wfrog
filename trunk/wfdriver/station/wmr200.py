@@ -144,20 +144,21 @@ class WMR200Station(BaseStation):
         except Exception, e:
           self.logger.exception("WMR200 exception: %s" % str(e))
 
-        self.logger.critical("USB WMR200 connection failure")
         errors += 1
         # We we get too frequent errors, bail out.
         if errors >= 3:
           self.logger.fatal("Too many USB errors. Terminating...")
           exit(1)
 
+        self.logger.critical("Trying to recover USB device")
         # Let's try if we can get the connection going again.
         try:
           devh.reset()
+          time.sleep(1)
           devh.releaseInterface()
         except Exception, e:
           self.logger.exception("WMR200 USB reset failed: %s" % str(e))
-        devh = dev = None
+        devh, dev = None, None
 
         ## Wait 5 seconds
         time.sleep(5)
@@ -179,7 +180,7 @@ class WMR200Station(BaseStation):
           # The first octet is always the number of valid octets in the
           # packet. Since a packet can only have 8 bytes, ignore all packets
           # with a larger size value. It must be corrupted.
-          self.logger.error("Bad Record: %s" % self._list2bytes(packet))
+          self.logger.error("Bad packet: %s" % self._list2bytes(packet))
         else:
           # Append the valid part of the packet to the frame buffer.
           frame += packet[1:packet[0] + 1]
@@ -189,7 +190,7 @@ class WMR200Station(BaseStation):
             # Discard all octets and restart with the next packet.
             self.logger.error("Bad frame: %s" % self._list2bytes(frame))
             frame = []
-          if frame[0] == 0xD1:
+          elif frame[0] == 0xD1:
             # Frames starting with 0xD1 are 1 byte frames and contain no
             # further information. Just remove it from the frame buffer.
             frame = frame[1:len(frame) - 1]
