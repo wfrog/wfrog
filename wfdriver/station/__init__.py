@@ -29,6 +29,10 @@ import auto
 class YamlAutoDetectStation(auto.AutoDetectStation, yaml.YAMLObject):
     yaml_tag = u'!auto'
 
+class YamlWMR200Station(wmr200.WMR200Station, yaml.YAMLObject):
+    yaml_tag = u'!wmr200'
+auto.stations.append(wmr200)
+
 class YamlWMRS200Station(wmrs200.WMRS200Station, yaml.YAMLObject):
     yaml_tag = u'!wmrs200'
 auto.stations.append(wmrs200)
@@ -36,10 +40,6 @@ auto.stations.append(wmrs200)
 class YamlWMR928NXStation(wmr928nx.WMR928NXStation, yaml.YAMLObject):
     yaml_tag = u'!wmr928nx'
 auto.stations.append(wmr928nx)
-
-class YamlWMR200Station(wmr200.WMR200Station, yaml.YAMLObject):
-    yaml_tag = u'!wmr200'
-auto.stations.append(wmr200)
 
 class YamlRandomSimulator(simulator.RandomSimulator, yaml.YAMLObject):
     yaml_tag = u'!random-simulator'
