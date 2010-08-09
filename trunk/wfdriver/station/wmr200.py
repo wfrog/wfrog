@@ -30,9 +30,10 @@ import sys
 windDirMap = { 0:"N", 1:"NNE", 2:"NE", 3:"ENE",
                4:"E", 5:"ESE", 6:"SE", 7:"SSE",
                8:"S", 9:"SSW", 10:"SW", 11:"WSW",
-	       12:"W", 13:"WNW", 14:"NW", 15:"NNW" }
+               12:"W", 13:"WNW", 14:"NW", 15:"NNW" }
 forecastMap = { 0:"Partly Cloudy", 1:"Rainy", 2:"Cloudy", 3:"Sunny",
-		4:"Snowy", 5:"Unknown5", 6:"Unknown6", 7:"Unknown7" }
+                4:"Snowy", 5:"Unknown5", 6:"Unknown6", 7:"Unknown7" }
+usbWait = 0.5
 
 # The USB vendor and product ID of the WMR200. Unfortunately, Oregon
 # Scientific is using this combination for several other products as
@@ -44,17 +45,39 @@ product_id = 0xca01
 name = "Oregon Scientific WMR 200"
 
 def detect():
-    station = WMR200Station()
-    if station._search_device(vendor_id, product_id) is not None:
-        return station
+  station = WMR200Station()
+  if station.connectDevice() is not None:
+    return station
 
 class WMR200Station(BaseStation):
     logger = logging.getLogger('station.wmr200')
 
+    def __init__(self):
+      # The timeout and delay for USB reads and writes in seconds.
+      # Should be between 3 and 5
+      self.usbTimeout = 3
+      # Initialize some statistic counters.
+      # The total number of packets.
+      self.totalPackets = 0
+      # The number of correctly received USB packets.
+      self.packets = 0
+      # The number of correctly received data frames.
+      self.frames = 0
+      # The number of corrupted packets.
+      self.badPackets = 0
+      # The number of corrupted frames
+      self.badFrames = 0
+      # The number of checksum errors
+      self.checkSumErrors = 0
+      # The number of sent requests for data frames
+      self.requests = 0
+      # The number of USB connection resyncs
+      self.resyncs = 0
+
     def _list2bytes(self, d):
         return reduce(lambda a, b: a + b, map(lambda a: "%02X " % a, d))
 
-    def _search_device(self, vendorId, productId):
+    def searchDevice(self, vendorId, productId):
       try:
         import usb
       except Exception, e:
@@ -66,149 +89,248 @@ class WMR200Station(BaseStation):
           if device.idVendor == vendorId and device.idProduct == productId:
                return device 
 
-    def receivePacket(self, devh):
+    def receivePacket(self):
       import usb
       errors = 0
       while True:
         try:
-          return devh.interruptRead(usb.ENDPOINT_IN + 1, 0x0000008, 1000)
+          packet = self.devh.interruptRead(usb.ENDPOINT_IN + 1, 8, 
+                                           self.usbTimeout * 1000)
+          self.totalPackets += 1
+	  if len(packet) != 8:
+	    # Valid packets must always have 8 octets.
+	    self.badPackets += 1
+	    self.logger.error("Wrong packet size: %s" %
+			      self._list2bytes(packet))
+          elif packet[0] > 7:
+            # The first octet is always the number of valid octets in the
+            # packet. Since a packet can only have 8 bytes, ignore all packets
+            # with a larger size value. It must be corrupted.
+            self.badPackets += 1
+            self.logger.error("Bad packet: %s" % self._list2bytes(packet))
+	  else:
+            # We've received a new packet.
+            return packet
+
         except usb.USBError, e:
-          if e.args == ('No error',):
-            return None
-          else:
+          if e.args != ('No error',):
             self.logger.exception("Exception reading interrupt: "+ str(e))
+            self.devh.resetEndpoint(usb.ENDPOINT_IN + 1)
             errors = errors + 1
             if errors > 3:
-              time.sleep(3)
               raise e
+          # Return none in case we hit a timeout or other error. This
+	  # will trigger another request for new packets, so we don't
+	  # run dry in this method waiting for new packets.
+          return None
 
-    def sendPacket(self, devh, packet):
+    def sendPacket(self, packet):
       import usb
       try:
-        devh.controlMsg(usb.TYPE_CLASS + usb.RECIP_INTERFACE,
-                        0x000009, packet, 0x000200, timeout=500)
+        self.devh.controlMsg(usb.TYPE_CLASS + usb.RECIP_INTERFACE,
+                             0x000009, packet, 0x000200,
+                             timeout = self.usbTimeout * 1000)
       except Exception, e:
         if e.args != ('No error',):
           self.logger.exception("Can't write request record: "+ str(e))
 
-    def sendCommand(self, devh, command):
-      self.sendPacket(devh, [0x01, command, 0x00, 0x00,
-	                     0x00, 0x00, 0x00, 0x00])
+    def sendCommand(self, command):
+      self.sendPacket([0x01, command, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
 
-    def clearReceiver(self, devh):
+    def clearReceiver(self):
       while True:
-	if self.receivePacket(devh) == None:
-	  break
+        if self.receivePacket() == None:
+          break
 
-    def run(self, generate_event, send_event):
+    def connectDevice(self):
       import usb
 
+      self.logger.info("USB initialization")
+      self.resyncs += 1
+      try:
+        dev = self.searchDevice(vendor_id, product_id)
+
+        if dev == None:
+          raise Exception("USB WMR200 not found (%04X %04X)" %
+                          (vendor_id, product_id))
+
+        self.devh = dev.open()
+        self.devh.clearHalt(usb.ENDPOINT_IN + 1)
+        self.logger.info("Oregon Scientific weather station found")
+        self.logger.info("Manufacturer: %s" % dev.iManufacturer)
+        self.logger.info("Product: %s" % dev.iProduct)
+        self.logger.info("Device version: %s" % dev.deviceVersion)
+        self.logger.info("USB version: %s" % dev.usbVersion)
+
+        # Some magic to get the USB connection going. Not sure if all of
+        # this is really needed, but I've seen this in the pyUSB
+        # documentation. The sleep() calls where empiricly added to
+        # prevent the functions from failing spuriously.
+        self.devh.claimInterface(0)
+        time.sleep(usbWait)
+        tbuf = self.devh.getDescriptor(1, 0, 0x12)
+        time.sleep(usbWait)
+        tbuf = self.devh.getDescriptor(2, 0, 0x09)
+        time.sleep(usbWait)
+        tbuf = self.devh.getDescriptor(2, 0, 0x22)
+        time.sleep(usbWait)
+        self.devh.releaseInterface()
+        time.sleep(usbWait)
+        self.devh.setConfiguration(1)
+        time.sleep(usbWait)
+        self.devh.claimInterface(0)
+        time.sleep(usbWait)
+        self.devh.setAltInterface(0)
+        time.sleep(usbWait)
+
+        # WMR200 Init sequence
+        self.devh.controlMsg(usb.TYPE_CLASS + usb.RECIP_INTERFACE,
+                             0xA, [], 0, 0, self.usbTimeout * 1000)
+        time.sleep(usbWait)
+        self.devh.getDescriptor(0x22, 0, 0x62)
+        self.devh.controlMsg(usb.TYPE_CLASS + usb.RECIP_INTERFACE,
+                             0x9,
+                                   [0x20, 0x00, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00],
+                             0x200, 0, self.usbTimeout * 1000)
+
+        time.sleep(self.usbTimeout)
+        # This command is supposed to clear the WMR200 history
+        # memory. We do this to prevent 0xD2 frames.
+        self.sendCommand(0xDB)
+        # This command is supposed to stop the communication between
+        # PC and the station.
+        self.sendCommand(0xDF)
+        # Ignore any response packets the commands might have generated.
+        self.clearReceiver()
+        # This command is probably a 'hello' command. The station
+        # usually respons with a 0x01 0xD1 packet.
+        self.sendCommand(0xDA)
+        time.sleep(self.usbTimeout)
+        packet = self.receivePacket()
+        if packet == None:
+          raise Exception("WMR200 did not respond to ping")
+        elif packet[0] == 0x01 and packet[1] == 0xD1:
+          self.logger.info("Orgon Scientific WMR200 found")
+        else:
+          raise Exception("Ping answer doesn't match: %s" %
+                          self._list2bytes(packet))
+
+        self.clearReceiver()
+        self.logger.info("USB connection established")
+
+        return self.devh
+      except Exception, e:
+        self.logger.exception("WMR200 connect failed: %s" % str(e))
+        self.disconnectDevice()
+        return None
+
+    def disconnectDevice(self):
+      if self.devh == None:
+        return
+
+      try:
+        # Tell console the session is finished.
+        self.sendCommand(0xDF)
+        self.devh.releaseInterface()
+        self.logger.info("USB connection closed")
+        time.sleep(self.usbTimeout)
+      except Exception, e:
+        self.logger.exception("WMR200 disconnect failed: %s" % str(e))
+      self.devh = None
+
+    def run(self, generate_event, send_event):
       # Initialize injected functions used by BaseStation
       self.generate_event = generate_event
       self.send_event = send_event
       self.logger.info("Thread started")
-      errors = 0
+
       while True:
         try:
-          self.logger.info("USB initialization")
-          dev = self._search_device(vendor_id, product_id)
+          if self.devh == None:
+            self.connectDevice()
+          self.logData()
+        except:
+          self.logger.error("Re-syncing USB connection")
+        self.disconnectDevice()
 
-          if dev == None:
-            raise Exception("USB WMR200 not found (%04X %04X)" % (vendor_id, product_id))
+        if self.usbTimeout < 5:
+          self.usbTimeout += 1
+        self.logStats()
+        # The more often we resync, the less likely we get back in
+        # sync. To prevent useless retries, we wait longer the more
+        # often we've tried.
+        time.sleep(self.resyncs)
 
-          devh = dev.open()
-          self.logger.info("WMR200 found")
-
-          # Some magic to get the USB connection going. Not sure if all of
-          # this is really needed, but I've seen this in the pyUSB
-          # documentation.
-          devh.claimInterface(0)
-          tbuf = devh.getDescriptor(1, 0, 0x12)
-          tbuf = devh.getDescriptor(2, 0, 0x09)
-          tbuf = devh.getDescriptor(2, 0, 0x22)
-          devh.releaseInterface()
-          devh.setConfiguration(1)
-          devh.claimInterface(0)
-          devh.setAltInterface(0)
-          time.sleep(0.3)
-
-          # WMR200 Init sequence
-          devh.controlMsg(usb.TYPE_CLASS + usb.RECIP_INTERFACE,
-                          0x000000A, [], 0x0000000, 0x0000000, 1000)
-          devh.getDescriptor(0x22, 0, 0x62)
-	  self.clearReceiver(devh)
-          self.logger.info("USB WMR200 initialized")
-          errors = 0
-          self._run(devh)
-
-        except Exception, e:
-          self.logger.exception("WMR200 exception: %s" % str(e))
-
-        errors += 1
-        # We we get too frequent errors, bail out.
-        if errors >= 3:
-          self.logger.fatal("Too many USB errors. Terminating...")
-          exit(1)
-
-        self.logger.critical("Trying to recover USB device")
-        # Let's try if we can get the connection going again.
-        try:
-          devh.reset()
-          time.sleep(1)
-          devh.releaseInterface()
-        except Exception, e:
-          self.logger.exception("WMR200 USB reset failed: %s" % str(e))
-        devh, dev = None, None
-
-        ## Wait 5 seconds
-        time.sleep(5)
-
-    def _run(self, devh):
+    def logData(self):
+      self.logger.info("Starting data logging")
       frame = []
 
       while True:
         # Get the next 8 byte packet from the USB device.
-	packet = self.receivePacket(devh)
+        packet = self.receivePacket()
+
+        # Provide some statistics on the USB connection every 1000
+        # packets.
+        if self.totalPackets > 0 and self.totalPackets % 1000 == 0:
+          self.logStats()
 
         if packet == None:
           # No more data to read. Send a control message to signal that
           # we are ready for more. If we poll too fast, we get frames
           # with historic data (0xD2 frames).
-          time.sleep(5)
-          self.sendCommand(devh, 0xD0)
-        elif packet[0] > 7:
-          # The first octet is always the number of valid octets in the
-          # packet. Since a packet can only have 8 bytes, ignore all packets
-          # with a larger size value. It must be corrupted.
-          self.logger.error("Bad packet: %s" % self._list2bytes(packet))
+          time.sleep(self.usbTimeout)
+          # The 0xD0 command requests the next value. 0xDA seems to
+          # work as well.
+          self.sendCommand(0xD0)
+          self.requests += 1
+          # The WMR200 needs this time to prepare the packet. If we
+          # poll too quickly the probabily of broken packets rises.
+          time.sleep(self.usbTimeout)
         else:
+          self.logger.debug("Packet: %s" % self._list2bytes(packet))
           # Append the valid part of the packet to the frame buffer.
           frame += packet[1:packet[0] + 1]
-          if frame[0] < 0xD1 or frame[0] > 0xD9:
-            # All frames must start with 0xD1 - 0xD9. If the first byte is
-            # not within this range, we don't have a proper frame start.
-            # Discard all octets and restart with the next packet.
-            self.logger.error("Bad frame: %s" % self._list2bytes(frame))
-            frame = []
-          elif frame[0] == 0xD1:
-            # Frames starting with 0xD1 are 1 byte frames and contain no
-            # further information. Just remove it from the frame buffer.
-            frame = frame[1:len(frame) - 1]
-          elif len(frame) > 1 and len(frame) >= frame[1]:
-            # We have a complete frame. Let's decode it.
-            self.logger.debug("Frame: %s" % self._list2bytes(frame))
-            self.decodeRecord(frame[0:frame[1]])
-            # Put the remainder in the frame. It should be the start of
-            # the next frame.
-            frame = frame[frame[1]:len(frame)]
+          self.packets += 1
+          while True:
+            if frame[0] < 0xD1 or frame[0] > 0xD9:
+              # All frames must start with 0xD1 - 0xD9. If the first byte is
+              # not within this range, we don't have a proper frame start.
+              # Discard all octets and restart with the next packet.
+              self.logger.error("Bad frame: %s" % self._list2bytes(frame))
+              self.badFrames += 1
+              frame = []
+              break
+            elif len(frame) > 1:
+              if frame[1] > 0xD0:
+                # Octet 1 of a frame is the total length of the frame.
+                # This value includes the frame type and length octet.
+                # If the length is larger then 0xD0 it's probably the
+                # start of a new frame. This can happen for 0xD1
+                # frames that have only 1 octet and no length octet.
+                # Drop the first octet of the frame.
+                frame = frame[1:len(frame) - 1]
+                self.frames += 1
+              elif len(frame) >= frame[1]:
+                # We have a complete frame. Let's decode it.
+                self.logger.debug("Frame: %s" % self._list2bytes(frame))
+                self.frames += 1
+                self.decodeFrame(frame[0:frame[1]])
+                # Put the remainder in the frame. It should be the start of
+                # the next frame.
+                frame = frame[frame[1]:len(frame)]
+            if len(frame) <= 1 or len(frame) < frame[1]:
+              # We don't have enough octects for the current frame.
+              # Get a new packet.
+              break
           
-    def decodeRecord(self, record):
+    def decodeFrame(self, record):
       # The last 2 octets of D2 - D9 frames are always the low and high byte
       # of the checksum. We ignore all frames that don't have a matching
       # checksum.
       if self.checkSum(record[0:len(record)-2],
                        record[len(record) - 2] |
                        (record[len(record) - 1] << 8)) == False:
+        self.checkSumErrors += 1
         return
 
       type = record[0]
@@ -275,8 +397,10 @@ class WMR200Station(BaseStation):
         self.logger.info("Pressure1: %d hPa" % pressure)
         # Bytes 10 - 11: Similar to bytes 8 and 9, but altitude corrected
         # pressure.
-        self.logger.info("Forecast2: %s" % forecastMap[(record[10] & 0x70) >> 4])
-        self.logger.info("Pressure2: %d hPa" % ((record[10] & 0xF) * 256 + record[9]))
+        self.logger.info("Forecast2: %s" %
+                        forecastMap[(record[10] & 0x70) >> 4])
+        self.logger.info("Pressure2: %d hPa" %
+                        ((record[10] & 0xF) * 256 + record[9]))
 
         self._report_barometer_absolute(pressure)
       elif type == 0xD7:
@@ -334,4 +458,25 @@ class WMR200Station(BaseStation):
         self.logger.error("Checksum error: %d instead of %d" % (sum, checkSum))
         return False
       return True
+
+    def logStats(self):
+      if self.totalPackets > 0:
+        self.logger.info("Total packets: %d" % self.totalPackets)
+        self.logger.info("Good packets: %d (%.1f%%)" %
+                          (self.packets,
+                          self.packets * 100.0 / self.totalPackets))
+        self.logger.info("Bad packets: %d (%.1f%%)" %
+                         (self.badPackets,
+                          self.badPackets * 100.0 / self.totalPackets))
+      if self.frames > 0:
+        self.logger.info("Frames: %d" % self.frames)
+        self.logger.info("Bad frames: %d (%.1f%%)" %
+                         (self.badFrames,
+                          self.badFrames * 100.0 / self.frames))
+        self.logger.info("Checksum errors: %d (%.1f%%)" %
+                         (self.checkSumErrors,
+                          self.checkSumErrors * 100.0 / self.frames))
+        self.logger.info("Requests: %d" % self.requests)
+      self.logger.info("USB timeout: %d" % self.usbTimeout)
+      self.logger.info("USB resyncs: %d" % self.resyncs)
 
