@@ -61,7 +61,7 @@ class WMR200Station(BaseStation):
       self.totalPackets = 0
       # The number of correctly received USB packets.
       self.packets = 0
-      # The number of correctly received data frames.
+      # The total number of received data frames.
       self.frames = 0
       # The number of corrupted packets.
       self.badPackets = 0
@@ -73,6 +73,16 @@ class WMR200Station(BaseStation):
       self.requests = 0
       # The number of USB connection resyncs
       self.resyncs = 0
+      # The time when the program was started
+      self.start = time.time()
+      # The time of the last resync start or end
+      self.lastResync = time.time()
+      # True if we are (re-)synching with the station
+      self.syncing = True
+      # The accumulated time in logging mode
+      self.loggedTime = 0
+      # The accumulated time in (re-)sync mode
+      self.resyncTime = 0
 
     def _list2bytes(self, d):
         return reduce(lambda a, b: a + b, map(lambda a: "%02X " % a, d))
@@ -97,19 +107,26 @@ class WMR200Station(BaseStation):
           packet = self.devh.interruptRead(usb.ENDPOINT_IN + 1, 8, 
                                            self.usbTimeout * 1000)
           self.totalPackets += 1
-	  if len(packet) != 8:
-	    # Valid packets must always have 8 octets.
-	    self.badPackets += 1
-	    self.logger.error("Wrong packet size: %s" %
-			      self._list2bytes(packet))
+
+          # Provide some statistics on the USB connection every 1000
+          # packets.
+          if self.totalPackets > 0 and self.totalPackets % 1000 == 0:
+            self.logStats()
+
+          if len(packet) != 8:
+            # Valid packets must always have 8 octets.
+            self.badPackets += 1
+            self.logger.error("Wrong packet size: %s" %
+                              self._list2bytes(packet))
           elif packet[0] > 7:
             # The first octet is always the number of valid octets in the
             # packet. Since a packet can only have 8 bytes, ignore all packets
             # with a larger size value. It must be corrupted.
             self.badPackets += 1
             self.logger.error("Bad packet: %s" % self._list2bytes(packet))
-	  else:
+          else:
             # We've received a new packet.
+            self.packets += 1
             return packet
 
         except usb.USBError, e:
@@ -120,8 +137,8 @@ class WMR200Station(BaseStation):
             if errors > 3:
               raise e
           # Return none in case we hit a timeout or other error. This
-	  # will trigger another request for new packets, so we don't
-	  # run dry in this method waiting for new packets.
+          # will trigger another request for new packets, so we don't
+          # run dry in this method waiting for new packets.
           return None
 
     def sendPacket(self, packet):
@@ -146,6 +163,7 @@ class WMR200Station(BaseStation):
       import usb
 
       self.logger.info("USB initialization")
+      self.syncMode(True)
       self.resyncs += 1
       try:
         dev = self.searchDevice(vendor_id, product_id)
@@ -155,29 +173,12 @@ class WMR200Station(BaseStation):
                           (vendor_id, product_id))
 
         self.devh = dev.open()
-        self.devh.clearHalt(usb.ENDPOINT_IN + 1)
         self.logger.info("Oregon Scientific weather station found")
         self.logger.info("Manufacturer: %s" % dev.iManufacturer)
         self.logger.info("Product: %s" % dev.iProduct)
         self.logger.info("Device version: %s" % dev.deviceVersion)
         self.logger.info("USB version: %s" % dev.usbVersion)
 
-        # Some magic to get the USB connection going. Not sure if all of
-        # this is really needed, but I've seen this in the pyUSB
-        # documentation. The sleep() calls where empiricly added to
-        # prevent the functions from failing spuriously.
-        self.devh.claimInterface(0)
-        time.sleep(usbWait)
-        tbuf = self.devh.getDescriptor(1, 0, 0x12)
-        time.sleep(usbWait)
-        tbuf = self.devh.getDescriptor(2, 0, 0x09)
-        time.sleep(usbWait)
-        tbuf = self.devh.getDescriptor(2, 0, 0x22)
-        time.sleep(usbWait)
-        self.devh.releaseInterface()
-        time.sleep(usbWait)
-        self.devh.setConfiguration(1)
-        time.sleep(usbWait)
         self.devh.claimInterface(0)
         time.sleep(usbWait)
         self.devh.setAltInterface(0)
@@ -190,7 +191,7 @@ class WMR200Station(BaseStation):
         self.devh.getDescriptor(0x22, 0, 0x62)
         self.devh.controlMsg(usb.TYPE_CLASS + usb.RECIP_INTERFACE,
                              0x9,
-                                   [0x20, 0x00, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00],
+                             [0x20, 0x00, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00],
                              0x200, 0, self.usbTimeout * 1000)
 
         time.sleep(self.usbTimeout)
@@ -261,78 +262,82 @@ class WMR200Station(BaseStation):
         # often we've tried.
         time.sleep(self.resyncs)
 
-    def logData(self):
-      self.logger.info("Starting data logging")
-      frame = []
-
+    def receiveFrames(self):
+      packets = []
+      # Wait a bit so the station can generate the data frames.
+      time.sleep(self.usbTimeout)
+      # Collect packets until we get no more data. By then we should have
+      # received one or more frames.
       while True:
-        # Get the next 8 byte packet from the USB device.
         packet = self.receivePacket()
-
-        # Provide some statistics on the USB connection every 1000
-        # packets.
-        if self.totalPackets > 0 and self.totalPackets % 1000 == 0:
-          self.logStats()
-
         if packet == None:
-          # No more data to read. Send a control message to signal that
-          # we are ready for more. If we poll too fast, we get frames
-          # with historic data (0xD2 frames).
-          time.sleep(self.usbTimeout)
-          # The 0xD0 command requests the next value. 0xDA seems to
-          # work as well.
-          self.sendCommand(0xD0)
-          self.requests += 1
-          # The WMR200 needs this time to prepare the packet. If we
-          # poll too quickly the probabily of broken packets rises.
+          break
+        self.logger.debug("Packet: %s" % self._list2bytes(packet))
+        # The first octet is the length. Only length octets are valid data.
+        packets += packet[1:packet[0] + 1]
+
+      frames = []
+      while True:
+        self.frames += 1
+        if len(packets) == 0:
+          # There should be at least one frame.
+          if len(frames) == 0:
+            self.logger.error("Received empty frame")
+            self.badFrames += 1
+            return None
+          # We've found all the frames in the packets.
+          break
+        if packets[0] < 0xD1 or packets[0] > 0xD9:
+          # All frames must start with 0xD1 - 0xD9. If the first byte is
+          # not within this range, we don't have a proper frame start.
+          # Discard all octets and restart with the next packet.
+          self.logger.error("Bad frame: %s" % self._list2bytes(packets))
+          self.badFrames += 1
+          return None
+        if packets[0] == 0xD1 and len(packets) == 1:
+          # 0xD1 frames have only 1 octet.
+          return packets
+        if len(packets) < 2 or len(packets) < packets[1]:
+          # 0xD2 - 0xD9 frames use the 2nd octet to specifiy the length of the
+          # frame. The length includes the type and length octet.
+          self.logger.error("Short frame: %s" % self._list2bytes(packets))
+          self.badFrames += 1
+          return None
+
+        frame = packets[0:packets[1]]
+        packets = packets[packets[1]:len(packets)]
+
+        # The last 2 octets of D2 - D9 frames are always the low and high byte
+        # of the checksum. We ignore all frames that don't have a matching
+        # checksum.
+        if self.checkSum(frame[0:len(frame)-2],
+                         frame[len(frame) - 2] |
+                         (frame[len(frame) - 1] << 8)) == False:
+          self.checkSumErrors += 1
+          return None
+
+        frames.append(frame)
+      return frames
+
+    def logData(self):
+      while True:
+        # Requesting the next set of data frames.
+        self.sendCommand(0xD0)
+        self.requests += 1
+        # Get the frames.
+        frames = self.receiveFrames()
+        if frames == None:
+          # This should normally not happen. A request should always generate
+          # an answer.
           time.sleep(self.usbTimeout)
         else:
-          self.logger.debug("Packet: %s" % self._list2bytes(packet))
-          # Append the valid part of the packet to the frame buffer.
-          frame += packet[1:packet[0] + 1]
-          self.packets += 1
-          while True:
-            if frame[0] < 0xD1 or frame[0] > 0xD9:
-              # All frames must start with 0xD1 - 0xD9. If the first byte is
-              # not within this range, we don't have a proper frame start.
-              # Discard all octets and restart with the next packet.
-              self.logger.error("Bad frame: %s" % self._list2bytes(frame))
-              self.badFrames += 1
-              frame = []
-              break
-            elif len(frame) > 1:
-              if frame[1] > 0xD0:
-                # Octet 1 of a frame is the total length of the frame.
-                # This value includes the frame type and length octet.
-                # If the length is larger then 0xD0 it's probably the
-                # start of a new frame. This can happen for 0xD1
-                # frames that have only 1 octet and no length octet.
-                # Drop the first octet of the frame.
-                frame = frame[1:len(frame) - 1]
-                self.frames += 1
-              elif len(frame) >= frame[1]:
-                # We have a complete frame. Let's decode it.
-                self.logger.debug("Frame: %s" % self._list2bytes(frame))
-                self.frames += 1
-                self.decodeFrame(frame[0:frame[1]])
-                # Put the remainder in the frame. It should be the start of
-                # the next frame.
-                frame = frame[frame[1]:len(frame)]
-            if len(frame) <= 1 or len(frame) < frame[1]:
-              # We don't have enough octects for the current frame.
-              # Get a new packet.
-              break
-          
-    def decodeFrame(self, record):
-      # The last 2 octets of D2 - D9 frames are always the low and high byte
-      # of the checksum. We ignore all frames that don't have a matching
-      # checksum.
-      if self.checkSum(record[0:len(record)-2],
-                       record[len(record) - 2] |
-                       (record[len(record) - 1] << 8)) == False:
-        self.checkSumErrors += 1
-        return
+          # Send the received frames to the decoder.
+          for frame in frames:
+            self.decodeFrame(frame)
 
+    def decodeFrame(self, record):
+      self.syncMode(False)
+      self.logger.debug("Frame: %s" % self._list2bytes(record))
       type = record[0]
       # We don't care about 0xD2 frames. They only contain historic data.
       if type == 0xD3:
@@ -460,6 +465,9 @@ class WMR200Station(BaseStation):
       return True
 
     def logStats(self):
+      now = time.time()
+      uptime = now - self.start
+      self.logger.info("Uptime: %s" % self.durationToStr(uptime))
       if self.totalPackets > 0:
         self.logger.info("Total packets: %d" % self.totalPackets)
         self.logger.info("Good packets: %d (%.1f%%)" %
@@ -479,4 +487,42 @@ class WMR200Station(BaseStation):
         self.logger.info("Requests: %d" % self.requests)
       self.logger.info("USB timeout: %d" % self.usbTimeout)
       self.logger.info("USB resyncs: %d" % self.resyncs)
+
+      loggedTime = self.loggedTime
+      resyncTime = self.resyncTime
+      if not self.syncing:
+        loggedTime += now - self.lastResync
+      else:
+        resyncTime += now - self.lastResync
+      self.logger.info("Logged time: %s (%.1f%%)" %
+                       (self.durationToStr(loggedTime),
+                        loggedTime * 100.0 / uptime))
+      self.logger.info("Resync time: %s (%.1f%%)" %
+                       (self.durationToStr(resyncTime),
+                        resyncTime * 100.0 / uptime))
+
+    def durationToStr(self, sec):
+      seconds = sec % 60
+      minutes = (sec / 60) % 60
+      hours = (sec / (60 * 60)) % 24
+      days = (sec / (60 * 60 * 24))
+      return ("%d days, %d hours, %d minutes, %d seconds" %
+              (days, hours, minutes, seconds))
+
+    def syncMode(self, on):
+      now = time.time()
+      if self.syncing:
+        if not on:
+          self.logger.info("*** Switching to log mode ***")
+          # We are in sync mode and need to switch to log mode now.
+          self.resyncTime += now - self.lastResync
+          self.lastResync = now
+          self.syncing = False
+      else:
+        if on:
+          self.logger.info("*** Switching to sync mode ***")
+          # We are in log mode and need to switch to sync mode now.
+          self.loggedTime += now - self.lastResync
+          self.lastResync = now
+          self.syncing = True
 
