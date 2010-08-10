@@ -47,5 +47,6 @@ class FirebirdStorage(base.DatabaseStorage):
     
     logger = logging.getLogger('storage.firebird')
     
-    def init(self):
+    def init(self, context=None):
         self.db = wfcommon.database.FirebirdDB(self.database, self.user, self.password, self.charset)
+
