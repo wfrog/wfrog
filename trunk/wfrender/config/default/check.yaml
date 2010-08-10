@@ -37,20 +37,3 @@ renderer: !template
                             last: !last { index: localtime }
 
 
-
-
-#            monthly: !data
-#                source: !accumulator
-#                    slice: month
-#                    span: 1
-#                    storage: !include { path: storage.yaml } 
-#                renderer: 
-
-#            yearly: !data
-#                source: !accumulator
-#                    slice: year
-#                    span: 1
-#                    storage: !include { path: storage.yaml } 
-#                renderer: 
-
-
