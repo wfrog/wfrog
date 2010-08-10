@@ -50,5 +50,6 @@ class MysqlStorage(base.DatabaseStorage):
 
     logger = logging.getLogger('storage.mysql')
 
-    def init(self):
+    def init(self, context=None):
         self.db = wfcommon.database.MySQLDB(self.database, self.host, self.port, self.user, self.password)
+
