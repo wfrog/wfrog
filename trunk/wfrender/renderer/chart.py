@@ -578,7 +578,10 @@ class GoogleChartWindRadarRenderer(object):
             if data.has_key(self.sector_key): # 'new' sector data from accumulator
                 sector_data = self.calculate_accumulated_sector_data(data[self.sector_key]['series'])
             else:
-                sector_data = self.calculate_cheap_sector_data(data[self.key]['series'])
+                if data[self.key].has_key('series'):
+                    sector_data = self.calculate_cheap_sector_data(data[self.key]['series'])
+                else:
+                    sector_data = None
 
         if data[self.key].has_key('value'):
             current_noscale = data[self.key]['value']
