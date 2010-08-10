@@ -5,7 +5,7 @@ renderer: !template
         source: !accumulator
             slice: day
             span: 31
-            storage : !service
+            storage: !service
                 name: storage
         renderer: !multi
             children:

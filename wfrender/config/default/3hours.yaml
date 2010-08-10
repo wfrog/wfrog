@@ -5,7 +5,7 @@ renderer: !template
         source: !accumulator
             slice: minute
             span: 180
-            storage : !service
+            storage: !service
                 name: storage
         renderer: !multi
             children:

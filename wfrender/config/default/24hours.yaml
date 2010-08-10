@@ -5,8 +5,8 @@ renderer: !template
         source: !accumulator
             slice: hour
             span: 24
-            storage: !include { path: ../../../wfcommon/config/storage.yaml }  
-                
+            storage: !service
+                name: storage                
         renderer: !multi
             children:
                 current: !include
