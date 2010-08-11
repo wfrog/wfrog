@@ -22,7 +22,7 @@
 # Before loading other modules add wfrog directory to sys.path to be able to use wfcommon
 import os.path
 import sys
-if __name__ == "__main__": sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/..'))
+if __name__ == "__main__": sys.path.append(os.path.abspath(sys.path[0] + '/..'))
 
 import config
 import copy
