@@ -18,7 +18,7 @@ NAME=wfrog
 DESC="wfrog logger - Weather Station Software "
 LOGGER_DIR=/usr/lib/wfrog/bin
 LOGGER=wfrog
-LOGGER_ARGS=--backend
+LOGGER_ARGS="--backend -m"
 PIDFILE_LOGGER=/var/run/wflogger.pid
 SCRIPTNAME=/etc/init.d/wflogger
 
@@ -46,7 +46,7 @@ do_start_logger()
     #   2 if daemon could not be started
     start-stop-daemon --start --quiet --background --make-pidfile --pidfile $PIDFILE_LOGGER -d $LOGGER_DIR --exec $LOGGER_DIR/$LOGGER --test > /dev/null \
         || return 1
-    start-stop-daemon --start --quiet --background --make-pidfile --pidfile $PIDFILE_LOGGER -d $LOGGER_DIR --exec $LOGGER_DIR/$LOGGER -- $LOGGER_ARGS \
+    start-stop-daemon --start --verbose --background --make-pidfile --pidfile $PIDFILE_LOGGER -d $LOGGER_DIR --exec $LOGGER_DIR/$LOGGER -- $LOGGER_ARGS \
         || return 2
 }
 
