@@ -32,7 +32,8 @@ windDirMap = { 0:"N", 1:"NNE", 2:"NE", 3:"ENE",
                8:"S", 9:"SSW", 10:"SW", 11:"WSW",
                12:"W", 13:"WNW", 14:"NW", 15:"NNW" }
 forecastMap = { 0:"Partly Cloudy", 1:"Rainy", 2:"Cloudy", 3:"Sunny",
-                4:"Snowy", 5:"Unknown5", 6:"Unknown6", 7:"Unknown7" }
+                4:"Clear Night", 5:"Snowy",
+                6:"Partly Cloudy Night", 7:"Unknown7" }
 usbWait = 0.5
 
 # The USB vendor and product ID of the WMR200. Unfortunately, Oregon
