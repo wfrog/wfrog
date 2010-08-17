@@ -18,7 +18,7 @@ NAME=wfrender
 DESC="wfrog renderer - Weather Station Software "
 RENDERER_DIR=/usr/lib/wfrog/bin
 RENDERER=wfrog
-RENDERER_ARGS=--renderer
+RENDERER_ARGS="--renderer -m"
 PIDFILE_RENDERER=/var/run/wfrender.pid
 SCRIPTNAME=/etc/init.d/wfrender
 

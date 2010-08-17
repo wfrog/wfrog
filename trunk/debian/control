@@ -13,4 +13,4 @@ Description: Web-based customizable weather station software
  wfrog is a python software for logging weather station data and statistics, 
  viewing them graphically on the web and sending them on a remote FTP site.
  The layout and behaviour is fully customizable through an advanced configuration system. 
- Currently supports Oregon Scientific WMRS200 and WMR928NX stations and is compliant with the WESTEP protocol.
+ Currently supports Oregon Scientific WMR200, WMRS200 and WMR928NX stations and is compliant with the WESTEP protocol.

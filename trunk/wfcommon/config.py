@@ -96,10 +96,12 @@ class Configurer(object):
 
         config = yaml.load( file(self.config_file, "r") )
 
+        settings_warning=False
         if self.settings_file is None:
             if options.settings is not None:
                 self.settings_file = options.settings
             else:
+                settings_warning=True
                 self.settings_file = os.path.dirname(self.config_file)+'/../../wfcommon/config/default-settings.yaml'
         settings = yaml.load( file(self.settings_file, 'r') )
 
@@ -113,10 +115,11 @@ class Configurer(object):
         if not embedded:
             self.log_configurer.configure(options, config, context)
 
-        self.logger.debug("Loaded config file " + self.config_file)
-        self.logger.info("Loaded settings file " + self.settings_file)
-        self.logger.info('Loaded settings %s', repr(settings))
-
+        self.logger.debug("Loaded config file " + os.path.normpath(self.config_file))
+        if settings_warning:
+            self.logger.warn('User settings are missing. Loading default ones.')
+        self.logger.info("Loaded settings file " + os.path.normpath(self.settings_file))
+        self.logger.debug('Loaded settings %s', repr(settings))
 
         if config.has_key('init'):
             for k,v in config['init'].iteritems():
