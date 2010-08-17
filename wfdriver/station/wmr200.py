@@ -34,6 +34,9 @@ windDirMap = { 0:"N", 1:"NNE", 2:"NE", 3:"ENE",
 forecastMap = { 0:"Partly Cloudy", 1:"Rainy", 2:"Cloudy", 3:"Sunny",
                 4:"Clear Night", 5:"Snowy",
                 6:"Partly Cloudy Night", 7:"Unknown7" }
+climateSmileys = { 0:"-", 1:":-)", 2:":-(", 3:":-|" }
+humidityTrend = { 0:"Stable", 1:"Rising", 2:"Falling", 3:"Undefined" }
+
 usbWait = 0.5
 
 # The USB vendor and product ID of the WMR200. Unfortunately, Oregon
@@ -84,6 +87,9 @@ class WMR200Station(BaseStation):
       self.loggedTime = 0
       # The accumulated time in (re-)sync mode
       self.resyncTime = 0
+      # Counters for each of the differnt data record types (0xD1 -
+      # 0xD9)
+      self.recordCounters = [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
 
     def _list2bytes(self, d):
         return reduce(lambda a, b: a + b, map(lambda a: "%02X " % a, d))
@@ -105,6 +111,7 @@ class WMR200Station(BaseStation):
       errors = 0
       while True:
         try:
+          time.sleep(0.1)
           packet = self.devh.interruptRead(usb.ENDPOINT_IN + 1, 8, 
                                            self.usbTimeout * 1000)
           self.totalPackets += 1
@@ -294,7 +301,7 @@ class WMR200Station(BaseStation):
           # Discard all octets and restart with the next packet.
           self.logger.error("Bad frame: %s" % self._list2bytes(packets))
           self.badFrames += 1
-          return None
+          break
         if packets[0] == 0xD1 and len(packets) == 1:
           # 0xD1 frames have only 1 octet.
           return packets
@@ -303,7 +310,7 @@ class WMR200Station(BaseStation):
           # frame. The length includes the type and length octet.
           self.logger.error("Short frame: %s" % self._list2bytes(packets))
           self.badFrames += 1
-          return None
+          break
 
         frame = packets[0:packets[1]]
         packets = packets[packets[1]:len(packets)]
@@ -315,10 +322,14 @@ class WMR200Station(BaseStation):
                          frame[len(frame) - 2] |
                          (frame[len(frame) - 1] << 8)) == False:
           self.checkSumErrors += 1
-          return None
+          break
 
         frames.append(frame)
-      return frames
+
+      if len(frames) > 0:
+        return frames
+      else:
+        return None
 
     def logData(self):
       while True:
@@ -340,6 +351,7 @@ class WMR200Station(BaseStation):
       self.syncMode(False)
       self.logger.debug("Frame: %s" % self._list2bytes(record))
       type = record[0]
+      self.recordCounters[type - 0xD1] += 1
       # We don't care about 0xD2 frames. They only contain historic data.
       if type == 0xD3:
         # 0xD3 frames contain wind related information.
@@ -422,6 +434,8 @@ class WMR200Station(BaseStation):
         for i in xrange(records):
           # Byte 7: low nibble contains sensor ID. 0 for base station.
           sensor = record[offset + i * rSize] & 0xF
+          smiley = (record[offset + i * rSize] >> 6) & 0x3
+          trend = (record[offset + i * rSize] >> 4) & 0x3
           # Byte 8: probably the high nible contains the sign indicator.
           #         The low nibble is the high byte of the temperature.
           # Byte 9: The low byte of the temperature. The value is in 1/10
@@ -440,12 +454,22 @@ class WMR200Station(BaseStation):
 
           self.logger.info("Sensor: %d" % sensor)
           self.logger.info("Temp: %.1f C" % temp)
-          self.logger.info("Humidity: %d%%" % humidity) 
+          self.logger.info("Humidity: %d%%   Trend: %s   Climate: %s" %
+                           (humidity, humidityTrend[trend],
+                            climateSmileys[smiley]))
           self.logger.info("Dew point: %.1f C" % dewPoint)
 
           self._report_temperature(temp, humidity, sensor)
+      elif type == 0xD8:
         # 0xD8 frames have never been observerd.
-        # 0xD9 frames have unknown content.
+        self.logger.info("TODO: 0xD8 frame found: %s" %
+                         self._list2bytes(record))
+      elif type == 0xD9:
+        # 0xD9 frames have unknown content. Maybe we can find out
+        # what the bits mean.
+        if record[2] != 0 or record[3] != 0 or record[4] != 0 or record[5] != 0:
+          self.logger.info("TODO: 0xD9 frame found: %s" %
+                           self._list2bytes(record[2:6]))
 
     def decodeTimeStamp(self, record):
       minutes = record[0]
@@ -501,6 +525,10 @@ class WMR200Station(BaseStation):
       self.logger.info("Resync time: %s (%.1f%%)" %
                        (self.durationToStr(resyncTime),
                         resyncTime * 100.0 / uptime))
+      for i in xrange(9):
+        self.logger.info("0x%X records: %8d (%2d%%)" %
+                         (0xD1 + i, self.recordCounters[i],
+                          self.recordCounters[i] * 100.0 / self.frames))
 
     def durationToStr(self, sec):
       seconds = sec % 60
