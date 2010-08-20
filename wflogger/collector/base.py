@@ -72,10 +72,10 @@ class BaseCollector(object):
                 return self._mean_temp
         try:
 
-            average = AverageFormula('temp')
+            average = AverageFormula(self.storage.keys().index('temp'))
 
             for sample in self.storage.samples(datetime.datetime.now() - datetime.timedelta(hours=12), context=context):
-                average.add(sample)
+                average.append(sample)
             self._mean_temp = average.value()
             if self._mean_temp is None:
                 return current_temp
