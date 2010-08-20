@@ -1,5 +1,5 @@
 *Documentation*<br>
-  [Documentation Usage and Installation]<br>
+  [Documentation Usage and Installation - wfrog 0.6]<br>
   [http://www.windmaster.ch/wfrog/doc/ Configuration Reference]<br>
   [ReleaseNotes Release Notes]<br>
 
