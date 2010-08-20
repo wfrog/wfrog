@@ -40,7 +40,7 @@ echo
 echo "Press enter description line for this release:"
 read summary
 
-tar cf $archive $checkout
+tar czf $archive $checkout
 
 echo
 echo "Please enter the build number [1]"
