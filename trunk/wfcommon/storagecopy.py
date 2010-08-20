@@ -42,7 +42,7 @@ class StorageCopy(object):
         if config_file is None:
             config_file = "config/storagecopy.yaml"
 
-        configurer = wfcommon.config.Configurer(config_file, module_map)
+        configurer = wfcommon.config.Configurer(module_map)
 
         # Initialize the option parser
         opt_parser = optparse.OptionParser()
@@ -51,7 +51,7 @@ class StorageCopy(object):
         # Parse the options and create object trees from configuration
         (options, args) = opt_parser.parse_args()
 
-        (config, context) = configurer.configure(options, self)
+        (config, context) = configurer.configure(options, self, config_file)
 
         self.from_storage = config['from']
         self.to_storage = config['to']
