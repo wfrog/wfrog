@@ -136,18 +136,26 @@ class WMR200Station(BaseStation):
           else:
             # We've received a new packet.
             self.packets += 1
+	    errors = 0
             return packet
 
         except usb.USBError, e:
-          if e.args != ('No error',):
+          if e.args == ('No error',):
+	    # Return None in case we hit a timeout or other error.
+	    # This will trigger another request for new packets, so we
+	    # don't run dry in this method waiting for new packets.
+	    return None
+          elif e.args == ('error sending control message: Connection timed out',):
+            # Seems to be a common problem. We just retry the read.
+            self.logger.debug("Hit sender timeout. Retrying.")
+            errors += 1
+          else:
             self.logger.exception("Exception reading interrupt: "+ str(e))
             self.devh.resetEndpoint(usb.ENDPOINT_IN + 1)
-            errors = errors + 1
-            if errors > 3:
-              raise e
-          # Return none in case we hit a timeout or other error. This
-          # will trigger another request for new packets, so we don't
-          # run dry in this method waiting for new packets.
+            errors += 1
+
+          if errors > 3:
+            raise e
           return None
 
     def sendPacket(self, packet):
