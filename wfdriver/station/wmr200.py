@@ -50,7 +50,7 @@ name = "Oregon Scientific WMR 200"
 
 def detect():
   station = WMR200Station()
-  if station.connectDevice() is not None:
+  if station.connectDevice(silent_fail=True) is not None:
     return station
 
 class WMR200Station(BaseStation):
@@ -90,6 +90,7 @@ class WMR200Station(BaseStation):
       # Counters for each of the differnt data record types (0xD1 -
       # 0xD9)
       self.recordCounters = [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+      self.devh = None
 
     def _list2bytes(self, d):
         return reduce(lambda a, b: a + b, map(lambda a: "%02X " % a, d))
@@ -167,10 +168,13 @@ class WMR200Station(BaseStation):
         if self.receivePacket() == None:
           break
 
-    def connectDevice(self):
+    def connectDevice(self, silent_fail=False):
       import usb
 
-      self.logger.info("USB initialization")
+      if silent_fail:
+        self.logger.debug("USB initialization")
+      else:
+        self.logger.info("USB initialization")
       self.syncMode(True)
       self.resyncs += 1
       try:
@@ -229,7 +233,10 @@ class WMR200Station(BaseStation):
 
         return self.devh
       except Exception, e:
-        self.logger.exception("WMR200 connect failed: %s" % str(e))
+        if silent_fail:
+           self.logger.debug("WMR200 connect failed: %s" % str(e))
+        else:
+            self.logger.exception("WMR200 connect failed: %s" % str(e)) 
         self.disconnectDevice()
         return None
 
