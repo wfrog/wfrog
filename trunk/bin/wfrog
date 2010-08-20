@@ -23,8 +23,9 @@
 # specially in order to run these programs from bin/.
 import sys, os, string, os.path
 WFROG_HOME='.'
-if string.find(os.path.abspath(sys.argv[0]), os.sep+'wfrog') != -1:
-    WFROG_HOME=os.path.normpath(os.path.join(os.path.abspath(sys.argv[0]), os.pardir, os.pardir))
+this_script=os.path.abspath(os.path.realpath(sys.argv[0]))
+if string.find(this_script, os.sep+'wfrog') != -1:
+    WFROG_HOME=os.path.normpath(os.path.join(this_script, os.pardir, os.pardir))
     sys.path.insert(0, WFROG_HOME)
 if hasattr(os, "getuid") and os.getuid() != 0:
     sys.path.insert(0, os.path.abspath(os.getcwd()))
@@ -131,5 +132,7 @@ if options.setup or settings is None:
         settings = wfcommon.setup.SetupClient().setup_settings(SETTINGS_DEF, settings, settings_file)
         if options.setup:
             sys.exit(0)
+        else:
+            print "Now starting wfrog. Standard config serves on http://localhost:7680/."
 
 component.run(config_file, settings)
