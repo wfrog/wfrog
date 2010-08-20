@@ -117,7 +117,7 @@ class Configurer(object):
 
         self.logger.debug("Loaded config file " + os.path.normpath(self.config_file))
         if settings_warning:
-            self.logger.warn('User settings are missing. Loading default ones.')
+            self.logger.warn('User settings are missing. Loading default ones. Run \'wfrog -S\' for user settings setup.')
         self.logger.info("Loaded settings file " + os.path.normpath(self.settings_file))
         self.logger.debug('Loaded settings %s', repr(settings))
 
