@@ -98,7 +98,6 @@ class HttpRendererHandler(BaseHTTPRequestHandler):
         context = copy.deepcopy(_HttpRendererSingleton.context)
         cookie_sections = _HttpRendererSingleton.cookies
 
-
         data = copy.deepcopy(_HttpRendererSingleton.data)
 
         params = cgi.parse_qsl(urlparse.urlsplit(self.path).query)
@@ -163,6 +162,10 @@ class HttpRendererHandler(BaseHTTPRequestHandler):
             self.wfile.write(content)
         else:
             self.send_error(404,"File Not Found: '%s'" % self.path)
+    
+    def log_message(self, format, *args):
+        global _HttpRendererSingleton
+        _HttpRendererSingleton.logger.info(str(self.client_address[0]) + " - "+ format % args)
 
 class StoppableHTTPServer(HTTPServer):
 
