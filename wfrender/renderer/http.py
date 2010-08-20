@@ -49,14 +49,14 @@ class HttpRenderer(object):
         the key names.
 
     port [numeric] (optional):
-        The listening TCP port. Defaults to 8080.
+        The listening TCP port. Defaults to 7680.
 
     cookies [list] (optional):
         List of context sections overridable with a cookie using the -set- uri.
     """
 
     renderers = None
-    port = 8080
+    port = 7680
     root = None
     cookies = []
 
