@@ -7,7 +7,7 @@ Standards-Version: 3.8.3
 Homepage: htp://www.wfrog.org
 
 Package: wfrog
-Architecture: any
+Architecture: all
 Depends: python (>=2.5), python-cheetah (>=2.0), python-lxml (>=1.1.1), python-usb (>=0.4), python-serial (>=2.3)
 Description: Web-based customizable weather station software 
  wfrog is a python software for logging weather station data and statistics, 
