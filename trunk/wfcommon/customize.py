@@ -26,15 +26,17 @@ class Customizer(object):
     '''Prepares the user directory for customization. Does not override existing
     custom config.'''
 
-    config_subdir = '/config/'
+    config_subdirs = [ '/config/', '/templates/' ]
 
     def customize(self, source_dir, target_dir, modules, output=sys.stdout):
         for module in modules:
-            source_config_dir = source_dir+module+self.config_subdir
-            target_config_dir = target_dir+module+self.config_subdir
-            if os.path.exists(target_config_dir):
-                output.write('Config for '+module+' was already customized in '+target_config_dir+'. Skipping')
-            else:
-                output.write('Copying config of '+module+' for customization in '+target_config_dir+'.')
-                shutil.copytree(source_config_dir, target_config_dir)
-            output.write('\n')
+            for subdir in self.config_subdirs:
+                source_config_dir = source_dir+module+subdir
+                target_config_dir = target_dir+module+subdir
+                if os.path.exists(source_config_dir):
+                    if os.path.exists(target_config_dir):
+                        output.write('Config for '+module+' was already customized in '+target_config_dir+'. Skipping')
+                    else:
+                        output.write('Copying config of '+module+' for customization in '+target_config_dir+'.')
+                        shutil.copytree(source_config_dir, target_config_dir)
+                    output.write('\n')
