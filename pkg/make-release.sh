@@ -7,7 +7,7 @@ vline='wfrog_version = "\([^"]*\)"'
 app=wfrog
 checkout=$app
 
-echo "Please make sure the version number is correctly set in $app/$vfile"
+echo "Please make sure the version number is correctly set in $app/$vfile in the subversion repository."
 echo Press enter to proceed with checkout or Ctrl-C to abort.
 read key
 
