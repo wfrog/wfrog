@@ -377,15 +377,15 @@ class WMR200Station(BaseStation):
         dirDeg = (record[7] & 0xF) * 22.5
         # Byte 8: Always 0x0C? Maybe high nible is high byte of gust speed.
         # Byts 9: The low byte of gust speed in 0.1 m/s.
-        gustSpeed = (((record[8] >> 4) & 0xF) | record[9]) * 0.36
+        gustSpeed = (((record[8] >> 4) & 0xF) | record[9]) * 0.1
         # Byte 10: High nibble seems to be low nibble of average speed.
         # Byte 11: Maybe low nibble of high byte and high nibble of low byte
         #          of average speed. Value is in 0.1 m/s
-        avgSpeed = ((record[11] << 4) | ((record[10] >> 4) & 0xF)) * 0.36
+        avgSpeed = ((record[11] << 4) | ((record[10] >> 4) & 0xF)) * 0.1
 
         self.logger.info("Wind Dir: %s" % windDirMap[record[7]])
-        self.logger.info("Gust: %.1f km/h" % gustSpeed)
-        self.logger.info("Wind: %.1f km/h" % avgSpeed)
+        self.logger.info("Gust: %.1f m/s" % gustSpeed)
+        self.logger.info("Wind: %.1f m/s" % avgSpeed)
 
         self._report_wind(dirDeg, avgSpeed, gustSpeed)
       elif type == 0xD4:
