@@ -70,3 +70,27 @@ class HeatIndexMaxFormula(object):
         return self.max_heatindex
 
 
+class HumidexMaxFormula(object):
+    '''
+    Maximum Humidex temperature. Requires temperature and humidity.
+    '''
+
+    def __init__(self, index):
+        self.index = index
+
+    index = None
+    max_humidex = None
+
+    def append(self, sample):
+        value_temp = sample[self.index[0]]
+        value_hum = sample[self.index[1]]
+
+        if value_temp is not None and value_hum is not None :
+            sample_humidex = meteo.Humidex(value_temp, value_hum)
+            if sample_humidex is not None:
+                if self.max_humidex is None or self.max_humidex < sample_humidex:
+                    self.max_humidex = sample_humidex
+
+    def value(self):
+        return self.max_humidex
+
