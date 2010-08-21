@@ -54,5 +54,8 @@ class YamlWindSectorFrequencyFormula(wind.WindSectorFrequencyFormula, yaml.YAMLO
 class YamlHeatIndexMaxFormula(temp.HeatIndexMaxFormula, yaml.YAMLObject):
     yaml_tag = u'!heatindex'
 
+class YamlHumidexMaxFormula(temp.HumidexMaxFormula, yaml.YAMLObject):
+    yaml_tag = u'!humidex'
+
 class YamlWindChillMinFormula(temp.WindChillMinFormula, yaml.YAMLObject):
     yaml_tag = u'!windchill'

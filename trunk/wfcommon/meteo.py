@@ -290,20 +290,27 @@ def HeatIndex(tempC, humidity):
         return None
     else:
         tSqrd = tempF **2
-        hSqrd = humidity ** 2
-        Result = (0 - 42.379 + (2.04901523 * tempF) + (10.14333127 * humidity) -
+        hSqrd = humidity **2
+        Result = (0.0 - 42.379 + (2.04901523 * tempF) + (10.14333127 * humidity) -
                  (0.22475541 * tempF * humidity) - (0.00683783 * tSqrd) -
                  (0.05481717 * hSqrd) + (0.00122874 * tSqrd * humidity) +
                  (0.00085282 * tempF * hSqrd) - (0.00000199 * tSqrd * hSqrd))
         ## Rothfusz adjustments
         if ((humidity < 13) and (tempF >= 80) and (tempF <= 112)):
-            Result -= ((13 - humidity)/4) * Sqrt((17 - Abs(tempf - 95))/17)
+            Result -= ((13.0 - humidity)/4.0) * Sqrt((17.0 - Abs(tempf - 95.0))/17.0)
         elif ((humidity > 85) and (tempF >= 80) and (tempF <= 87)):
-            Result += ((humidity - 85)/10) * ((87 - tempF)/5)
+            Result += ((humidity - 85.0)/10.0) * ((87.0 - tempF)/5.0)
     return FToC(Result) if Result > tempF else tempC
 
 def Humidex(tempC, humidity): 
-    return tempC + ((5/9) * (ActualVaporPressure(tempC, humidity, 'vaTetenNWS') - 10.0))
+    if tempC <= 20.0:
+        return None
+    else:
+        humidex = tempC + ((5.0/9.0) * (ActualVaporPressure(tempC, humidity, 'vaTetenNWS') - 10.0))
+        if humidex > tempC:
+            return humidex
+        else:
+            return None
 
 def GeopotentialAltitude(geometricAltitudeM): 
     return (earthRadius45 * 1000 * geometricAltitudeM) / ((earthRadius45 * 1000) + geometricAltitudeM)
