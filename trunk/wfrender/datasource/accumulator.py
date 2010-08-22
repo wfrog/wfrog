@@ -79,7 +79,7 @@ class AccumulatorDatasource(object):
     formats = { 'year': '%y',
                 'month': '%m',
                 'week': '%d/%m', 
-                'day': '%d',
+                'day': '%d/%m',
                 'hour': '%H',
                 'minute': '%H:%M' }
 
