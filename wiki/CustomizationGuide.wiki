@@ -48,7 +48,7 @@ Note: a common module named `wfcommon` provides the infrastructure shared by the
 
 === Backend and Renderer ===
 
-  * Without parameters, the `wfrog` command runs all modules in the same process.
+Without parameters, the `wfrog` command runs all modules in the same process.
   * To run the backend (i.e. driver+logger) only: `wfrog --backend`
   * To run the renderer only: `wfrog --renderer`
 
@@ -57,15 +57,16 @@ Note: a common module named `wfcommon` provides the infrastructure shared by the
 You can also separate the driver and logger, although it does not makes lot of sense except if you use an external WESTEP driver or use wfrog as a WESTEP driver.
 
 *Using an external WESTEP driver*
+
 Configure wflogger to use a `!stdio-in` or a `!http-in` input (see below the section about logger configuration). Then run the logger directly with `wflogger/wflogger.py`.
 
 *Using wfrog as WESTEP driver*
+
 Configure wfdriver to use a`!stdio-out` or a `!http-out` output (see below the section about driver configuration). Then run the logger directly with `wfdriver/wfdriver.py`.
 
 
 == Using a database storage instead of a CSV file ==
 === Firebird ===
-
 ==== Needed dependencies ====
 
 {{{
