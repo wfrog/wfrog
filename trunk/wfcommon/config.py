@@ -24,7 +24,7 @@ import sys
 import os.path
 import copy
 
-wfrog_version = "0.7-rc1"
+wfrog_version = "0.7"
 
 class Configurer(object):
 

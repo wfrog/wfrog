@@ -58,15 +58,15 @@ debversion=$version-$build
 ( cd $checkout; dpkg-buildpackage )
 debarchive=${app}_${debversion}_all.deb
 
-echo Creating RPM archive
-
-mkdir -p rpm
-cp $debarchive rpm
-(cd rpm; sudo alien --scripts --to-rpm $debarchive)
-rpmarchive=$(cd rpm; ls *.rpm)
-sudo mv rpm/$rpmarchive .
-rm -fr rpm
-sudo chmod o+w $rpmarchive
+#~ echo Creating RPM archive
+#~ 
+#~ mkdir -p rpm
+#~ cp $debarchive rpm
+#~ (cd rpm; sudo alien --scripts --to-rpm $debarchive)
+#~ rpmarchive=$(cd rpm; ls *.rpm)
+#~ sudo mv rpm/$rpmarchive .
+#~ rm -fr rpm
+#~ sudo chmod o+w $rpmarchive
 
 echo
 echo 'Version is' $version
@@ -74,9 +74,9 @@ echo
 echo Press enter to proceed with package subversion tag or Ctrl-C to abort.
 read key
 
-echo svn ci $checkout/debian/changelog -m"[make-release] Release $app $version"
+svn ci $checkout/debian/changelog -m"[make-release] Release $app $version"
 
-echo svn copy https://wfrog.googlecode.com/svn/trunk https://wfrog.googlecode.com/svn/tags/wfrog-$version -m"[make-release] Release $app $version"
+svn copy https://wfrog.googlecode.com/svn/trunk https://wfrog.googlecode.com/svn/tags/wfrog-$version -m"[make-release] Release $app $version"
 
 echo
 echo 'Version is' $version
@@ -84,8 +84,7 @@ echo
 echo Press enter to proceed with package upload on googlecode or Ctrl-C to abort.
 read key
 
-
-echo python googlecode_upload.py -s"$summary" -p $app $archive
-echo python googlecode_upload.py -s"$summary" -p $app $debarchive
-echo python googlecode_upload.py -s"$summary" -p $app $rpmarchive
+python googlecode_upload.py -s"$summary" -p $app $archive
+python googlecode_upload.py -s"$summary" -p $app $debarchive
+#~ echo python googlecode_upload.py -s"$summary" -p $app $rpmarchive
 
