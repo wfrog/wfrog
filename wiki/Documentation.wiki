@@ -1,8 +1,6 @@
 #labels Phase-Support
 <p align="center"><img src="http://wfrog.googlecode.com/svn/wiki/images/logo-web.png"/></p>
 
-= Documentation =
-
   * [InstallationGuide Installation Guide]
   * [CustomizationGuide Customization Guide]
 
