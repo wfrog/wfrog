@@ -16,7 +16,6 @@
   * Download and decompress the latest .tgz wfrog distribution from the [http://code.google.com/p/wfrog/downloads/list download page] or [http://code.google.com/p/wfrog/source/checkout checkout from subversion].
 
   * Install the dependencies
-*Python eggs*
 {{{
 sudo easy_install cheetah                  # Template engine
 sudo easy_install lxml                     # XML serialization 
