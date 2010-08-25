@@ -4,6 +4,6 @@
 = Documentation =
 
   * [InstallationGuide Installation Guide]
-  * [Customization Customization Guide]
+  * [CustomizationGuide Customization Guide]
 
   * [ReleaseNotes Release Notes]
