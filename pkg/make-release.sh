@@ -58,16 +58,6 @@ debversion=$version-$build
 ( cd $checkout; dpkg-buildpackage )
 debarchive=${app}_${debversion}_all.deb
 
-#~ echo Creating RPM archive
-#~ 
-#~ mkdir -p rpm
-#~ cp $debarchive rpm
-#~ (cd rpm; sudo alien --scripts --to-rpm $debarchive)
-#~ rpmarchive=$(cd rpm; ls *.rpm)
-#~ sudo mv rpm/$rpmarchive .
-#~ rm -fr rpm
-#~ sudo chmod o+w $rpmarchive
-
 echo
 echo 'Version is' $version
 echo 
@@ -84,7 +74,6 @@ echo
 echo Press enter to proceed with package upload on googlecode or Ctrl-C to abort.
 read key
 
-python googlecode_upload.py -s"$summary" -p $app $archive
-python googlecode_upload.py -s"$summary" -p $app $debarchive
-#~ echo python googlecode_upload.py -s"$summary" -p $app $rpmarchive
+python googlecode_upload.py -s"$summary" -p $app -l Featured,Type-Archive $archive
+python googlecode_upload.py -s"$summary" -p $app -l Featured,Type-Package,OpSys-Linux $debarchive
 
