@@ -98,7 +98,7 @@ SQL> IN db.sql;
 
 Steps to make wfrog start and stop automatically on a debian-based system:
 
-  * Only for non-debian/ubuntu installations: Make links to the daemon scripts. Adapt the target path to your wfrog directory.
+  * Only for non-debian installations: Make links to the daemon scripts. Adapt the target path to your wfrog directory.
 {{{
 cd /etc/init.d/
 sudo ln -s /opt/wfrog/init.d/wfrender 
