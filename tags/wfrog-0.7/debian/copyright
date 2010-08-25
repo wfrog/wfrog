@@ -1,0 +1,91 @@
+This work was packaged for Debian by:
+
+    Laurent Bovet <laurent.bovet@windmaster.ch> on Tue, 27 Jul 2010 23:28:30 +0200
+
+It was downloaded from:
+
+    http://www.wfrog.org
+
+Upstream Author(s):
+
+    Laurent Bovet <laurent.bovet@windmaster.ch>
+    Jordi Puigsegur <jordi.puigsegur@gmail.com>
+
+Copyright:
+
+    Copyright (C) 2010 Laurent Bovet
+    Copyright (C) 2010 Jordi Puigsegur
+
+License:
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This package is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+On Debian systems, the complete text of the GNU General
+Public License version 3 can be found in `/usr/share/common-licenses/GPL-3'.
+
+The Debian packaging is:
+
+    Copyright (C) 2010 Laurent Bovet <laurent.bovet@windmaster.ch>
+
+and is licensed under the GPL version 3, see above.
+
+This work contains code from:
+
+    webcolors (http://bitbucket.org/ubernostrum/webcolors/overview/)
+    Copyright (c) 2008-2009, James Bennett
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+     modification, are permitted provided that the following conditions are
+     met:
+    
+         * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above
+          copyright notice, this list of conditions and the following
+          disclaimer in the documentation and/or other materials provided
+          with the distribution.
+        * Neither the name of the author nor the names of other
+          contributors may be used to endorse or promote products derived
+          from this software without specific prior written permission.
+    
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+    A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+    OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+    SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+    LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+    DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+This work contains python code ported from:
+
+    uWxUtils (http://www.softwx.com/weather/uwxutils.html)      
+    This source code may be freely used, including for commercial purposes
+    Steve Hatchett, SoftWx, Inc.
+    http://www.softwx.com/
+
+This work was inspired from the documentation from:
+
+    http://www.ejeklint.se/development/wmr100n-driver-for-mac-os-x/wmr100n-usb-protocol/
+    http://wmrx00.sourceforge.net/  (WMR100 weather logger project)
+    http://www.netsky.org/WMR/Protocol.htm
+    http://www.cs.stir.ac.uk/~kjt/software/comms/wmr928.html
+    http://www.castro.aus.net/~maurice/weather/
+
+Thanks to all of them.
+
