@@ -1,3 +1,5 @@
+#summary Editing the configuration to adapt wfrog to your needs.
+
 <p align="center"><img src="http://wfrog.googlecode.com/svn/wiki/images/logo-web.png"/></p>
 
 <wiki:toc/>
