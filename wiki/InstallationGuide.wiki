@@ -20,3 +20,5 @@ sudo easy_install pygooglechart            # Chart rendering
 }}}
   * Plug your station
   * Run `sudo wfrog` and open http://localhost:7680/
+
+<p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
