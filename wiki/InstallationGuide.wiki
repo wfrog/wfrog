@@ -1,6 +1,4 @@
-#summary Installation guide
 #labels Phase-Support
-
 <p align="center"><img src="http://wfrog.googlecode.com/svn/wiki/images/logo-web.png"/></p>
 
 =Installation Guide=
