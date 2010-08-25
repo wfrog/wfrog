@@ -1,0 +1,130 @@
+<p align="center"><img src="http://wfrog.googlecode.com/svn/wiki/images/logo-web.png"/></p>
+
+<wiki:toc/>
+
+==Architecture==
+
+The wfrog architecture involves three functional modules:
+
+   # The Driver. Reads data from the connected station and sends it to the logger as events.
+   # The Logger. Logs data into a persistent storage (default is CSV file). It also maintains a XML file with the latest current conditions.
+   # The Renderer. Reads data from the database and/or the XML file and renders it on a web page, either served by an internal web server or sent on a FTP site.
+
+{{{
+          +--------------+             +--------------+
+          |   Station    |             |   Browser    |
+          +--------------+             +--------------+
+                 |                            ^     ^
+                 |                            |     |
+          +--------------+                    |     |
+          |              |                    |     |
+          |   wfdriver   |                    |   +--------------+
+          |              |                    |   |   FTP site   |
+          +--------------+                    |   +--------------+
+                 |                            |       ^
+                 | events                     |       |
+                 |                            |  HTML |
+                 v                            |       |
+          +--------------+                +-----------+--+
+          |              |                |              |
+          |   wflogger   |                |   wfrender   |
+          |              |                |              |
+          +--------------+                +--------------+
+                 |                               ^
+                 |         ,-----------.         |
+         samples |        (             )        | samples
+                 |        |`-----------'|        |
+                 +------->|             |--------+
+                          |   Storage   |
+                          |             |
+                           `-----------'
+}}}
+
+== Using a database storage instesd of a CSV file ==
+=== Firebird ===
+
+==== Needed dependencies ====
+
+sudo apt-get install firebird2.0-super    #  Firebird database 2.0 
+
+==== Start Database Server ====
+
+{{{
+sudo mkdir -p /var/run/firebird/2.0
+sudo dpkg-reconfigure firebird2.0-super
+}}}
+
+==== Create Database and Tables ====
+
+{{{
+sudo mkdir /var/lib/firebird/2.0/data
+isql-fb -u sysdba -p masterkey
+cd wflogger/db
+SQL> create database 'localhost:/var/lib/firebird/2.0/data/wfrog.db';
+SQL> IN db.sql;
+}}}
+
+== Install as a Boot-Time Services ==
+
+Steps to make wfrog start and stop automatically on a debian-based system:
+
+  * Only for non-debian/ubuntu installations: Make links to the daemon scripts. Adapt the target path to your wfrog directory.
+{{{
+cd /etc/init.d/
+sudo ln -s /opt/wfrog/init.d/wfrender 
+sudo ln -s /opt/wfrog/init.d/wflogger 
+}}}
+  * Make these scripts be called by the system (as root)<br>
+Debian:
+{{{
+sudo update-rc.d wfrender defaults 99
+sudo update-rc.d wflogger defaults 99
+}}}
+Fedora/RedHat:
+{{{
+sudo chkconfig httpd --add
+sudo chkconfig  httpd  on --level 2,3,5
+}}}
+
+== Sending pages to a FTP server ==
+
+The default configuration starts an internal web-server on port 7680.
+
+To send the generated page periodically to a FTP site instead of serving it in the internal web-server, replace the following part of the configuration file:
+
+{{{
+renderer: !http
+    root: !template
+}}}
+
+with 
+
+{{{
+renderer: !scheduler
+    period: 120  # in seconds
+    renderer: !ftp
+        host: myhost.mydomain.com            # where to send the file
+        username: myusername
+        password: mypassword
+        renderers:
+            wfrender.html: !file             # The remote filename
+                path: /tmp/wfrender.html     # The local one
+                renderer: !template         
+}}}
+
+And indent the configuration below so that it is one level below the `render: !template` line.
+
+== Getting Help ==
+
+See the [http://www.windmaster.ch/wfrog/doc Configuration Reference] for details on configuration elements.
+
+The configuration reference is also available in the builtin help of each module, e.g.:
+
+{{{
+wfdriver/wfdriver.py --help             # General help
+wfdriver/wfdriver.py -H                 # List and descriptions of configuration !elements
+wfdriver/wfdriver.py -E ELEMENT         # Help on a specific element
+}}}
+
+
+<p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
