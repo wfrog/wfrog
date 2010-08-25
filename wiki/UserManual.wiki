@@ -4,6 +4,16 @@
 
 <wiki:toc/>
 
+== Troubleshooting ==
+
+When running wfrog on the command line without parameters, the errors are logged only in the `/var/log/wfrog.log` file.
+
+You can make wfrog issue these messages on the standard output with
+
+{{{
+sudo wfrog -v
+}}}
+
 == Trying wfrog before buying a station ==
 
 You can figure out what wfrog looks like even without station.
@@ -14,6 +24,14 @@ wfrog -d
 }}}
 
 In debug mode, if no station is detected, a station simulator is used instead. This is useful during the very development of wfrog, to test configuration and can also give an idea how wfrog works if we don't have any station (yet).
+
+== Changing the settings ==
+
+At first run of wfrog, the settings are interactively setup. You can re-enter them with:
+
+{{{
+sudo wfrog -S
+}}}
 
 == Running wfrog as user or root ==
 
