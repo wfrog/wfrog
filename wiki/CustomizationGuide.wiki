@@ -64,7 +64,9 @@ Configure wfdriver to use a`!stdio-out` or a `!http-out` output (see below the s
 
 ==== Needed dependencies ====
 
+{{{
 sudo apt-get install firebird2.0-super    #  Firebird database 2.0 
+}}}
 
 ==== Start Database Server ====
 
