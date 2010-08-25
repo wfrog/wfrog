@@ -46,7 +46,7 @@ usbWait = 0.5
 vendor_id  = 0xfde
 product_id = 0xca01
 
-name = "Oregon Scientific WMR 200"
+name = "Oregon Scientific WMR200"
 
 def detect():
   station = WMR200Station()
