@@ -58,11 +58,11 @@ You can also separate the driver and logger, although it does not makes lot of s
 
 *Using an external WESTEP driver*
 
-Configure wflogger to use a `!stdio-in` or a `!http-in` input (see below the section about logger configuration). Then run the logger directly with `wflogger/wflogger.py`.
+Configure wflogger to use a `!stdio-in` or a `!http-in` input. Then run the logger directly with `wflogger/wflogger.py`.
 
 *Using wfrog as WESTEP driver*
 
-Configure wfdriver to use a`!stdio-out` or a `!http-out` output (see below the section about driver configuration). Then run the driver directly with `wfdriver/wfdriver.py`.
+Configure wfdriver to use a`!stdio-out` or a `!http-out` output. Then run the driver directly with `wfdriver/wfdriver.py`.
 
 
 == Using a database storage instead of a CSV file ==
