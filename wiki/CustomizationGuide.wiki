@@ -42,6 +42,8 @@ The wfrog architecture involves three functional modules:
                            `-----------'
 }}}
 
+Note: a common module named `wfcommon` provides the infrastructure shared by the functional modules (storage, units, ...).
+
 == Running the modules in separate processes ==
 
 === Backend and Renderer ===
