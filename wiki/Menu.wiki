@@ -1,5 +1,6 @@
 *Documentation*<br>
   [InstallationGuide Installation Guide]<br>
+  [UserManual User Manual]<br>
   [CustomizationGuide Customization Guide]<br>
   [http://www.windmaster.ch/wfrog/doc/ Configuration Reference]<br>
   [ReleaseNotes Release Notes]<br>
