@@ -20,6 +20,7 @@ import yaml
 
 import aggregator
 import flush
+import current
 import xmlfile
 
 # YAML mappings
@@ -29,6 +30,9 @@ class YamlAggregatorCollector(aggregator.AggregatorCollector, yaml.YAMLObject):
 
 class YamlFlushCollector(flush.FlushCollector, yaml.YAMLObject):
     yaml_tag = u'!flush'
+
+class YamlCurrentConditionsCollector(current.CurrentConditionCollector, yaml.YAMLObject):
+    yaml_tag = u'!current-collector'
 
 class YamlXmlFileCollector(xmlfile.XmlFileCollector, yaml.YAMLObject):
     yaml_tag = u'!xmlfile'

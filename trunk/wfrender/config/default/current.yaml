@@ -3,9 +3,11 @@ renderer: !data
         choices:
             root: !currentxml
                 path: /var/lib/wfrog/wfrog-current.xml
-            default: !currentxml
-                path: data/wfrog-current.xml  
-        
+            default: !current-datasource
+                collector: !service
+                    name: current-collector
+                path: data/wfrog-current.yaml
+
     renderer: !multi
         children:
             temp0: !value { key: temp0 }
