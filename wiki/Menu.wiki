@@ -1,10 +1,10 @@
 *Documentation*<br>
-  [Documentation0_6 wfrog 0.6: Usage and Installation]<br>
   [http://www.windmaster.ch/wfrog/doc/ Configuration Reference]<br>
 
   [ReleaseNotes Release Notes]<br>
 
-*Platform-Specific Installation*<br>
+*Unmaintained Documents*<br>
+  [Documentation0_6 wfrog 0.6: Usage and Installation]<br>
   [InstallOnVoyageLinux Installation on Voyage Linux]<br>
   [InstallOn_Alix3D2_voyageLinux0_6_2 wfrog on ALIX3D2]<br>
 
