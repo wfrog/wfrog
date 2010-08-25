@@ -10,6 +10,7 @@
   * Added init section in config to initialize reused components like storage
   * Fixed major layout problems for IE, Opera and Safari.
   * Made Beaufort digit more legible.
+  * Added wind direction on line graph.
   * Added WindChill, HeatIndex and Humidex formulas.
   * Corrected many bugs in slice calculations and chart rendering.
   * Made rain graph accumulative.
