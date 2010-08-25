@@ -40,7 +40,26 @@ The wfrog architecture involves three functional modules:
                            `-----------'
 }}}
 
-== Using a database storage instesd of a CSV file ==
+== Running the modules in separate processes ==
+
+=== Backend and Renderer ===
+
+  * Without parameters, the `wfrog` command runs all modules in the same process.
+  * To run the backend (i.e. driver+logger) only: `wfrog --backend`
+  * To run the renderer only: `wfrog --renderer`
+
+=== Logger and Driver ===
+
+You can also separate the driver and logger, although it does not makes lot of sense except if you use an external WESTEP driver or use wfrog as a WESTEP driver.
+
+*Using an external WESTEP driver*
+Configure wflogger to use a `!stdio-in` or a `!http-in` input (see below the section about logger configuration). Then run the logger directly with `wflogger/wflogger.py`.
+
+*Using wfrog as WESTEP driver*
+Configure wfdriver to use a`!stdio-out` or a `!http-out` output (see below the section about driver configuration). Then run the logger directly with `wfdriver/wfdriver.py`.
+
+
+== Using a database storage instead of a CSV file ==
 === Firebird ===
 
 ==== Needed dependencies ====
@@ -63,6 +82,10 @@ cd wflogger/db
 SQL> create database 'localhost:/var/lib/firebird/2.0/data/wfrog.db';
 SQL> IN db.sql;
 }}}
+
+==== Configure the Storage ====
+
+  * Edit `wfcommon/config/storage.yaml` to enable the `!firebird` storage.
 
 == Install as a Boot-Time Services ==
 
