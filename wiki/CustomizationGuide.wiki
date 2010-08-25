@@ -54,7 +54,7 @@ Without parameters, the `wfrog` command runs all modules in the same process.
 
 === Logger and Driver ===
 
-You can also separate the driver and logger, although it does not makes lot of sense except if you use an external WESTEP driver or use wfrog as a WESTEP driver.
+You can also separate the driver and logger, although it does not makes lot of sense except if you use an external WESTEP driver or use wfrog as a WESTEP driver sending events to another software.
 
 *Using an external WESTEP driver*
 
@@ -62,7 +62,7 @@ Configure wflogger to use a `!stdio-in` or a `!http-in` input (see below the sec
 
 *Using wfrog as WESTEP driver*
 
-Configure wfdriver to use a`!stdio-out` or a `!http-out` output (see below the section about driver configuration). Then run the logger directly with `wfdriver/wfdriver.py`.
+Configure wfdriver to use a`!stdio-out` or a `!http-out` output (see below the section about driver configuration). Then run the driver directly with `wfdriver/wfdriver.py`.
 
 
 == Using a database storage instead of a CSV file ==
