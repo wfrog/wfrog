@@ -1,8 +1,5 @@
 #labels Phase-Support
 <p align="center"><img src="http://wfrog.googlecode.com/svn/wiki/images/logo-web.png"/></p>
-
-=Installation Guide=
-
 ==Debian-based Linux Distributions==
 
   * Download and install the latest wfrog package *.deb* file from the [http://code.google.com/p/wfrog/downloads/list download page]
