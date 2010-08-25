@@ -4,7 +4,8 @@
 
   * Download and install the latest wfrog package *.deb* file from the [http://code.google.com/p/wfrog/downloads/list download page]
   * Plug your station
-  * Run `sudo wfrog` and open http://localhost:7680/
+  * Run `sudo wfrog`
+  * Open http://localhost:7680/
 
 ==Other Linux Distributions==
 
@@ -19,6 +20,7 @@ sudo easy_install pyyaml                   # For reading config files
 sudo easy_install pygooglechart            # Chart rendering
 }}}
   * Plug your station
-  * Run `sudo bin/wfrog` and open http://localhost:7680/
+  * Run `sudo bin/wfrog` 
+  * Open http://localhost:7680/
 
 <p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
