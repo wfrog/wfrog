@@ -20,7 +20,6 @@ import yaml
 
 import accumulator
 import database
-import current
 import xmlquery
 import simulator
 
@@ -34,9 +33,6 @@ class YamlSimulatorDataSource(simulator.SimulatorDataSource, yaml.YAMLObject):
 
 class YamlDatabaseDataSource(database.DatabaseDataSource, yaml.YAMLObject):
     yaml_tag = u'!database'
-
-class YamlCurrentConditionsDataSource(current.CurrentConditionsDataSource, yaml.YAMLObject):
-    yaml_tag = u'!current-datasource'
 
 class YamlCurrentConditionsXmlDataSource(xmlquery.CurrentConditionsXmlDataSource, yaml.YAMLObject):
     yaml_tag = u'!currentxml'
