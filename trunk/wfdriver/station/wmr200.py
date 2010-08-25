@@ -54,6 +54,10 @@ def detect():
     return station
 
 class WMR200Station(BaseStation):
+    '''
+    Station driver for the Oregon Scientific WMR200.
+    '''    
+    
     logger = logging.getLogger('station.wmr200')
 
     def __init__(self):
