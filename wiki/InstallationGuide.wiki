@@ -5,16 +5,16 @@
 
 <wiki:toc/>
 
-= Installation Guide =
+=Installation Guide=
 
-== Debian-based Linux Distributions
+==Debian-based Linux Distributions==
 
   * Download and install the latest wfrog package .deb file from the [http://code.google.com/p/wfrog/downloads/list download page]
   * Setup the system-wide settings interactively with `sudo wfrog -S'
   * Plug your station
   * Run 'sudo wfrog' and open http://localhost:7680/
 
-== Other Linux Distributions 
+==Other Linux Distributions==
 
   * Download and decompress the latest .tgz wfrog distribution from the [http://code.google.com/p/wfrog/downloads/list download page] or [http://code.google.com/p/wfrog/source/checkout checkout from subversion].
 
