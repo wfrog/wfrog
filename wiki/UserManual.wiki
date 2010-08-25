@@ -33,4 +33,4 @@ Here are the differences between running as root or as a user:
    * Data are located in `~/.wfrog/data`
    * Settings are located in `~/.wfrog/settings.yaml`. If absent, wfrog uses the ones in `/etc/wfrog/settings.yaml`
    * Custom configuration is located in `~/wfrog/`. If absent, and a custom configuration exists in `/etc/wfrog`, this latter is used.
-   * Logs are located in `
+   * Logs are located in `~/.wfrog`
