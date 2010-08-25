@@ -3,16 +3,13 @@
 
 <p align="center"><img src="http://wfrog.googlecode.com/svn/wiki/images/logo-web.png"/></p>
 
-<wiki:toc/>
-
 =Installation Guide=
 
 ==Debian-based Linux Distributions==
 
   * Download and install the latest wfrog package .deb file from the [http://code.google.com/p/wfrog/downloads/list download page]
-  * Setup the system-wide settings interactively with `sudo wfrog -S'
   * Plug your station
-  * Run 'sudo wfrog' and open http://localhost:7680/
+  * Run 'sudo wfrog` and open http://localhost:7680/
 
 ==Other Linux Distributions==
 
@@ -28,6 +25,5 @@ sudo easy_install pyserial                 # (optional) If your station is seria
 sudo easy_install pyyaml                   # For reading config files
 sudo easy_install pygooglechart            # Chart rendering
 }}}
-  * Setup the system-wide settings interactively with `sudo wfrog -S'
   * Plug your station
-  * Run 'sudo wfrog' and open http://localhost:7680/
+  * Run 'sudo wfrog` and open http://localhost:7680/
