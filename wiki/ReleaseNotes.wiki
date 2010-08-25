@@ -1,5 +1,5 @@
 *wfrog 0.7 - xx.08.2010*
-  WMR200 driver, .deb and packaging, better configurability. *Caution*: The configuration structure has changed since version 0.6. You will have to re-adapt your configuration using wfrog --customize.
+  WMR200 driver, .deb packaging, better configurability. *Caution*: The configuration structure has changed since version 0.6. You will have to re-adapt your configuration using wfrog --customize.
   * [http://code.google.com/p/wfrog/issues/list?can=1&q=label%3ARelease0.7 Fixed Issues]
   * Added bootstrap script bin/wfrog to run all wfrog in one single command.
   * Added WMR200 driver.
