@@ -60,12 +60,13 @@ debarchive=${app}_${debversion}_all.deb
 
 echo Creating RPM archive
 
-mkdir rpm
+mkdir -p rpm
 cp $debarchive rpm
-(cd rpm; alien --to-rpm $debarchive)
+(cd rpm; sudo alien --scripts --to-rpm $debarchive)
 rpmarchive=$(cd rpm; ls *.rpm)
-mv rpm/$rpmarchive .
+sudo mv rpm/$rpmarchive .
 rm -fr rpm
+sudo chmod o+w $rpmarchive
 
 echo
 echo 'Version is' $version
