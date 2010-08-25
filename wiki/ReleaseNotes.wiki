@@ -1,3 +1,30 @@
+*wfrog 0.7 - xx.08.2010*
+  WMR200 driver, .deb and .rpm packaging, better configurability.
+  * [http://code.google.com/p/wfrog/issues/list?can=1&q=label%3ARelease0.7 Fixed Issues]
+  * Added bootstrap script bin/wfrog to run all wfrog in one single command.
+  * Added WMR200 driver.
+  * Changed default port to an uncommon one to avoid conflicts (7680).
+  * Prepare wfrog config files to optionally allow sending email messages on critical events.
+  * Added auto-detect station. In debug mode, if no station is detected, the simulator is used.
+  * Made log file and data files default location different if running as root or not.
+  * Added init section in config to initialize reused components like storage
+  * Fixed major layout problems for IE, Opera and Safari.
+  * Made Beaufort digit more legible.
+  * Added WindChill, HeatIndex and Humidex formulas.
+  * Corrected many bugs in slice calculations and chart rendering.
+  * Made rain graph accumulative.
+  * Made all graphs ignore flat series by default.
+  * Added .deb and .rpm packaging.
+  * Put settings (former context) into a separate settings.yaml file configurable interactively.
+  * New formulas Last and Count.
+  * New render datatable, to present textual data.
+  * New page to check wfrog status (http://localhost:7680/check).
+  * Added --customize option to wfrog script for preparing user custom config/template directory.
+  * Correcter bug: wfrender fails (does not find wfcommon modules) when called "python wfrender.py" and must always be called "./wfrender.py".
+  * Removed http log on stdout and now logs requests in default log.
+  * Performance improvement: slice unit for 365 days is week.
+
+
 *wfrog 0.6 - 07.06.2010*
   Main feature: Accumulator for rendering able to read from any storage.
   * [http://code.google.com/p/wfrog/issues/list?can=1&q=label%3ARelease0.6 Fixed Issues]
