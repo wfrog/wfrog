@@ -158,7 +158,7 @@ Make sure that the version number is correct in trunk's `wfcommon/config.py`
 
 {{{
 cd pkg/
-make-release.sh
+./make-release.sh
 }}}
 
 This will guide you step by step through the release process. It is interruptable anytime:
@@ -166,5 +166,6 @@ This will guide you step by step through the release process. It is interruptabl
 # Build the .tgz and .deb packages
 # Upload them on google code
 
+Of course, you will need commit permission on the SVN to do that.
 
 <p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
