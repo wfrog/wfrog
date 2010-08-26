@@ -50,7 +50,10 @@ class AutoDetectStation(object):
             else:
                 name = '<unknown>'
             if hasattr(station, 'detect'):
-                detected_result = station.detect()
+                try:
+                    detected_result = station.detect()
+                except Exception, e:
+                    self.logger.warn('Detection code error: %s', str(e))
                 if self.detected(detected_result):
                     self.logger.info("Detected station "+name)
                     detected_station = detected_result
