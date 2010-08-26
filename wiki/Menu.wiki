@@ -3,6 +3,8 @@
   [UserManual User Manual]<br>
   [CustomizationGuide Customization Guide]<br>
   [http://www.windmaster.ch/wfrog/doc/ Configuration Reference]<br>
+  [DeveloperGuide Developer Guide]
+
   [ReleaseNotes Release Notes]<br>
 
 *Unmaintained Documents*<br>
