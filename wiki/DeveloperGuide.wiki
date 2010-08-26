@@ -132,7 +132,15 @@ auto.stations.append(mystation)
 
 === Packaging outside of wfrog ===
 
+If you want to develop/package your station driver outside of the wfrog directory, you can use the extension mechanism.
 
+{{{
+export PYTHONPATH=/path/to/my/driver/python/module/called/mydriver
+./wfdriver.py -e mydriver
+}}}
 
+=== Submit your station driver ===
+
+We are very welcoming station drivers contribution and open commiter accounts for those willing to maintain them themselves.
 
 <p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
