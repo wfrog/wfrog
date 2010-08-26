@@ -74,6 +74,6 @@ echo
 echo Press enter to proceed with package upload on googlecode or Ctrl-C to abort.
 read key
 
-python googlecode_upload.py -s"$summary" -p $app -l Featured,Type-Archive $archive
-python googlecode_upload.py -s"$summary" -p $app -l Featured,Type-Package,OpSys-Linux $debarchive
+python ../googlecode_upload.py -s"$summary" -p $app -l Featured,Type-Archive $archive
+python ../googlecode_upload.py -s"$summary" -p $app -l Featured,Type-Package,OpSys-Linux $debarchive
 
