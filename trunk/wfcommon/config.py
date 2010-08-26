@@ -36,6 +36,7 @@ class Configurer(object):
 
     def __init__(self, module_map):
         self.module_map = module_map
+        self.extensions = {}
 
     def add_options(self, opt_parser):
         opt_parser.add_option("-f", "--config", dest="config",
