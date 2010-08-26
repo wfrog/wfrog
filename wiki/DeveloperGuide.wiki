@@ -4,6 +4,15 @@
 
 <wiki:toc/>
 
+== Generating the configuration reference HTML pages =
+
+{{{
+cd wfcommon/gendoc/
+./gendoc.sh
+}}}
+
+It creates a `doc/` directory.
+
 == Writing a station driver ==
 
 === The `Station` interface ==
@@ -141,6 +150,21 @@ export PYTHONPATH=/path/to/my/driver/python/module/called/mydriver
 
 === Submit your station driver ===
 
-We are very welcoming station drivers contribution and open commiter accounts for those willing to maintain them themselves.
+We are very welcoming station drivers contribution and will open commiter accounts for those wanting to maintain them themselves.
+
+== Making a release of wfrog ==
+
+Make sure that the version number is correct in trunk's `wfcommon/config.py`
+
+{{{
+cd pkg/
+make-release.sh
+}}}
+
+This will guide you step by step through the release process. It is interruptable anytime:
+# Get a fresh checkout of the project
+# Build the .tgz and .deb packages
+# Upload them on google code
+
 
 <p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
