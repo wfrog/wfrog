@@ -19,64 +19,65 @@
 import time
 import logging
 from wfcommon import units
-import weather.stations.davis
 
 class VantageProStation(object):
 
     '''
     Station driver for the Davis VantagePro. It is a wrapper around PyWeather, thus
     need this package installed on your system (sudo easy_install weather).
-    
+
     [Properties]
-    
+
     port [string] (optional):
         Serial port tty to use. Defaults to /dev/ttyS0.
-    
+
     period [numeric] (optional):
         Polling interval in seconds. Defaults to 60.
     '''
 
     ARCHIVE_INTERVAL=10
-    
+
     port='/dev/ttyS0'
     period=60
 
     logger = logging.getLogger('station.vantagepro')
 
     def run(self, generate_event, send_event, context={}):
-    
+
+        import weather.stations.davis
+
         station = weather.stations.davis.VantagePro(self.port, self.ARCHIVE_INTERVAL)
 
         while True:
 
             try:
                 station.parse()
-                
+
                 e = generate_event('press')
                 e.value = units.InHgToHPa(station.fields['Pressure'])
                 send_event(e)
-                                
+
                 e = generate_event('temp')
                 e.sensor = 1
                 e.value = units.FToC(station.fields['TempOut'])
                 send_event(e)
-                
+
                 e = generate_event('hum')
                 e.sensor = 1
                 e.value = station.fields['HumOut']
                 send_event(e)
-                
+
                 e = generate_event('rain')
                 e.rate = units.InToMm(station.fields['RainRate'])
                 send_event(e)
-                
+
                 e = generate_event('wind')
                 e.create_child('mean')
                 e.mean.speed = units.MphToMps(station.fields['WindSpeed10Min'])
                 e.mean.dir = station.fields['WindDir']
-                send_event(e)                        
-                
-            except (Exception) as e:
+                send_event(e)
+
+            except Exception, e:
                 self.logger.error(e)
 
             # pause until next update time
