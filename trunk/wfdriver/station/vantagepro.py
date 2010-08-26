@@ -53,7 +53,7 @@ class VantageProStation(object):
                 station.parse()
                 
                 e = generate_event('press')
-                e.value = station.fields['Pressure']
+                e.value = units.InHgToHPa(station.fields['Pressure'])
                 send_event(e)
                                 
                 e = generate_event('temp')
@@ -63,7 +63,7 @@ class VantageProStation(object):
                 
                 e = generate_event('hum')
                 e.sensor = 1
-                e.value = station.fields['HumOut'],
+                e.value = station.fields['HumOut']
                 send_event(e)
                 
                 e = generate_event('rain')
