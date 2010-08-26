@@ -22,6 +22,7 @@ import simulator
 import wmrs200
 import wmr928nx
 import wmr200
+import vantagepro
 import auto
 
 # YAML mappings and registration for auto-detect
@@ -40,6 +41,9 @@ auto.stations.append(wmrs200)
 class YamlWMR928NXStation(wmr928nx.WMR928NXStation, yaml.YAMLObject):
     yaml_tag = u'!wmr928nx'
 auto.stations.append(wmr928nx)
+
+class YamlVantageProStation(vantagepro.VantageProStation, yaml.YAMLObject):
+    yaml_tag = u'!vantagepro'
 
 class YamlRandomSimulator(simulator.RandomSimulator, yaml.YAMLObject):
     yaml_tag = u'!random-simulator'
