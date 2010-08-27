@@ -21,6 +21,26 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# There is no known official documentation for the USB protocol that
+# the WMR200 uses to exchange weather data with a PC. Too bad that
+# Oregon Scientific does not understand the benefits of open
+# protocols. The code in this WMR200 driver is based on a collective
+# reverse engineering effort. Most of the decoding is probably
+# accurate, but minor bugs cannot be ruled out. Please submit a bug
+# report at http://code.google.com/p/wfrog/issues/list in case you see
+# odd behaviour. The report must include the full debug output of
+# the logger.
+#
+#    cd wflogger
+#    ./wflogger -d 2> wmr200.log
+#
+# Attach the wmr200.log file and include the corresponding actual
+# readings from your WMR200 display. I'd like to thank the folks at
+# http://aguilmard.com/phpBB3/viewtopic.php?f=2&t=508&st=0&sk=t&sd=a&sid=4f64fc06860272367eb6c9e408acabe1
+# for their previous work. Also, the work from Denis Ducret
+# <info@windspots.com> was very helpful to write this driver. His data
+# logger can be found at http://www.sdic.ch/innovation/contributions.
+
 from base import BaseStation
 import time
 import logging
@@ -38,6 +58,7 @@ climateSmileys = { 0:"-", 1:":-)", 2:":-(", 3:":-|" }
 humidityTrend = { 0:"Stable", 1:"Rising", 2:"Falling", 3:"Undefined" }
 
 usbWait = 0.5
+usbTimeout = 3.0
 
 # The USB vendor and product ID of the WMR200. Unfortunately, Oregon
 # Scientific is using this combination for several other products as
@@ -59,14 +80,11 @@ class WMR200Error(IOError):
 class WMR200Station(BaseStation):
     '''
     Station driver for the Oregon Scientific WMR200.
-    '''    
-    
+    '''
+
     logger = logging.getLogger('station.wmr200')
 
     def __init__(self):
-      # The timeout and delay for USB reads and writes in seconds.
-      # Should be between 3 and 5
-      self.usbTimeout = 3
       # The delay between data requests. This value will be adjusted
       # automatically.
       self.pollDelay = 2.5
@@ -95,6 +113,9 @@ class WMR200Station(BaseStation):
       self.syncing = True
       # The accumulated time in logging mode
       self.loggedTime = 0
+      # Difference between the PC clock and the station clock in
+      # minutes.
+      self.clockDelta = 0
       # The accumulated time in (re-)sync mode
       self.resyncTime = 0
       # Counters for each of the differnt data record types (0xD1 -
@@ -115,14 +136,22 @@ class WMR200Station(BaseStation):
       for bus in busses:
         for device in bus.devices:
           if device.idVendor == vendorId and device.idProduct == productId:
-               return device 
+               return device
 
+    # After each 0xD0 command, the station will provide a set of data
+    # packets. The first byte of each packet indicates the number of
+    # valid octects in the packet. The length octect is not counted,
+    # so the maximum value for the first octet is 7. The remaining
+    # octets to fill the 8 octests are invalid. The actual weather
+    # data is contained in data frames that may spread over several
+    # packets. If the read times-out, we have received the final
+    # packet of the last frame.
     def receivePacket(self):
       import usb
       errors = 0
       while True:
         try:
-          packet = self.devh.interruptRead(usb.ENDPOINT_IN + 1, 8, 
+          packet = self.devh.interruptRead(usb.ENDPOINT_IN + 1, 8,
                                            int(self.pollDelay * 1000))
           self.totalPackets += 1
 
@@ -172,13 +201,19 @@ class WMR200Station(BaseStation):
       import usb
       try:
         self.devh.controlMsg(usb.TYPE_CLASS + usb.RECIP_INTERFACE,
-                             0x000009, packet, 0x000200,
-                             timeout = self.usbTimeout * 1000)
+                             0x9, packet, 0x200,
+                             timeout = int(usbTimeout * 1000))
       except usb.USBError, e:
         if e.args != ('No error',):
           self.logger.exception("Can't write request record: "+ str(e))
 
+    # The WMR200 is known to support the following commands:
+    # 0xD0: Request next set of data frames.
+    # 0xDA: Check if station is ready.
+    # 0xDB: Clear historic data from station memory.
+    # 0xDF: Not really known. Maybe to signal end of data transfer.
     def sendCommand(self, command):
+      # All commands are only 1 octect long.
       self.sendPacket([0x01, command, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
       self.logger.debug("Command: %02X" % command)
 
@@ -210,27 +245,42 @@ class WMR200Station(BaseStation):
         self.logger.info("Device version: %s" % dev.deviceVersion)
         self.logger.info("USB version: %s" % dev.usbVersion)
 
+        # The following init sequence was adapted from Denis Ducret's
+        # wmr200log program.
         self.devh.claimInterface(0)
         time.sleep(usbWait)
         self.devh.setAltInterface(0)
         time.sleep(usbWait)
 
+        self.devh.getDescriptor(1, 0, 0x12)
+        self.devh.getDescriptor(2, 0, 0x9)
+        self.devh.getDescriptor(2, 0, 0x22)
+        time.sleep(usbWait)
+
+        self.devh.releaseInterface()
+        self.devh.setConfiguration(1)
+        self.devh.claimInterface(0)
+        self.devh.setAltInterface(0)
+        time.sleep(usbWait)
+
         # WMR200 Init sequence
+        self.logger.debug("Sending 0xA message")
         self.devh.controlMsg(usb.TYPE_CLASS + usb.RECIP_INTERFACE,
-                             0xA, [], 0, 0, self.usbTimeout * 1000)
+                             0xA, [], 0, 0, int(usbTimeout * 1000))
         time.sleep(usbWait)
         self.devh.getDescriptor(0x22, 0, 0x62)
-        self.devh.controlMsg(usb.TYPE_CLASS + usb.RECIP_INTERFACE,
-                             0x9,
-                             [0x20, 0x00, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00],
-                             0x200, 0, self.usbTimeout * 1000)
-
         # Ignore any response packets the commands might have generated.
         self.clearReceiver()
 
-	# This command clears the WMR200 history memory. We can use it
-	# if we don't care about old data that has been logged to the
-	# station memory.
+        self.logger.debug("Sending init message")
+        self.sendPacket([0x20, 0x00, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00])
+        # Ignore any response packets the commands might have generated.
+        self.clearReceiver()
+
+
+        # This command clears the WMR200 history memory. We can use it
+        # if we don't care about old data that has been logged to the
+        # station memory.
         # self.sendCommand(0xDB)
         # self.clearReceiver()
 
@@ -240,8 +290,8 @@ class WMR200Station(BaseStation):
         # Ignore any response packets the commands might have generated.
         self.clearReceiver()
 
-	# This command is a 'hello' command. The station respons with
-	# a 0x01 0xD1 packet.
+        # This command is a 'hello' command. The station respons with
+        # a 0x01 0xD1 packet.
         self.sendCommand(0xDA)
         packet = self.receivePacket()
         if packet == None:
@@ -262,7 +312,7 @@ class WMR200Station(BaseStation):
         if silent_fail:
            self.logger.debug("WMR200 connect failed: %s" % str(e))
         else:
-            self.logger.exception("WMR200 connect failed: %s" % str(e)) 
+            self.logger.exception("WMR200 connect failed: %s" % str(e))
         self.disconnectDevice()
         return None
 
@@ -275,23 +325,23 @@ class WMR200Station(BaseStation):
       try:
         # Tell console the session is finished.
         self.sendCommand(0xDF)
-	try:
+        try:
           self.devh.releaseInterface()
-	except ValueError:
+        except ValueError:
           None
         self.logger.info("USB connection closed")
-        time.sleep(self.usbTimeout)
+        time.sleep(usbTimeout)
       except usb.USBError, e:
         self.logger.exception("WMR200 disconnect failed: %s" % str(e))
       self.devh = None
 
     def increasePollDelay(self):
-      if self.pollDelay < 3.0:
+      if self.pollDelay < 5.0:
         self.pollDelay += 0.1
         self.logger.debug("Polling delay increased: %.1f" % self.pollDelay)
 
     def decreasePollDelay(self):
-      if self.pollDelay > 0.1:
+      if self.pollDelay > 0.5:
         self.pollDelay -= 0.1
         self.logger.debug("Polling delay decreased: %.1f" % self.pollDelay)
 
@@ -310,14 +360,18 @@ class WMR200Station(BaseStation):
           self.logger.error("Re-syncing USB connection")
         self.disconnectDevice()
 
-        if self.usbTimeout < 5:
-          self.usbTimeout += 1
         self.logStats()
         # The more often we resync, the less likely we get back in
         # sync. To prevent useless retries, we wait longer the more
         # often we've tried.
         time.sleep(self.resyncs)
 
+    # The weather data is contained in frames of variable length. The
+    # first octet of each frame indicates the type of the frame. Valid
+    # types are 0xD1 to 0xD9. The 0xD1 frame is only 1 octet long. It
+    # is sent as a response to a 0xDA command. The 0xD2 - 0xD9 frames
+    # are responses to a 0xD0 command. 0xD8 frames are probably not
+    # used. The meaning of 0xD9 frames is currently unknown.
     def receiveFrames(self):
       packets = []
       # Collect packets until we get no more data. By then we should have
@@ -395,7 +449,7 @@ class WMR200Station(BaseStation):
         if frames == None:
           # The station does not have any data right now. Just wait a
           # bit and ask again.
-          time.sleep(self.usbTimeout)
+          time.sleep(usbTimeout)
         else:
           # Send the received frames to the decoder.
           for frame in frames:
@@ -410,7 +464,7 @@ class WMR200Station(BaseStation):
         self.logger.info(">>>>> Historic data >>>>>")
         # We ignore 0xD2 frames for now. They only contain historic data.
         # Byte 2 - 6 contains the time stamp.
-        self.decodeTimeStamp(record[2:7])
+        self.decodeTimeStamp(record[2:7], '@Time', False)
         # Bytes 7 - 19 contain rain data
         rainTotal, rainRate = self.decodeRain(record[7:20])
         # Bytes 20 - 26 contain wind data
@@ -421,7 +475,7 @@ class WMR200Station(BaseStation):
         pressure = self.decodePressure(record[28:33])
         # Bytes 33 - end contain temperature and humidity data
         data = self.decodeTempHumid(record[33:len(record) - 4])
-        self.logger.info("<<<<< Historic data <<<<<") 
+        self.logger.info("<<<<< Historic data <<<<<")
       elif type == 0xD3:
         # 0xD3 frames contain wind related information.
         # Byte 2 - 6 contains the time stamp.
@@ -465,7 +519,7 @@ class WMR200Station(BaseStation):
           self.logger.info("TODO: 0xD9 frame found: %s" %
                            self._list2bytes(record[2:6]))
 
-    def decodeTimeStamp(self, record, label = 'Time'):
+    def decodeTimeStamp(self, record, label = 'Time', check = True):
       minutes = record[0]
       hours = record[1]
       day = record[2]
@@ -473,7 +527,16 @@ class WMR200Station(BaseStation):
       year = 2000 + record[4]
       date = "%04d-%02d-%02d %d:%02d" % (year, month, day, hours, minutes)
       self.logger.info("%s: %s" % (label, date))
-      #time.mktime(year, month, day, hours, minutes, 0, -1, -1, -1)
+      ts = time.mktime((year, month, day, hours, minutes, 0, -1, -1, -1))
+
+      if check:
+        self.clockDelta = int(time.time() / 60) - int(ts / 60)
+        # Generate a warning if PC and station clocks are more than 2
+        # minutes out of sync.
+        if abs(self.clockDelta) > 2:
+          self.logger.warning("PC and station clocks are out of sync")
+
+      return ts
 
     def decodeWind(self, record):
       # Byte 0: Wind direction in steps of 22.5 degrees.
@@ -508,7 +571,7 @@ class WMR200Station(BaseStation):
       self.logger.info("Rain 24h: %.1f mm" % rainDay)
       self.logger.info("Rain Total: %.1f mm" % rainTotal)
       # Bytes 8 - 12 contain the time stamp since the measurement started.
-      self.decodeTimeStamp(record[8:13], 'Since') 
+      self.decodeTimeStamp(record[8:13], 'Since', False)
       return (rainTotal, rainRate)
 
     def decodeUV(self, uv):
@@ -520,12 +583,12 @@ class WMR200Station(BaseStation):
       # Byte 1: high nibble is probably forecast
       #         low nibble is high byte of pressure.
       pressure = ((record[1] & 0xF) << 8) | record[0]
-      forecast = forecastMap[(record[1] & 0x70) >> 4] 
+      forecast = forecastMap[(record[1] & 0x70) >> 4]
       # Bytes 2 - 3: Similar to bytes 0 and 1, but altitude corrected
       # pressure. Upper nibble of byte 3 is still unknown. Seems to
       # be always 3.
       altPressure = (record[3] & 0xF) * 256 + record[2]
-      unknownNibble = (record[3] & 0x70) >> 4 
+      unknownNibble = (record[3] & 0x70) >> 4
 
       self.logger.info("Forecast: %s" % forecast)
       self.logger.info("Measured Pressure: %d hPa" % pressure)
@@ -603,8 +666,8 @@ class WMR200Station(BaseStation):
                          (self.checkSumErrors,
                           self.checkSumErrors * 100.0 / self.frames))
         self.logger.info("Requests: %d" % self.requests)
+      self.logger.info("Clock delta: %d" % self.clockDelta)
       self.logger.info("Polling delay: %.1f" % self.pollDelay)
-      self.logger.info("USB timeout: %d" % self.usbTimeout)
       self.logger.info("USB resyncs: %d" % self.resyncs)
 
       loggedTime = self.loggedTime
