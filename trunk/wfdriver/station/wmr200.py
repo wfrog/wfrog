@@ -53,6 +53,9 @@ def detect():
   if station.connectDevice(silent_fail=True) is not None:
     return station
 
+class WMR200Error(IOError):
+  "Used to signal an error condition"
+
 class WMR200Station(BaseStation):
     '''
     Station driver for the Oregon Scientific WMR200.
@@ -64,6 +67,9 @@ class WMR200Station(BaseStation):
       # The timeout and delay for USB reads and writes in seconds.
       # Should be between 3 and 5
       self.usbTimeout = 3
+      # The delay between data requests. This value will be adjusted
+      # automatically.
+      self.pollDelay = 2.5
       # Initialize some statistic counters.
       # The total number of packets.
       self.totalPackets = 0
@@ -116,9 +122,8 @@ class WMR200Station(BaseStation):
       errors = 0
       while True:
         try:
-          time.sleep(0.1)
           packet = self.devh.interruptRead(usb.ENDPOINT_IN + 1, 8, 
-                                           self.usbTimeout * 1000)
+                                           int(self.pollDelay * 1000))
           self.totalPackets += 1
 
           # Provide some statistics on the USB connection every 1000
@@ -140,15 +145,16 @@ class WMR200Station(BaseStation):
           else:
             # We've received a new packet.
             self.packets += 1
-	    errors = 0
+            errors = 0
+            self.logger.debug("Packet: %s" % self._list2bytes(packet))
             return packet
 
         except usb.USBError, e:
           if e.args == ('No error',):
-	    # Return None in case we hit a timeout or other error.
-	    # This will trigger another request for new packets, so we
-	    # don't run dry in this method waiting for new packets.
-	    return None
+            # Return None in case we hit a timeout or other error.
+            # This will trigger another request for new packets, so we
+            # don't run dry in this method waiting for new packets.
+            return None
           elif e.args == ('error sending control message: Connection timed out',):
             # Seems to be a common problem. We just retry the read.
             self.logger.debug("Hit sender timeout. Retrying.")
@@ -159,7 +165,7 @@ class WMR200Station(BaseStation):
             errors += 1
 
           if errors > 3:
-            raise e
+            raise WRM200Error("Resync required")
           return None
 
     def sendPacket(self, packet):
@@ -168,12 +174,13 @@ class WMR200Station(BaseStation):
         self.devh.controlMsg(usb.TYPE_CLASS + usb.RECIP_INTERFACE,
                              0x000009, packet, 0x000200,
                              timeout = self.usbTimeout * 1000)
-      except Exception, e:
+      except usb.USBError, e:
         if e.args != ('No error',):
           self.logger.exception("Can't write request record: "+ str(e))
 
     def sendCommand(self, command):
       self.sendPacket([0x01, command, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
+      self.logger.debug("Command: %02X" % command)
 
     def clearReceiver(self):
       while True:
@@ -193,8 +200,8 @@ class WMR200Station(BaseStation):
         dev = self.searchDevice(vendor_id, product_id)
 
         if dev == None:
-          raise Exception("USB WMR200 not found (%04X %04X)" %
-                          (vendor_id, product_id))
+          raise WMR200Error("USB WMR200 not found (%04X %04X)" %
+                            (vendor_id, product_id))
 
         self.devh = dev.open()
         self.logger.info("Oregon Scientific weather station found")
@@ -218,33 +225,40 @@ class WMR200Station(BaseStation):
                              [0x20, 0x00, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00],
                              0x200, 0, self.usbTimeout * 1000)
 
-        time.sleep(self.usbTimeout)
-        # This command is supposed to clear the WMR200 history
-        # memory. We do this to prevent 0xD2 frames.
-        self.sendCommand(0xDB)
+        # Ignore any response packets the commands might have generated.
+        self.clearReceiver()
+
+	# This command clears the WMR200 history memory. We can use it
+	# if we don't care about old data that has been logged to the
+	# station memory.
+        # self.sendCommand(0xDB)
+        # self.clearReceiver()
+
         # This command is supposed to stop the communication between
         # PC and the station.
         self.sendCommand(0xDF)
         # Ignore any response packets the commands might have generated.
         self.clearReceiver()
-        # This command is probably a 'hello' command. The station
-        # usually respons with a 0x01 0xD1 packet.
+
+	# This command is a 'hello' command. The station respons with
+	# a 0x01 0xD1 packet.
         self.sendCommand(0xDA)
-        time.sleep(self.usbTimeout)
         packet = self.receivePacket()
         if packet == None:
-          raise Exception("WMR200 did not respond to ping")
+          self.logger.error("Station did not respond properly to WMR200 ping")
+          return None
         elif packet[0] == 0x01 and packet[1] == 0xD1:
-          self.logger.info("Orgon Scientific WMR200 found")
+          self.logger.info("Station identified as WMR200")
         else:
-          raise Exception("Ping answer doesn't match: %s" %
-                          self._list2bytes(packet))
+          self.logger.error("Ping answer doesn't match: %s" %
+                            self._list2bytes(packet))
+          return None
 
         self.clearReceiver()
         self.logger.info("USB connection established")
 
         return self.devh
-      except Exception, e:
+      except usb.USBError, e:
         if silent_fail:
            self.logger.debug("WMR200 connect failed: %s" % str(e))
         else:
@@ -253,18 +267,33 @@ class WMR200Station(BaseStation):
         return None
 
     def disconnectDevice(self):
+      import usb
+
       if self.devh == None:
         return
 
       try:
         # Tell console the session is finished.
         self.sendCommand(0xDF)
-        self.devh.releaseInterface()
+	try:
+          self.devh.releaseInterface()
+	except ValueError:
+          None
         self.logger.info("USB connection closed")
         time.sleep(self.usbTimeout)
-      except Exception, e:
+      except usb.USBError, e:
         self.logger.exception("WMR200 disconnect failed: %s" % str(e))
       self.devh = None
+
+    def increasePollDelay(self):
+      if self.pollDelay < 3.0:
+        self.pollDelay += 0.1
+        self.logger.debug("Polling delay increased: %.1f" % self.pollDelay)
+
+    def decreasePollDelay(self):
+      if self.pollDelay > 0.1:
+        self.pollDelay -= 0.1
+        self.logger.debug("Polling delay decreased: %.1f" % self.pollDelay)
 
     def run(self, generate_event, send_event):
       # Initialize injected functions used by BaseStation
@@ -277,7 +306,7 @@ class WMR200Station(BaseStation):
           if self.devh == None:
             self.connectDevice()
           self.logData()
-        except:
+        except WMR200Error, e:
           self.logger.error("Re-syncing USB connection")
         self.disconnectDevice()
 
@@ -291,15 +320,12 @@ class WMR200Station(BaseStation):
 
     def receiveFrames(self):
       packets = []
-      # Wait a bit so the station can generate the data frames.
-      time.sleep(self.usbTimeout)
       # Collect packets until we get no more data. By then we should have
       # received one or more frames.
       while True:
         packet = self.receivePacket()
         if packet == None:
           break
-        self.logger.debug("Packet: %s" % self._list2bytes(packet))
         # The first octet is the length. Only length octets are valid data.
         packets += packet[1:packet[0] + 1]
 
@@ -309,8 +335,9 @@ class WMR200Station(BaseStation):
         if len(packets) == 0:
           # There should be at least one frame.
           if len(frames) == 0:
-            self.logger.error("Received empty frame")
-            self.badFrames += 1
+            # If we get empty frames we increase the polling delay a
+            # bit.
+            self.increasePollDelay()
             return None
           # We've found all the frames in the packets.
           break
@@ -323,43 +350,51 @@ class WMR200Station(BaseStation):
           break
         if packets[0] == 0xD1 and len(packets) == 1:
           # 0xD1 frames have only 1 octet.
-          return packets
-        if len(packets) < 2 or len(packets) < packets[1]:
+          frame = packets[0:1]
+          packets = packets[1:len(packets)]
+          frames.append(frame)
+        elif len(packets) < 2 or len(packets) < packets[1]:
           # 0xD2 - 0xD9 frames use the 2nd octet to specifiy the length of the
           # frame. The length includes the type and length octet.
           self.logger.error("Short frame: %s" % self._list2bytes(packets))
           self.badFrames += 1
           break
+        else:
+          # This is for all frames with length byte and checksum.
+          frame = packets[0:packets[1]]
+          packets = packets[packets[1]:len(packets)]
 
-        frame = packets[0:packets[1]]
-        packets = packets[packets[1]:len(packets)]
+          # The last 2 octets of D2 - D9 frames are always the low and high byte
+          # of the checksum. We ignore all frames that don't have a matching
+          # checksum.
+          if self.checkSum(frame[0:len(frame)-2],
+                           frame[len(frame) - 2] |
+                           (frame[len(frame) - 1] << 8)) == False:
+            self.checkSumErrors += 1
+            break
 
-        # The last 2 octets of D2 - D9 frames are always the low and high byte
-        # of the checksum. We ignore all frames that don't have a matching
-        # checksum.
-        if self.checkSum(frame[0:len(frame)-2],
-                         frame[len(frame) - 2] |
-                         (frame[len(frame) - 1] << 8)) == False:
-          self.checkSumErrors += 1
-          break
-
-        frames.append(frame)
+          frames.append(frame)
 
       if len(frames) > 0:
+        if len(frames) > 2:
+          # If we get more than 2 frames at a time we increase the
+          # polling frequency again.
+          self.decreasePollDelay()
         return frames
       else:
         return None
 
     def logData(self):
       while True:
-        # Requesting the next set of data frames.
+        # Requesting the next set of data frames by sending a D0
+        # command.
         self.sendCommand(0xD0)
         self.requests += 1
         # Get the frames.
         frames = self.receiveFrames()
         if frames == None:
-          # This should normally not happen. A request should always generate
-          # an answer.
+          # The station does not have any data right now. Just wait a
+          # bit and ask again.
           time.sleep(self.usbTimeout)
         else:
           # Send the received frames to the decoder.
@@ -371,116 +406,56 @@ class WMR200Station(BaseStation):
       self.logger.debug("Frame: %s" % self._list2bytes(record))
       type = record[0]
       self.recordCounters[type - 0xD1] += 1
-      # We don't care about 0xD2 frames. They only contain historic data.
-      if type == 0xD3:
+      if type == 0xD2:
+        self.logger.info(">>>>> Historic data >>>>>")
+        # We ignore 0xD2 frames for now. They only contain historic data.
+        # Byte 2 - 6 contains the time stamp.
+        self.decodeTimeStamp(record[2:7])
+        # Bytes 7 - 19 contain rain data
+        rainTotal, rainRate = self.decodeRain(record[7:20])
+        # Bytes 20 - 26 contain wind data
+        dirDeg, avgSpeed, gustSpeed = self.decodeWind(record[20:27])
+        # Byte 27 contains UV data
+        uv = self.decodeUV(record[27])
+        # Bytes 28 - 32 contain pressure data
+        pressure = self.decodePressure(record[28:33])
+        # Bytes 33 - end contain temperature and humidity data
+        data = self.decodeTempHumid(record[33:len(record) - 4])
+        self.logger.info("<<<<< Historic data <<<<<") 
+      elif type == 0xD3:
         # 0xD3 frames contain wind related information.
         # Byte 2 - 6 contains the time stamp.
         self.decodeTimeStamp(record[2:7])
-        # Byte 7: Wind direction in steps of 22.5 degrees.
-        # 0 is N, 1 is NNE and so on. See windDirMap for complete list.
-        dirDeg = (record[7] & 0xF) * 22.5
-        # Byte 8: Always 0x0C? Maybe high nible is high byte of gust speed.
-        # Byts 9: The low byte of gust speed in 0.1 m/s.
-        gustSpeed = (((record[8] >> 4) & 0xF) | record[9]) * 0.1
-        # Byte 10: High nibble seems to be low nibble of average speed.
-        # Byte 11: Maybe low nibble of high byte and high nibble of low byte
-        #          of average speed. Value is in 0.1 m/s
-        avgSpeed = ((record[11] << 4) | ((record[10] >> 4) & 0xF)) * 0.1
-
-        self.logger.info("Wind Dir: %s" % windDirMap[record[7]])
-        self.logger.info("Gust: %.1f m/s" % gustSpeed)
-        self.logger.info("Wind: %.1f m/s" % avgSpeed)
-
+        dirDeg, avgSpeed, gustSpeed = self.decodeWind(record[7:15])
         self._report_wind(dirDeg, avgSpeed, gustSpeed)
       elif type == 0xD4:
         # 0xD4 frames contain rain data
         # Byte 2 - 6 contains the time stamp.
         self.decodeTimeStamp(record[2:7])
-        # Bytes 7 and 8: high and low byte of the current rainfall rate
-        # in 0.1 in/h
-        rainRate = ((record[8] << 8) | record[7]) / 3.9370078
-        # Bytes 9 and 10: high and low byte of the last hour rainfall in 0.1in
-        rainHour = ((record[10] << 8) | record[9]) / 3.9370078
-        # Bytes 11 and 12: high and low byte of the last day rainfall in 0.1in
-        rainDay = ((record[12] << 8) | record[11]) / 3.9370078
-        # Bytes 13 and 14: high and low byte of the total rainfall in 0.1in
-        rainTotal = ((record[14] << 8) | record[13]) / 3.9370078
-
-        self.logger.info("Rain Rate: %.1f mm/hr" % rainRate)
-        self.logger.info("Rain Hour: %.1f mm" % rainHour)
-        self.logger.info("Rain 24h: %.1f mm" % rainDay)
-        self.logger.info("Rain Total: %.1f mm" % rainTotal)
-        # Bytes 15 - 19 contain the time stamp since the measurement started.
-        self.decodeTimeStamp(record[15:20]) 
-
+        rainTotal, rainRate = self.decodeRain(record[7:21])
         self._report_rain(rainTotal, rainRate)
       elif type == 0xD5:
         # 0xD5 frames contain UV data.
         # Untested. I don't have a UV sensor.
         # Byte 2 - 6 contains the time stamp.
         self.decodeTimeStamp(record[2:7])
-        uv = record[7]
-        self.logger.info("UV Index: %d" % uv)
+        uv = self.decodeUV(record[7])
         self._report_uv(uv)
       elif type == 0xD6:
         # 0xD6 frames contain forecast and air pressure data.
         # Byte 2 - 6 contains the time stamp.
         self.decodeTimeStamp(record[2:7])
-        # Byte 8: high nibble is probably forecast
-        #         low nibble is high byte of pressure.
-        # Byte 9: low byte of pressure. Value is in hPa.
-        pressure = ((record[8] & 0xF) << 8) | record[7]
-        self.logger.info("Forecast1: %s" % forecastMap[(record[8] & 0x70) >> 4])
-        self.logger.info("Pressure1: %d hPa" % pressure)
-        # Bytes 10 - 11: Similar to bytes 8 and 9, but altitude corrected
-        # pressure.
-        self.logger.info("Forecast2: %s" %
-                        forecastMap[(record[10] & 0x70) >> 4])
-        self.logger.info("Pressure2: %d hPa" %
-                        ((record[10] & 0xF) * 256 + record[9]))
-
+        pressure = self.decodePressure(record[7:12])
         self._report_barometer_absolute(pressure)
       elif type == 0xD7:
         # 0xD7 frames contain humidity and temperature data.
         # Byte 2 - 6 contains the time stamp.
         self.decodeTimeStamp(record[2:7])
-        # The historic data can contain data from multiple sensors. I'm not
-        # sure if the 0xD7 frames can do too. I've never seen a frame with
-        # multiple sensors.
-        offset = 7
-        rSize = 7
-        records = (record[1] - offset + 1) / rSize
-        for i in xrange(records):
-          # Byte 7: low nibble contains sensor ID. 0 for base station.
-          sensor = record[offset + i * rSize] & 0xF
-          smiley = (record[offset + i * rSize] >> 6) & 0x3
-          trend = (record[offset + i * rSize] >> 4) & 0x3
-          # Byte 8: probably the high nible contains the sign indicator.
-          #         The low nibble is the high byte of the temperature.
-          # Byte 9: The low byte of the temperature. The value is in 1/10
-          # degrees centigrade.
-          temp = (((record[offset + i * rSize + 2] & 0x0F) << 8) +
-                  record[offset + i * rSize + 1]) * 0.1
-          if record[offset + i * rSize + 2] & 0x80:
-            temp = -temp
-          # Byte 10: The humidity in percent.
-          humidity = record[offset + i * rSize + 3]
-          # Bytes 11 and 12: Like bytes 8 and 9 but for dew point.
-          dewPoint = (((record[offset + i * rSize + 5] & 0x0F) << 8) +
-                      record[offset + i * rSize + 4]) * 0.1
-          if record[offset + i * rSize + 5] & 0x80:
-            dewPoint = -dewPoint
-
-          self.logger.info("Sensor: %d" % sensor)
-          self.logger.info("Temp: %.1f C" % temp)
-          self.logger.info("Humidity: %d%%   Trend: %s   Climate: %s" %
-                           (humidity, humidityTrend[trend],
-                            climateSmileys[smiley]))
-          self.logger.info("Dew point: %.1f C" % dewPoint)
-
-          self._report_temperature(temp, humidity, sensor)
+        data = self.decodeTempHumid(record[7:14])
+        temp, humidity, sensor = data[0]
+        self._report_temperature(temp, humidity, sensor)
       elif type == 0xD8:
-        # 0xD8 frames have never been observerd.
+        # 0xD8 frames have never been observed.
         self.logger.info("TODO: 0xD8 frame found: %s" %
                          self._list2bytes(record))
       elif type == 0xD9:
@@ -490,14 +465,113 @@ class WMR200Station(BaseStation):
           self.logger.info("TODO: 0xD9 frame found: %s" %
                            self._list2bytes(record[2:6]))
 
-    def decodeTimeStamp(self, record):
+    def decodeTimeStamp(self, record, label = 'Time'):
       minutes = record[0]
       hours = record[1]
       day = record[2]
       month = record[3]
-      year = record[4]
-      date = "20%02d-%02d-%02d %d:%02d" % (year, month, day, hours, minutes)
-      self.logger.info("Date: %s", date)
+      year = 2000 + record[4]
+      date = "%04d-%02d-%02d %d:%02d" % (year, month, day, hours, minutes)
+      self.logger.info("%s: %s" % (label, date))
+      #time.mktime(year, month, day, hours, minutes, 0, -1, -1, -1)
+
+    def decodeWind(self, record):
+      # Byte 0: Wind direction in steps of 22.5 degrees.
+      # 0 is N, 1 is NNE and so on. See windDirMap for complete list.
+      dirDeg = (record[0] & 0xF) * 22.5
+      # Byte 1: Always 0x0C? Maybe high nible is high byte of gust speed.
+      # Byts 2: The low byte of gust speed in 0.1 m/s.
+      gustSpeed = (((record[1] >> 4) & 0xF) | record[2]) * 0.1
+      # Byte 3: High nibble seems to be low nibble of average speed.
+      # Byte 4: Maybe low nibble of high byte and high nibble of low byte
+      #          of average speed. Value is in 0.1 m/s
+      avgSpeed = ((record[4] << 4) | ((record[3] >> 4) & 0xF)) * 0.1
+
+      self.logger.info("Wind Dir: %s" % windDirMap[record[0]])
+      self.logger.info("Gust: %.1f m/s" % gustSpeed)
+      self.logger.info("Wind: %.1f m/s" % avgSpeed)
+      return (dirDeg, avgSpeed, gustSpeed)
+
+    def decodeRain(self, record):
+      # Bytes 0 and 1: high and low byte of the current rainfall rate
+      # in 0.1 in/h
+      rainRate = ((record[1] << 8) | record[0]) / 3.9370078
+      # Bytes 2 and 3: high and low byte of the last hour rainfall in 0.1in
+      rainHour = ((record[3] << 8) | record[2]) / 3.9370078
+      # Bytes 4 and 5: high and low byte of the last day rainfall in 0.1in
+      rainDay = ((record[5] << 8) | record[4]) / 3.9370078
+      # Bytes 6 and 7: high and low byte of the total rainfall in 0.1in
+      rainTotal = ((record[7] << 8) | record[6]) / 3.9370078
+
+      self.logger.info("Rain Rate: %.1f mm/hr" % rainRate)
+      self.logger.info("Rain Hour: %.1f mm" % rainHour)
+      self.logger.info("Rain 24h: %.1f mm" % rainDay)
+      self.logger.info("Rain Total: %.1f mm" % rainTotal)
+      # Bytes 8 - 12 contain the time stamp since the measurement started.
+      self.decodeTimeStamp(record[8:13], 'Since') 
+      return (rainTotal, rainRate)
+
+    def decodeUV(self, uv):
+      self.logger.info("UV Index: %d" % uv)
+      return uv
+
+    def decodePressure(self, record):
+      # Byte 0: low byte of pressure. Value is in hPa.
+      # Byte 1: high nibble is probably forecast
+      #         low nibble is high byte of pressure.
+      pressure = ((record[1] & 0xF) << 8) | record[0]
+      forecast = forecastMap[(record[1] & 0x70) >> 4] 
+      # Bytes 2 - 3: Similar to bytes 0 and 1, but altitude corrected
+      # pressure. Upper nibble of byte 3 is still unknown. Seems to
+      # be always 3.
+      altPressure = (record[3] & 0xF) * 256 + record[2]
+      unknownNibble = (record[3] & 0x70) >> 4 
+
+      self.logger.info("Forecast: %s" % forecast)
+      self.logger.info("Measured Pressure: %d hPa" % pressure)
+      if unknownNibble != 3:
+        self.logger.info("TODO: Unknown nibble: %d" % unknownNibble)
+      self.logger.info("Altitude corrected Pressure: %d hPa" % altPressure)
+      return pressure
+
+    def decodeTempHumid(self, record):
+      data = []
+      # The historic data can contain data from multiple sensors. I'm not
+      # sure if the 0xD7 frames can do too. I've never seen a frame with
+      # multiple sensors. But historic data bundles data for multiple
+      # sensors.
+      rSize = 7
+      for i in xrange(len(record) / rSize):
+        # Byte 0: low nibble contains sensor ID. 0 for base station.
+        sensor = record[i * rSize] & 0xF
+        smiley = (record[i * rSize] >> 6) & 0x3
+        trend = (record[i * rSize] >> 4) & 0x3
+        # Byte 1: probably the high nible contains the sign indicator.
+        #         The low nibble is the high byte of the temperature.
+        # Byte 2: The low byte of the temperature. The value is in 1/10
+        # degrees centigrade.
+        temp = (((record[i * rSize + 2] & 0x0F) << 8) +
+                record[i * rSize + 1]) * 0.1
+        if record[i * rSize + 2] & 0x80:
+          temp = -temp
+        # Byte 3: The humidity in percent.
+        humidity = record[i * rSize + 3]
+        # Bytes 4 and 5: Like bytes 1 and 2 but for dew point.
+        dewPoint = (((record[i * rSize + 5] & 0x0F) << 8) +
+                    record[i * rSize + 4]) * 0.1
+        if record[i * rSize + 5] & 0x80:
+          dewPoint = -dewPoint
+
+        self.logger.info("Sensor: %d" % sensor)
+        self.logger.info("Temp: %.1f C" % temp)
+        self.logger.info("Humidity: %d%%   Trend: %s   Climate: %s" %
+                         (humidity, humidityTrend[trend],
+                          climateSmileys[smiley]))
+        self.logger.info("Dew point: %.1f C" % dewPoint)
+
+        data.append((temp, humidity, sensor))
+
+      return data
 
     def checkSum(self, packet, checkSum):
       sum = 0
@@ -529,6 +603,7 @@ class WMR200Station(BaseStation):
                          (self.checkSumErrors,
                           self.checkSumErrors * 100.0 / self.frames))
         self.logger.info("Requests: %d" % self.requests)
+      self.logger.info("Polling delay: %.1f" % self.pollDelay)
       self.logger.info("USB timeout: %d" % self.usbTimeout)
       self.logger.info("USB resyncs: %d" % self.resyncs)
 
