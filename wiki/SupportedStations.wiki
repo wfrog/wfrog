@@ -7,7 +7,7 @@ Maturity level:
 
 Auto-Detect:
   * If yes, wfrog will work out-of-the-box without configuration change.
-  * If no, you will need to [http://code.google.com/p/wfrog/wiki/CustomizationGuide?ts=1283113562&updated=CustomizationGuide#Defining_your_station_model configure the appropriate driver], listed in the Driver column.
+  * If no, you will need to [http://code.google.com/p/wfrog/wiki/CustomizationGuide?ts=1283113562&updated=CustomizationGuide#Specifying_your_station_model configure the appropriate driver], listed in the Driver column.
 
 || *Vendor*|| *Model* || *Link* || *Maturity* || *Auto-Detect* || *Driver* || *Notes* ||
 || *Davis* || !VantagePro || Serial || Low || No || !vantagepro || Needs third party !PyWeather library.<br> Install it with `sudo easy_install weather`. ||
