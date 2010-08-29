@@ -76,13 +76,13 @@ This will prepare the custom configuration under `/etc/wfrog/` by copying the fa
 
 When a configuration is available at this location, it will be used instead of the factory configuration. It is your custom configuration that you modify.
 
-== Configuring the station driver
+== Configuring the station driver ==
 
-=== Defining your station model
+=== Defining your station model ==
 
 If your station is not listed as capable of auto-detect in SupportedStations, you will need to configure the correct driver:
 
-  * Be sure to have prepared your custom configuration: 
+  * Be sure to have [http://code.google.com/p/wfrog/wiki/CustomizationGuide?ts=1283113562&updated=CustomizationGuide#Preparing_the_customization prepared your custom configuration] 
   * Modify the file `wfdriver/config/embedded.yaml`:
     * Comment out the `station: !auto` line.
     * Add the line `station; !xxxx`. Where `!xxx` is the driver listed in SupportedStations.
