@@ -64,6 +64,29 @@ Configure wflogger to use a `!stdio-in` or a `!http-in` input. Then run the logg
 
 Configure wfdriver to use a`!stdio-out` or a `!http-out` output. Then run the driver directly with `wfdriver/wfdriver.py`.
 
+== Preparing the customization ==
+
+In order not to modify directly the configuration in the wfrog distribution (that would be overwritten when upgrading to a new version, for example), run the following command to prepare your custom configuration:
+
+{{{
+sudo wfrog --customize
+}}}
+
+This will prepare the custom configuration under `/etc/wfrog/` by copying the factory default configuration. If not run as root, it will be prepared under `~/.wfrog`.
+
+When a configuration is available at this location, it will be used instead of the factory configuration. It is your custom configuration that you modify.
+
+== Configuring the station driver
+
+=== Defining your station model
+
+If your station is not listed as capable of auto-detect in SupportedStations, you will need to configure the correct driver:
+
+  * Be sure to have prepared your custom configuration: 
+  * Modify the file `wfdriver/config/embedded.yaml`:
+    * Comment out the `station: !auto` line.
+    * Add the line `station; !xxxx`. Where `!xxx` is the driver listed in SupportedStations.
+
 
 == Using a database storage instead of a CSV file ==
 === Firebird ===
