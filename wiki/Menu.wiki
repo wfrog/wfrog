@@ -3,7 +3,7 @@
   [UserManual User Manual]<br>
   [CustomizationGuide Customization Guide]<br>
   [http://www.windmaster.ch/wfrog/doc/ Configuration Reference]<br>
-  [DeveloperGuide Developer Guide]
+  [DeveloperGuide Developer's Guide]
 
   [SupportedStations Supported Stations]<br>
   [ReleaseNotes Release Notes]<br>
