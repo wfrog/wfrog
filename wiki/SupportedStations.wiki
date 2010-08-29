@@ -2,7 +2,7 @@
 
 Maturity level:
   * High: Users are actively using it.
-  * Medium: Support has been tested and is available in the packaged distribution.
+  * Medium: Support is available in the packaged distribution.
   * Low: Support has been recently implemented and is available only in the subversion trunk.
 
 Auto-Detect:
