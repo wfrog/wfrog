@@ -7,7 +7,7 @@ Maturity level:
 
 || *Vendor*|| *Model* || *Link* || *Maturity* || *Auto-Detect* || *Driver* || *Notes* ||
 || *Davis* || !VantagePro || Serial || Low || No || !vantagepro || Needs third party !PyWeather library.<br> Install it with `sudo easy_install weather`. ||
-||       || !VantagePro2 || Serial || Low || No || !vantagepro || See !VantagePro |
+||       || !VantagePro2 || Serial || Low || No || !vantagepro || See !VantagePro ||
 || *Elecsa*                  || AstroTouch 6975 || USB || Low || No || !wh1080 || See Fine Offset Electronics WH1080 ||
 || Fine Offset Electronics || WS1080, WS1080PC || USB || Low || No || !ws1080 || Needs third party pywws library (http://code.google.com/p/pywws/downloads/list).<br>Uncompress it and add the main directory to the `PYTHONPATH` environment variable ||
 ||                         || WH1081 || USB || Low || No || !wh1080 || See WH1080 ||
