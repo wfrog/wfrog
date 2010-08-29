@@ -79,8 +79,8 @@ class WH1080Station(object):
                 e.mean.speed = units.MphToMps(data['wind_ave'])
                 e.mean.dir = data['wind_dir']
                 e.create_child('gust')
-                e.mean.speed = units.MphToMps(data['wind_gust'])
-                e.mean.dir = data['wind_dir']
+                e.gust.speed = units.MphToMps(data['wind_gust'])
+                e.gust.dir = data['wind_dir']
                 send_event(e)                        
                 
             except (Exception) as e:
