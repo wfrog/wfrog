@@ -1,0 +1,10 @@
+#summary Notes on supported hardware.
+
+Maturity level:
+  * High: Users are actively using it.
+  * Medium: Support has been tested and is published in a version.
+  * Low: Support is under work and is available only in the subversion trunk.
+
+|| Vendor || Model || Link || Maturity || Auto-Detect || Notes ||
+|| Oregon Scientific || WMRS200 || USB || Yes ||  ||
+|| Oregon Scientific || WMRS200 || USB || Yes ||  ||
