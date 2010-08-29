@@ -3,7 +3,12 @@
 Maturity level:
   * High: Users are actively using it.
   * Medium: Support has been tested and is available in the packaged distribution.
-  * Low: Support has been recently implemented and is available only in the subversion trunk.
+  * Low: Support has been recently implemented and is available only in the subversion 
+trunk.
+
+Auto-Detect:
+  * If yes, wfrog will work out-of-the-box without configuration change.
+  * If no, you will need to configure the appropriate driver, listed in the Driver column.
 
 || *Vendor*|| *Model* || *Link* || *Maturity* || *Auto-Detect* || *Driver* || *Notes* ||
 || *Davis* || !VantagePro || Serial || Low || No || !vantagepro || Needs third party !PyWeather library.<br> Install it with `sudo easy_install weather`. ||
