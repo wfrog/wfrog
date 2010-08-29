@@ -6,28 +6,20 @@ Maturity level:
   * Low: Support has been recently implemented and is available only in the subversion trunk.
 
 || *Vendor*|| *Model* || *Link* || *Maturity* || *Auto-Detect* || *Driver* || *Notes* ||
-
-|| Davis || !VantagePro || Serial || Low || No || !vantagepro || Needs third party !PyWeather library.<br> Install it with `sudo easy_install weather`. ||
+|| *Davis* || !VantagePro || Serial || Low || No || !vantagepro || Needs third party !PyWeather library.<br> Install it with `sudo easy_install weather`. ||
 ||       || !VantagePro2 || Serial || Low || No || !vantagepro || See !VantagePro |
-
-|| Elecsa                  || AstroTouch 6975 || USB || Low || No || !wh1080 || See Fine Offset Electronics WH1080 ||
-
+|| *Elecsa*                  || AstroTouch 6975 || USB || Low || No || !wh1080 || See Fine Offset Electronics WH1080 ||
 || Fine Offset Electronics || WS1080, WS1080PC || USB || Low || No || !ws1080 || Needs third party pywws library (http://code.google.com/p/pywws/downloads/list).<br>Uncompress it and add the main directory to the `PYTHONPATH` environment variable ||
 ||                         || WH1081 || USB || Low || No || !wh1080 || See WH1080 ||
 ||                         || WH1090 || USB || Low || No || !wh1080 || See WH1080 ||
 ||                         || WH1091 || USB || Low || No || !wh1080 || See WH1080 ||
 ||                         || WH2080 || USB || Low || No || !wh1080 || See WH1080 ||
 ||                         || WH2081 || USB || Low || No || !wh1080 || See WH1080 ||
-
-|| Oregon Scientific || WMR100N || USB || Medium || No || !wmrs200 ||  ||
+|| *Oregon Scientific* || WMR100N || USB || Medium || No || !wmrs200 ||  ||
 ||                   || WMR200  || USB || High || Yes || !wmr200 ||  ||
 ||                   || WMRS200 || USB || High || Yes || !wmrs200 ||  ||
 ||                   || WMR928NX || Serial || High || No || !wmr928x||   ||
-
-|| PCE                  || FWS20 || USB || Low || No || !wh1080 || See Fine Offset Electronics WH1080 ||
-
-|| Scientific Sales                  || Pro Touch Screen Weather Station || USB || Low || No || !wh1080 || See Fine Offset Electronics WH1080 ||
-
-|| Topcom National Geographic        || 265NE || USB || Low || No || !wh1080 || See Fine Offset Electronics WH1080 ||
-
-|| Watson                  || W8681 || USB || Low || No || !wh1080 || See Fine Offset Electronics WH1080 ||
+|| *PCE*                  || FWS20 || USB || Low || No || !wh1080 || See Fine Offset Electronics WH1080 ||
+|| *Scientific Sales*                  || Pro Touch Screen Weather Station || USB || Low || No || !wh1080 || See Fine Offset Electronics WH1080 ||
+|| *Topcom National Geographic*        || 265NE || USB || Low || No || !wh1080 || See Fine Offset Electronics WH1080 ||
+|| *Watson*                  || W8681 || USB || Low || No || !wh1080 || See Fine Offset Electronics WH1080 ||
