@@ -5,6 +5,7 @@
   [http://www.windmaster.ch/wfrog/doc/ Configuration Reference]<br>
   [DeveloperGuide Developer Guide]
 
+  [SupportedStations Supported Stations]
   [ReleaseNotes Release Notes]<br>
 
 *Unmaintained Documents*<br>
