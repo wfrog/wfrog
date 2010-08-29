@@ -27,3 +27,5 @@ Auto-Detect:
 || *Scientific Sales*                  || Pro Touch Screen Weather Station || USB || Low || No || !wh1080 || See Fine Offset Electronics WH1080 ||
 || *Topcom National Geographic*        || 265NE || USB || Low || No || !wh1080 || See Fine Offset Electronics WH1080 ||
 || *Watson*                  || W8681 || USB || Low || No || !wh1080 || See Fine Offset Electronics WH1080 ||
+
+<p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
