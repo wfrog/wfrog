@@ -78,7 +78,7 @@ When a configuration is available at this location, it will be used instead of t
 
 == Configuring the station driver ==
 
-=== Defining your station model ==
+=== Specifying your station model ==
 
 If your station is not listed as capable of auto-detect in SupportedStations, you will need to configure the correct driver:
 
