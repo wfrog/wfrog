@@ -20,8 +20,6 @@ import time
 import logging
 from wfcommon import units
 
-from pywws import WeatherStation
-
 class WH1080Station(object):
 
     '''
@@ -42,6 +40,7 @@ class WH1080Station(object):
 
     def run(self, generate_event, send_event, context={}):
     
+        from pywws import WeatherStation    
         station = WeatherStation.weather_station()
 
         for data in station.live_data():

@@ -45,7 +45,6 @@ class VantageProStation(object):
     def run(self, generate_event, send_event, context={}):
 
         import weather.stations.davis
-
         station = weather.stations.davis.VantagePro(self.port, self.ARCHIVE_INTERVAL)
 
         while True:
@@ -56,7 +55,17 @@ class VantageProStation(object):
                 e = generate_event('press')
                 e.value = units.InHgToHPa(station.fields['Pressure'])
                 send_event(e)
+                
+                e = generate_event('temp')
+                e.sensor = 0
+                e.value = units.FToC(station.fields['TempIn'])
+                send_event(e)
 
+                e = generate_event('hum')
+                e.sensor = 0
+                e.value = station.fields['HumIn']
+                send_event(e)
+                                
                 e = generate_event('temp')
                 e.sensor = 1
                 e.value = units.FToC(station.fields['TempOut'])
@@ -69,12 +78,18 @@ class VantageProStation(object):
 
                 e = generate_event('rain')
                 e.rate = units.InToMm(station.fields['RainRate'])
+                e.total = units.InToMm(station.fields['RainYear'])
                 send_event(e)
 
                 e = generate_event('wind')
                 e.create_child('mean')
-                e.mean.speed = units.MphToMps(station.fields['WindSpeed10Min'])
-                e.mean.dir = station.fields['WindDir']
+                e.mean.speed = units.MphToMps(station.fields['WindSpeed'])
+                e.mean.dir = station.fields['WindDir']             
+                rec = station.fields['Archive']      
+                if rec:
+                    e.create_child('gust')
+                    e.gust.speed = units.MphToMps(rec['WindHi'])
+                    e.gust.dir = rec['WindHiDir']                                    
                 send_event(e)
 
             except Exception, e:
