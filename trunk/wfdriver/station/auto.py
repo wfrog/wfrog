@@ -52,12 +52,12 @@ class AutoDetectStation(object):
             if hasattr(station, 'detect'):
                 try:
                     detected_result = station.detect()
+                    if self.detected(detected_result):
+                        self.logger.info("Detected station "+name)
+                        detected_station = detected_result
+                        break
                 except Exception, e:
-                    self.logger.warn('Detection code error: %s', str(e))
-                if self.detected(detected_result):
-                    self.logger.info("Detected station "+name)
-                    detected_station = detected_result
-                    break
+                    self.logger.warn("Could not probe station "+name+": %s", e)
         if detected_station is None:
             self.logger.error("Could not detect any station connected to this computer")
             sys.exit(1)
