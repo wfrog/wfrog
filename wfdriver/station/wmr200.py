@@ -472,7 +472,10 @@ class WMR200Station(BaseStation):
         # Byte 27 contains UV data
         uv = self.decodeUV(record[27])
         # Bytes 28 - 32 contain pressure data
-        pressure = self.decodePressure(record[28:33])
+        pressure = self.decodePressure(record[28:32])
+        # Byte 32: Unknown
+        if record[32] != 1:
+          self.logger.info("TODO: History byte 32: %02X" % record[32])
         # Bytes 33 - end contain temperature and humidity data
         data = self.decodeTempHumid(record[33:len(record) - 4])
         self.logger.info("<<<<< Historic data <<<<<")
@@ -499,7 +502,7 @@ class WMR200Station(BaseStation):
         # 0xD6 frames contain forecast and air pressure data.
         # Byte 2 - 6 contains the time stamp.
         self.decodeTimeStamp(record[2:7])
-        pressure = self.decodePressure(record[7:12])
+        pressure = self.decodePressure(record[7:11])
         self._report_barometer_absolute(pressure)
       elif type == 0xD7:
         # 0xD7 frames contain humidity and temperature data.
@@ -545,10 +548,18 @@ class WMR200Station(BaseStation):
       # Byte 1: Always 0x0C? Maybe high nible is high byte of gust speed.
       # Byts 2: The low byte of gust speed in 0.1 m/s.
       gustSpeed = (((record[1] >> 4) & 0xF) | record[2]) * 0.1
+      if record[1] != 0x0C:
+        self.logger.info("TODO: Wind byte 1: %02X" % record[1])
       # Byte 3: High nibble seems to be low nibble of average speed.
       # Byte 4: Maybe low nibble of high byte and high nibble of low byte
       #          of average speed. Value is in 0.1 m/s
       avgSpeed = ((record[4] << 4) | ((record[3] >> 4) & 0xF)) * 0.1
+      if (record[3] & 0x0F) != 0:
+        self.logger.info("TODO: Wind byte 3: %02X" % record[3])
+      if record[5] != 0:
+        self.logger.info("TODO: Wind byte 5: %02X" % record[5])
+      if record[6] != 0x20:
+        self.logger.info("TODO: Wind byte 6: %02X" % record[6])
 
       self.logger.info("Wind Dir: %s" % windDirMap[record[0]])
       self.logger.info("Gust: %.1f m/s" % gustSpeed)
@@ -593,7 +604,7 @@ class WMR200Station(BaseStation):
       self.logger.info("Forecast: %s" % forecast)
       self.logger.info("Measured Pressure: %d hPa" % pressure)
       if unknownNibble != 3:
-        self.logger.info("TODO: Unknown nibble: %d" % unknownNibble)
+        self.logger.info("TODO: Pressure unknown nibble: %d" % unknownNibble)
       self.logger.info("Altitude corrected Pressure: %d hPa" % altPressure)
       return pressure
 
@@ -624,6 +635,8 @@ class WMR200Station(BaseStation):
                     record[i * rSize + 4]) * 0.1
         if record[i * rSize + 5] & 0x80:
           dewPoint = -dewPoint
+        if record[i * rSize + 6] != 0:
+          self.logger.info("TODO: Temp byte 6: %02X" % record[i * rSize + 6])
 
         self.logger.info("Sensor: %d" % sensor)
         self.logger.info("Temp: %.1f C" % temp)
