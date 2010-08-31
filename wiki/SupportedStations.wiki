@@ -19,6 +19,7 @@ Auto-Detect:
 ||                         || WH1091 || USB || Low || No || !wh1080 || See WH1080 ||
 ||                         || WH2080 || USB || Low || No || !wh1080 || See WH1080 ||
 ||                         || WH2081 || USB || Low || No || !wh1080 || See WH1080 ||
+|| Freetec                 || PX1117 || USB || Low || No || !wh1080 || See WH1080 ||
 || *Oregon Scientific* || WMR100N || USB || Medium || No || !wmrs200 ||  ||
 ||                   || WMR200  || USB || High || Yes || !wmr200 ||  ||
 ||                   || WMRS200 || USB || High || Yes || !wmrs200 ||  ||
