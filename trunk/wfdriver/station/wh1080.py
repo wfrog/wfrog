@@ -82,5 +82,5 @@ class WH1080Station(object):
                 e.gust.dir = data['wind_dir']
                 send_event(e)                        
                 
-            except (Exception) as e:
+            except Exception, e:
                 self.logger.error(e)
