@@ -461,15 +461,16 @@ class WMR200Station(BaseStation):
       type = record[0]
       self.recordCounters[type - 0xD1] += 1
       if type == 0xD2:
-        self.logger.info(">>>>> Historic data >>>>>")
+        self.logger.info(">>>>> Historic Data Record >>>>>")
         # We ignore 0xD2 frames for now. They only contain historic data.
         # Byte 2 - 6 contains the time stamp.
         self.decodeTimeStamp(record[2:7], '@Time', False)
         # Bytes 7 - 19 contain rain data
         rainTotal, rainRate = self.decodeRain(record[7:20])
         # Bytes 20 - 26 contain wind data
-        dirDeg, avgSpeed, gustSpeed = self.decodeWind(record[20:27])
+        dirDeg, avgSpeed, gustSpeed, windchill = self.decodeWind(record[20:27])
         # Byte 27 contains UV data
+        # If no UV data is present, the value is 255.
         uv = self.decodeUV(record[27])
         # Bytes 28 - 32 contain pressure data
         pressure = self.decodePressure(record[28:32])
@@ -477,13 +478,13 @@ class WMR200Station(BaseStation):
         if record[32] != 1:
           self.logger.info("TODO: History byte 32: %02X" % record[32])
         # Bytes 33 - end contain temperature and humidity data
-        data = self.decodeTempHumid(record[33:len(record) - 4])
-        self.logger.info("<<<<< Historic data <<<<<")
+        data = self.decodeTempHumid(record[33:len(record) - 2])
+        self.logger.info("<<<<< End Historic Record <<<<<")
       elif type == 0xD3:
         # 0xD3 frames contain wind related information.
         # Byte 2 - 6 contains the time stamp.
         self.decodeTimeStamp(record[2:7])
-        dirDeg, avgSpeed, gustSpeed = self.decodeWind(record[7:15])
+        dirDeg, avgSpeed, gustSpeed, windchill = self.decodeWind(record[7:15])
         self._report_wind(dirDeg, avgSpeed, gustSpeed)
       elif type == 0xD4:
         # 0xD4 frames contain rain data
@@ -556,15 +557,21 @@ class WMR200Station(BaseStation):
       avgSpeed = ((record[4] << 4) | ((record[3] >> 4) & 0xF)) * 0.1
       if (record[3] & 0x0F) != 0:
         self.logger.info("TODO: Wind byte 3: %02X" % record[3])
-      if record[5] != 0:
-        self.logger.info("TODO: Wind byte 5: %02X" % record[5])
-      if record[6] != 0x20:
-        self.logger.info("TODO: Wind byte 6: %02X" % record[6])
+      # Byte 5 and 6: Low and high byte of windchill temperature. The value is
+      # in 0.1F. If no windchill is available byte 5 is 0 and byte 6 0x20.
+      # Looks like OS hasn't had their Mars Climate Orbiter experience yet.
+      if record[5] != 0 or record[6] != 0x20:
+        windchill = (((record[6] << 8) | record[5]) - 320) * (5.0 / 90.0)
+      else:
+        windchill = None
 
       self.logger.info("Wind Dir: %s" % windDirMap[record[0]])
       self.logger.info("Gust: %.1f m/s" % gustSpeed)
       self.logger.info("Wind: %.1f m/s" % avgSpeed)
-      return (dirDeg, avgSpeed, gustSpeed)
+      if windchill != None:
+        self.logger.info("Windchill: %.1f C" % windchill)
+
+      return (dirDeg, avgSpeed, gustSpeed, windchill)
 
     def decodeRain(self, record):
       # Bytes 0 and 1: high and low byte of the current rainfall rate
