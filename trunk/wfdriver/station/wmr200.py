@@ -643,14 +643,14 @@ class WMR200Station(BaseStation):
         if record[i * rSize + 5] & 0x80:
           dewPoint = -dewPoint
         if record[i * rSize + 6] != 0:
-          self.logger.info("TODO: Temp byte 6: %02X" % record[i * rSize + 6])
+          self.logger.info("TODO: Sensor %d byte 6: %02X" %
+                           (sensor, record[i * rSize + 6]))
 
-        self.logger.info("Sensor: %d" % sensor)
-        self.logger.info("Temp: %.1f C" % temp)
-        self.logger.info("Humidity: %d%%   Trend: %s   Climate: %s" %
-                         (humidity, humidityTrend[trend],
+        self.logger.info("Temperature %d: %.1f C" % (sensor, temp))
+        self.logger.info("Humidity %d: %d%%   Trend: %s   Climate: %s" %
+                         (sensor, humidity, humidityTrend[trend],
                           climateSmileys[smiley]))
-        self.logger.info("Dew point: %.1f C" % dewPoint)
+        self.logger.info("Dew point %d: %.1f C" % (sensor, dewPoint))
 
         data.append((temp, humidity, sensor))
 
