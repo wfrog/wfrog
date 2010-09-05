@@ -385,7 +385,6 @@ class WMR200Station(BaseStation):
 
       frames = []
       while True:
-        self.frames += 1
         if len(packets) == 0:
           # There should be at least one frame.
           if len(frames) == 0:
@@ -395,6 +394,9 @@ class WMR200Station(BaseStation):
             return None
           # We've found all the frames in the packets.
           break
+
+        self.frames += 1
+
         if packets[0] < 0xD1 or packets[0] > 0xD9:
           # All frames must start with 0xD1 - 0xD9. If the first byte is
           # not within this range, we don't have a proper frame start.
@@ -402,6 +404,7 @@ class WMR200Station(BaseStation):
           self.logger.error("Bad frame: %s" % self._list2bytes(packets))
           self.badFrames += 1
           break
+
         if packets[0] == 0xD1 and len(packets) == 1:
           # 0xD1 frames have only 1 octet.
           frame = packets[0:1]
