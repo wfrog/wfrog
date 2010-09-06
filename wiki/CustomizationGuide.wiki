@@ -87,6 +87,17 @@ If your station is not listed as capable of auto-detect in SupportedStations, yo
     * Comment out the `station: !auto` line.
     * Add the line `station; !xxxx`. Where `!xxx` is the driver listed in SupportedStations.
 
+== Configuring the renderer ==
+
+=== Make wfrog be reloaded on configuration change ===
+
+This trick allows for avoiding to restart wfrog manually while editing configuration and templates.
+
+  * Install dnotify:
+    * `sudo apt-get install dnotify`
+  * `dnotify -r -M ~/.wfrog/wfrender -e sh -c "killall wfrog; bin/wfrog -R -d &"`
+
+This will monitor the directory `/.wfrog/wfrender` and restart wfrog each time a file is modified in this directory.
 
 == Using a database storage instead of a CSV file ==
 === Firebird ===
