@@ -2,14 +2,14 @@
 <p align="center"><img src="http://wfrog.googlecode.com/svn/wiki/images/logo-web.png"/></p>
 == <img src="http://wfrog.googlecode.com/svn/wiki/images/ubuntu_logo.png"/> Debian-based Linux Distributions==
 
-  * Download and install the latest wfrog package *.deb* file from the [http://code.google.com/p/wfrog/downloads/list download page]
+  * Download and install the latest wfrog package *.deb* file from the [http://code.google.com/p/wfrog/downloads/list?can=2&q=OpSys%3DDebian download page]
   * Plug your station and [SupportedStations check notes about your station model].
   * Run `sudo wfrog`
   * Open http://localhost:7680/
 
 == <img src="http://wfrog.googlecode.com/svn/wiki/images/linux_logo.png"/> Other Linux Distributions==
 
-  * Download and decompress the latest *.tgz* wfrog distribution from the [http://code.google.com/p/wfrog/downloads/list download page] or [http://code.google.com/p/wfrog/source/checkout checkout from subversion].
+  * Download and decompress the latest *.tgz* wfrog distribution from the [http://code.google.com/p/wfrog/downloads/list?can=2&q=OpSys%3DLinux download page] or [http://code.google.com/p/wfrog/source/checkout checkout from subversion].
   * Install the dependencies
 {{{
 sudo easy_install cheetah                  # Template engine
@@ -25,7 +25,7 @@ sudo easy_install pygooglechart            # Chart rendering
 
 == <img src="http://wfrog.googlecode.com/svn/wiki/images/windows_logo.png"/> Windows ==
 
-  * Download and install the latest win32 wfrog zip file from the [http://code.google.com/p/wfrog/downloads/list download page]
+  * Download and install the latest win32 wfrog zip file from the [http://code.google.com/p/wfrog/downloads/list?can=2&q=OpSys%3DWindows download page]
   * Plug your station and [SupportedStations check notes about your station model].
   * Run `wfrog.exe`
   * Open http://localhost:7680/
