@@ -168,7 +168,7 @@ logging [logging configuration] (optional):
         # Wait for ever
         try:
             while True:
-                time.sleep(99999999)
+                time.sleep(999999)
         except KeyboardInterrupt:
             pass
 
