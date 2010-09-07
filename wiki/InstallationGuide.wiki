@@ -24,3 +24,10 @@ sudo easy_install pygooglechart            # Chart rendering
   * Open http://localhost:7680/
 
 <p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
+
+== Windows ==
+
+  * Download and install the latest win32 wfrog zip file from the [http://code.google.com/p/wfrog/downloads/list download page]
+  * Plug your station and [SupportedStations check notes about your station model].
+  * Run `wfrog.exe`
+  * Open http://localhost:7680/
