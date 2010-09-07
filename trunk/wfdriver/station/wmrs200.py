@@ -97,21 +97,14 @@ class WMRS200Station(BaseStation):
                 devh = dev.open()
                 self.logger.info("USB WMRS200 open")
 
-                if sys.platform in ['linux2']:
-                    try:
-                        devh.claimInterface(0)
-                    except usb.USBError:
-                        devh.detachKernelDriver(0)
-                        devh.claimInterface(0)
-                elif sys.platform in ['win32']:
-                    #devh.claimInterface(0)
-                    self.logger.critical('Windows is not yet supported: devh.claimInterface() fails')
-                    print 'Windows is not yet supported: devh.claimInterface() fails'
-                    exit(1)
-                else:
-                    self.logger.critical('Platform "%s" not yet supported' % sys.platform)
-                    print 'Platform "%s" not yet supported' % sys.platform
-                    exit(1)
+                if platform.system() is 'Windows':
+                    self.devh.setConfiguration(1)
+
+                try:
+                    devh.claimInterface(0)
+                except usb.USBError:
+                    devh.detachKernelDriver(0)
+                    devh.claimInterface(0)
 
                 # WMRS200 Init sequence
                 devh.controlMsg(usb.TYPE_CLASS + usb.RECIP_INTERFACE,       # requestType
