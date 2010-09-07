@@ -45,6 +45,7 @@ from base import BaseStation
 import time
 import logging
 import threading
+import platform
 import sys
 
 windDirMap = { 0:"N", 1:"NNE", 2:"NE", 3:"ENE",
@@ -247,6 +248,8 @@ class WMR200Station(BaseStation):
 
         # The following init sequence was adapted from Denis Ducret's
         # wmr200log program.
+        if platform.system() is 'Windows':
+            self.devh.setConfiguration(1)        
         self.devh.claimInterface(0)
         time.sleep(usbWait)
         self.devh.setAltInterface(0)
