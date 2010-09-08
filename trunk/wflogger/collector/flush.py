@@ -18,6 +18,7 @@
 
 import logging
 import time
+import datetime
 
 class FlushEvent(object):
     _type = '_flush'
@@ -29,7 +30,8 @@ class FlushCollector(object):
     Forwards incoming events to a wrapped collector and periodically issues
     a 'flush event'. Flush events are issued only together with a forwarded
     event, there is no internal thread and no flushing occurs during periods
-    where no events are received.
+    where no events are received. If an event is timestamped and older than
+    an already treated event, it is discarded.
 
     [ Properties ]
 
@@ -37,19 +39,33 @@ class FlushCollector(object):
         The wrapped collector the events are forwarded to.
 
     period [numeric] (optional):
-        Minimum number of seconds between flush events. Defaults to 300.
+        Minimum number of seconds between flush events. Defaults to 10.
     '''
 
     period = 300
     collector = None
 
     last_flush_time = None
+    max_event_time = datetime.datetime(2001, 01, 01)
 
     logger = logging.getLogger('collector.flush')
 
     def send_event(self, event, context={}):
         if self.collector == None:
             raise Exception('Attribute collector must be set')
+
+        now = datetime.datetime.now()
+
+        if hasattr(event, "timestamp"):
+            timestamp = event.timestamp
+        else:
+            timestamp = now
+
+        if timestamp > self.max_event_time and timestamp > now - datetime.timedelta(0, self.period):
+            self.max_event_time = timestamp
+        else:
+            self.logger.debug("Discarded old event")
+            return
 
         current_time = time.time()
 
