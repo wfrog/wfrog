@@ -39,9 +39,9 @@ class BaseCollector(object):
         self.init()
 
         if hasattr(event, "timestamp") and event.timestamp is not None:
-            _timestamp_last = event.timestamp
+            self._timestamp_last = event.timestamp
         else:
-            _timestamp_last = datetime.datetime.now()
+            self._timestamp_last = datetime.datetime.now()
 
         if event._type == "_flush":
             self.flush(context)

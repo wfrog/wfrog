@@ -168,6 +168,8 @@ class AggregatorCollector(base.BaseCollector):
         if self._uv_index != None:
             data['uv_index'] = int(self._uv_index)
 
+        data['localtime'] = self._timestamp_last
+
         self.logger.debug('data = %s', data)
 
         return data
@@ -178,7 +180,5 @@ class AggregatorCollector(base.BaseCollector):
             self._new_period()
 
             self.logger.debug("Flushing sample: "+repr(sample))
-
-            sample['localtime'] = self._timestamp_last
 
             self.storage.write_sample(sample, context=context)
