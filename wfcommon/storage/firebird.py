@@ -37,7 +37,10 @@ class FirebirdStorage(base.DatabaseStorage):
         Database user password. Defaults to 'masterkey'.
         
     charset [string] (optional):
-        Character encoding in the database. Defaults to 'ISO8859_1'.    
+        Character encoding in the database. Defaults to 'ISO8859_1'.
+
+    tablename [string] (optional):
+        Table name. Defaults to 'METEO'.   
     '''
     
     database = 'localhost:/var/lib/firebird/2.0/data/wfrog.db'
