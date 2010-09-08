@@ -10,6 +10,7 @@ Auto-Detect:
   * If no, you will need to [http://code.google.com/p/wfrog/wiki/CustomizationGuide?ts=1283113562&updated=CustomizationGuide#Specifying_your_station_model configure the appropriate driver], listed in the Driver column.
 
 || *Vendor*|| *Model* || *Link* || *Maturity* || *Auto-Detect* || *Driver* || *Notes* || *Linux* || *Windows* ||
+|| *Ambient Weather* || WS1080 || USB || Low || No || !wh1080 || See Fine Offset Electronics WH1080 || Yes || ? ||
 || *Davis* || !VantagePro || Serial || Low || No || !vantagepro || Needs third party !PyWeather library.<br> Install it with `sudo easy_install weather`. || Yes || ? ||
 ||       || !VantagePro2 || Serial || Low || No || !vantagepro || See !VantagePro || Yes || ? ||
 || *Elecsa*                  || !AstroTouch 6975 || USB || Low || No || !wh1080 || See Fine Offset Electronics WH1080 || Yes || ? ||
