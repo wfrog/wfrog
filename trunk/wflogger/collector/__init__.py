@@ -21,6 +21,7 @@ import yaml
 import aggregator
 import flush
 import xmlfile
+import buffer
 
 # YAML mappings
 
@@ -29,6 +30,9 @@ class YamlAggregatorCollector(aggregator.AggregatorCollector, yaml.YAMLObject):
 
 class YamlFlushCollector(flush.FlushCollector, yaml.YAMLObject):
     yaml_tag = u'!flush'
+
+class YamlBufferCollector(buffer.BufferCollector, yaml.YAMLObject):
+    yaml_tag = u'!buffer'
 
 class YamlXmlFileCollector(xmlfile.XmlFileCollector, yaml.YAMLObject):
     yaml_tag = u'!xmlfile'

@@ -38,7 +38,6 @@ class AggregatorCollector(base.BaseCollector):
     logger = logging.getLogger('collector.aggregator')
 
     ## Init internal data
-
     _rain_last = None
 
     initialized = False
@@ -70,6 +69,7 @@ class AggregatorCollector(base.BaseCollector):
         ## UV
         self._uv_index = None
         ## Log
+        self._timestamp_last = None
         self.logger.info ('New period')
 
 
@@ -173,12 +173,12 @@ class AggregatorCollector(base.BaseCollector):
         return data
 
     def flush(self, context):
-        sample = self.get_data()
-        self._new_period()
+        if self._timestamp_last is not None:
+            sample = self.get_data()
+            self._new_period()
 
-        self.logger.debug("Flushing sample: "+repr(sample))
+            self.logger.debug("Flushing sample: "+repr(sample))
 
-        sample['localtime'] = datetime.datetime.now()
+            sample['localtime'] = self._timestamp_last
 
-        self.storage.write_sample(sample, context=context)
-
+            self.storage.write_sample(sample, context=context)
