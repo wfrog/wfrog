@@ -124,9 +124,13 @@ class BufferCollector(object):
         if self.last_flush is None:
             # Initialize flush timer with first event.
             self.last_flush = event.timestamp
-        if event.timestamp > self.last_flush + self.period_delta:
-            # Flushes when needed
-            self.do_send(FlushEvent(), context)
+        flush_time = self.last_flush + self.period_delta
+
+        if event.timestamp > flush_time:
+            # Flushes if needed
+            flush_event = FlushEvent()
+            flush_event.timestamp = flush_time
+            self.do_send(flush_event, context)
             self.last_flush = event.timestamp
         self.do_send(event, context)
 
