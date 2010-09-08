@@ -13,7 +13,7 @@ input: !service
 
 collector: !multi
     children:
-        aggregator : !flush
+        aggregator : !buffer
             period: 600
             collector: !aggregator
                 storage : !service

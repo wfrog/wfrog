@@ -50,9 +50,8 @@ class XmlFileCollector(base.BaseCollector):
 
     def init(self):
         if not self.initialized:
-            self.doc = E.current()
+            self.reset()
             self.initialized = True
-
     def _report_rain(self, total, rate):
         rain_elt = element(self.doc, 'rain')
         element(rain_elt, 'rate').text = str(rate)
@@ -108,3 +107,6 @@ class XmlFileCollector(base.BaseCollector):
         file = open(self.path, 'w')
         file.write(doc_string)
         file.close()
+
+    def reset(self, context={}):
+        self.doc = E.current()

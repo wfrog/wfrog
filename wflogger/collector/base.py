@@ -26,6 +26,7 @@ class BaseCollector(object):
     Base class for collectors.
     '''
 
+    _timestamp_last = None
     _temp_last = None
     _hum_last = None
     _mean_temp = None
@@ -37,30 +38,36 @@ class BaseCollector(object):
 
         self.init()
 
+        if hasattr(event, "timestamp") and event.timestamp is not None:
+            _timestamp_last = event.timestamp
+        else:
+            _timestamp_last = datetime.datetime.now()
+
         if event._type == "_flush":
             self.flush(context)
-        elif event._type == 'rain':
-            self._report_rain(event.total, event.rate)
-        elif event._type == 'wind':
-            self._report_wind(event.mean.speed, event.mean.dir, event.gust.speed, event.gust.dir)
-        elif event._type == 'press':
-            if hasattr(event, 'code'):
-                if event.code == 'RAW' or event.code == 'QFE':
-                    self._report_barometer_absolute(event.value)
+        else:
+            if event._type == 'rain':
+                self._report_rain(event.total, event.rate)
+            elif event._type == 'wind':
+                self._report_wind(event.mean.speed, event.mean.dir, event.gust.speed, event.gust.dir)
+            elif event._type == 'press':
+                if hasattr(event, 'code'):
+                    if event.code == 'RAW' or event.code == 'QFE':
+                        self._report_barometer_absolute(event.value)
+                    else:
+                        self._report_barometer_sea_level(event.value)
                 else:
-                    self._report_barometer_sea_level(event.value)
-            else:
-                self._report_barometer_absolute(event.value, context)
-        elif event._type == 'temp':
-            self._report_temperature(event.value, event.sensor)
-            if event.sensor == 1:
-                self._temp_last = event.value
-        elif event._type == 'hum':
-            self._report_humidity(event.value, event.sensor)
-            if event.sensor == 1:
-                self._hum_last = event.value
-        elif event._type == 'uv':
-            self._report_uv(event.value)
+                    self._report_barometer_absolute(event.value, context)
+            elif event._type == 'temp':
+                self._report_temperature(event.value, event.sensor)
+                if event.sensor == 1:
+                    self._temp_last = event.value
+            elif event._type == 'hum':
+                self._report_humidity(event.value, event.sensor)
+                if event.sensor == 1:
+                    self._hum_last = event.value
+            elif event._type == 'uv':
+                self._report_uv(event.value)
 
     def _get_mean_temp(self, current_temp, context):  # Last 12 hours mean temp
 
