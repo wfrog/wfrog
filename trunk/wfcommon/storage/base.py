@@ -28,31 +28,34 @@ class DatabaseStorage(object):
 
     time_format = '%Y-%m-%d %H:%M:%S'
 
+    tablename = 'METEO'
+
     def write_sample(self, sample, context={}):
         if not self.initialized:
             self.init()
             self.initialized = True
 
-        statement =  "INSERT INTO METEO (TIMESTAMP_UTC, TIMESTAMP_LOCAL," + \
+        statement =  "INSERT INTO %s (TIMESTAMP_UTC, TIMESTAMP_LOCAL," + \
             " TEMP, HUM, WIND, WIND_DIR, WIND_GUST, WIND_GUST_DIR, DEW_POINT,"+ \
             " RAIN, RAIN_RATE, PRESSURE, UV_INDEX) "+ \
             "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
         timestamp = time.mktime(sample['localtime'].timetuple())
         utc_time = datetime.utcfromtimestamp(timestamp)
-        sql = statement % ("'%s'" % utc_time.strftime(self.time_format),
-       "'%s'" % sample['localtime'].strftime(self.time_format),
-       self.format(sample['temp']),
-       self.format(sample['hum']),
-       self.format(sample['wind']),
-       self.format(sample['wind_dir']),
-       self.format(sample['wind_gust']),
-       self.format(sample['wind_gust_dir']),
-       self.format(sample['dew_point']),
-       self.format(sample['rain']),
-       self.format(sample['rain_rate']),
-       self.format(sample['pressure']),
-       self.format(sample['uv_index']))
+        sql = statement % (self.tablename,
+                 "'%s'" % utc_time.strftime(self.time_format),
+                 "'%s'" % sample['localtime'].strftime(self.time_format),
+                 self.format(sample['temp']),
+                 self.format(sample['hum']),
+                 self.format(sample['wind']),
+                 self.format(sample['wind_dir']),
+                 self.format(sample['wind_gust']),
+                 self.format(sample['wind_gust_dir']),
+                 self.format(sample['dew_point']),
+                 self.format(sample['rain']),
+                 self.format(sample['rain_rate']),
+                 self.format(sample['pressure']),
+                 self.format(sample['uv_index']))
         try:
             self.db.connect()
             self.db.execute(sql)
@@ -86,12 +89,13 @@ class DatabaseStorage(object):
 
         statement = "SELECT TIMESTAMP_LOCAL," + \
             " TEMP, HUM, WIND, WIND_DIR, WIND_GUST, WIND_GUST_DIR, DEW_POINT,"+ \
-            " RAIN, RAIN_RATE, PRESSURE, UV_INDEX FROM METEO " + \
+            " RAIN, RAIN_RATE, PRESSURE, UV_INDEX FROM %s " + \
             " WHERE TIMESTAMP_LOCAL >= '%s' AND TIMESTAMP_LOCAL < '%s' "+ \
             " ORDER BY TIMESTAMP_LOCAL ASC"
 
-        sql = statement % ( from_time.strftime(self.time_format),
-            to_time.strftime(self.time_format))
+        sql = statement % ( self.tablename, 
+                 from_time.strftime(self.time_format),
+                 to_time.strftime(self.time_format))
 
         try:
             self.db.connect()
