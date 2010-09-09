@@ -43,6 +43,7 @@
 
 from base import BaseStation
 import time
+import datetime
 import logging
 import threading
 import platform
@@ -249,7 +250,7 @@ class WMR200Station(BaseStation):
         # The following init sequence was adapted from Denis Ducret's
         # wmr200log program.
         if platform.system() is 'Windows':
-            self.devh.setConfiguration(1)        
+            self.devh.setConfiguration(1)
         self.devh.claimInterface(0)
         time.sleep(usbWait)
         self.devh.setAltInterface(0)
@@ -470,13 +471,12 @@ class WMR200Station(BaseStation):
         self.logger.info(">>>>> Historic Data Record >>>>>")
         # We ignore 0xD2 frames for now. They only contain historic data.
         # Byte 2 - 6 contains the time stamp.
-        self.decodeTimeStamp(record[2:7], '@Time', False)
+        timeStamp = self.decodeTimeStamp(record[2:7], '@Time', False)
         # Bytes 7 - 19 contain rain data
         rainTotal, rainRate = self.decodeRain(record[7:20])
         # Bytes 20 - 26 contain wind data
         dirDeg, avgSpeed, gustSpeed, windchill = self.decodeWind(record[20:27])
         # Byte 27 contains UV data
-        # If no UV data is present, the value is 255.
         uv = self.decodeUV(record[27])
         # Bytes 28 - 32 contain pressure data
         pressure = self.decodePressure(record[28:32])
@@ -486,6 +486,18 @@ class WMR200Station(BaseStation):
         # Bytes 33 - end contain temperature and humidity data
         data = self.decodeTempHumid(record[33:len(record) - 2])
         self.logger.info("<<<<< End Historic Record <<<<<")
+
+        # TODO: Find out how "no wind data" is encoded and ignore it.
+        self._report_wind(dirDeg, avgSpeed, gustSpeed, timeStamp)
+        # TODO: Find out how "no rain data" is encoded and ignore it.
+        self._report_rain(rainTotal, rainRate, timeStamp)
+        # If no UV data is present, the value is 0xFF.
+        if uv != 0xFF:
+          self._report_uv(uv, timeStamp)
+        self._report_barometer_absolute(pressure, timeStamp)
+        for d in data:
+          temp, humidity, sensor = d
+          self._report_temperature(temp, humidity, sensor, timeStamp)
       elif type == 0xD3:
         # 0xD3 frames contain wind related information.
         # Byte 2 - 6 contains the time stamp.
@@ -546,7 +558,7 @@ class WMR200Station(BaseStation):
         if abs(self.clockDelta) > 2:
           self.logger.warning("PC and station clocks are out of sync")
 
-      return ts
+      return datetime.datetime(year, month, day, hours, minutes)
 
     def decodeWind(self, record):
       # Byte 0: Wind direction in steps of 22.5 degrees.
