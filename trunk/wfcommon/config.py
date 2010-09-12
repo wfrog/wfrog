@@ -24,7 +24,7 @@ import sys
 import os.path
 import copy
 
-wfrog_version = "0.7"
+wfrog_version = "0.8-svn"
 
 class Configurer(object):
 
