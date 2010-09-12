@@ -37,6 +37,7 @@ import time
 import logging
 import logging
 import threading
+import platform
 import sys
 
 forecastMap = { 0:'PartlyCloudy', 1:'Rainy', 2:'Cloudy', 3:'Sunny', 4:'Snowy' }
