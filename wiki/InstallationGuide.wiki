@@ -1,7 +1,7 @@
 #labels Phase-Support
 <p align="center"><img src="http://wfrog.googlecode.com/svn/wiki/images/logo-web.png"/></p>
-== <img src="http://wfrog.googlecode.com/svn/wiki/images/ubuntu_logo.png"/> Debian-based Linux Distributions==
-
+== <img src="http://wfrog.googlecode.com/svn/wiki/images/ubuntu_logo.png"/> Debian, Ubuntu, Linux Mint ==
+_In fact, this will work with any debian based Linux distribution_
   * Download and install the latest wfrog package *.deb* file from the [http://code.google.com/p/wfrog/downloads/list?can=2&q=OpSys%3DDebian download page]
   * Plug your station and [SupportedStations check notes about your station model].
   * Run `sudo wfrog`
