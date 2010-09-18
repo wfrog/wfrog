@@ -138,7 +138,10 @@ class WMR200Station(BaseStation):
       for bus in busses:
         for device in bus.devices:
           if device.idVendor == vendorId and device.idProduct == productId:
-               return device
+            self.usbDevice = device
+            self.usbConfiguration = device.configurations[0]
+            self.usbInterface = self.usbConfiguration.interfaces[0][0]
+            return device
 
     # After each 0xD0 command, the station will provide a set of data
     # packets. The first byte of each packet indicates the number of
@@ -150,7 +153,6 @@ class WMR200Station(BaseStation):
     # packet of the last frame.
     def receivePacket(self):
       import usb
-      errors = 0
       while True:
         try:
           packet = self.devh.interruptRead(usb.ENDPOINT_IN + 1, 8,
@@ -176,27 +178,11 @@ class WMR200Station(BaseStation):
           else:
             # We've received a new packet.
             self.packets += 1
-            errors = 0
             self.logger.debug("Packet: %s" % self._list2bytes(packet))
             return packet
 
         except usb.USBError, e:
-          if e.args == ('No error',):
-            # Return None in case we hit a timeout or other error.
-            # This will trigger another request for new packets, so we
-            # don't run dry in this method waiting for new packets.
-            return None
-          elif e.args == ('error sending control message: Connection timed out',):
-            # Seems to be a common problem. We just retry the read.
-            self.logger.debug("Hit sender timeout. Retrying.")
-            errors += 1
-          else:
-            self.logger.exception("Exception reading interrupt: "+ str(e))
-            self.devh.resetEndpoint(usb.ENDPOINT_IN + 1)
-            errors += 1
-
-          if errors > 3:
-            raise WRM200Error("Resync required")
+          self.logger.debug("Exception reading interrupt: "+ str(e))
           return None
 
     def sendPacket(self, packet):
@@ -247,24 +233,19 @@ class WMR200Station(BaseStation):
         self.logger.info("Device version: %s" % dev.deviceVersion)
         self.logger.info("USB version: %s" % dev.usbVersion)
 
+        try:
+          self.devh.detachKernelDriver(self.usbInterface.interfaceNumber)
+          self.logger.info("Unloaded other driver from interface %d" %
+              self.usbInterface.interfaceNumber)
+        except usb.USBError, e:
+          pass
+
         # The following init sequence was adapted from Denis Ducret's
         # wmr200log program.
-        if platform.system() is 'Windows':
-            self.devh.setConfiguration(1)
-        self.devh.claimInterface(0)
-        time.sleep(usbWait)
-        self.devh.setAltInterface(0)
-        time.sleep(usbWait)
-
-        self.devh.getDescriptor(1, 0, 0x12)
-        self.devh.getDescriptor(2, 0, 0x9)
-        self.devh.getDescriptor(2, 0, 0x22)
-        time.sleep(usbWait)
-
-        self.devh.releaseInterface()
-        self.devh.setConfiguration(1)
-        self.devh.claimInterface(0)
-        self.devh.setAltInterface(0)
+        self.devh.setConfiguration(self.usbConfiguration)
+        self.devh.claimInterface(self.usbInterface)
+        self.devh.setAltInterface(self.usbInterface)
+        self.devh.reset()
         time.sleep(usbWait)
 
         # WMR200 Init sequence
@@ -553,10 +534,6 @@ class WMR200Station(BaseStation):
 
       if check:
         self.clockDelta = int(time.time() / 60) - int(ts / 60)
-        # Generate a warning if PC and station clocks are more than 2
-        # minutes out of sync.
-        if abs(self.clockDelta) > 2:
-          self.logger.warning("PC and station clocks are out of sync")
 
       return datetime.datetime(year, month, day, hours, minutes)
 
@@ -660,6 +637,10 @@ class WMR200Station(BaseStation):
                     record[i * rSize + 4]) * 0.1
         if record[i * rSize + 5] & 0x80:
           dewPoint = -dewPoint
+        # The meaning of byte 6 is still unknown. The observed values are
+        # ususally 0. But I've occasionally observed values in the 0x4F - 0x51
+        # range. There seems to be some correlation with the dew point.
+
         if record[i * rSize + 6] != 0:
           self.logger.info("TODO: Sensor %d byte 6: %02X" %
                            (sensor, record[i * rSize + 6]))
@@ -705,6 +686,11 @@ class WMR200Station(BaseStation):
                           self.checkSumErrors * 100.0 / self.frames))
         self.logger.info("Requests: %d" % self.requests)
       self.logger.info("Clock delta: %d" % self.clockDelta)
+      # Generate a warning if PC and station clocks are more than 2
+      # minutes out of sync.
+      if abs(self.clockDelta) > 2:
+        self.logger.warning("PC and station clocks are out of sync")
+
       self.logger.info("Polling delay: %.1f" % self.pollDelay)
       self.logger.info("USB resyncs: %d" % self.resyncs)
 
