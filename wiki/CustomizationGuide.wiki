@@ -118,15 +118,37 @@ sudo dpkg-reconfigure firebird2.0-super
 
 {{{
 sudo mkdir /var/lib/firebird/2.0/data
+cd database
 isql-fb -u sysdba -p masterkey
-cd wflogger/db
 SQL> create database 'localhost:/var/lib/firebird/2.0/data/wfrog.db';
-SQL> IN db.sql;
+SQL> IN db-firebird-0.2.sql;
 }}}
 
 ==== Configure the Storage ====
 
   * Edit `wfcommon/config/storage.yaml` to enable the `!firebird` storage.
+
+
+=== Firebird ===
+==== Needed dependencies ====
+
+mysql should be installed and started in the system
+
+[TODO] specify how to install and setup mysql if necessary
+
+==== Create Database and Tables ====
+
+{{{
+cd database
+mysql --user=root --password=secret
+SQL> create database wfrog;
+SQL> exit
+mysql --user=root --password=secret --database=wfrog < db-mysql-0.3.sql
+}}}
+
+==== Configure the Storage ====
+
+  * Edit `wfcommon/config/storage.yaml` to enable the `!mysql` storage.
 
 == Install as a Boot-Time Services ==
 
