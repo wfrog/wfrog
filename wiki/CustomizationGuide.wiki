@@ -129,12 +129,12 @@ SQL> IN db-firebird-0.2.sql;
   * Edit `wfcommon/config/storage.yaml` to enable the `!firebird` storage.
 
 
-=== Firebird ===
+=== Mysql ===
 ==== Needed dependencies ====
 
 mysql should be installed and started in the system
 
-[TODO] specify how to install and setup mysql if necessary
+TODO: specify how to install and setup mysql if necessary
 
 ==== Create Database and Tables ====
 
