@@ -132,8 +132,11 @@ SQL> IN db-firebird-0.2.sql;
 === Mysql ===
 ==== Needed dependencies ====
 
-mysql should be installed and started in the system
+{{{
+sudo apt-get install python-mysqldb    #  Mysql Python driver 
+}}}
 
+mysql server should be installed and started in the system (or another available system)
 TODO: specify how to install and setup mysql if necessary
 
 ==== Create Database and Tables ====
