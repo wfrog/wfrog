@@ -1,0 +1,25 @@
+init:
+    storage: !service
+        name: storage
+        instance: !include
+            path: storage.yaml
+
+renderer: !wunderground
+    id: YOUR_STATION_ID
+    password: YOUR_PASSWORD
+    storage: !service
+        name: storage
+    period: 300
+
+logging:
+    level: info    
+    handlers:
+        default:
+            level: debug
+            handler: !include 
+                path: loghandler.yaml
+                variables:
+                    process: wfrender
+
+
+
