@@ -66,7 +66,8 @@ class DatabaseStorage(object):
             self.db.disconnect()
 
     def keys(self, context={}):
-        return ['localtime',
+        return ['utctime',
+                'localtime',
                 'temp',
                 'hum',
                 'wind',
@@ -87,7 +88,7 @@ class DatabaseStorage(object):
             self.init()
             self.initialized = True
 
-        statement = "SELECT TIMESTAMP_LOCAL," + \
+        statement = "SELECT TIMESTAMP_UTC, TIMESTAMP_LOCAL," + \
             " TEMP, HUM, WIND, WIND_DIR, WIND_GUST, WIND_GUST_DIR, DEW_POINT,"+ \
             " RAIN, RAIN_RATE, PRESSURE, UV_INDEX FROM %s " + \
             " WHERE TIMESTAMP_LOCAL >= '%s' AND TIMESTAMP_LOCAL < '%s' "+ \

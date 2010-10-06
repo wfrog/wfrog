@@ -81,7 +81,8 @@ class CsvStorage(object):
                 'rain',
                 'rain_rate',
                 'pressure',
-                'uv_index']
+                'uv_index',
+                'utctime']
 
     def samples(self, from_time=datetime.fromtimestamp(0), to_time=datetime.now(), context={}):
         if not os.path.exists(self.path):
@@ -108,6 +109,9 @@ class CsvStorage(object):
                         sample[i] = float(sample[i])
                     else:
                         sample[i] = None
+
+                sample[length] = datetime.utcfromtimestamp(ts)
+
                 yield sample
         finally:
             file.close()
