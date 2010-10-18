@@ -1,5 +1,5 @@
 ## Copyright 2010 Laurent Bovet <laurent.bovet@windmaster.ch>
-##                derived from PyWeather by Patrick C. McGinty
+##                derived from pywws by Jim Easterbrook
 ##
 ##  This file is part of wfrog
 ##
