@@ -43,7 +43,7 @@ class WH1080Station(object):
         from pywws import WeatherStation    
         station = WeatherStation.weather_station()
 
-        for data in station.live_data():
+        for data, last_ptr, logged in station.live_data():
             try:                
                 e = generate_event('press')
                 e.value = data['Pressure']
