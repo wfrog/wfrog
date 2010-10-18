@@ -1,5 +1,5 @@
-## Copyright 2010 Laurent Bovet <laurent.bovet@windmaster.ch>
-##                Jordi Puigsegur <jordi.puigsegur@gmail.com>
+## Copyright 2010 Jordi Puigsegur <jordi.puigsegur@gmail.com>
+##                derived from PyWeather by Patrick C. McGinty
 ##
 ##  This file is part of wfrog
 ##
@@ -36,9 +36,9 @@ from wfcommon.units import MpsToMph
 
 class WeatherUndergroundPublisher(object):
     """
-    Render and publisher for Weather Underground. It is a wrapper around
-    PyWeather, thus needs this package installed on your system
-    (sudo easy_install weather)
+    Render and publisher for Weather Underground. It is a wrapper 
+    around PyWeather, thus needs this package installed on your 
+    system, version 0.9.1 or superior. (sudo easy_install weather)
 
     [ Properties ]
 
@@ -141,9 +141,10 @@ class WeatherUndergroundPublisher(object):
                                            windgustdir = windgustdir, 
                                            windspeed = windspeed, 
                                            winddir = winddir)
-                        self.publisher.publish()
                         self.logger.info("Publishing Wunderground data (normal server, %s station): %s / %.1fF / %d%% / %.1finHg / %.1finh / %.1fin / %.1fMph(%.0fdeg.) / %.1fMph(%.0fdeg.) " % (
                                self.id, dateutc, tempf, humidity, pressure, rainin, rainday, windgust, windgustdir, windspeed, winddir))
+                        response = self.publisher.publish()               
+                        self.logger.info('Result Wunderground publisher: %s' % str(response))
 
                     except Exception, e:
                         self.logger.exception(e)
