@@ -1,5 +1,5 @@
-# To test Weather Underground update:
-#    python ../wfrender.py -f wunderground.yaml -s ../../wfcommon/config/settings.yaml
+# To test PWSWeather update:
+#    python ../wfrender.py -f wunderground.yaml -s ../../wfcommon/config/default-settings.yaml
 
 init:
     storage: !service
@@ -7,7 +7,7 @@ init:
         instance: !include
             path: ../../wfcommon/config/storage.yaml
 
-renderer: !wunderground
+renderer: !pwsweather
     id: YOUR_STATION_ID
     password: YOUR_PASSWORD
     storage: !service
