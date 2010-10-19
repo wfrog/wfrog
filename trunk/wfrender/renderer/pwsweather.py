@@ -145,11 +145,10 @@ class PwsWeatherPublisher(object):
                                        rainyear = rainyear, 
                                        dateutc = dateutc, 
                                        windgust = windgust,
-                                       windgustdir = windgustdir, 
                                        windspeed = windspeed, 
                                        winddir = winddir)
-                    self.logger.info("Publishing PWS data (%s station): %s / %.1fF / %d%% / %.1finHg / %.1finh / %.1fin / %.1fin / %.1fin / %.1fMph(%.0fdeg.) / %.1fMph(%.0fdeg.) " % (
-                           self.id, dateutc, tempf, humidity, pressure, rainin, rainday, rainmonth, rainyear, windgust, windgustdir, windspeed, winddir))
+                    self.logger.info("Publishing PWS data (%s station): %s / %.1fF / %d%% / %.1finHg / %.1finh / %.1fin / %.1fin / %.1fin / %.1fMph / %.1fMph(%.0fdeg.) " % (
+                           self.id, dateutc, tempf, humidity, pressure, rainin, rainday, rainmonth, rainyear, windgust, windspeed, winddir))
                     response = self.publisher.publish()               
                     self.logger.info('Result Wunderground publisher: %s' % str(response))
 
