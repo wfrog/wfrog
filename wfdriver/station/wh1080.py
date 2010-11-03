@@ -46,7 +46,7 @@ class WH1080Station(object):
         for data, last_ptr, logged in station.live_data():
             try:                
                 e = generate_event('press')
-                e.value = data['Pressure']
+                e.value = data['abs_pressure']
                 send_event(e)
 
                 e = generate_event('temp')
@@ -71,6 +71,7 @@ class WH1080Station(object):
                 
                 e = generate_event('rain')
                 e.total = data['rain']
+                e.rate = 0
                 send_event(e)
                 
                 e = generate_event('wind')
