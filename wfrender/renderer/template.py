@@ -18,6 +18,7 @@
 
 from Cheetah.Template import Template
 import logging
+from pprint import pformat
 import os.path
 
 def rnd(value, dec=0):
@@ -45,10 +46,15 @@ class TemplateRenderer(object):
 
     mime [string] (optional):
         The mime type of the generated document. Defaults to 'text/plain'.
+        
+    debug: [true|false] (optional):
+        If true, dumps the rendered data to the log output. Default to false.
     """
 
     path = None
     renderer = None
+    debug = False
+    
     mime = "text/plain"
 
     logger = logging.getLogger("renderer.template")
@@ -57,6 +63,9 @@ class TemplateRenderer(object):
         content = {}
         if self.renderer:
             content = self.renderer.render(data=data, context=context)
+        
+        if self.debug:
+            self.logger.debug(pformat(content))
         
         if context.has_key('_yaml_config_file'):        
             dir_name = os.path.dirname(context['_yaml_config_file'] )

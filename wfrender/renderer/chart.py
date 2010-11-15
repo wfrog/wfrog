@@ -415,7 +415,7 @@ class GoogleChartRenderer(object):
                 chart.set_axis_style(1, _valid_color(config.text), config.size, 0, Axis.BOTH if config.ticks else Axis.AXIS_LINES)
             else:
                 chart.set_axis_labels(Axis.BOTTOM, [])
-                chart.set_axis_style(1, _valid_color(config.text), config.size, 0, Axis.TICK_MARKS, _valid_color(config.bgcolor))
+                chart.set_axis_style(1, _valid_color(config.text), config.size, 0, Axis.TICK_MARKS, _valid_color(config.color))
 
         try:
             return chart.get_url()+"&chma=10,10,10,10" # add a margin
@@ -709,6 +709,8 @@ class GoogleChartWindRadarRenderer(object):
         return chart.get_url()
 
     def scale(self, value, mean, max):
+        if value < 0:
+            value=0
         if mean == max / 2:
             return value
         else:
