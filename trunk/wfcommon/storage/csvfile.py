@@ -110,7 +110,7 @@ class CsvStorage(object):
                     else:
                         sample[i] = None
 
-                sample[length] = datetime.utcfromtimestamp(ts)
+                sample.append(datetime.utcfromtimestamp(ts))
 
                 yield sample
         finally:
