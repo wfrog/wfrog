@@ -24,6 +24,7 @@ import wmr928nx
 import wmr200
 import vantagepro
 import wh1080
+import ws23xx
 import auto
 
 # YAML mappings and registration for auto-detect
@@ -48,6 +49,9 @@ class YamlVantageProStation(vantagepro.VantageProStation, yaml.YAMLObject):
 
 class YamlWH1080Station(wh1080.WH1080Station, yaml.YAMLObject):
     yaml_tag = u'!wh1080'
+    
+class YamlWS2300Station(ws23xx.WS2300Station, yaml.YAMLObject):
+    yaml_tag = u'!ws2300'    
 
 class YamlRandomSimulator(simulator.RandomSimulator, yaml.YAMLObject):
     yaml_tag = u'!random-simulator'
