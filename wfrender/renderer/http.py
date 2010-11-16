@@ -100,60 +100,65 @@ class HttpRendererHandler(BaseHTTPRequestHandler):
 
         data = copy.deepcopy(_HttpRendererSingleton.data)
 
-        params = cgi.parse_qsl(urlparse.urlsplit(self.path).query)
-        for p in params:
-            data[p[0]] = p[1]
+        try:
+            params = cgi.parse_qsl(urlparse.urlsplit(self.path).query)
+            for p in params:
+                data[p[0]] = p[1]
 
-        content = None
+            content = None
 
-        name = urlparse.urlsplit(self.path).path.strip('/')
+            name = urlparse.urlsplit(self.path).path.strip('/')
 
-        if name == "-set-":
-            if data.has_key("s") and data.has_key("k") and data.has_key("v"):
-                section = data["s"]
-                key = data["k"]
-                value = data["v"]
-                if not cookie_sections.__contains__(section):
-                    self.send_error(403,"Permission Denied")
+            if name == "-set-":
+                if data.has_key("s") and data.has_key("k") and data.has_key("v"):
+                    section = data["s"]
+                    key = data["k"]
+                    value = data["v"]
+                    if not cookie_sections.__contains__(section):
+                        self.send_error(403,"Permission Denied")
+                        return
+                    context[section][key]=value
+                    cookie = Cookie.SimpleCookie()
+
+                    cookie[section+"."+key]=value
+
+                    self.send_response(302)
+                    self.send_header('Location', self.headers["Referer"] if self.headers.has_key("Referer") else "/")
+                    self.wfile.write(cookie)
+                    self.end_headers()
+
                     return
-                context[section][key]=value
-                cookie = Cookie.SimpleCookie()
+                else:
+                    self.send_error(500,"Missing parameters")
+                    return
 
-                cookie[section+"."+key]=value
+            cookie_str = self.headers.get('Cookie')
+            if cookie_str:
+                cookie = Cookie.SimpleCookie(cookie_str)
+                for i in cookie:
+                    parts = i.split('.')
+                    if len(parts) == 2:
+                        section = parts[0]
+                        key = parts[1]
+                        if cookie_sections.__contains__(section) and context[section].has_key(key):
+                            context[section][key]=cookie[i].value
 
-                self.send_response(302)
-                self.send_header('Location', self.headers["Referer"] if self.headers.has_key("Referer") else "/")
-                self.wfile.write(cookie)
-                self.end_headers()
-
-                return
+            if name == "":
+                if not root:
+                    mime = "text/html"
+                    content = "<html><head><title>wfrender</title><body>"
+                    for renderer in renderers.keys():
+                        content += "<a href='"+renderer+"'>"+renderer+"</a><br>"
+                    content += "</body></html>"
+                else:
+                    [ mime, content ] = root.render(data=data, context=context)
             else:
-                self.send_error(500,"Missing parameters")
-                return
-
-        cookie_str = self.headers.get('Cookie')
-        if cookie_str:
-            cookie = Cookie.SimpleCookie(cookie_str)
-            for i in cookie:
-                parts = i.split('.')
-                if len(parts) == 2:
-                    section = parts[0]
-                    key = parts[1]
-                    if cookie_sections.__contains__(section) and context[section].has_key(key):
-                        context[section][key]=cookie[i].value
-
-        if name == "":
-            if not root:
-                mime = "text/html"
-                content = "<html><head><title>wfrender</title><body>"
-                for renderer in renderers.keys():
-                    content += "<a href='"+renderer+"'>"+renderer+"</a><br>"
-                content += "</body></html>"
-            else:
-                [ mime, content ] = root.render(data=data, context=context)
-        else:
-            if renderers is not None and renderers.has_key(name):
-                [ mime, content ] = renderers[name].render(data=data, context=context)
+                if renderers is not None and renderers.has_key(name):
+                    [ mime, content ] = renderers[name].render(data=data, context=context)
+        except Exception, e:
+            _HttpRendererSingleton.logger.exception(e)
+            self.send_error(500, "Internal Server Error")
+            return 
 
         if content:
             self.send_response(200)
