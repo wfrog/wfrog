@@ -386,7 +386,7 @@ class GoogleChartRenderer(object):
             chart.set_axis_labels(Axis.LEFT, [])
             chart.set_axis_style(0, _valid_color(config.text), config.size, 0, Axis.TICK_MARKS, _valid_color(config.bgcolor))
 
-        if config.zero and config.axes and range_min_ref_units < 0:
+        if config.zero and config.axes and range_min_ref_units < 0 and range_max_ref_units > 0:
             zero_config = ChartConfig()
             zero_config.__dict__.update(config.__dict__)
             zero_config.__dict__.update(config.zero)
