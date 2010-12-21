@@ -108,9 +108,6 @@ class WeatherUndergroundPublisher(object):
                         data = accu.execute()['current']['series']
                         index = len(data['lbl'])-1
 
-                        print data
-                        print index
-
                         # <float> pressure: in inches of Hg
                         pressure = HPaToInHg(data['pressure'][index])
                         # <float> dewpoint: in Fahrenheit
