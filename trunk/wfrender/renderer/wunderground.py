@@ -96,9 +96,9 @@ class WeatherUndergroundPublisher(object):
                      'hum' : LastFormula('hum'),
                      'pressure' : LastFormula('pressure'),
                      'wind' : LastFormula('wind'),
-                     'wind_deg,wind_dir' : PredominantWindFormula('wind'),
+                     'wind_deg' : LastFormula('wind_dir'),
                      'gust' : LastFormula('wind_gust'),
-                     'gust_deg,gust_dir' : PredominantWindFormula('wind_gust'),
+                     'gust_deg' : LastFormula('wind_gust_dir'),
                      'rain_rate' : LastFormula('rain_rate'),
                      'rain_fall' : SumFormula('rain'), 
                      'utctime' : LastFormula('utctime') } }
@@ -106,29 +106,33 @@ class WeatherUndergroundPublisher(object):
                 while self.alive:
                     try:
                         data = accu.execute()['current']['series']
+                        index = len(data['lbl'])-1
+
+                        print data
+                        print index
 
                         # <float> pressure: in inches of Hg
-                        pressure = HPaToInHg(data['pressure'][0])
+                        pressure = HPaToInHg(data['pressure'][index])
                         # <float> dewpoint: in Fahrenheit
-                        dewpoint = CToF(data['dew_point'][0])
+                        dewpoint = CToF(data['dew_point'][index])
                         # <float> humidity: between 0.0 and 100.0 inclusive
                         humidity = data['hum'][0]
                         # <float> tempf: in Fahrenheit
-                        tempf = CToF(data['temp'][0])
+                        tempf = CToF(data['temp'][index])
                         # <float> rainin: inches/hour of rain
-                        rainin = MmToIn(data['rain_rate'][0])
+                        rainin = MmToIn(data['rain_rate'][index])
                         # <float> rainday: total rainfall in day (localtime)
-                        rainday = MmToIn(data['rain_fall'][0])
+                        rainday = MmToIn(data['rain_fall'][index])
                         # <string> dateutc: date "YYYY-MM-DD HH:MM:SS" in GMT timezone
-                        dateutc = data['utctime'][0].strftime('%Y-%m-%d %H:%M:%S')
+                        dateutc = data['utctime'][index].strftime('%Y-%m-%d %H:%M:%S')
                         # <float> windgust: in mph
-                        windgust = MpsToMph(data['gust'][0])
+                        windgust = MpsToMph(data['gust'][index])
                         # <float> windgustdir:in degrees, between 0.0 and 360.0
-                        windgustdir = data['gust_deg'][0]
+                        windgustdir = data['gust_deg'][index]
                         # <float> windspeed: in mph
-                        windspeed = MpsToMph(data['wind'][0])
+                        windspeed = MpsToMph(data['wind'][index])
                         # <float> winddir: in degrees, between 0.0 and 360.0
-                        winddir = data['wind_deg'][0]
+                        winddir = data['wind_deg'][index]
 
                         self.publisher.set(pressure = pressure, 
                                            dewpoint = dewpoint, 
@@ -141,6 +145,9 @@ class WeatherUndergroundPublisher(object):
                                            windgustdir = windgustdir, 
                                            windspeed = windspeed, 
                                            winddir = winddir)
+                        print "Publishing Wunderground data (normal server, %s station): %s / %.1fF / %d%% / %.1finHg / %.1finh / %.1fin / %.1fMph(%.0fdeg.) / %.1fMph(%.0fdeg.) " % (
+                               self.id, dateutc, tempf, humidity, pressure, rainin, rainday, windgust, windgustdir, windspeed, winddir)
+
                         self.logger.info("Publishing Wunderground data (normal server, %s station): %s / %.1fF / %d%% / %.1finHg / %.1finh / %.1fin / %.1fMph(%.0fdeg.) / %.1fMph(%.0fdeg.) " % (
                                self.id, dateutc, tempf, humidity, pressure, rainin, rainday, windgust, windgustdir, windspeed, winddir))
                         response = self.publisher.publish()               
