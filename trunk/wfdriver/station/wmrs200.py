@@ -62,7 +62,14 @@ def detect():
 class WMRS200Station(BaseStation):
     '''
     Station driver for the Oregon Scientific WMRS200. Reported to work with WMR100.
+
+    [ Properties ]
+ 
+    pressure_cal [numeric] (optional):
+        Pressure calibration offset in mb. Defaults to 0.
     '''
+    
+    pressure_cal = 0
 
     logger = logging.getLogger('station.wmrs200')
 
@@ -361,7 +368,7 @@ class WMRS200Station(BaseStation):
         slpForecastTxt = forecastMap.get(slpForecast, str(slpForecast))
 
         # Report data
-        self._report_barometer_absolute(pressure)
+        self._report_barometer_absolute(pressure + self.pressure_cal)
 
         # Log
         self.logger.info("Barometer Forecast: %s, Absolute pressure: %.1f mb, Sea Level Pressure: %.1f", forecastTxt, pressure, seaLevelPressure)
