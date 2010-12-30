@@ -23,8 +23,6 @@ import time
 import wfcommon.database
 from wfcommon.formula.base import LastFormula
 from wfcommon.formula.base import SumFormula
-from wfcommon.formula.base import AverageFormula
-from wfcommon.formula.wind import PredominantWindFormula
 try:
     import wfrender.datasource.accumulator
 except ImportError, e:
@@ -113,7 +111,7 @@ class WeatherUndergroundPublisher(object):
                         # <float> dewpoint: in Fahrenheit
                         dewpoint = CToF(data['dew_point'][index])
                         # <float> humidity: between 0.0 and 100.0 inclusive
-                        humidity = data['hum'][0]
+                        humidity = data['hum'][index]
                         # <float> tempf: in Fahrenheit
                         tempf = CToF(data['temp'][index])
                         # <float> rainin: inches/hour of rain

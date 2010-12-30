@@ -1,5 +1,6 @@
-## Copyright 2009 Laurent Bovet <laurent.bovet@windmaster.ch>
-##                Jordi Puigsegur <jordi.puigsegur@gmail.com>
+# -*- coding: latin-1 -*-
+
+## Copyright 2010 Jordi Puigsegur <jordi.puigsegur@gmail.com>
 ##
 ##  This file is part of wfrog
 ##
@@ -21,11 +22,23 @@ import logging
 import sys
 import time
 import wfcommon.database
+from wfcommon.formula.base import LastFormula
+from wfcommon.formula.base import SumFormula
+from wfcommon.formula.base import MinFormula
+from wfcommon.formula.base import MaxFormula
+try:
+    import wfrender.datasource.accumulator
+except ImportError, e:
+    import datasource.accumulator
+from wfcommon.units import MpsToKmh
 
 class MeteoclimaticRenderer(object):
     """
-    Renders the data chunk to send to the meteoclimatic website.
+    Renders the data chunk to send to the meteoclimatic website using local time.
     See www.meteoclimatic.com.
+
+    Meteoclimatic has not disclosed its direct upload protocol. 
+    Therefore it is necessary to upload (FTP) or publish (HTTP) the data.
 
     render result [string]:
         The generated chunk.
@@ -34,54 +47,261 @@ class MeteoclimaticRenderer(object):
 
     id [string]:
         meteoclimatic station ID.
+
+    storage: 
+        The storage service.
     """
 
     id = None
-
+    storage = None
+    accuY = None
+    accuM = None
+    accuD = None
+    lastTemplate = None
+    
     logger = logging.getLogger("renderer.meteoclimatic")
 
     def render(self, data={}, context={}):
         try:
-            now = time.localtime()
-            db = wfcommon.database.DBFactory({'type':'firebird', 'database':context['database']['url']})
-            db.connect()
-            ## Current data
-            data_block_1 = self._calculateCurrentData(db)
-            ## Today data
-            data_block_2 = self._calculateAggregData(db, 'D','%s.%s.%s'%(now.tm_year, now.tm_mon, now.tm_mday))
-            ## Current month
-            data_block_3 = self._calculateAggregData(db, 'M','%s.%s.1'%(now.tm_year, now.tm_mon))
-            ## Current year
-            data_block_4 = self._calculateAggregData(db, 'Y','%s.1.1'%(now.tm_year))
-            db.disconnect()
-            return ['text/plain', "*VER=DATA2*COD=%s%s%s%s%s*EOT*" % (
-                    self.id, data_block_1, data_block_2, data_block_3, data_block_4)]
+            assert self.id is not None, "'meteoclimatic.id' must be set"
+            assert self.storage is not None, "'meteoclimatic.storage' must be set"
+
+            if self.accuD == None:
+                self.logger.info("Initializing accumulators")
+
+                # Accumulator for yearly data
+                self.accuY = datasource.accumulator.AccumulatorDatasource()
+                self.accuY.slice = 'year'
+                self.accuY.span = 1
+                self.accuY.storage = self.storage
+                self.accuY.formulas = {'data': {
+                     'max_temp' : MaxFormula('temp'),
+                     'min_temp' : MinFormula('temp'),
+                     'max_hum' : MaxFormula('hum'),
+                     'min_hum' : MinFormula('hum'),
+                     'max_pressure' : MaxFormula('pressure'),
+                     'min_pressure' : MinFormula('pressure'),
+                     'max_gust' : MaxFormula('wind_gust'),
+                     'rain_fall' : SumFormula('rain') } }
+
+                # Accumulator for monthly data
+                self.accuM = datasource.accumulator.AccumulatorDatasource()
+                self.accuM.slice = 'month'
+                self.accuM.span = 1
+                self.accuM.storage = self.storage
+                self.accuM.formulas = {'data': {
+                     'max_temp' : MaxFormula('temp'),
+                     'min_temp' : MinFormula('temp'),
+                     'max_hum' : MaxFormula('hum'),
+                     'min_hum' : MinFormula('hum'),
+                     'max_pressure' : MaxFormula('pressure'),
+                     'min_pressure' : MinFormula('pressure'),
+                     'max_gust' : MaxFormula('wind_gust'),
+                     'rain_fall' : SumFormula('rain') } }
+
+                # Accumulator for daily and current data
+                self.accuD = datasource.accumulator.AccumulatorDatasource()
+                self.accuD.slice = 'day'
+                self.accuD.span = 1
+                self.accuD.storage = self.storage
+                self.accuD.formulas = {
+                     'data': {
+                         'max_temp' : MaxFormula('temp'),
+                         'min_temp' : MinFormula('temp'),
+                         'max_hum' : MaxFormula('hum'),
+                         'min_hum' : MinFormula('hum'),
+                         'max_pressure' : MaxFormula('pressure'),
+                         'min_pressure' : MinFormula('pressure'),
+                         'max_gust' : MaxFormula('wind_gust'),
+                         'rain_fall' : SumFormula('rain') },
+                     'current': {
+                         'temp' : LastFormula('temp'),
+                         'hum' : LastFormula('hum'),
+                         'pressure' : LastFormula('pressure'),
+                         'gust' : LastFormula('wind_gust'),
+                         'wind_deg' : LastFormula('wind_dir'),
+                         'time' : LastFormula('localtime') } }
+
+            self.logger.info("Calculating ...")
+
+            template = "*VER=DATA2*COD=%s*%s*%s*%s*%s*EOT*" % (
+                       self.id, 
+                       self._calculateCurrentData(self.accuD), 
+                       self._calculateAggregData('D', self.accuD), 
+                       self._calculateAggregData('M', self.accuM), 
+                       self._calculateAggregData('Y', self.accuY))
+
+            self.lastTemplate = template
+
+            self.logger.info("Template calculated: %s" % template)
+
+            return ['text/plain', template]
+
         except Exception, e:
             self.logger.warning("Error rendering meteoclimatic data: %s" % str(e))
-            return ['text/plain', "*VER=DATA2*COD=%s*EOT*" % self.id]
+            if self.lastTemplate == None:
+                return ['text/plain', "*VER=DATA2*COD=%s*EOT*" % self.id]
+            else:
+                return ['text/plain', self.lastTemplate] 
 
-    def _calculateCurrentData(self, db):
-        sql = """
-SELECT FIRST 1 TIMESTAMP_LOCAL, TEMP, WIND_GUST, WIND_GUST_DIR, PRESSURE, HUM
-FROM METEO
-ORDER BY TIMESTAMP_UTC DESC
-        """
-        [(UPD, TMP, WND, AZI, BAR, HUM)] = db.select(sql)
-        return "*UPD=%s*TMP=%s*WND=%s*AZI=%s*BAR=%s*HUM=%s*SUN=" % (
-               UPD.strftime("%d/%m/%Y %H:%M"), TMP,  WND * 3.6, AZI, BAR, HUM)
+    def _calculateCurrentData(self, accu):
+        data = accu.execute()['current']['series']
+        index = len(data['lbl'])-1
+        template = "UPD=%s*TMP=%s*WND=%s*AZI=%s*BAR=%s*HUM=%s*SUN=" % (
+               data['time'][index].strftime("%d/%m/%Y %H:%M"), 
+               data['temp'][index],  
+               MpsToKmh(data['gust'][index]), 
+               self._nvl(data['wind_deg'][index], 0), 
+               data['pressure'][index], 
+               data['hum'][index] )
+        self.logger.debug("Calculating current data (index: %d): %s" % (index, template))
+        return template
+
+    def _calculateAggregData(self, time_span, accu):
+        data = accu.execute()['data']['series']
+        index = len(data['lbl'])-1
+        template = "%sHTM=%s*%sLTM=%s*%sHHM=%s*%sLHM=%s*%sHBR=%s*%sLBR=%s*%sGST=%s*%sPCP=%s" % (
+               time_span, data['max_temp'][index], 
+               time_span, data['min_temp'][index], 
+               time_span, data['max_hum'][index], 
+               time_span, data['min_hum'][index],
+               time_span, data['max_pressure'][index], 
+               time_span, data['min_pressure'][index], 
+               time_span, MpsToKmh(data['max_gust'][index]), 
+               time_span, data['rain_fall'][index] )
+        self.logger.debug("Calculating %s data (index: %d): %s" % (time_span, index, template))
+        return template
+
+    def _nvl(self, value, default):
+        return value if value != None else default
 
 
-    def _calculateAggregData(self, db, time_span, date_from):
-        sql = """
-SELECT MAX(TEMP), MIN(TEMP), MAX(HUM), MIN(HUM), MAX(PRESSURE), MIN(PRESSURE), MAX(WIND_GUST), SUM(RAIN)
-FROM METEO
-WHERE TIMESTAMP_LOCAL >= '%s'
-        """ % date_from
-        [(HTM, LTM, HHM, LHM, HBR, LBR, GST, PCP)] = db.select(sql)
-        return "*%sHTM=%s*%sLTM=%s*%sHHM=%s*%sLHM=%s*%sHBR=%s*%sLBR=%s*%sGST=%s*%sPCP=%s" % (
-               time_span, HTM, time_span, LTM, time_span, HHM, time_span, LHM,
-               time_span, HBR, time_span, LBR, time_span, GST * 3.6, time_span, PCP )
+# Information on the data template can be found at     
+# http://www.meteoclimatic.com/index/wp/plantilla_es.html
+#
+# Formato del fichero de datos
+# ############################
+# El fichero de datos está compuesto por una serie de campos. Cada campo está compuesto por 
+# una etiqueta identificativa y el valor correspondiente. La etiqueta se indicará en caracteres 
+# en mayúscula, está precedida por un asterisco y finaliza con un signo de igual. Esta etiqueta 
+# identifica el valor que lo sigue.
+# A grandes rasgos, este fichero se divide en:
+#
+#    * Cabecera
+#    * Datos actuales
+#    * Datos diarios (máximas, mínimas y precipitación)
+#    * Datos mensuales (máximas, mínimas y precipitación)
+#    * Datos anuales (máximas, mínimas y precipitación)
+#    * Final de fichero
+#
+# Importante: El objetivo de este fichero es que sea comprendido por un programa y no mostrado 
+# a un usuario. Por ello, es muy importante que no se formatee la información para hacerla bonita 
+# visualmente. Es necesario que sea un fichero de texto neto, sin marcas ni etiquetas de 
+# hipertexto entre sus marcas de cabecera y final de fichero.
+#
+# Cabecera
+# ########
+# Tiene como objetivo marcar el inicio del bloque de datos y la identificación de la estación. 
+# Contiene los siguientes campos:
+# *VER=DATA2
+#       Marca de inicio del fichero. Versión del fichero de datos. Valor constante.
+# *COD=[código_estación]
+#       Identificación del código de la estación
+# *UPD=[actualización]
+#       Fecha y hora de los datos. La fecha se ha de indicar en formato normalizado de 
+#       día/mes/año. No se entiende el formato anglosajón de tipo mes/día/año. A continuación
+#       de la fecha se debe indicar la hora, preferiblemente en formato de 24 horas. 
+#       Excepción: Si el usuario requiere específicamente que el formato de fecha sea el 
+#       anglosajón, se precederá esta fecha por los caracteres US_ 
+#       Ejemplo: *UPD=US_03/14/2007 14:25
+# 
+# Datos actuales
+# ##############
+# Contiene los datos del momento de envío del fichero y lo forman los siguientes campos:
+# *TMP=[temperatura]
+#       Temperatura en grados Celsius
+# *WND=[velocidad_viento]
+#       Velocidad del viento en km/h
+# *AZI=[dirección]
+#       Dirección del viento. Se puede indicar en grados, donde los 0º o 360º son 
+#       el norte y 90º, 180º y 270º son el este, sur y oeste, respectivamente. También 
+#       se pueden indicar en el formato geográfico o literal (N, NNE, NE, ENE, E, ESE, 
+#       SE, SSE, S, SSW, SSO, SW, SO, WSW, OSO, W, O, WNW, ONO, NW, NO, NNW, NNO)
+# *BAR=[presión]
+#       Presión en hPa o mb.
+# *HUM=[humedad]
+#       Humedad relativa
+# *SUN=[radiación_solar]
+#       Radiación solar W/m2. En blanco si no se proporciona.
 
-
-
+# Datos diarios
+# Contiene las máximas y mínimas diarias y el total de precipitación del día, según 
+# los siguientes campos:
+# DHTM=[temperatura]
+#       Temperatura máxima del día en grados Celsius
+# DLTM=[temperatura]
+#       Temperatura mínima del día en grados Celsius
+# DHHM=[humedad]
+#       Humedad relativa máxima del día
+# DLHM=[humedad]
+#       Humedad relativa mínima del día
+# DHBR=[presión]
+#       Presión máxima del día
+# DLBR=[presión]
+#       Presión mínima del día
+# DGST=[velocidad_viento]
+#       Racha de viento máxima del día
+# DPCP=[precipitación]
+#       Precipitación total del día en mm
+#
+# Datos mensuales
+# ###############
+# Contiene las máximas y mínimas mensuales y el total de precipitación del mes, según 
+# los siguientes campos:
+# MHTM=[temperatura]
+#       Temperatura máxima del mes en grados Celsius
+# MLTM=[temperatura]
+#       Temperatura mínima del mes en grados Celsius
+# MHHM=[humedad]
+#       Humedad relativa máxima del mes
+# MLHM=[humedad]
+#       Humedad relativa mínima del mes
+# MHBR=[presión]
+#       Presión máxima del mes
+# MLBR=[presión]
+#       Presión mínima del mes
+# MGST=[velocidad_viento]
+#       Racha de viento máxima del mes
+# MPCP=[precipitación]
+#       Precipitación total del mes en mm
+#
+# Datos anuales
+# #############
+# Contiene las máximas y mínimas anuales y el total de precipitación del año, según 
+# los siguientes campos:
+# YHTM=[temperatura]
+#       Temperatura máxima del año en grados Celsius
+# YLTM=[temperatura]
+#       Temperatura mínima del año en grados Celsius
+# YHHM=[humedad]
+#       Humedad relativa máxima del año
+# YLHM=[humedad]
+#       Humedad relativa mínima del año
+# YHBR=[presión]
+#       Presión máxima del año
+# YLBR=[presión]
+#       Presión mínima del año
+# YGST=[velocidad_viento]
+#       Racha de viento máxima del año
+# YPCP=[precipitación]
+#       Precipitación total del año en mm
+#
+# Final del fichero
+# #################
+# El fichero de datos finaliza con una marca de fin de texto *EOT*
+# Debido a que muchos servicios gratuítos de alojamiento de pàginas web basan su 
+# financiación en la inserción de publicidad, a menudo modifican las páginas que 
+# envían los usuarios para hacer que esta aparezca. Para que se pueda discriminar 
+# entre la publicidad y los datos, se marca el inicio y final del fichero de datos 
+# con estas etiquetas.
 
