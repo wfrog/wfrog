@@ -27,9 +27,9 @@ from wfcommon.formula.base import SumFormula
 from wfcommon.formula.base import MinFormula
 from wfcommon.formula.base import MaxFormula
 try:
-    import wfrender.datasource.accumulator
+    from wfrender.datasource.accumulator import AccumulatorDatasource
 except ImportError, e:
-    import datasource.accumulator
+    from datasource.accumulator import AccumulatorDatasource
 from wfcommon.units import MpsToKmh
 
 class MeteoclimaticRenderer(object):
@@ -70,7 +70,7 @@ class MeteoclimaticRenderer(object):
                 self.logger.info("Initializing accumulators")
 
                 # Accumulator for yearly data
-                self.accuY = datasource.accumulator.AccumulatorDatasource()
+                self.accuY = AccumulatorDatasource()
                 self.accuY.slice = 'year'
                 self.accuY.span = 1
                 self.accuY.storage = self.storage
@@ -85,7 +85,7 @@ class MeteoclimaticRenderer(object):
                      'rain_fall' : SumFormula('rain') } }
 
                 # Accumulator for monthly data
-                self.accuM = datasource.accumulator.AccumulatorDatasource()
+                self.accuM = AccumulatorDatasource()
                 self.accuM.slice = 'month'
                 self.accuM.span = 1
                 self.accuM.storage = self.storage
@@ -100,7 +100,7 @@ class MeteoclimaticRenderer(object):
                      'rain_fall' : SumFormula('rain') } }
 
                 # Accumulator for daily and current data
-                self.accuD = datasource.accumulator.AccumulatorDatasource()
+                self.accuD = AccumulatorDatasource()
                 self.accuD.slice = 'day'
                 self.accuD.span = 1
                 self.accuD.storage = self.storage
