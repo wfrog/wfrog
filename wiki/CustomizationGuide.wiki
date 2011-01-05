@@ -76,6 +76,8 @@ This will prepare the custom configuration under `/etc/wfrog/` by copying the fa
 
 When a configuration is available at this location, it will be used instead of the factory configuration. It is your custom configuration that you modify.
 
+*Caution*: Once you have customized your configuration, the config directory of the wfrog installation will not be used anymore. Remember that, especially when you upgrade wfrog because it will not update the customized configuration.
+
 == Configuring the station driver ==
 
 === Specifying your station model ==
