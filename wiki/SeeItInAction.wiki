@@ -9,6 +9,8 @@ Users are invited to submit as comment to this page the URL of their stations to
 || [http://www.6tec.es/estacio/24hours.html (6tec enginyeria) Manacor, Balearic Islands] || WMRS200 || Uses FTP renderer. Running on [http://www.pcengines.ch/alix.htm ALIX3D2] with [http://linux.voyage.hk/ voyage linux] 0.6.2. Uploads online data to www.meteoclimatic.com  ||
 || [http://weather.fire-mgou.ru/ Yubileyny (Moscow region), Russia] || WMR200 || Uses HTTP renderer. ||
 ||
-|| [http://meteocieza.dyndns.org/ Cieza, Murcia, Spain] || WMR200 || Uses HTTP renderer. Running on Asus WL-500gP V2 router, with http://koppel.cz/cdmawifi/ firmware ||
+|| [http://meteocieza.dyndns.org/24hours.html Cieza, Murcia, Spain] || WMR200 || Uses HTTP renderer. Running on Asus WL-500gP V2 router, with http://koppel.cz/cdmawifi/ firmware ||
+||
+|| [http://mazonovo.meteoviedo.es/ Taramundi, Asturias, Spain] || WMRS200 || Uses FTP renderer. Uploads online data to www.meteoclimatic.com ||
 
 <p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
