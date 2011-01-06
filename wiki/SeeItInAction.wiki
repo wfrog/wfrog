@@ -12,7 +12,7 @@ Users are invited to submit as comment to this page the URL of their stations to
 || [http://meteocieza.dyndns.org/24hours.html Cieza, Murcia, Spain] || WMR200 || Uses HTTP renderer. Running on Asus WL-500gP V2 router, with http://koppel.cz/cdmawifi/ firmware ||
 ||
 || [http://mazonovo.meteoviedo.es/ Taramundi, Asturias, Spain] || WMRS200 || Uses FTP renderer. Uploads online data to www.meteoclimatic.com ||
-|| [http://lode-hermsdorf.dyndns.org Taramundi, Hermsdorf, Germany] || WMRS200 || Uses HTTP renderer. Running on Alix1d with Ubuntu 10.04 ||
+|| [http://lode-hermsdorf.dyndns.org Hermsdorf, Germany] || WMRS200 || Uses HTTP renderer. Running on Alix1d with Ubuntu 10.04 ||
 
 
 <p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
