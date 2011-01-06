@@ -310,7 +310,7 @@ class WMRS200Station(BaseStation):
         monthT = record[13]
         yearT = 2000 + record[14]
 
-        # Convert rain if a diferent rain gauge is installed 
+        # Convert rain if the rain gauge is modified 
         if rain_gauge_diameter != 0:  
           x = 100.0 ** 2 / rain_gauge_diameter ** 2
           total = x * total
