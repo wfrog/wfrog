@@ -21,7 +21,6 @@
 # http://wmrx00.sourceforge.net/  (WMR100 weather logger project)
 
 ## TODO: DOCUMENT MESSAGES' PROTOCOL
-##       Implement calibration parameter for rain sensor
 ##       WMRS100 projects implement a calibration for humidity sensor to obtain 100% value (necessary?)
 ##       GENERATE CRITICAL LOG ENTRIES FOR LOW BATTERY LEVEL (ONE ALARM PER DAY!)
 ##       ALLOW CONFIG TO SPECIFY WHICH temp/hum SENSOR(S) SHOULD BE USED
@@ -67,9 +66,14 @@ class WMRS200Station(BaseStation):
  
     pressure_cal [numeric] (optional):
         Pressure calibration offset in mb. Defaults to 0.
-    '''
+
+    rain_gauge_diameter [numeric] (optional):
+        Rain gauge diamater in mm. When specified the driver will do the necessary 
+        conversions to adjust rain to the new gauge size. Defaults to 0 (= no calculation)
+     '''
     
     pressure_cal = 0
+    rain_gauge_diameter = 0
 
     logger = logging.getLogger('station.wmrs200')
 
@@ -305,6 +309,12 @@ class WMRS200Station(BaseStation):
         dayT = record[12]
         monthT = record[13]
         yearT = 2000 + record[14]
+
+        # Convert rain if a diferent rain gauge is installed 
+        if rain_gauge_diameter != 0:  
+          x = 100.0 ** 2 / rain_gauge_diameter ** 2
+          total = x * total
+          rate = x * rate 
 
         # Report data
         self._report_rain(total, rate)
