@@ -120,14 +120,18 @@ class WeatherUndergroundPublisher(object):
                         rainday = MmToIn(data['rain_fall'][index])
                         # <string> dateutc: date "YYYY-MM-DD HH:MM:SS" in GMT timezone
                         dateutc = data['utctime'][index].strftime('%Y-%m-%d %H:%M:%S')
-                        # <float> windgust: in mph
-                        windgust = MpsToMph(data['gust'][index])
-                        # <float> windgustdir:in degrees, between 0.0 and 360.0
-                        windgustdir = data['gust_deg'][index]
                         # <float> windspeed: in mph
                         windspeed = MpsToMph(data['wind'][index])
                         # <float> winddir: in degrees, between 0.0 and 360.0
                         winddir = data['wind_deg'][index]
+                        if winddir == None and windspeed != None: 
+                            winddir = 0.0
+                        # <float> windgust: in mph
+                        windgust = MpsToMph(data['gust'][index])
+                        # <float> windgustdir:in degrees, between 0.0 and 360.0
+                        windgustdir = data['gust_deg'][index]
+                        if windgustdir == None: 
+                            windgustdir = windgust
 
                         self.publisher.set(pressure = pressure, 
                                            dewpoint = dewpoint, 
@@ -140,8 +144,6 @@ class WeatherUndergroundPublisher(object):
                                            windgustdir = windgustdir, 
                                            windspeed = windspeed, 
                                            winddir = winddir)
-                        print "Publishing Wunderground data (normal server, %s station): %s / %.1fF / %d%% / %.1finHg / %.1finh / %.1fin / %.1fMph(%.0fdeg.) / %.1fMph(%.0fdeg.) " % (
-                               self.id, dateutc, tempf, humidity, pressure, rainin, rainday, windgust, windgustdir, windspeed, winddir)
 
                         self.logger.info("Publishing Wunderground data (normal server, %s station): %s / %.1fF / %d%% / %.1finHg / %.1finh / %.1fin / %.1fMph(%.0fdeg.) / %.1fMph(%.0fdeg.) " % (
                                self.id, dateutc, tempf, humidity, pressure, rainin, rainday, windgust, windgustdir, windspeed, winddir))
