@@ -1,5 +1,5 @@
 renderer: !template
-    path: path: ../../templates/default/check.txt
+    path: ../../templates/default/check.txt
     mime: text/plain
 
     renderer: !multi
@@ -9,7 +9,7 @@ renderer: !template
                     slice: day
                     format: '%Y-%m-%d'
                     span: 10
-                    storage: !include { path: storage.yaml } 
+                    storage: !service { name: storage }
                     formulas:
                         temp:
                             avg: !avg { index: temp }
