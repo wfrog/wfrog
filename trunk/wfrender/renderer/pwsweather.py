@@ -23,8 +23,6 @@ import time
 import wfcommon.database
 from wfcommon.formula.base import LastFormula
 from wfcommon.formula.base import SumFormula
-from wfcommon.formula.base import AverageFormula
-from wfcommon.formula.wind import PredominantWindFormula
 try:
     import wfrender.datasource.accumulator
 except ImportError, e:
@@ -85,9 +83,9 @@ class PwsWeatherPublisher(object):
                  'hum' : LastFormula('hum'),
                  'pressure' : LastFormula('pressure'),
                  'wind' : LastFormula('wind'),
-                 'wind_deg,wind_dir' : PredominantWindFormula('wind'),
+                 'wind_deg' : LastFormula('wind_dir'),
                  'gust' : LastFormula('wind_gust'),
-                 'gust_deg,gust_dir' : PredominantWindFormula('wind_gust'),
+                 'gust_deg' : LastFormula('wind_gust_dir'),
                  'rain_rate' : LastFormula('rain_rate'),
                  'rain_fall' : SumFormula('rain'), 
                  'utctime' : LastFormula('utctime') } }
@@ -110,47 +108,39 @@ class PwsWeatherPublisher(object):
                     data_month= accu_month.execute()['current']['series']
                     data_year = accu_year.execute()['current']['series']
 
-                    # <float> pressure: in inches of Hg
-                    pressure = HPaToInHg(data['pressure'][0])
-                    # <float> dewpoint: in Fahrenheit
-                    dewpoint = CToF(data['dew_point'][0])
-                    # <float> humidity: between 0.0 and 100.0 inclusive
-                    humidity = data['hum'][0]
-                    # <float> tempf: in Fahrenheit
-                    tempf = CToF(data['temp'][0])
-                    # <float> rainin: inches/hour of rain
-                    rainin = MmToIn(data['rain_rate'][0])
-                    # <float> rainday: total rainfall in day (localtime)
-                    rainday = MmToIn(data['rain_fall'][0])
-                    # <float> rainmonth:  total rainfall for month (localtime)
-                    rainmonth = MmToIn(data_month['rain_fall'][0])
-                    # <float> rainyear:   total rainfall for year (localtime)
-                    rainyear = MmToIn(data_year['rain_fall'][0])
-                    # <string> dateutc: date "YYYY-MM-DD HH:MM:SS" in GMT timezone
-                    dateutc = data['utctime'][0].strftime('%Y-%m-%d %H:%M:%S')
-                    # <float> windgust: in mph
-                    windgust = MpsToMph(data['gust'][0])
-                    # <float> windspeed: in mph
-                    windspeed = MpsToMph(data['wind'][0])
-                    # <float> winddir: in degrees, between 0.0 and 360.0
-                    winddir = data['wind_deg'][0]
+                    params = {
+                        # <float> pressure: in inches of Hg
+                        'pressure' : HPaToInHg(data['pressure'][0]),
+                        # <float> dewpoint: in Fahrenheit
+                        'dewpoint' : CToF(data['dew_point'][0]),
+                        # <float> humidity: between 0.0 and 100.0 inclusive
+                        'humidity' : data['hum'][0],
+                        # <float> tempf: in Fahrenheit
+                        'tempf' : CToF(data['temp'][0]),
+                        # <float> rainin: inches/hour of rain
+                        'rainin' : MmToIn(data['rain_rate'][0]),
+                        # <float> rainday: total rainfall in day (localtime)
+                        'rainday' : MmToIn(data['rain_fall'][0]),
+                        # <float> rainmonth:  total rainfall for month (localtime)
+                        'rainmonth' : MmToIn(data_month['rain_fall'][0]),
+                        # <float> rainyear:   total rainfall for year (localtime)
+                        'rainyear' : MmToIn(data_year['rain_fall'][0]),
+                        # <string> dateutc: date "YYYY-MM-DD HH:MM:SS" in GMT timezone
+                        'dateutc' : data['utctime'][0].strftime('%Y-%m-%d %H:%M:%S'),
+                        # <float> windgust: in mph
+                        'windgust' : MpsToMph(data['gust'][0]),
+                        # <float> windspeed: in mph
+                        'windspeed' : MpsToMph(data['wind'][0]),
+                        # <float> winddir: in degrees, between 0.0 and 360.0
+                        'winddir' : data['wind_deg'][0] }
 
-                    self.publisher.set(pressure = pressure, 
-                                       dewpoint = dewpoint, 
-                                       humidity = humidity,
-                                       tempf = tempf,
-                                       rainin = rainin, 
-                                       rainday = rainday, 
-                                       rainmonth = rainmonth, 
-                                       rainyear = rainyear, 
-                                       dateutc = dateutc, 
-                                       windgust = windgust,
-                                       windspeed = windspeed, 
-                                       winddir = winddir)
-                    self.logger.info("Publishing PWS data (%s station): %s / %.1fF / %d%% / %.1finHg / %.1finh / %.1fin / %.1fin / %.1fin / %.1fMph / %.1fMph(%.0fdeg.) " % (
-                           self.id, dateutc, tempf, humidity, pressure, rainin, rainday, rainmonth, rainyear, windgust, windspeed, winddir))
+                    # Do not send parameters that are null (None).
+                    # from above only dateutc is a mandatory parameter.
+                    params = dict(filter(lambda (p,v): v, [(p,v) for p,v in params.iteritems()]))
+                    self.logger.info("Publishing PWS data: %s " % str(params))
+                    self.publisher.set(**params)
                     response = self.publisher.publish()               
-                    self.logger.info('Result Wunderground publisher: %s' % str(response))
+                    self.logger.info('Result PWS publisher: %s' % str(response))
 
                 except Exception, e:
                     self.logger.exception(e)
