@@ -21,10 +21,13 @@ import threading
 import socket
 import select
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+from SimpleHTTPServer import SimpleHTTPRequestHandler
 import copy
 import urlparse, cgi, Cookie
 import logging
-
+import posixpath
+import urllib
+import os
 
 class HttpRenderer(object):
     """
@@ -53,12 +56,21 @@ class HttpRenderer(object):
 
     cookies [list] (optional):
         List of context sections overridable with a cookie using the -set- uri.
+        
+    static [string] (optional):
+        Activates the serving of static files and specify under which URL path they are served. Disabled by default.
+        
+    docroot [string] (optional):
+        Root directory served when static content is enabled. Defaults to /var/wwww.
+        
     """
 
     renderers = None
     port = 7680
     root = None
     cookies = []
+    static = None
+    docroot = "/var/www"
 
     logger = logging.getLogger("renderer.http")
 
@@ -143,6 +155,24 @@ class HttpRendererHandler(BaseHTTPRequestHandler):
                         if cookie_sections.__contains__(section) and context[section].has_key(key):
                             context[section][key]=cookie[i].value
 
+            if self.path == "/"+_HttpRendererSingleton.static:
+                self.send_response(301);
+                self.send_header("Location", self.path + "/")
+                self.end_headers()
+                return
+
+            if _HttpRendererSingleton.static and self.path.startswith("/"+_HttpRendererSingleton.static+"/"):
+                h = StaticFileRequestHandler()             
+                h.requestline = self.requestline
+                h.request_version = self.request_version
+                h.client_address = self.client_address
+                h.command = self.command
+                h.path = self.path[len(_HttpRendererSingleton.static)+1:]
+                h.wfile = self.wfile
+                h.rfile = self.rfile
+                h.do_GET()
+                return
+
             if name == "":
                 if not root:
                     mime = "text/html"
@@ -224,3 +254,30 @@ class StoppableHTTPServer(HTTPServer):
             except:
                 self.handle_error(request, client_address)
                 self.close_request(request)
+
+class StaticFileRequestHandler(SimpleHTTPRequestHandler):
+
+    def __init__(self):
+        pass
+
+    def translate_path(self, path):
+        """Translate a /-separated PATH to the local filename syntax.
+
+        Components that mean special things to the local file system
+        (e.g. drive or directory names) are ignored.  (XXX They should
+        probably be diagnosed.)
+
+        """
+        print "IN: "+path
+        path = path.split('?',1)[0]
+        path = path.split('#',1)[0]
+        path = posixpath.normpath(urllib.unquote(path))
+        words = path.split('/')
+        words = filter(None, words)
+        path = _HttpRendererSingleton.docroot
+        for word in words:
+            drive, word = os.path.splitdrive(word)
+            head, word = os.path.split(word)
+            if word in (os.curdir, os.pardir): continue
+            path = os.path.join(path, word)
+        return path
