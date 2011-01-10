@@ -115,6 +115,8 @@ renderer: !http
     docroot: /home/user/webcam
 }}}
 
+Will serve the content of `/home/user/webcam` under http://localhost:7680/test.
+
 === Make wfrog be reloaded on configuration change ===
 
 This trick allows for avoiding to restart wfrog manually while editing configuration and templates.
