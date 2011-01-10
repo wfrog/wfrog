@@ -91,7 +91,7 @@ If your station is not listed as capable of auto-detect in SupportedStations, yo
 
 == Configuring the renderer ==
 
-=== Serve static files with HTTP renderer
+=== Serve static files with HTTP renderer ===
 
 To make the HTTP render serve other files (e.g. generataed webcam images), simply add to =wfrender/config/embedded.yaml= (or =wfrender.yaml= if renderer running alone) the =static= property defining the URL path under which you want the files served and the =docroot= property pointing to the filesystem directory. Example:
 
