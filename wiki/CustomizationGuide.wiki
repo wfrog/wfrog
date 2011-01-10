@@ -91,6 +91,30 @@ If your station is not listed as capable of auto-detect in SupportedStations, yo
 
 == Configuring the renderer ==
 
+=== Serve static files with HTTP renderer
+
+To make the HTTP render serve other files (e.g. generataed webcam images), simply add to =wfrender/config/embedded.yaml= (or =wfrender.yaml= if renderer running alone) the =static= property defining the URL path under which you want the files served and the =docroot= property pointing to the filesystem directory. Example:
+
+{{{
+renderer: !http
+    cookies: [ units ]
+    root: !include
+        path: default/24hours.yaml
+    renderers:
+        3hours.html: !include
+            path: default/3hours.yaml
+        24hours.html: !include
+            path: default/24hours.yaml
+        30days.html: !include
+            path: default/30days.yaml
+        365days.html: !include
+            path: default/365days.yaml
+        check: !include
+            path: default/check.yaml
+    static: test
+    docroot: /home/user/webcam
+}}}
+
 === Make wfrog be reloaded on configuration change ===
 
 This trick allows for avoiding to restart wfrog manually while editing configuration and templates.
