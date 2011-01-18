@@ -1,0 +1,31 @@
+=Your Contribution to wfrog=
+
+Besides the valuable activity in the [http://groups.google.com/group/wfrog-users discussion group] and reported [http://code.google.com/p/wfrog/issues/list issues], everyone is welcome to give a hand, even a small contribution.
+
+Write us on the [http://groups.google.com/group/wfrog-users discussion group] and be part of the growing wfrog community.
+
+==Develop==
+
+Developing new drivers, renderers, formulas or any other pluggable part is quite straightforward if you already now some programming language as [http://www.python.org/ Python] is not so difficult to learn and wfrog architecture is very modular. You can quickly write something useful without having to know the whole stuff.
+
+==Customize==
+
+Please share your original custom configuration. The versatile wfrog [http://code.google.com/p/wfrog/wiki/CustomizationGuide configuration system] puts no limits to your imagination.
+
+==Design==
+
+With web knowledge, you can easily improve the [http://code.google.com/p/wfrog/source/browse/trunk/wfrender/templates/default/main.html page template]. Share your artwork.
+
+==Test==
+
+We don't own every type of [http://code.google.com/p/wfrog/wiki/SupportedStations stations], so we really need people testing the stations on their OS and report findings. You can become a mentor for your station model and become an contributor of the project, for example to add specific documentation for a given station model.
+
+==Vote==
+
+Help us to prioritize the [http://code.google.com/p/wfrog/issues/list open issues]. By "starring" [http://www.gstatic.com/codesite/ph/images/star_on.gif] an issue, you notify us that you want it to be solved.
+
+==Translate==
+
+We are planning making wfrog multingual. As soon as this is done, we will appreciate having the texts translated in many languages.
+
+Then, efforts will also be welcome to translate some pages of the wfrog website.
