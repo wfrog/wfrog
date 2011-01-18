@@ -29,3 +29,4 @@ Help us to prioritize the [http://code.google.com/p/wfrog/issues/list open issue
 We plan [http://code.google.com/p/wfrog/issues/detail?id=56 making wfrog multingual]. As soon as this is done, we will appreciate having the texts translated in many languages.
 
 Then, efforts will also be welcome to translate some pages of the wfrog website.
+<p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
