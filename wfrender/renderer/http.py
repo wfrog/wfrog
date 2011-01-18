@@ -155,7 +155,7 @@ class HttpRendererHandler(BaseHTTPRequestHandler):
                         if cookie_sections.__contains__(section) and context[section].has_key(key):
                             context[section][key]=cookie[i].value
 
-            if self.path == "/"+_HttpRendererSingleton.static:
+            if _HttpRendererSingleton.static and self.path == "/"+_HttpRendererSingleton.static:
                 self.send_response(301);
                 self.send_header("Location", self.path + "/")
                 self.end_headers()
