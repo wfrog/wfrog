@@ -20,6 +20,10 @@ With web knowledge, you can easily improve the [http://code.google.com/p/wfrog/s
 
 We don't own every type of [http://code.google.com/p/wfrog/wiki/SupportedStations stations], so we really need people testing the stations on their OS and report findings. You can become a mentor for your station model and become an contributor of the project, for example to add specific documentation for a given station model.
 
+==Document==
+
+You are in a writing mood? Don't hesitate to lay down your words in the wiki pages and share your knowledge on wfrog with others. We can quickly open the write rights to new redactors.
+
 ==Vote==
 
 Help us to prioritize the [http://code.google.com/p/wfrog/issues/list open issues]. By "starring" [http://www.gstatic.com/codesite/ph/images/star_on.gif] an issue, you notify us that you want it to be solved.
