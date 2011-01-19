@@ -21,6 +21,7 @@ RENDERER=wfrog
 RENDERER_ARGS="--renderer -m"
 PIDFILE_RENDERER=/var/run/wfrender.pid
 SCRIPTNAME=/etc/init.d/wfrender
+USER=root
 
 # Exit if the package is not installed
 [ -x "$RENDERER_DIR/$RENDERER" ] || exit 0

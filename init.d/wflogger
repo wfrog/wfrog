@@ -21,6 +21,7 @@ LOGGER=wfrog
 LOGGER_ARGS="--backend -m"
 PIDFILE_LOGGER=/var/run/wflogger.pid
 SCRIPTNAME=/etc/init.d/wflogger
+USER=root
 
 # Exit if the package is not installed
 [ -x "$LOGGER_DIR/$LOGGER" ] || exit 0
