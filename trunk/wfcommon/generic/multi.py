@@ -55,11 +55,15 @@ class MultiElement(wrapper.ElementWrapper):
             self.logger.debug("Calling "+attr+" on child "+name)
 
             if self.parallel:
-                thread = Thread( target = r.__getattribute__(attr).__call__(*args, **keywords) )
+                thread = Thread( target=lambda : r.__getattribute__(attr).__call__(*args, **keywords) )
                 self.threads.append(thread)
                 thread.start()
+                # Necessary in slow machines to prevent a race condition due to the late deferencing 
+                # of r in the previous lambda expression. Should be solved.
+                time.sleep(2) 
             else:
                 result[name] = r.__getattribute__(attr).__call__(*args, **keywords)
+
 
         if self.parallel:
             try:
