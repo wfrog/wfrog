@@ -73,7 +73,7 @@ class MeteoclimaticRenderer(object):
                 self.accuY = AccumulatorDatasource()
                 self.accuY.slice = 'year'
                 self.accuY.span = 1
-                self.accuY.caching = False
+                self.accuY.caching = True
                 self.accuY.storage = self.storage
                 self.accuY.formulas = {'data': {
                      'max_temp' : MaxFormula('temp'),
@@ -90,7 +90,7 @@ class MeteoclimaticRenderer(object):
                 self.accuM.slice = 'month'
                 self.accuM.span = 1
                 self.accuM.storage = self.storage
-                self.accuM.caching = False
+                self.accuM.caching = True
                 self.accuM.formulas = {'data': {
                      'max_temp' : MaxFormula('temp'),
                      'min_temp' : MinFormula('temp'),
@@ -106,7 +106,7 @@ class MeteoclimaticRenderer(object):
                 self.accuD.slice = 'day'
                 self.accuD.span = 1
                 self.accuD.storage = self.storage
-                self.accuD.caching = False
+                self.accuD.caching = True
                 self.accuD.formulas = {
                      'data': {
                          'max_temp' : MaxFormula('temp'),
@@ -161,9 +161,6 @@ class MeteoclimaticRenderer(object):
         return template
 
     def _calculateAggregData(self, time_span, accu):
-        print ""
-        print time_span
-        print "============================================================================="
         data = accu.execute()['data']['series']
         index = len(data['lbl'])-1
         template = "%sHTM=%s*%sLTM=%s*%sHHM=%s*%sLHM=%s*%sHBR=%s*%sLBR=%s*%sGST=%s*%sPCP=%s" % (
