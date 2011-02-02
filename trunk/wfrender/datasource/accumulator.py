@@ -207,7 +207,8 @@ class AccumulatorDatasource(object):
 
         # Fill them with samples
         if last_timestamp:
-            update_from_time = max(last_timestamp, from_time)
+            update_from_time = max(last_timestamp + datetime.timedelta(seconds=1), from_time)
+            # Add 1 sec to last_timestamp so that the same sample is not retrieved twice
         else:
             update_from_time = from_time
         self.logger.debug("Update from %s ", update_from_time)
