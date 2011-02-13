@@ -151,12 +151,12 @@ class MeteoclimaticRenderer(object):
         data = accu.execute()['current']['series']
         index = len(data['lbl'])-1
         template = "UPD=%s*TMP=%s*WND=%s*AZI=%s*BAR=%s*HUM=%s*SUN=" % (
-               data['time'][index].strftime("%d/%m/%Y %H:%M"), 
-               data['temp'][index],  
-               MpsToKmh(data['gust'][index]), 
-               self._nvl(data['wind_deg'][index], 0), 
-               data['pressure'][index], 
-               data['hum'][index] )
+               self._format(data['time'][index].strftime("%d/%m/%Y %H:%M")), 
+               self._format(data['temp'][index]),  
+               self._format(MpsToKmh(data['gust'][index])), 
+               self._format(data['wind_deg'][index]), 
+               self._format(data['pressure'][index]), 
+               self._format(data['hum'][index]) )
         self.logger.debug("Calculating current data (index: %d): %s" % (index, template))
         return template
 
@@ -164,18 +164,18 @@ class MeteoclimaticRenderer(object):
         data = accu.execute()['data']['series']
         index = len(data['lbl'])-1
         template = "%sHTM=%s*%sLTM=%s*%sHHM=%s*%sLHM=%s*%sHBR=%s*%sLBR=%s*%sGST=%s*%sPCP=%s" % (
-               time_span, data['max_temp'][index], 
-               time_span, data['min_temp'][index], 
-               time_span, data['max_hum'][index], 
-               time_span, data['min_hum'][index],
-               time_span, data['max_pressure'][index], 
-               time_span, data['min_pressure'][index], 
-               time_span, MpsToKmh(data['max_gust'][index]), 
-               time_span, data['rain_fall'][index] )
+               time_span, self._format(data['max_temp'][index]), 
+               time_span, self._format(data['min_temp'][index]), 
+               time_span, self._format(data['max_hum'][index]), 
+               time_span, self._format(data['min_hum'][index]),
+               time_span, self._format(data['max_pressure'][index]), 
+               time_span, self._format(data['min_pressure'][index]), 
+               time_span, self._format(MpsToKmh(data['max_gust'][index])), 
+               time_span, self._format(data['rain_fall'][index]) )
         self.logger.debug("Calculating %s data (index: %d): %s" % (time_span, index, template))
         return template
 
-    def _nvl(self, value, default):
+    def _format(self, value, default='-'):
         return value if value != None else default
 
 
