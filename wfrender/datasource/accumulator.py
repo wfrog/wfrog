@@ -268,28 +268,23 @@ class AccumulatorDatasource(object):
         if use_cache:
             self.logger.debug("Last timestamp: %s", self.last_timestamp)
 
-            if self.last_timestamp < to_time - datetime.timedelta(0,self.period) or self.cached_series is None:
-                self.lock.acquire()
+            self.lock.acquire()
+            try:
                 if self.last_timestamp < to_time - datetime.timedelta(0,self.period) or self.cached_series is None:
+                    if self.cached_slices is None: 
+                        self.cached_slices = []
 
-                    try:
-                        if self.cached_slices is None:
-                            self.cached_slices = []
+                    last_timestamp, to_delete = self.update_slices(self.cached_slices, from_time, to_time, context, self.last_timestamp)
 
-                        last_timestamp, to_delete = self.update_slices(self.cached_slices, from_time, to_time, context, self.last_timestamp)
+                    self.cached_slices = self.cached_slices[to_delete:]
+                    self.logger.debug('Deleted %s slices', to_delete)
+                    self.logger.debug("Last timestamp: %s", self.last_timestamp)
 
-                        self.cached_slices = self.cached_slices[to_delete:]
-                        self.logger.debug('Deleted %s slices', to_delete)
-                        self.logger.debug("Last timestamp: %s", self.last_timestamp)
-
-                        self.last_timestamp = last_timestamp
-                    finally:
-                        # Replace the global lock by a per-instance lock
-                        current_lock = self.lock
-                        self.lock = threading.Lock()
-                        current_lock.release()
+                    self.last_timestamp = last_timestamp
 
                     self.cached_series = self.get_series(self.cached_slices)
+            finally:
+                self.lock.release()
 
             return self.cached_series
 

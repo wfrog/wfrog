@@ -48,7 +48,10 @@ class SchedulerRenderer(object):
 
         while self.alive:
             self.logger.debug("Rendering.")
-            self.renderer.render(data=data, context=context)
+            try:
+                self.renderer.render(data=data, context=context)
+            except Exception, e:
+                self.logger.exception(e)
             time.sleep(self.period)
 
     def close(self):
