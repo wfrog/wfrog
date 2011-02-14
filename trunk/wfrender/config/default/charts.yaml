@@ -36,6 +36,12 @@ renderer: !multi
                 rain.fall: {}
             labels: rain.lbl
             ymargin: [ 0, 10 ]
+        rain_rate: !chart
+            interpolate: $interpolate
+            series:
+                rain.rate: {}
+            labels: rain.lbl
+            ymargin: [ 0, 10 ]
         uv: !chart
             interpolate: $interpolate
             series:

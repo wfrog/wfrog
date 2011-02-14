@@ -268,7 +268,7 @@ class GoogleChartRenderer(object):
             serie_config = ChartConfig()
             serie_config.__dict__.update(config.__dict__)
             serie_config.__dict__.update(serie)
-            serie_data = data[key.split('.')[0]]['series'][key.split('.')[1]]
+            serie_data = copy.copy(data[key.split('.')[0]]['series'][key.split('.')[1]])
             measure = key.split('.')[0]
 
             if flat(serie_data):  # Series with all data = None
@@ -402,7 +402,7 @@ class GoogleChartRenderer(object):
             chart.set_legend_position(config.legend_pos)
 
         if self.labels:
-            labels_data = data[self.labels.split('.')[0]]['series'][self.labels.split('.')[1]]
+            labels_data = copy.copy(data[self.labels.split('.')[0]]['series'][self.labels.split('.')[1]])
             labels_data = compress_to(labels_data, config.nval, None, None)[0]
             if config.axes:
                 density = 1.0 * len("".join(labels_data))*config.size  / config.width
