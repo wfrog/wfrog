@@ -55,9 +55,10 @@ class AccumulatorDatasource(object):
         Number of seconds between two refreshes of the calculated data.
         DEfaults to 120.
 
-    format [string] (optional):
-        Date/time format string for labels.
-        See Python strftime function.
+    format [string or list of strings] (optional):
+        Date/time format string for labels. See Python strftime function.
+        It can be a single string (only 1 label) or a list of formats. 
+        First label is 'lbl' and the rest are 'lbl2', lbl3', etc.
 
     formulas [dict] (optional):
         Specify what and how to calculate. Defines the structure of the
@@ -76,12 +77,12 @@ class AccumulatorDatasource(object):
 
     format = None
 
-    formats = { 'year': '%y',
-                'month': '%m',
-                'week': '%d/%m', 
-                'day': '%d/%m',
-                'hour': '%H',
-                'minute': '%H:%M' }
+    formats = { 'year': ['%y', '%Y'],
+                'month': ['%m', '%Y/%m'],
+                'week': ['%d/%m', '%Y/%m/%d'], 
+                'day': ['%d/%m', '%Y/%m/%d'],
+                'hour': ['%H', '%Y/%m/%d %H'],
+                'minute': ['%H:%M', '%Y/%m/%d %H:%M'] }
 
     period = 120
 
@@ -89,16 +90,20 @@ class AccumulatorDatasource(object):
         'temp': { 'avg' : AverageFormula('temp'),
                    'min' : MinFormula('temp'),
                    'max' : MaxFormula('temp') },
-        'dew' : { 'avg': AverageFormula('dew_point')},
-        'hum' : { 'avg' : AverageFormula('hum') },
-        'press' : { 'avg' : AverageFormula('pressure') },
+        'dew' : { 'avg': AverageFormula('dew_point') },
+        'hum' : { 'avg' : AverageFormula('hum'),
+                   'min' : MinFormula('hum'),
+                   'max' : MaxFormula('hum') },
+        'press' : { 'avg' : AverageFormula('pressure'),
+                   'min' : MinFormula('pressure'),
+                   'max' : MaxFormula('pressure') },
         'wind' : { 'avg' : AverageFormula('wind'),
                    'max' : MaxFormula('wind_gust'),
                    'deg,dir' : PredominantWindFormula('wind')  },
         'sectors' : { 'avg' : WindSectorAverageFormula('wind'),
                       'max' : WindSectorMaxFormula('wind_gust'),
                       'freq' : WindSectorFrequencyFormula('wind') },
-        'rain' : { 'rate' : AverageFormula('rain_rate'),
+        'rain' : { 'rate' : MaxFormula('rain_rate'),
                    'fall' : SumFormula('rain') },
         'uv' : { 'index' : MaxFormula('uv_index') }
     }
@@ -184,10 +189,13 @@ class AccumulatorDatasource(object):
 
     def get_labels(self, slices):
         if self.format is not None:
-            format = self.format
+            if self.format == str:
+                format_list = [self.format]
+            else:
+                format_list = self.format
         else:
-            format = self.formats[self.slice]
-        return list(slice.from_time.strftime(format) for slice in slices)
+            format_list = self.formats[self.slice]
+        return [[slice.from_time.strftime(format) for slice in slices] for format in format_list]
 
     def update_slices(self, slices, from_time, to_time, context, last_timestamp=None):
         if len(slices) > 0:
@@ -238,7 +246,11 @@ class AccumulatorDatasource(object):
                 subkeys = key.split(',')
                 for subkey in subkeys:
                     result[k]['series'][subkey]=[]
-                result[k]['series']['lbl']=self.get_labels(slices)
+                i = 1
+                for labels in self.get_labels(slices):
+                    literal = 'lbl%d' % i if i > 1 else 'lbl'
+                    i += 1
+                    result[k]['series'][literal]=labels
 
         for slice in slices:
             for k,v in slice.formulas.iteritems():
