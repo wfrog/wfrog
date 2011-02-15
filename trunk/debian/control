@@ -8,9 +8,23 @@ Homepage: htp://www.wfrog.org
 
 Package: wfrog
 Architecture: all
-Depends: python (>=2.5), python-yaml (>=3.0), python-cheetah (>=2.0), python-pygooglechart (>=0.2.1), python-lxml (>=1.1.1), python-usb (>=0.4), python-serial (>=2.3)
+Depends: python (>=2.5), python-yaml (>=3.0), python-cheetah (>=2.0), python-pygooglechart (>=0.2.0), python-lxml (>=1.1.1), python-usb (>=0.4), python-serial (>=2.3)
 Description: Web-based customizable weather station software
- wfrog is a python software for logging weather station data and statistics,
+ wfrog is a software for logging weather station data and statistics,
  viewing them graphically on the web and sending them to a remote FTP site.
  The layout and behaviour is fully customizable through an advanced configuration system.
- Currently supports Oregon Scientific WMR200, WMRS200 and WMR928NX stations and is compliant with the WESTEP protocol.
+ It is written in python with an extensible architecture allowing new station drivers to be
+ written very easily.
+ wfrog supports many weather stations and is compliant with the WESTEP protocol.
+ Supported stations:
+  * Ambient Weather WS1080
+  * Davis VantagePro, VantagePro2
+  * Elecsa AstroTouch 6975
+  * Fine Offset Electronics WH1080, WH1081, WH1090, WH1091, WH2080, WH2081
+  * Freetec PX1117
+  * LaCrosse 2300 series
+  * Oregon Scientific WMR100N, WMR200, WMRS200, WMR928X
+  * PCE FWS20
+  * Scientific Sales Pro Touch Screen Weather Station
+  * Topcom National Geographic 265NE
+  * Watson W8681 
