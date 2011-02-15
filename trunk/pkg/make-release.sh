@@ -61,7 +61,7 @@ debarchive=${app}_${debversion}_all.deb
 echo
 echo 'Version is' $version
 echo 
-echo Press enter to proceed with package subversion tag or Ctrl-C to abort.
+echo Press enter to proceed with subversion tag or Ctrl-C to abort.
 read key
 
 svn ci $checkout/debian/changelog -m"[make-release] Release $app $version"
