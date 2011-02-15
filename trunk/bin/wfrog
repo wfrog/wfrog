@@ -24,7 +24,7 @@
 import sys, os, string, os.path
 WFROG_HOME='.'
 this_script=os.path.abspath(os.path.realpath(sys.argv[0]))
-if string.find(this_script, os.sep+'wfrog') != -1:
+if sys.platform != 'win32' and string.find(this_script, os.sep+'wfrog') != -1:
     WFROG_HOME=os.path.normpath(os.path.join(this_script, os.pardir, os.pardir))
     sys.path.insert(0, WFROG_HOME)
 if hasattr(os, "getuid") and os.getuid() != 0:
