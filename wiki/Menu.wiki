@@ -15,7 +15,7 @@
 
 *Community*<br>
   [SeeItInAction Online Stations]<br>
-  [http://groups.google.com/group/wfrog-users Discussion Group]
+  [http://groups.google.com/group/wfrog-users Discussion Group]<br>
   [Contribute Contribute]
 
 *Design Discussions*<br>
