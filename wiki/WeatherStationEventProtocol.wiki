@@ -115,7 +115,7 @@ With this transport, the event producer process performs a HTTP POST request on 
 
 = Compliance =
 
-Any product vendor or software provider wanting to use the WESTEP name to show their compliance to the protocol must request authorization to the email address "compliance AT westep DOT org". 
+Any product vendor or software provider wanting to use the WESTEP name to show their compliance to the protocol must announce it to the email address "compliance AT westep DOT org". 
 
 The compliance is then shown by specifying the supported protocol versions and transports. E.g. *WESTEP 1.0, 1.1 STDIO, HTTP* 
 
