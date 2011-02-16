@@ -1,3 +1,15 @@
+*wfrog 0.8 - _Coming up soon_*
+  * [http://code.google.com/p/wfrog/issues/list?can=1&q=label%3ARelease0.8 Fixed Issues]
+  * Many small bugs fixed.
+  * Added upload to Wunderground
+  * Added VantagePro support via PyWeather.
+  * Added numerical data summary to generated pages.
+  * Added support to decode historic data from station memory of WMR200.
+  * Station driver for Fine Offset WH1080, WH1081, WH1090, WH1091, WH2080, WH2081. This also covers all the re-branded weather stations working with EasyWeather.
+  * Windows build.
+  * Make table name configurable in database storages.
+  * Fixed logo lost on the right of large screens
+  * Fixed pygooglechart dependency version too recent for debian lenny.
 *wfrog 0.7 - 25.08.2010*
   WMR200 driver, .deb packaging, better configurability. *Caution*: The configuration structure has changed since version 0.6. You will have to re-adapt your configuration using wfrog --customize.
   * [http://code.google.com/p/wfrog/issues/list?can=1&q=label%3ARelease0.7 Fixed Issues]
