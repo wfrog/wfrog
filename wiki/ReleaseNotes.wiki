@@ -1,4 +1,7 @@
 *wfrog 0.8 - _Coming up soon_*
+
+Many fixes and improvements, added upload to wunderground, numerical data summary and improved support of WH1081 and VantagePro stations.
+
   * [http://code.google.com/p/wfrog/issues/list?can=1&q=label%3ARelease0.8 Fixed Issues]
   * Many small bugs fixed.
   * Added upload to Wunderground
