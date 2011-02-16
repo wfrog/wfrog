@@ -1,6 +1,6 @@
 *wfrog 0.8 - _Coming up soon_*
 
-Many fixes and improvements, added upload to wunderground, numerical data summary and improved support of WH1081 and VantagePro stations.
+Many fixes and improvements, added upload to wunderground, numerical data summary and improved support of WH1081-like and VantagePro stations.
 
   * [http://code.google.com/p/wfrog/issues/list?can=1&q=label%3ARelease0.8 Fixed Issues]
   * Many small bugs fixed.
@@ -14,6 +14,7 @@ Many fixes and improvements, added upload to wunderground, numerical data summar
   * Make table name configurable in database storages.
   * Fixed logo lost on the right of large screens
   * Fixed pygooglechart dependency version too recent for debian lenny.
+
 *wfrog 0.7 - 25.08.2010*
   WMR200 driver, .deb packaging, better configurability. *Caution*: The configuration structure has changed since version 0.6. You will have to re-adapt your configuration using wfrog --customize.
   * [http://code.google.com/p/wfrog/issues/list?can=1&q=label%3ARelease0.7 Fixed Issues]
