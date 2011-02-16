@@ -5,8 +5,9 @@
   * Added VantagePro support via PyWeather.
   * Added numerical data summary to generated pages.
   * Added support to decode historic data from station memory of WMR200.
-  * Station driver for Fine Offset WH1080, WH1081, WH1090, WH1091, WH2080, WH2081. This also covers all the re-branded weather stations working with EasyWeather.
-  * Windows build.
+  * Consolidated station driver for Fine Offset WH1080, WH1081, WH1090, WH1091, WH2080, WH2081. This also covers all the re-branded weather stations working with EasyWeather.
+  * Windows build consolidated.
+  * Under Windows, new wfrog data location is now %APPDATA%\Wfrog, _please move former %HOMEDIR%\.wfrog to this location._
   * Make table name configurable in database storages.
   * Fixed logo lost on the right of large screens
   * Fixed pygooglechart dependency version too recent for debian lenny.
