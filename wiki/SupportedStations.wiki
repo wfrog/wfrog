@@ -2,34 +2,34 @@
 
 Maturity level:
   * High: Users are actively using it.
-  * Medium: Support is available in the packaged distribution.
-  * Low: Support has been recently implemented and is available only in the subversion trunk.
+  * Medium: Reported to be working.
+  * Low: Support has been recently implemented.
 
 Auto-Detect:
   * If yes, wfrog will work out-of-the-box without configuration change.
   * If no, you will need to [http://code.google.com/p/wfrog/wiki/CustomizationGuide?ts=1283113562&updated=CustomizationGuide#Specifying_your_station_model configure the appropriate driver], listed in the Driver column.
 
 || *Vendor*|| *Model* || *Link* || *Maturity* || *Auto-Detect* || *Driver* || *Notes* || *Linux* || *Windows* ||
-|| *Ambient Weather* || WS1080 || USB || Low || No || !wh1080 || See Fine Offset Electronics WH1080 || Yes || ? ||
-|| *Davis* || !VantagePro || Serial || Low || No || !vantagepro || Needs third party !PyWeather library.<br> Install it with `sudo easy_install weather`. || Yes || ? ||
-||       || !VantagePro2 || Serial || Low || No || !vantagepro || See !VantagePro || Yes || ? ||
-|| *Elecsa*                  || !AstroTouch 6975 || USB || Low || No || !wh1080 || See Fine Offset Electronics WH1080 || Yes || ? ||
-|| *Fine Offset Electronics* || WH1080, WH1080PC || USB || Low || No || !ws1080 || Needs third party pywws library (http://code.google.com/p/pywws/downloads/list).<br>Uncompress it and add the uncompressed directory to the `PYTHONPATH` environment variable || Yes || ? ||
-||                         || WH1081 || USB || Low || No || !wh1080 || See WH1080 || Yes || ? ||
-||                         || WH1090 || USB || Low || No || !wh1080 || See WH1080 || Yes || ? ||
-||                         || WH1091 || USB || Low || No || !wh1080 || See WH1080 || Yes || ? ||
-||                         || WH2080 || USB || Low || No || !wh1080 || See WH1080 || Yes || ? ||
-||                         || WH2081 || USB || Low || No || !wh1080 || See WH1080 || Yes || ? ||
-|| *Freetec*                 || PX1117 || USB || Low || No || !wh1080 || See WH1080 || Yes || ? ||
+|| *Ambient Weather* || WS1080 || USB || Medium || No || !wh1080 || See Fine Offset Electronics WH1080 || Yes || ? ||
+|| *Davis* || !VantagePro || Serial || Medium || No || !vantagepro || Needs third party !PyWeather library.<br> Install it with `sudo easy_install weather`. || Yes || ? ||
+||       || !VantagePro2 || Serial || Medium || No || !vantagepro || See !VantagePro || Yes || ? ||
+|| *Elecsa*                  || !AstroTouch 6975 || USB || Medium || No || !wh1080 || See Fine Offset Electronics WH1080 || Yes || ? ||
+|| *Fine Offset Electronics* || WH1080, WH1080PC || USB || Medium || No || !ws1080 || Needs third party pywws library (http://code.google.com/p/pywws/downloads/list).<br>Uncompress it and add the uncompressed directory to the `PYTHONPATH` environment variable || Yes || ? ||
+||                         || WH1081 || USB || Medium || No || !wh1080 || See WH1080 || Yes || ? ||
+||                         || WH1090 || USB || Medium || No || !wh1080 || See WH1080 || Yes || ? ||
+||                         || WH1091 || USB || Medium || No || !wh1080 || See WH1080 || Yes || ? ||
+||                         || WH2080 || USB || Medium || No || !wh1080 || See WH1080 || Yes || ? ||
+||                         || WH2081 || USB || Medium || No || !wh1080 || See WH1080 || Yes || ? ||
+|| *Freetec*                 || PX1117 || USB || Medium || No || !wh1080 || See WH1080 || Yes || ? ||
 || *!LaCrosse*                 || WS2300 || Serial || Low || No || !ws2300 || Needs third party ws2300 library (http://ace-host.stuart.id.au/russell/files/ws2300/).<br/>Run `sudo ./setup.py install` to make it visible to wfrog. || Yes || ? ||
-|| *Oregon Scientific* || WMR100N || USB || Medium || No || !wmrs200 ||  || Yes || ? ||
+|| *Oregon Scientific* || WMR100N || USB || High || No || !wmrs200 ||  || Yes || ? ||
 ||                   || WMR200  || USB || High || Yes || !wmr200 ||  || Yes || ? ||
 ||                   || WMRS200 || USB || High || Yes || !wmrs200 ||  || Yes || ? ||
 ||                   || WMR928NX || Serial || High || No || !wmr928x||   || Yes || ? ||
-|| *PCE*                  || FWS20 || USB || Low || No || !wh1080 || See Fine Offset Electronics WH1080 || Yes || ? ||
-|| *Scientific Sales*                  || Pro Touch Screen Weather Station || USB || Low || No || !wh1080 || See Fine Offset Electronics WH1080 || Yes || ? ||
-|| *Topcom National Geographic*        || 265NE || USB || Low || No || !wh1080 || See Fine Offset Electronics WH1080 || Yes || ? ||
-|| *Watson*                  || W8681 || USB || Low || No || !wh1080 || See Fine Offset Electronics WH1080 || Yes || ? ||
+|| *PCE*                  || FWS20 || USB || Medium || No || !wh1080 || See Fine Offset Electronics WH1080 || Yes || ? ||
+|| *Scientific Sales*                  || Pro Touch Screen Weather Station || USB || Medium || No || !wh1080 || See Fine Offset Electronics WH1080 || Yes || ? ||
+|| *Topcom National Geographic*        || 265NE || USB || Medium || No || !wh1080 || See Fine Offset Electronics WH1080 || Yes || ? ||
+|| *Watson*                  || W8681 || USB || Medium || No || !wh1080 || See Fine Offset Electronics WH1080 || Yes || ? ||
 
 <p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
 
