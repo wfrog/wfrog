@@ -189,7 +189,7 @@ class AccumulatorDatasource(object):
 
     def get_labels(self, slices):
         if self.format is not None:
-            if self.format == str:
+            if type(self.format) == str:
                 format_list = [self.format]
             else:
                 format_list = self.format
