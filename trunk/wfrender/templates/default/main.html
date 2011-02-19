@@ -210,37 +210,37 @@ $u
     </div>
     <div class="bordered cell graph" style="clear: both">
        <div style="clear: both"><pre style="font-size:94%">
-    #set $indexes = $summary.keys()
-    #silent $indexes.sort()
-    #silent $indexes.reverse()
-    ${"%s      Temp. %s         Humidity %%     Pressure %s       Rain %s        Wind %s       UV     " % (
-      " " * len($indexes[0]),
-      $unitstr('temp',$units.temp).rstrip(), 
-      $unitstr('press',$units.press).rstrip(), 
-      $unitstr('rain',$units.rain).rstrip(),  
-      $unitstr('wind',$units.wind).rstrip() ) }
-    ${"%s   max   min   avg  max  min  avg   max   min   avg   fall   rate    avg    max  dir" % (" " * len($indexes[0]))}
-    #for $index in $indexes
-    #set $value = $summary[$index]
-    #if $value.temp_max != None or $value.hum_max != None or $value.press_max != None or $value.rain_fall != None or $value.wind_avg != None
-    ${"%s" % $index}#slurp
-    ${"%6.1f" % $value.temp_max if $value.temp_max != None else "     -"}#slurp
-    ${"%6.1f" % $value.temp_min if $value.temp_min != None else "     -"}#slurp
-    ${"%6.1f" % $value.temp_avg if $value.temp_avg != None else "     -"}#slurp
-    ${"%4.0f%%" % $value.hum_max if $value.hum_max != None else "   - "}#slurp
-    ${"%4.0f%%" % $value.hum_min if $value.hum_min != None else "   - "}#slurp
-    ${"%4.0f%%" % $value.hum_avg if $value.hum_avg != None else "   - "}#slurp
-    ${"%6.0f" % $value.press_max if $value.press_max != None else "     -"}#slurp
-    ${"%6.0f" % $value.press_min if $value.press_min != None else "     -"}#slurp 
-    ${"%6.0f" % $value.press_avg if $value.press_avg != None else "     -"}#slurp 
-    ${"%7.1f" % $value.rain_fall if $value.rain_fall != None else "      -"}#slurp
-    ${"%7.1f" % $value.rain_rate if $value.rain_rate != None else "      -"}#slurp
-    ${"%7.1f" % $value.wind_avg if $value.wind_avg != None else "      -"}#slurp
-    ${"%7.1f" % $value.wind_max if $value.wind_max != None else "      -"}#slurp
-    ${"%5s" % $value.wind_dir  if $value.wind_dir != None else "      -"}#slurp
-    ${"%5d" % $value.uv_index  if $value.uv_index != None else "    -"}
-    #end if
-    #end for
+#set $indexes = $summary.keys()
+#silent $indexes.sort()
+#silent $indexes.reverse()
+${"%s      Temp. %s         Humidity %%     Pressure %s       Rain %s        Wind %s       UV     " % (
+  " " * len($indexes[0]),
+  $unitstr('temp',$units.temp).rstrip(), 
+  $unitstr('press',$units.press).rstrip(), 
+  $unitstr('rain',$units.rain).rstrip(),  
+  $unitstr('wind',$units.wind).rstrip() ) }
+${"%s   max   min   avg  max  min  avg   max   min   avg   fall   rate    avg    max  dir" % (" " * len($indexes[0]))}
+#for $index in $indexes
+#set $value = $summary[$index]
+#if $value.temp_max != None or $value.hum_max != None or $value.press_max != None or $value.rain_fall != None or $value.wind_avg != None
+${"%s" % $index}#slurp
+${"%6.1f" % $value.temp_max if $value.temp_max != None else "     -"}#slurp
+${"%6.1f" % $value.temp_min if $value.temp_min != None else "     -"}#slurp
+${"%6.1f" % $value.temp_avg if $value.temp_avg != None else "     -"}#slurp
+${"%4.0f%%" % $value.hum_max if $value.hum_max != None else "   - "}#slurp
+${"%4.0f%%" % $value.hum_min if $value.hum_min != None else "   - "}#slurp
+${"%4.0f%%" % $value.hum_avg if $value.hum_avg != None else "   - "}#slurp
+${"%6.0f" % $value.press_max if $value.press_max != None else "     -"}#slurp
+${"%6.0f" % $value.press_min if $value.press_min != None else "     -"}#slurp 
+${"%6.0f" % $value.press_avg if $value.press_avg != None else "     -"}#slurp 
+${"%7.1f" % $value.rain_fall if $value.rain_fall != None else "      -"}#slurp
+${"%7.1f" % $value.rain_rate if $value.rain_rate != None else "      -"}#slurp
+${"%7.1f" % $value.wind_avg if $value.wind_avg != None else "      -"}#slurp
+${"%7.1f" % $value.wind_max if $value.wind_max != None else "      -"}#slurp
+${"%5s" % $value.wind_dir  if $value.wind_dir != None else "      -"}#slurp
+${"%5d" % $value.uv_index  if $value.uv_index != None else "    -"}
+#end if
+#end for
     </pre></div>
     </div>
 </div>
