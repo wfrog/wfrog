@@ -19,6 +19,9 @@
 import ftplib
 import logging
 import time
+import socket
+# Set up socket timeout to prevent hangs when ftp sites fail
+socket.setdefaulttimeout(30)  # 30 seconds 
 
 class FtpRenderer(object):
     """
