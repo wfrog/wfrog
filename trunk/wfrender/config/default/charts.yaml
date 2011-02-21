@@ -33,7 +33,8 @@ renderer: !multi
             interpolate: $interpolate
             accumulate: true
             series:
-                rain.fall: {}
+                rain.fall:
+                    last: { color: darkred, text: darkred, thickness: 0.5 }
             labels: rain.lbl
             ymargin: [ 0, 10 ]
         rain_rate: !chart
