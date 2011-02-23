@@ -21,6 +21,7 @@ import yaml
 import function
 import stdio
 import http
+import atom
 
 # YAML mappings
 
@@ -32,3 +33,6 @@ class YamlStdioInput(stdio.StdioInput, yaml.YAMLObject):
 
 class YamlHttpInput(http.HttpInput, yaml.YAMLObject):
     yaml_tag = u'!http-in'
+
+class YamlAtomInput(atom.AtomInput, yaml.YAMLObject):
+    yaml_tag = u'!atom-in'

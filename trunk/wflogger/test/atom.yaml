@@ -1,0 +1,9 @@
+
+input: !atom-in
+    url: test/feed.xml
+    period: 10
+
+collector: !flush
+            period: 0
+            collector: !xmlfile
+                path: test/wfrog-current.xml
