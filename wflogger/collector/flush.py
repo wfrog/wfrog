@@ -61,7 +61,7 @@ class FlushCollector(object):
         else:
             timestamp = now
 
-        if timestamp > self.max_event_time and timestamp >= now - datetime.timedelta(0, self.period):
+        if timestamp >= self.max_event_time and timestamp >= now - datetime.timedelta(0, self.period):
             self.max_event_time = timestamp
         else:
             self.logger.debug("Discarded old event")
