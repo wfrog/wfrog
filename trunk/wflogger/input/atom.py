@@ -19,6 +19,7 @@
 import logging
 import base
 import time
+import datetime
 
 class AtomInput(base.XmlInput):
     """
@@ -63,22 +64,24 @@ class AtomInput(base.XmlInput):
             
             new_events=0
             old_events=0
+            off = datetime.datetime.now() - datetime.datetime.utcnow()
 
             for entry in feed.entries:
                 if entry.updated_parsed > self.last_event:
                     new_events = new_events + 1
                     event = entry.content[0]['value']
-                    self.process_message(event)                    
+                    timestamp = (datetime.datetime(*(entry.updated_parsed[0:6]))+off).replace(microsecond=0)
+                    self.process_message(event, timestamp)                    
                 else:
                     old_events = old_events + 1
                 if entry.updated_parsed > last_update:
                     last_update = entry.updated_parsed
 
             if new_events:
-                self.logger.info("Got %s new events dated %s", new_events, time.asctime(last_update))
+                self.logger.info("Got %s new events dated %s UTC", new_events, time.asctime(last_update))
             
             if old_events:
-                self.logger.debug("Skipped %s old events dated %s", old_events, time.asctime(last_update))
+                self.logger.debug("Skipped %s old events dated before %s UTC", old_events, time.asctime(self.last_event))
             
             if last_update > self.last_event:
                 self.last_event = last_update
