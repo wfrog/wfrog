@@ -19,9 +19,6 @@
 import logging
 import base
 import time
-import feedparser
-
-#feedparser._debug = True
 
 class AtomInput(base.XmlInput):
     """
@@ -43,6 +40,13 @@ class AtomInput(base.XmlInput):
     logger = logging.getLogger('input.atom')
 
     def do_run(self):
+        import feedparser
+    
+        # Tweek feedparser to accept XML as content
+        feedparser._FeedParserMixin.unknown_starttag = feedparser_unknown_starttag
+        feedparser._FeedParserMixin.unknown_endtag = feedparser_unknown_endtag
+        feedparser._sanitizeHTML = lambda source, encoding:  source
+    
         self.logger.debug('Starting')
         
         # Does not accept events pre-dating the startup
@@ -85,9 +89,8 @@ class AtomInput(base.XmlInput):
             
             time.sleep(self.period)
 
-# Tweek feedparser to accept XML as content
 
-def unknown_starttag(self, tag, attrs):
+def feedparser_unknown_starttag(self, tag, attrs):
     attrs = [(k.lower(), v) for k, v in attrs]
     attrs = [(k, k in ('rel', 'type') and v.lower() or v) for k, v in attrs]
     attrsD = dict(attrs)       
@@ -117,7 +120,7 @@ def unknown_starttag(self, tag, attrs):
     except AttributeError:
         return self.push(prefix + suffix, 1)
 
-def unknown_endtag(self, tag):
+def feedparser_unknown_endtag(self, tag):
     if tag.find(':') <> -1:
         prefix, suffix = tag.split(':', 1)
     else:
@@ -143,6 +146,3 @@ def unknown_endtag(self, tag):
         if self.langstack:
             self.lang = self.langstack[-1]
 
-feedparser._FeedParserMixin.unknown_starttag = unknown_starttag
-feedparser._FeedParserMixin.unknown_endtag = unknown_endtag
-feedparser._sanitizeHTML = lambda source, encoding:  source
