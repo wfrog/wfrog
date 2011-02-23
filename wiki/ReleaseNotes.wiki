@@ -15,6 +15,7 @@ Many fixes and improvements, added upload to wunderground, numerical data summar
   * Fixed logo lost on the right of large screens
   * Fixed pygooglechart dependency version too recent for debian lenny.
   * Added configurable delay to the scheduler (by default 60 secs).
+  * Added WESTEP input reading station events from Atom feeds (to support custom web-based stations).
 
 *wfrog 0.7 - 25.08.2010*
   WMR200 driver, .deb packaging, better configurability. *Caution*: The configuration structure has changed since version 0.6. You will have to re-adapt your configuration using wfrog --customize.
