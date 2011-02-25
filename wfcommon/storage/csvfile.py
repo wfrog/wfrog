@@ -81,8 +81,7 @@ class CsvStorage(object):
                 'rain',
                 'rain_rate',
                 'pressure',
-                'uv_index',
-                'utctime']
+                'uv_index']
 
     def samples(self, from_time=datetime.fromtimestamp(0), to_time=datetime.now(), context={}):
         if not os.path.exists(self.path):
@@ -92,13 +91,9 @@ class CsvStorage(object):
         file = self._position_cursor(from_timestamp)
         to_timestamp = time.mktime(to_time.timetuple())
         reader = csv.reader(file)
-        counter=0
+
         try:
             for line in reader:
-                counter=counter+1
-                if len(line) == 0 or line[0].strip() == '':
-                    self.logger.warn('Encountered empty line after '+str(counter)+' lines')
-                    continue
                 ts = int(line[0])
                 if ts < from_timestamp:
                     continue
@@ -113,9 +108,6 @@ class CsvStorage(object):
                         sample[i] = float(sample[i])
                     else:
                         sample[i] = None
-
-                sample.append(datetime.utcfromtimestamp(ts))
-
                 yield sample
         finally:
             file.close()

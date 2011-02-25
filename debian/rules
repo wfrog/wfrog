@@ -24,11 +24,8 @@ install: build
 	# Install wfrog executables and default config
 	mkdir -p $(CURDIR)/debian/wfrog/usr/lib/wfrog
 	mkdir -p $(CURDIR)/debian/wfrog/usr/bin
-	mkdir -p $(CURDIR)/debian/wfrog/etc/init.d
 	cp -r bin/ wfcommon/ wfdriver/ wflogger/ wfrender/ init.d/ $(CURDIR)/debian/wfrog/usr/lib/wfrog
 	ln -s /usr/lib/wfrog/bin/wfrog $(CURDIR)/debian/wfrog/usr/bin/wfrog
-	ln -s /usr/lib/wfrog/init.d/wflogger $(CURDIR)/debian/wfrog/etc/init.d/wflogger
-	ln -s /usr/lib/wfrog/init.d/wfrender $(CURDIR)/debian/wfrog/etc/init.d/wfrender
 
 	# Prepare data directory
 	mkdir -p $(CURDIR)/debian/wfrog/var/lib/wfrog

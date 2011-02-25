@@ -55,10 +55,9 @@ class AccumulatorDatasource(object):
         Number of seconds between two refreshes of the calculated data.
         DEfaults to 120.
 
-    format [string or list of strings] (optional):
-        Date/time format string for labels. See Python strftime function.
-        It can be a single string (only 1 label) or a list of formats. 
-        First label is 'lbl' and the rest are 'lbl2', lbl3', etc.
+    format [string] (optional):
+        Date/time format string for labels.
+        See Python strftime function.
 
     formulas [dict] (optional):
         Specify what and how to calculate. Defines the structure of the
@@ -77,12 +76,12 @@ class AccumulatorDatasource(object):
 
     format = None
 
-    formats = { 'year': ['%y', '%Y'],
-                'month': ['%m', '%Y/%m'],
-                'week': ['%d/%m', '%Y/%m/%d'], 
-                'day': ['%d/%m', '%Y/%m/%d'],
-                'hour': ['%H', '%Y/%m/%d %H'],
-                'minute': ['%H:%M', '%Y/%m/%d %H:%M'] }
+    formats = { 'year': '%y',
+                'month': '%m',
+                'week': '%d/%m', 
+                'day': '%d/%m',
+                'hour': '%H',
+                'minute': '%H:%M' }
 
     period = 120
 
@@ -90,20 +89,16 @@ class AccumulatorDatasource(object):
         'temp': { 'avg' : AverageFormula('temp'),
                    'min' : MinFormula('temp'),
                    'max' : MaxFormula('temp') },
-        'dew' : { 'avg': AverageFormula('dew_point') },
-        'hum' : { 'avg' : AverageFormula('hum'),
-                   'min' : MinFormula('hum'),
-                   'max' : MaxFormula('hum') },
-        'press' : { 'avg' : AverageFormula('pressure'),
-                   'min' : MinFormula('pressure'),
-                   'max' : MaxFormula('pressure') },
+        'dew' : { 'avg': AverageFormula('dew_point')},
+        'hum' : { 'avg' : AverageFormula('hum') },
+        'press' : { 'avg' : AverageFormula('pressure') },
         'wind' : { 'avg' : AverageFormula('wind'),
                    'max' : MaxFormula('wind_gust'),
                    'deg,dir' : PredominantWindFormula('wind')  },
         'sectors' : { 'avg' : WindSectorAverageFormula('wind'),
                       'max' : WindSectorMaxFormula('wind_gust'),
                       'freq' : WindSectorFrequencyFormula('wind') },
-        'rain' : { 'rate' : MaxFormula('rain_rate'),
+        'rain' : { 'rate' : AverageFormula('rain_rate'),
                    'fall' : SumFormula('rain') },
         'uv' : { 'index' : MaxFormula('uv_index') }
     }
@@ -189,13 +184,10 @@ class AccumulatorDatasource(object):
 
     def get_labels(self, slices):
         if self.format is not None:
-            if type(self.format) == str:
-                format_list = [self.format]
-            else:
-                format_list = self.format
+            format = self.format
         else:
-            format_list = self.formats[self.slice]
-        return [[slice.from_time.strftime(format) for slice in slices] for format in format_list]
+            format = self.formats[self.slice]
+        return list(slice.from_time.strftime(format) for slice in slices)
 
     def update_slices(self, slices, from_time, to_time, context, last_timestamp=None):
         if len(slices) > 0:
@@ -215,8 +207,7 @@ class AccumulatorDatasource(object):
 
         # Fill them with samples
         if last_timestamp:
-            update_from_time = max(last_timestamp + datetime.timedelta(seconds=1), from_time)
-            # Add 1 sec to last_timestamp so that the same sample is not retrieved twice
+            update_from_time = max(last_timestamp, from_time)
         else:
             update_from_time = from_time
         self.logger.debug("Update from %s ", update_from_time)
@@ -246,11 +237,7 @@ class AccumulatorDatasource(object):
                 subkeys = key.split(',')
                 for subkey in subkeys:
                     result[k]['series'][subkey]=[]
-                i = 1
-                for labels in self.get_labels(slices):
-                    literal = 'lbl%d' % i if i > 1 else 'lbl'
-                    i += 1
-                    result[k]['series'][literal]=labels
+                result[k]['series']['lbl']=self.get_labels(slices)
 
         for slice in slices:
             for k,v in slice.formulas.iteritems():
@@ -280,23 +267,28 @@ class AccumulatorDatasource(object):
         if use_cache:
             self.logger.debug("Last timestamp: %s", self.last_timestamp)
 
-            self.lock.acquire()
-            try:
+            if self.last_timestamp < to_time - datetime.timedelta(0,self.period) or self.cached_series is None:
+                self.lock.acquire()
                 if self.last_timestamp < to_time - datetime.timedelta(0,self.period) or self.cached_series is None:
-                    if self.cached_slices is None: 
-                        self.cached_slices = []
 
-                    last_timestamp, to_delete = self.update_slices(self.cached_slices, from_time, to_time, context, self.last_timestamp)
+                    try:
+                        if self.cached_slices is None:
+                            self.cached_slices = []
 
-                    self.cached_slices = self.cached_slices[to_delete:]
-                    self.logger.debug('Deleted %s slices', to_delete)
-                    self.logger.debug("Last timestamp: %s", self.last_timestamp)
+                        last_timestamp, to_delete = self.update_slices(self.cached_slices, from_time, to_time, context, self.last_timestamp)
 
-                    self.last_timestamp = last_timestamp
+                        self.cached_slices = self.cached_slices[to_delete:]
+                        self.logger.debug('Deleted %s slices', to_delete)
+                        self.logger.debug("Last timestamp: %s", self.last_timestamp)
+
+                        self.last_timestamp = last_timestamp
+                    finally:
+                        # Replace the global lock by a per-instance lock
+                        current_lock = self.lock
+                        self.lock = threading.Lock()
+                        current_lock.release()
 
                     self.cached_series = self.get_series(self.cached_slices)
-            finally:
-                self.lock.release()
 
             return self.cached_series
 

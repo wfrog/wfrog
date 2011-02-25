@@ -1,7 +1,5 @@
 #station: !random-simulator {}
 station: !auto {}
-#station: !vantagepro {}
-#station: !wh1080 {}
 
 #output: !http-out { url: 'http://localhost:8888/' }
 output: !stdio-out {}

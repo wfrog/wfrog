@@ -15,7 +15,3 @@ renderer: !template
                     path: charts.yaml
                     variables:
                         interpolate: true
-                summary: !datatable
-                    label: 2
-
-

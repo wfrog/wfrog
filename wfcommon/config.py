@@ -24,7 +24,7 @@ import sys
 import os.path
 import copy
 
-wfrog_version = "0.8-svn"
+wfrog_version = "0.7-rc1"
 
 class Configurer(object):
 
@@ -36,7 +36,6 @@ class Configurer(object):
 
     def __init__(self, module_map):
         self.module_map = module_map
-        self.extensions = {}
 
     def add_options(self, opt_parser):
         opt_parser.add_option("-f", "--config", dest="config",

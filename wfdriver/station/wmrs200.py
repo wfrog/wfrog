@@ -21,6 +21,7 @@
 # http://wmrx00.sourceforge.net/  (WMR100 weather logger project)
 
 ## TODO: DOCUMENT MESSAGES' PROTOCOL
+##       Implement calibration parameter for rain sensor
 ##       WMRS100 projects implement a calibration for humidity sensor to obtain 100% value (necessary?)
 ##       GENERATE CRITICAL LOG ENTRIES FOR LOW BATTERY LEVEL (ONE ALARM PER DAY!)
 ##       ALLOW CONFIG TO SPECIFY WHICH temp/hum SENSOR(S) SHOULD BE USED
@@ -36,7 +37,6 @@ import time
 import logging
 import logging
 import threading
-import platform
 import sys
 
 forecastMap = { 0:'PartlyCloudy', 1:'Rainy', 2:'Cloudy', 3:'Sunny', 4:'Snowy' }
@@ -61,19 +61,7 @@ def detect():
 class WMRS200Station(BaseStation):
     '''
     Station driver for the Oregon Scientific WMRS200. Reported to work with WMR100.
-
-    [ Properties ]
- 
-    pressure_cal [numeric] (optional):
-        Pressure calibration offset in mb. Defaults to 0.
-
-    rain_gauge_diameter [numeric] (optional):
-        Rain gauge diamater in mm. When specified the driver will do the necessary 
-        conversions to adjust rain to the new gauge size. Defaults to 0 (= no calculation)
-     '''
-    
-    pressure_cal = 0
-    rain_gauge_diameter = 0
+    '''
 
     logger = logging.getLogger('station.wmrs200')
 
@@ -109,14 +97,21 @@ class WMRS200Station(BaseStation):
                 devh = dev.open()
                 self.logger.info("USB WMRS200 open")
 
-                if platform.system() is 'Windows':
-                    self.devh.setConfiguration(1)
-
-                try:
-                    devh.claimInterface(0)
-                except usb.USBError:
-                    devh.detachKernelDriver(0)
-                    devh.claimInterface(0)
+                if sys.platform in ['linux2']:
+                    try:
+                        devh.claimInterface(0)
+                    except usb.USBError:
+                        devh.detachKernelDriver(0)
+                        devh.claimInterface(0)
+                elif sys.platform in ['win32']:
+                    #devh.claimInterface(0)
+                    self.logger.critical('Windows is not yet supported: devh.claimInterface() fails')
+                    print 'Windows is not yet supported: devh.claimInterface() fails'
+                    exit(1)
+                else:
+                    self.logger.critical('Platform "%s" not yet supported' % sys.platform)
+                    print 'Platform "%s" not yet supported' % sys.platform
+                    exit(1)
 
                 # WMRS200 Init sequence
                 devh.controlMsg(usb.TYPE_CLASS + usb.RECIP_INTERFACE,       # requestType
@@ -310,12 +305,6 @@ class WMRS200Station(BaseStation):
         monthT = record[13]
         yearT = 2000 + record[14]
 
-        # Convert rain if the rain gauge is modified 
-        if self.rain_gauge_diameter != 0:  
-          x = 100.0 ** 2 / self.rain_gauge_diameter ** 2
-          total = x * total
-          rate = x * rate 
-
         # Report data
         self._report_rain(total, rate)
 
@@ -378,7 +367,7 @@ class WMRS200Station(BaseStation):
         slpForecastTxt = forecastMap.get(slpForecast, str(slpForecast))
 
         # Report data
-        self._report_barometer_absolute(pressure + self.pressure_cal)
+        self._report_barometer_absolute(pressure)
 
         # Log
         self.logger.info("Barometer Forecast: %s, Absolute pressure: %.1f mb, Sea Level Pressure: %.1f", forecastTxt, pressure, seaLevelPressure)

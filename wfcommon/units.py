@@ -30,52 +30,52 @@ def identity(value):
     return value
 
 def FToC(value): 
-    return (((value * 1.0) - 32.0) * 5.0) / 9.0 if value != None else None
+    return (((value * 1.0) - 32.0) * 5.0) / 9.0
 
 def CToF(value): 
-    return  ((value * 9.0) / 5.0) + 32.0 if value != None else None
+    return  ((value * 9.0) / 5.0) + 32.0
 
 def InHgToHPa(value):
-    return value / 0.02953 if value != None else None
+    return value / 0.02953
 
 def HPaToInHg(value):
-    return value * 0.02953 if value != None else None
+    return value * 0.02953
 
 def HPaToMmHg(value):
-    return value * 0.750062 if value != None else None
+    return value * 0.750062
 
 def MmHgToHPa(value):
-    return value / 0.750062 if value != None else None
+    return value / 0.750062
 
 def InToMm(value): 
-    return value * 25.4 if value != None else None
+    return value * 25.4
 
 def MmToIn(value): 
-    return value / 25.4 if value != None else None
+    return value / 25.4
 
 def MpsToKt(value):
-    return value / 0.514 if value != None else None
+    return value / 0.514
 
 def KtToMps(value):
-    return value * 0.514 if value != None else None
+    return value * 0.514
 
 def MpsToKmh(value):
-    return value * 3.6 if value != None else None
+    return value * 3.6
 
 def KmhToMps(value):
-    return value / 3.6 if value != None else None
+    return value / 3.6
 
 def MphToMps(value): 
-    return value / 2.2445 if value != None else None
+    return value / 2.2445
 
 def MpsToMph(value): 
-    return value * 2.2445 if value != None else None
+    return value * 2.2445
     
 def MpsToBft(value):
-    return pow((pow((value*3.6),2))/9, 1.0/3.0) if value != None else None
+    return pow((pow((value*3.6),2))/9, 1.0/3.0) 
 
 def BftToMps(value):
-    return sqrt(pow(value, 3)*9)/3.6 if value != None else None
+    return sqrt(pow(value, 3)*9)/3.6
     
 conversions = {
     "temp" : {

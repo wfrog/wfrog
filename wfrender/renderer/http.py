@@ -21,13 +21,10 @@ import threading
 import socket
 import select
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-from SimpleHTTPServer import SimpleHTTPRequestHandler
 import copy
 import urlparse, cgi, Cookie
 import logging
-import posixpath
-import urllib
-import os
+
 
 class HttpRenderer(object):
     """
@@ -56,21 +53,12 @@ class HttpRenderer(object):
 
     cookies [list] (optional):
         List of context sections overridable with a cookie using the -set- uri.
-        
-    static [string] (optional):
-        Activates the serving of static files and specify under which URL path they are served. Disabled by default.
-        
-    docroot [string] (optional):
-        Root directory served when static content is enabled. Defaults to /var/wwww.
-        
     """
 
     renderers = None
     port = 7680
     root = None
     cookies = []
-    static = None
-    docroot = "/var/www"
 
     logger = logging.getLogger("renderer.http")
 
@@ -112,83 +100,60 @@ class HttpRendererHandler(BaseHTTPRequestHandler):
 
         data = copy.deepcopy(_HttpRendererSingleton.data)
 
-        try:
-            params = cgi.parse_qsl(urlparse.urlsplit(self.path).query)
-            for p in params:
-                data[p[0]] = p[1]
+        params = cgi.parse_qsl(urlparse.urlsplit(self.path).query)
+        for p in params:
+            data[p[0]] = p[1]
 
-            content = None
+        content = None
 
-            name = urlparse.urlsplit(self.path).path.strip('/')
+        name = urlparse.urlsplit(self.path).path.strip('/')
 
-            if name == "-set-":
-                if data.has_key("s") and data.has_key("k") and data.has_key("v"):
-                    section = data["s"]
-                    key = data["k"]
-                    value = data["v"]
-                    if not cookie_sections.__contains__(section):
-                        self.send_error(403,"Permission Denied")
-                        return
-                    context[section][key]=value
-                    cookie = Cookie.SimpleCookie()
-
-                    cookie[section+"."+key]=value
-
-                    self.send_response(302)
-                    self.send_header('Location', self.headers["Referer"] if self.headers.has_key("Referer") else "/")
-                    self.wfile.write(cookie)
-                    self.end_headers()
-
+        if name == "-set-":
+            if data.has_key("s") and data.has_key("k") and data.has_key("v"):
+                section = data["s"]
+                key = data["k"]
+                value = data["v"]
+                if not cookie_sections.__contains__(section):
+                    self.send_error(403,"Permission Denied")
                     return
-                else:
-                    self.send_error(500,"Missing parameters")
-                    return
+                context[section][key]=value
+                cookie = Cookie.SimpleCookie()
 
-            cookie_str = self.headers.get('Cookie')
-            if cookie_str:
-                cookie = Cookie.SimpleCookie(cookie_str)
-                for i in cookie:
-                    parts = i.split('.')
-                    if len(parts) == 2:
-                        section = parts[0]
-                        key = parts[1]
-                        if cookie_sections.__contains__(section) and context[section].has_key(key):
-                            context[section][key]=cookie[i].value
+                cookie[section+"."+key]=value
 
-            if _HttpRendererSingleton.static and self.path == "/"+_HttpRendererSingleton.static:
-                self.send_response(301);
-                self.send_header("Location", self.path + "/")
+                self.send_response(302)
+                self.send_header('Location', self.headers["Referer"] if self.headers.has_key("Referer") else "/")
+                self.wfile.write(cookie)
                 self.end_headers()
-                return
 
-            if _HttpRendererSingleton.static and self.path.startswith("/"+_HttpRendererSingleton.static+"/"):
-                h = StaticFileRequestHandler()             
-                h.requestline = self.requestline
-                h.request_version = self.request_version
-                h.client_address = self.client_address
-                h.command = self.command
-                h.path = self.path[len(_HttpRendererSingleton.static)+1:]
-                h.wfile = self.wfile
-                h.rfile = self.rfile
-                h.do_GET()
                 return
-
-            if name == "":
-                if not root:
-                    mime = "text/html"
-                    content = "<html><head><title>wfrender</title><body>"
-                    for renderer in renderers.keys():
-                        content += "<a href='"+renderer+"'>"+renderer+"</a><br>"
-                    content += "</body></html>"
-                else:
-                    [ mime, content ] = root.render(data=data, context=context)
             else:
-                if renderers is not None and renderers.has_key(name):
-                    [ mime, content ] = renderers[name].render(data=data, context=context)
-        except Exception, e:
-            _HttpRendererSingleton.logger.exception(e)
-            self.send_error(500, "Internal Server Error")
-            return 
+                self.send_error(500,"Missing parameters")
+                return
+
+        cookie_str = self.headers.get('Cookie')
+        if cookie_str:
+            cookie = Cookie.SimpleCookie(cookie_str)
+            for i in cookie:
+                parts = i.split('.')
+                if len(parts) == 2:
+                    section = parts[0]
+                    key = parts[1]
+                    if cookie_sections.__contains__(section) and context[section].has_key(key):
+                        context[section][key]=cookie[i].value
+
+        if name == "":
+            if not root:
+                mime = "text/html"
+                content = "<html><head><title>wfrender</title><body>"
+                for renderer in renderers.keys():
+                    content += "<a href='"+renderer+"'>"+renderer+"</a><br>"
+                content += "</body></html>"
+            else:
+                [ mime, content ] = root.render(data=data, context=context)
+        else:
+            if renderers is not None and renderers.has_key(name):
+                [ mime, content ] = renderers[name].render(data=data, context=context)
 
         if content:
             self.send_response(200)
@@ -254,30 +219,3 @@ class StoppableHTTPServer(HTTPServer):
             except:
                 self.handle_error(request, client_address)
                 self.close_request(request)
-
-class StaticFileRequestHandler(SimpleHTTPRequestHandler):
-
-    def __init__(self):
-        pass
-
-    def translate_path(self, path):
-        """Translate a /-separated PATH to the local filename syntax.
-
-        Components that mean special things to the local file system
-        (e.g. drive or directory names) are ignored.  (XXX They should
-        probably be diagnosed.)
-
-        """
-        print "IN: "+path
-        path = path.split('?',1)[0]
-        path = path.split('#',1)[0]
-        path = posixpath.normpath(urllib.unquote(path))
-        words = path.split('/')
-        words = filter(None, words)
-        path = _HttpRendererSingleton.docroot
-        for word in words:
-            drive, word = os.path.splitdrive(word)
-            head, word = os.path.split(word)
-            if word in (os.curdir, os.pardir): continue
-            path = os.path.join(path, word)
-        return path

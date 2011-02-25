@@ -2,6 +2,9 @@ init:
     storage: !service
         name: storage
         instance: !include { path: ../../wfcommon/config/storage.yaml }
+    current: !service
+        name: current-collector
+        instance: !current-collector {}
 
 input: !service
     name: events  # Use embedded wfdriver to receive events
@@ -9,7 +12,7 @@ input: !service
 
 collector: !multi
     children:
-        aggregator : !buffer
+        aggregator : !flush
             period: 600
             collector: !aggregator
                 storage : !service
@@ -22,10 +25,8 @@ collector: !multi
                         path: /var/lib/wfrog/wfrog-current.xml
                         storage : !service
                             name: storage
-                    default: !xmlfile
-                        path: data/wfrog-current.xml
-                        storage : !service
-                            name: storage
+                    default: !service
+                        name: current-collector
 
 embed:
     wfdriver: { config: ../../wfdriver/config/embedded.yaml }

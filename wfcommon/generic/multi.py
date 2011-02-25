@@ -55,12 +55,11 @@ class MultiElement(wrapper.ElementWrapper):
             self.logger.debug("Calling "+attr+" on child "+name)
 
             if self.parallel:
-                thread = Thread( target=r.__getattribute__(attr).__call__, args=args, kwargs=keywords) 
+                thread = Thread( target=lambda : r.__getattribute__(attr).__call__(*args, **keywords) )
                 self.threads.append(thread)
                 thread.start()
             else:
                 result[name] = r.__getattribute__(attr).__call__(*args, **keywords)
-
 
         if self.parallel:
             try:

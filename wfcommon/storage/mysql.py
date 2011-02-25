@@ -40,9 +40,6 @@ class MysqlStorage(base.DatabaseStorage):
         
     password [string] (optional):
         Database user password. Defaults to 'root'.    
-
-    tablename [string] (optional):
-        Table name. Defaults to 'METEO'.   
     '''
 
     database = 'wfrog'

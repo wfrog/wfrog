@@ -28,41 +28,32 @@ class DataTableRenderer(object):
 
     [ Properties ]
 
-    source [datasource] (optional):
-        A data source performing the query and returning a data structure. When using
-        !datatable inside a !data it is not necessary to inform (by default it 
-        takes the datasource of the !data element).
-
-    label [integer] (optional):
-        Label to be used when creating the table. By default "1".
+    source [datasource]:
+        A data source performing the query and returning a data structure.
     """
 
     source=None
-    label=1
 
     def render(self,data={}, context={}):
-        if self.source != None:
-	    new_data = self.source.execute(data=data, context=context)
-        else:
-           new_data = data
+        assert self.source is not None, "'data.source' must be set"
+        new_data = self.source.execute(data=data, context=context)
+        merge(new_data, data)
         result = {}
 
         converter = wfcommon.units.Converter(context["units"])
 
-        label_key = 'lbl' + str(self.label) if self.label > 1 else 'lbl'
         for measure in new_data.keys():
-            if measure != 'sectors':
-                lbls = new_data[measure]['series'][label_key]
-                for lbl in lbls:
-                    if not lbl in result:
-                        result[lbl] = {}
-                for (serie, values) in new_data[measure]['series'].iteritems():
-                    if serie[:3] != 'lbl':
-                        for i in range(len(lbls)):
-                            if serie == 'count':  # Unit conversion cannot be applied to count formula
-                                result[lbls[i]][measure + '_' + serie] = values[i]
-                            else:
-                                result[lbls[i]][measure + '_' + serie] = converter.convert(measure, values[i])
+            lbls = new_data[measure]['series']['lbl']
+            for lbl in lbls:
+                if not lbl in result:
+                    result[lbl] = {}
+            for (serie, values) in new_data[measure]['series'].iteritems():
+                if serie != 'lbl':
+                    for i in range(len(lbls)):
+                        if serie != 'count':  # Unit conversion cannot be applied to count formula
+                            result[lbls[i]][measure + '_' + serie] = converter.convert(measure, values[i])
+                        else:
+                            result[lbls[i]][measure + '_' + serie] = values[i]
         return result
 
 

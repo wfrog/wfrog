@@ -28,8 +28,6 @@ import scheduler
 import template
 import value
 import meteoclimatic
-import wunderground
-import pwsweather
 
 
 # YAML mappings
@@ -66,10 +64,3 @@ class YamlValueRenderer(value.ValueRenderer, yaml.YAMLObject):
 
 class YamlMeteoclimaticRenderer(meteoclimatic.MeteoclimaticRenderer, yaml.YAMLObject):
     yaml_tag = u'!meteoclimatic'
-
-class YamlWundergroundRenderer(wunderground.WeatherUndergroundPublisher, yaml.YAMLObject):
-    yaml_tag = u'!wunderground'
-
-class YamlWundergroundRenderer(pwsweather.PwsWeatherPublisher, yaml.YAMLObject):
-    yaml_tag = u'!pwsweather'
-

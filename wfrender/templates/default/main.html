@@ -132,116 +132,76 @@ $u
 <div class="wide bordered line cell">
             <div class="leftCell">wfrog $version - Weather Dashboard </div><div class="rightCell"><span class="value">$current.timestamp</span></div>
 </div>
-<div style="width: 100%">
-    <div class="bordered header" style="clear: both">
-        <div class="headerContent">
-            <a href="http://www.wfrog.org"><img border="0" src="http://code.google.com/p/wfrog/logo" alt="wfrog"/></a>
-        </div>
+
+<div class="bordered header">
+    <div class="headerContent">
+        <a href="http://www.wfrog.org"><img border="0" src="http://code.google.com/p/wfrog/logo" alt="wfrog"/></a>
     </div>
-    <div class="bordered header">
-        <div class="headerContent">
-            <div class="leftCell">
-                <span class="symbol"></span> <span class="bigger" ><span class="value">$rnd($current.temp1, 1)</span>&deg;</span>$unitstr('temp',$units.temp)<br>
-                Humidity <span class="value">$rnd($current.hum1)</span> % <br>
-                Pressure <span class="value">$rnd($current.press)</span> $unitstr('press',$units.press)
-            </div>
-            <div class="leftCell leftpad rightAlign">
-                <span class="bigger">&#8962; &nbsp;</span><br>
-                <span class="value">$rnd($current.temp0,1)</span>&deg;$unitstr('temp',$units.temp) <br>
-                <span class="value">$rnd($current.hum0)</span> %
-            </div>
-        </div>
-    </div>
-    <div class="bordered headerNoPad">
+</div>
+<div class="bordered header">
+    <div class="headerContent">
         <div class="leftCell">
-            <img src="$current.wind.dir"/>
+            <span class="symbol"></span> <span class="bigger" ><span class="value">$rnd($current.temp1, 1)</span>&deg;</span>$unitstr('temp',$units.temp)<br>
+            Humidity <span class="value">$rnd($current.hum1)</span> % <br>
+            Pressure <span class="value">$rnd($current.press)</span> $unitstr('press',$units.press)
         </div>
-        <div class="leftCell smallpad">
-            <br style="font-size:50%">Wind <span class="value">$rnd($current.wind.speed, 1)</span> $unitstr('wind',$units.wind)<br>
-            Gust <span class="value">$rnd($current.wind.gust, 1)</span> $unitstr('wind',$units.wind)<br>
-            Rain <span class="value">$rnd($current.rain, 1)</span> $unitstr('rain',$units.rain)/h<br>
-            <!-- UV Index <span class="value">0</span> -->
-        </div>
-    </div>
-    <div class="tabPane">
-        <div class="leftCell" style="width:10px;">&nbsp;</div>
-        <div id="3hours" class="tab"><a href="3hours.html">3 Hours</a></div>    
-        <div id="24hours" class="tab"><a href="24hours.html">24 Hours</a></div>
-        <div id="30days" class="tab"><a href="30days.html">30 Days</a></div>
-        <div id="365days" class="tab"><a href="365days.html">365 Days</a></div>
-    </div>
-    <div>
-        <div class="bordered cell graph">
-            <div class="leftCell">Temperature and Dew Point</div><div class="units">&deg;$unitstr('temp',$units.temp)</div>
-            <div><img src="$chart.temp"/></div>
-        </div>
-        <div class="bordered cell graph">
-            <div class="leftCell">Humidity</div><div class="units">%</div>
-            <div><img src="$chart.hum"/></div>
-        </div>
-        <div class="bordered cell graph">
-           <div class="leftCell">Pressure</div><div class="units">$unitstr('press',$units.press)</div>
-            <div><img src="$chart.press"/></div>
+        <div class="leftCell leftpad rightAlign">
+            <span class="bigger">&#8962; &nbsp;</span><br>
+            <span class="value">$rnd($current.temp0,1)</span>&deg;$unitstr('temp',$units.temp) <br>
+            <span class="value">$rnd($current.hum0)</span> %
         </div>
     </div>
-    <div>
-        <div class="bordered cell graph"  style="clear: both">
-            <div class="leftCell">Wind and Gusts</div><div class="units">$unitstr('wind',$units.wind)</div>
-            <div><img src="$chart.wind"/></div>
-        </div>
-        <div class="bordered cell graph">
-            <div class="leftCell">Wind Direction</div><br/>
-            <div><img src="$chart.wind_dir"/></div>
-        </div>
+</div>
+<div class="bordered headerNoPad">
+    <div class="leftCell">
+        <img src="$current.wind.dir"/>
     </div>
-    <div>
-        <div class="bordered cell graph"  style="clear: both">
-            <div class="leftCell">Rain</div><div class="units">$unitstr('rain',$units.rain)</div>
-            <div><img src="$chart.rain"/></div>
-        </div>
-        <div class="bordered cell graph">
-            <div class="leftCell">Rain rate</div><div class="units">$unitstr('rain',$units.rain)/h</div>
-            <div><img src="$chart.rain_rate"/></div>
-        </div>
-        <div class="bordered cell graph">
-            <div class="leftCell">UV Index</div><br/>
-            <div><img src="$chart.uv"/></div>
-        </div>
+    <div class="leftCell smallpad">
+        <br style="font-size:50%">Wind <span class="value">$rnd($current.wind.speed, 1)</span> $unitstr('wind',$units.wind)<br>
+        Gust <span class="value">$rnd($current.wind.gust, 1)</span> $unitstr('wind',$units.wind)<br>
+        Rain <span class="value">$rnd($current.rain, 1)</span> $unitstr('rain',$units.rain)/h<br>
+        <!-- UV Index <span class="value">0</span> -->
     </div>
-    <div class="bordered cell graph" style="clear: both">
-       <div style="clear: both"><pre style="font-size:94%">
-#set $indexes = $summary.keys()
-#silent $indexes.sort()
-#silent $indexes.reverse()
-${"%s      Temp. %s         Humidity %%     Pressure %s       Rain %s        Wind %s       UV     " % (
-  " " * len($indexes[0]),
-  $unitstr('temp',$units.temp).rstrip(), 
-  $unitstr('press',$units.press).rstrip(), 
-  $unitstr('rain',$units.rain).rstrip(),  
-  $unitstr('wind',$units.wind).rstrip() ) }
-${"%s   max   min   avg  max  min  avg   max   min   avg   fall   rate    avg    max  dir" % (" " * len($indexes[0]))}
-#for $index in $indexes
-#set $value = $summary[$index]
-#if $value.temp_max != None or $value.hum_max != None or $value.press_max != None or $value.rain_fall != None or $value.wind_avg != None
-${"%s" % $index}#slurp
-${"%6.1f" % $value.temp_max if $value.temp_max != None else "     -"}#slurp
-${"%6.1f" % $value.temp_min if $value.temp_min != None else "     -"}#slurp
-${"%6.1f" % $value.temp_avg if $value.temp_avg != None else "     -"}#slurp
-${"%4.0f%%" % $value.hum_max if $value.hum_max != None else "   - "}#slurp
-${"%4.0f%%" % $value.hum_min if $value.hum_min != None else "   - "}#slurp
-${"%4.0f%%" % $value.hum_avg if $value.hum_avg != None else "   - "}#slurp
-${"%6.0f" % $value.press_max if $value.press_max != None else "     -"}#slurp
-${"%6.0f" % $value.press_min if $value.press_min != None else "     -"}#slurp 
-${"%6.0f" % $value.press_avg if $value.press_avg != None else "     -"}#slurp 
-${"%7.1f" % $value.rain_fall if $value.rain_fall != None else "      -"}#slurp
-${"%7.1f" % $value.rain_rate if $value.rain_rate != None else "      -"}#slurp
-${"%7.1f" % $value.wind_avg if $value.wind_avg != None else "      -"}#slurp
-${"%7.1f" % $value.wind_max if $value.wind_max != None else "      -"}#slurp
-${"%5s" % $value.wind_dir  if $value.wind_dir != None else "      -"}#slurp
-${"%5d" % $value.uv_index  if $value.uv_index != None else "    -"}
-#end if
-#end for
-    </pre></div>
+</div>
+<div class="tabPane">
+    <div class="leftCell" style="width:10px;">&nbsp;</div>
+    <div id="3hours" class="tab"><a href="3hours.html">3 Hours</a></div>    
+    <div id="24hours" class="tab"><a href="24hours.html">24 Hours</a></div>
+    <div id="30days" class="tab"><a href="30days.html">30 Days</a></div>
+    <div id="365days" class="tab"><a href="365days.html">365 Days</a></div>
+</div>
+<div>
+    <div class="bordered cell graph">
+        <div class="leftCell">Temperature and Dew Point</div><div class="units">&deg;$unitstr('temp',$units.temp)</div>
+        <div><img src="$chart.temp"/></div>
+    </div>
+    <div class="bordered cell graph">
+        <div class="leftCell">Humidity</div><div class="units">%</div>
+        <div><img src="$chart.hum"/></div>
+    </div>
+    <div class="bordered cell graph">
+       <div class="leftCell">Pressure</div><div class="units">$unitstr('press',$units.press)</div>
+        <div><img src="$chart.press"/></div>
+    </div>
+</div>
+<div>
+    <div class="bordered cell graph"  style="clear: both">
+        <div class="leftCell">Wind and Gusts</div><div class="units">$unitstr('wind',$units.wind)</div>
+        <div><img src="$chart.wind"/></div>
+    </div>
+    <div class="bordered cell graph">
+        <div class="leftCell">Wind Direction</div><br/>
+        <div><img src="$chart.wind_dir"/></div>
+    </div>
+</div>
+<div>
+    <div class="bordered cell graph"  style="clear: both">
+        <div class="leftCell">Rain</div><div class="units">$unitstr('rain',$units.rain)</div>
+        <div><img src="$chart.rain"/></div>
+    </div>
+    <div class="bordered cell graph">
+        <div class="leftCell">UV Index</div><br/>
+        <div><img src="$chart.uv"/></div>
     </div>
 </div>
 <div style="width:100%;clear:both;"><br></div>

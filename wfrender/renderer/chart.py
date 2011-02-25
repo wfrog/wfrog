@@ -268,7 +268,7 @@ class GoogleChartRenderer(object):
             serie_config = ChartConfig()
             serie_config.__dict__.update(config.__dict__)
             serie_config.__dict__.update(serie)
-            serie_data = copy.copy(data[key.split('.')[0]]['series'][key.split('.')[1]])
+            serie_data = data[key.split('.')[0]]['series'][key.split('.')[1]]
             measure = key.split('.')[0]
 
             if flat(serie_data):  # Series with all data = None
@@ -386,7 +386,7 @@ class GoogleChartRenderer(object):
             chart.set_axis_labels(Axis.LEFT, [])
             chart.set_axis_style(0, _valid_color(config.text), config.size, 0, Axis.TICK_MARKS, _valid_color(config.bgcolor))
 
-        if config.zero and config.axes and range_min_ref_units < 0 and range_max_ref_units > 0:
+        if config.zero and config.axes and range_min_ref_units < 0:
             zero_config = ChartConfig()
             zero_config.__dict__.update(config.__dict__)
             zero_config.__dict__.update(config.zero)
@@ -402,7 +402,7 @@ class GoogleChartRenderer(object):
             chart.set_legend_position(config.legend_pos)
 
         if self.labels:
-            labels_data = copy.copy(data[self.labels.split('.')[0]]['series'][self.labels.split('.')[1]])
+            labels_data = data[self.labels.split('.')[0]]['series'][self.labels.split('.')[1]]
             labels_data = compress_to(labels_data, config.nval, None, None)[0]
             if config.axes:
                 density = 1.0 * len("".join(labels_data))*config.size  / config.width
@@ -415,7 +415,7 @@ class GoogleChartRenderer(object):
                 chart.set_axis_style(1, _valid_color(config.text), config.size, 0, Axis.BOTH if config.ticks else Axis.AXIS_LINES)
             else:
                 chart.set_axis_labels(Axis.BOTTOM, [])
-                chart.set_axis_style(1, _valid_color(config.text), config.size, 0, Axis.TICK_MARKS, _valid_color(config.color))
+                chart.set_axis_style(1, _valid_color(config.text), config.size, 0, Axis.TICK_MARKS, _valid_color(config.bgcolor))
 
         try:
             return chart.get_url()+"&chma=10,10,10,10" # add a margin
@@ -709,8 +709,6 @@ class GoogleChartWindRadarRenderer(object):
         return chart.get_url()
 
     def scale(self, value, mean, max):
-        if value < 0:
-            value=0
         if mean == max / 2:
             return value
         else:

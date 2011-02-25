@@ -24,11 +24,9 @@
 import sys, os, string, os.path
 WFROG_HOME='.'
 this_script=os.path.abspath(os.path.realpath(sys.argv[0]))
-if sys.platform != 'win32' and string.find(this_script, os.sep+'wfrog') != -1:
+if string.find(this_script, os.sep+'wfrog') != -1:
     WFROG_HOME=os.path.normpath(os.path.join(this_script, os.pardir, os.pardir))
     sys.path.insert(0, WFROG_HOME)
-if sys.platform == 'win32':
-    WFROG_HOME=os.path.normpath(os.path.join(this_script, os.pardir))
 if hasattr(os, "getuid") and os.getuid() != 0:
     sys.path.insert(0, os.path.abspath(os.getcwd()))
 
@@ -41,12 +39,13 @@ import logging
 
 SETTINGS_FILE = 'settings.yaml'
 GLOBAL_CONF_DIR = '/etc/wfrog/'
-SETTINGS_DEF=os.path.normpath(WFROG_HOME+'/wfcommon/config/settings-definition.yaml')
+SETTINGS_DEF=WFROG_HOME+'/wfcommon/config/settings-definition.yaml'
 
-if sys.platform == 'win32':
-    import _winreg
-    HOME_WFROG_DIR = _winreg.ExpandEnvironmentStrings(u'%APPDATA%\\Wfrog\\')
-else:
+try:
+    from win32com.shell import shellcon, shell
+    HOME_WFROG_DIR = shell.SHGetFolderPath(0, shellcon.CSIDL_LOCAL_APPDATA, 0, 0)+'\\Wfrog\\'
+
+except ImportError: # quick semi-nasty fallback for non-windows/win32com case
     HOME_WFROG_DIR = os.path.expanduser("~")+'/.wfrog/'
 
 settings = None

@@ -34,14 +34,10 @@ class SchedulerRenderer(object):
 
     period [numeric]:
         The period in seconds.
-
-    delay [numeric] (optional):
-        Delay before first execution. By default 60 seconds.
     """
 
     renderers = None
     period = None
-    delay = 60
 
     alive = True
 
@@ -50,14 +46,9 @@ class SchedulerRenderer(object):
     def render(self, data={}, context={}):
         assert self.period is not None, "'scheduler.period' must be set"
 
-        time.sleep(self.delay)
-        self.logger.info("Started scheduler")
         while self.alive:
             self.logger.debug("Rendering.")
-            try:
-                self.renderer.render(data=data, context=context)
-            except Exception, e:
-                self.logger.exception(e)
+            self.renderer.render(data=data, context=context)
             time.sleep(self.period)
 
     def close(self):

@@ -17,10 +17,9 @@
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import time
-import datetime
 import random
 import copy
-import logging
+
 
 def detect():
     return RandomSimulator()
@@ -32,25 +31,15 @@ class RandomSimulator(object):
 
     '''
     Simulates a station. Issues events randomly with random variations.
-
-    [Properties]
-
-    past [number] (optional):
-        Will send events "from the past" at startup. Default to 0.
-
     '''
 
     debug_station = True
-
-    past = 0
 
     types = [ 'temp', 'press', 'hum', 'rain', 'wind', 'uv', 'rad' ]
     init_values = [ 10, 1020, 65, 10, [ 3, 180], 1, 2 ]
     range = [ 30, 100, 40, 20, [6, 360], 5, 4 ]
 
     rain_total = 55
-
-    logger = logging.getLogger('station.simulator')
 
     def new_value(self, current, init, range):
         step = random.random()*(range/8.0) - range/16.0
@@ -67,17 +56,10 @@ class RandomSimulator(object):
     def run(self, generate_event, send_event):
         current_values = copy.copy(self.init_values)
 
-        past_counter = self.past
-
         while True:
             t = random.randint(0,len(self.types)-1)
             type = self.types[t]
             e = generate_event(type)
-
-            if past_counter > 0:
-                timestamp = datetime.datetime.now() - datetime.timedelta(0, 600)
-                self.logger.debug("Setting timestamp %s to %s event", timestamp, type)
-                e.timestamp = timestamp
 
             if type == 'temp' or type=='hum':
                 e.sensor = random.randint(0,1)
@@ -102,9 +84,4 @@ class RandomSimulator(object):
                     e.value = current_values[t]
 
             send_event(e)
-
-            if past_counter > 0:
-                time.sleep(0.1)
-                past_counter = past_counter - 1
-            else:
-                time.sleep(2)
+            time.sleep(2)

@@ -49,7 +49,7 @@ class XmlInput(object):
         self.send_event = send_event
         self.do_run()
     
-    def process_message(self, message, timestamp=None):        
+    def process_message(self, message):        
         from lxml import objectify
         self.logger.debug("Received: %s ", message)
         if self.validate:
@@ -72,14 +72,4 @@ class XmlInput(object):
                 self.logger.info('Element not in standard namespace, considered as extension: %s', parsed_message.tag)
         event = objectify.XML(message)
         event._type = event.tag.replace('{'+self.namespace+'}','')
-        # transform the objectified XML to a pure python object to be able to add typed fields
-        pure_event = Event()
-        for el in event.iterchildren():
-            pure_event.__setattr__(el.tag, el)
-        if(timestamp):
-            pure_event.timestamp = timestamp
-        self.send_event(pure_event)
-
-            
-class Event(object):
-    pass
+        self.send_event(event)

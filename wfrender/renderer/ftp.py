@@ -19,9 +19,6 @@
 import ftplib
 import logging
 import time
-import socket
-# Set up socket timeout to prevent hangs when ftp sites fail
-socket.setdefaulttimeout(30)  # 30 seconds 
 
 class FtpRenderer(object):
     """
@@ -68,7 +65,6 @@ class FtpRenderer(object):
         files= {}
 
         for key in self.renderers.keys():
-            self.logger.info("Rendering %s" % key)
             files[key] = self.renderers[key].render(data=data, context=context)
 
         errors = 0
@@ -79,7 +75,6 @@ class FtpRenderer(object):
                 ftp.connect(self.host, self.port)
                 self.logger.debug("Authenticating...")
                 ftp.login(self.username, self.password)
-                self.logger.info("Connected to %s@%s:%d" % (self.username, self.host, self.port))
                 if self.directory is not None:
                     self.logger.debug("Moving to directory %s" % self.directory)
                     ftp.cwd(self.directory)
@@ -88,14 +83,9 @@ class FtpRenderer(object):
                     f = open(local_file, 'r')
                     ftp.storbinary("STOR %s" % remote_file, f)
                     f.close()
-                    self.logger.info("Sent %s to %s" % (local_file, remote_file))
-                ftp.quit()
+                ftp.close()
                 break
             except Exception, e:
-                try:
-                    ftp.close()
-                except:
-                    pass
                 errors += 1
                 if errors < 3:
                     self.logger.warning("Error sending files by FTP (retrying in 5 secs.): %s" % str(e))
