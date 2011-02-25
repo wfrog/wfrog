@@ -1,0 +1,41 @@
+## To display use: wget -qO- http://localhost:8080
+#set $days = $daily.keys()
+#silent $days.sort()
+#silent $days.reverse()
+wfrog $version (http://www.wfrog.org)
+
+Last measure stored: $daily[$days[0]].measures_last
+
+Number of measures collected (last ${len($days)} days)
+---------------------------------------------
+   Date     Total Temp/hum Press. Rain   Wind
+#for $day in $days
+#set $value = $daily[$day]
+$day#slurp
+${"%7d" % $value.measures_count}#slurp
+${"%7d" % $value.temp_count}#slurp
+${"%7d" % $value.press_count}#slurp
+${"%7d" % $value.rain_count}#slurp
+${"%7d" % $value.wind_count}
+#end for
+
+Meteorological data (last ${len($days)} days)
+--------------------------------------------------------------------------
+   Date         Temp.     Humidity    Pressure        Rain          Wind
+             max   min   max    min   max   min    fall   rate    max  dir
+#for $day in $days
+#set $value = $daily[$day]
+$day#slurp
+${"%6.1f" % $value.temp_max}#slurp
+${"%6.1f" % $value.temp_min}#slurp
+${"%6.1f" % $value.hum_max}%#slurp
+${"%6.1f" % $value.hum_min}%#slurp
+${"%6.0f" % $value.press_max}#slurp
+${"%6.0f" % $value.press_min}#slurp 
+${"%7.1f" % $value.rain_fall}#slurp
+${"%7.1f" % $value.rain_rate}#slurp
+${"%7.1f" % $value.wind_max}#slurp
+${"%5s" % $value.wind_dir}
+#end for
+
+

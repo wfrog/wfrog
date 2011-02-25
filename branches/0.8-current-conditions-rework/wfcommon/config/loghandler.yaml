@@ -1,0 +1,10 @@
+handler: !user
+    choices:
+        root: !include
+            path: ../../wfcommon/config/fileloghandler.yaml
+            variables:
+                filename: /var/log/${process}.log
+        default: !include
+            path: ../../wfcommon/config/fileloghandler.yaml
+            variables:
+                filename: ${process}.log
