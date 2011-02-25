@@ -24,7 +24,7 @@
     <summary>Sensor placed outside</summary>
     <id>tag:yourdomain.org,2011-02-21:/hum/0/20110221214746</id>
     <updated>2011-03-21T21:47:46Z</updated>
-    <content type="application/westep+xml" mode="xml">
+    <content type="application/westep+xml">
       <hum xmlns="http://www.westep.org/2010/westep">
         <sensor>0</sensor>
         <value>50</value>
