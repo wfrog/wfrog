@@ -11,6 +11,7 @@ echo "Please make sure the version number is correctly set in $app/$vfile in the
 echo Press enter to proceed with checkout or Ctrl-C to abort.
 read key
 
+mkdir -p build
 cd build
 
 echo Checking out $repo ...
