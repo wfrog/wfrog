@@ -110,7 +110,7 @@ class WMRS200Station(BaseStation):
                 self.logger.info("USB WMRS200 open")
 
                 if platform.system() is 'Windows':
-                    self.devh.setConfiguration(1)
+                    devh.setConfiguration(1)
 
                 try:
                     devh.claimInterface(0)
