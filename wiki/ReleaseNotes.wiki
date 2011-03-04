@@ -1,4 +1,4 @@
-*wfrog 0.8 - _Coming up soon_*
+*wfrog 0.8 - 04.03.2011*
 
 Many fixes and improvements, added upload to wunderground, numerical data summary and improved support of WH1081-like and VantagePro stations.
 
