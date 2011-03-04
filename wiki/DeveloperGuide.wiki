@@ -156,16 +156,29 @@ We are very welcoming station drivers contribution and will open commiter accoun
 
 Make sure that the version number is correct in trunk's `wfcommon/config.py`
 
+In order to build a debian package, you should have these requirements installed (currently tested on Ubuntu 10.10, should work on Debian lenny/squeeze, too).
+
 {{{
-cd pkg/
-./make-release.sh
+apt-get update
+apt-get install tar subversion devscripts debhelper
+}}}
+
+_Postfix installmode -> 'No configuration'._
+
+Download _/trunk/pkg/make-release.sh_ and save it.
+
+Now, simply run it:
+
+{{{
+sh make-release.sh
 }}}
 
 This will guide you step by step through the release process. It is interruptable anytime:
-# Get a fresh checkout of the project
-# Build the .tgz and .deb packages
-# Upload them on google code
 
-Of course, you will need commit permission on the SVN to do that.
+    # Get a fresh checkout of the project
+    # Build the .tgz and .deb packages
+    # Upload them on google code
+
+Of course, you will need commit permission on the SVN to do a upload to Googlecode, if you dont have the rights, simply press Ctrl+C if the installer is done with building the .deb
 
 <p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
