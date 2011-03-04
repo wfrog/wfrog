@@ -1,0 +1,48 @@
+<WMRS200>
+    <barometer>
+        <forecast>0</forecast>
+        <forecastTxt>PartlyCloudy</forecastTxt>
+        <pressure>968</pressure>
+    </barometer>
+    <console>
+        <battery>True</battery>
+        <clock>2/1/2007 7:26</clock>
+        <clockSync>True</clockSync>
+        <powered>True</powered>
+    </console>
+    <rain>
+        <batteryOk>True</batteryOk>
+        <rate>0.0</rate>
+        <thisDay>20.32</thisDay>
+        <thisHour>0.0</thisHour>
+        <total>20.32</total>
+        <totalSince>2007/1/1 12:0</totalSince>
+    </rain>
+    <th1>
+        <comfortLevel>1</comfortLevel>
+        <comfortLevelTxt>Good</comfortLevelTxt>
+        <dewPoint>15.0</dewPoint>
+        <humidity>69</humidity>
+        <temp>20.6</temp>
+        <trend>0</trend>
+        <trendTxt>Steady</trendTxt>
+    </th1>
+    <thInt>
+        <comfortLevel>1</comfortLevel>
+        <comfortLevelTxt>Good</comfortLevelTxt>
+        <dewPoint>14.0</dewPoint>
+        <humidity>61</humidity>
+        <temp>22.0</temp>
+        <trend>0</trend>
+        <trendTxt>Steady</trendTxt>
+    </thInt>
+    <timestampt>2009.09.19.09.26.48</timestampt>
+    <wind>
+        <avgSpeed>1.5</avgSpeed>
+        <batteryOk>True</batteryOk>
+        <dir>6</dir>
+        <dirDeg>135</dirDeg>
+        <dirStr>SE</dirStr>
+        <gustSpeed>3.0</gustSpeed>
+    </wind>
+</WMRS200>

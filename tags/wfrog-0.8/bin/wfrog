@@ -1,0 +1,139 @@
+#!/usr/bin/python
+## Copyright 2009 Laurent Bovet <laurent.bovet@windmaster.ch>
+##                Jordi Puigsegur <jordi.puigsegur@gmail.com>
+##
+##  This file is part of wfrog
+##
+##  wfrog is free software: you can redistribute it and/or modify
+##  it under the terms of the GNU General Public License as published by
+##  the Free Software Foundation, either version 3 of the License, or
+##  (at your option) any later version.
+##
+##  This program is distributed in the hope that it will be useful,
+##  but WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##  GNU General Public License for more details.
+##
+##  You should have received a copy of the GNU General Public License
+##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+''' Bootstrap script for running wfrog components from one place. '''
+
+# This makes sure that users don't have to set up their environment
+# specially in order to run these programs from bin/.
+import sys, os, string, os.path
+WFROG_HOME='.'
+this_script=os.path.abspath(os.path.realpath(sys.argv[0]))
+if sys.platform != 'win32' and string.find(this_script, os.sep+'wfrog') != -1:
+    WFROG_HOME=os.path.normpath(os.path.join(this_script, os.pardir, os.pardir))
+    sys.path.insert(0, WFROG_HOME)
+if sys.platform == 'win32':
+    WFROG_HOME=os.path.normpath(os.path.join(this_script, os.pardir))
+if hasattr(os, "getuid") and os.getuid() != 0:
+    sys.path.insert(0, os.path.abspath(os.getcwd()))
+
+import optparse
+import wfcommon.customize
+import wfcommon.setup
+import wflogger.wflogger
+import wfrender.wfrender
+import logging
+
+SETTINGS_FILE = 'settings.yaml'
+GLOBAL_CONF_DIR = '/etc/wfrog/'
+SETTINGS_DEF=os.path.normpath(WFROG_HOME+'/wfcommon/config/settings-definition.yaml')
+
+if sys.platform == 'win32':
+    import _winreg
+    HOME_WFROG_DIR = _winreg.ExpandEnvironmentStrings(u'%APPDATA%\\Wfrog\\')
+else:
+    HOME_WFROG_DIR = os.path.expanduser("~")+'/.wfrog/'
+
+settings = None
+
+# detect settings
+if os.path.exists(HOME_WFROG_DIR + SETTINGS_FILE):
+    settings = HOME_WFROG_DIR + SETTINGS_FILE
+else:
+    if os.path.exists(GLOBAL_CONF_DIR + SETTINGS_FILE):
+        settings = GLOBAL_CONF_DIR + SETTINGS_FILE
+    else:
+        if os.path.exists('./'+SETTINGS_FILE):
+            settings = os.path.abspath('./'+SETTINGS_FILE)
+
+opt_parser = optparse.OptionParser(conflict_handler='resolve')
+
+opt_parser.add_option("-B", "--backend", action="store_true", dest="backend", help="Starts the logger and the driver only.")
+opt_parser.add_option("-R", "--renderer", action="store_true", dest="renderer", help="Starts the renderer only.")
+opt_parser.add_option("-C", "--customize", action="store_true", dest="customize", help="Prepare the config files for customizing wfrog. Safe operation, it does not overwrite an existing custom config.")
+opt_parser.add_option("-S", "--setup", action="store_true", dest="setup", help="Define the settings interactively.")
+opt_parser.add_option('-w', '--cwd', action='store_true', dest='cwd', help='Use the current working directory for data instead of the default one.')
+opt_parser.add_option("-f", "--config", dest="config_file", help="Configuration file (in yaml)", metavar="CONFIG_FILE")
+opt_parser.add_option("-s", "--settings", dest="settings", help="Settings file (in yaml)", metavar="SETTINGS_FILE")
+opt_parser.add_option("-m", "--mute", action="store_true", dest="mute", help="Skip the setup of user settings. Do not issues any questions but fails if settings are missing.")
+
+candidate_logger = wflogger.wflogger.Logger(opt_parser)
+candidate_renderer = wfrender.wfrender.RenderEngine(opt_parser)
+
+(options, args) = opt_parser.parse_args()
+
+if options.settings:
+    settings = os.path.abspath(options.settings)
+
+component = candidate_logger
+if options.backend:
+    if not options.config_file:
+        config_file = 'wflogger/config/wflogger.yaml'
+else:
+    if options.renderer:
+        component = candidate_renderer
+        if not options.config_file:
+            config_file = 'wfrender/config/wfrender.yaml'
+    else:
+        if not options.config_file:
+            config_file = 'wflogger/config/wfrog.yaml'
+
+# detect configuration
+if os.path.exists(HOME_WFROG_DIR + config_file):
+    config_dir = HOME_WFROG_DIR
+else:
+    if os.path.exists(GLOBAL_CONF_DIR + config_file):
+        config_dir = GLOBAL_CONF_DIR
+    else:
+        if os.path.exists('./'+config_file):
+            config_dir = os.path.abspath('.')
+        else:
+            config_dir = WFROG_HOME
+config_file = config_dir + '/'+config_file
+
+user = os.getenv('USER')
+if(user == None):
+    user = os.getenv('USERNAME')
+
+if not options.cwd and not user=='root':
+    try:
+        os.makedirs(HOME_WFROG_DIR)
+    except:
+        pass
+    os.chdir(HOME_WFROG_DIR)
+
+if user == 'root':
+    customize_dir = GLOBAL_CONF_DIR
+    settings_file = GLOBAL_CONF_DIR+SETTINGS_FILE
+else:
+    customize_dir = HOME_WFROG_DIR
+    settings_file = HOME_WFROG_DIR+SETTINGS_FILE
+
+if options.customize:
+    wfcommon.customize.Customizer().customize(WFROG_HOME+'/', customize_dir, ['wfcommon', 'wfdriver', 'wflogger', 'wfrender'])
+    sys.exit(0)
+
+if options.setup or settings is None:
+    if not options.mute:
+        settings = wfcommon.setup.SetupClient().setup_settings(SETTINGS_DEF, settings, settings_file)
+        if options.setup:
+            sys.exit(0)
+        else:
+            print "Now starting wfrog. Standard config serves on http://localhost:7680/."
+
+component.run(config_file, settings)

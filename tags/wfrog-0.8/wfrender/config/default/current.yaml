@@ -1,0 +1,29 @@
+renderer: !data
+    source: !user
+        choices:
+            root: !currentxml
+                path: /var/lib/wfrog/wfrog-current.xml
+            default: !currentxml
+                path: data/wfrog-current.xml  
+        
+    renderer: !multi
+        children:
+            temp0: !value { key: temp0 }
+            hum0: !value { key: hum0 }
+            temp1: !value { key: temp1 }
+            hum1: !value { key: hum1 }
+            press: !value { key: press }
+            rain: !value { key: rain }
+            timestamp: !value { key: info, value: timestamp }
+            wind: !multi
+                children:
+                    speed: !value { key: wind }
+                    gust: !value { key: wind, value: max }
+                    dir: !windradar
+                        thickness: 0.4
+                        size: 5
+                        height: 76
+                        width: 76
+                        arrow: { show: yes }
+                        tail: {color: tan }
+                        beaufort: { color: wheat, intensity: 0.9 }

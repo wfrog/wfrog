@@ -1,0 +1,22 @@
+wfrog (0.8-1) unstable; urgency=low
+
+  * Many fixes and improvements, added upload to wunderground, numerical
+    data summary and improved support of WH1081-like and VantagePro
+    stations.
+  * See http://code.google.com/p/wfrog/wiki/ReleaseNotes
+
+ -- Laurent Bovet <shaman@naboo>  Fri, 04 Mar 2011 21:47:06 +0100
+
+wfrog (0.7-1) unstable; urgency=low
+
+  * WMR200 driver, .deb packaging, better configurability, many small
+    fixes and improvements.
+  * See http://code.google.com/p/wfrog/wiki/ReleaseNotes
+
+ -- Laurent Bovet <shaman@naboo>  Wed, 25 Aug 2010 21:57:37 +0200
+
+wfrog (0.6-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Laurent Bovet <laurent.bovet@windmaster.ch>  Tue, 27 Jul 2010 23:28:30 +0200

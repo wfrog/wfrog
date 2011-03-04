@@ -1,0 +1,42 @@
+## To display use: wget -qO- http://localhost:8080
+#set $days = $daily.keys()
+#silent $days.sort()
+#silent $days.reverse()
+wfrog $version (http://www.wfrog.org)
+
+#set $last_measure = $daily[$days[0]].measures_last 
+Last measure stored: ${$last_measure if $last_measure != None else "None"}
+
+Number of measures collected (last ${len($days)} days)
+---------------------------------------------
+   Date     Total Temp/hum Press. Rain   Wind
+#for $day in $days
+#set $value = $daily[$day]
+$day#slurp
+${"%7d" % $value.measures_count if $value.measures_count != None else "      -"}#slurp
+${"%7d" % $value.temp_count if $value.temp_count != None else "      -"}#slurp
+${"%7d" % $value.press_count if $value.press_count != None else "      -"}#slurp
+${"%7d" % $value.rain_count if $value.rain_count != None else "      -"}#slurp
+${"%7d" % $value.wind_count if $value.wind_count != None else "      -"}
+#end for
+
+Meteorological data (last ${len($days)} days)
+--------------------------------------------------------------------------
+   Date         Temp.     Humidity    Pressure        Rain          Wind
+             max   min   max    min   max   min    fall   rate    max  dir
+#for $day in $days
+#set $value = $daily[$day]
+$day#slurp
+${"%6.1f" % $value.temp_max if $value.temp_max != None else "     -"}#slurp
+${"%6.1f" % $value.temp_min if $value.temp_min != None else "     -"}#slurp
+${"%6.1f%%" % $value.hum_max if $value.hum_max != None else "     - "}#slurp
+${"%6.1f%%" % $value.hum_min if $value.hum_min != None else "     - "}#slurp
+${"%6.0f" % $value.press_max if $value.press_max != None else "     -"}#slurp
+${"%6.0f" % $value.press_min if $value.press_min != None else "     -"}#slurp 
+${"%7.1f" % $value.rain_fall if $value.rain_fall != None else "      -"}#slurp
+${"%7.1f" % $value.rain_rate if $value.rain_rate != None else "      -"}#slurp
+${"%7.1f" % $value.wind_max if $value.wind_max != None else "      -"}#slurp
+${"%5s" % $value.wind_dir if $value.wind_dir != None else "    -"}
+#end for
+
+
