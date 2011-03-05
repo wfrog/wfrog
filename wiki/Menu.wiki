@@ -16,7 +16,7 @@
 *Community*<br>
   [SeeItInAction Online Stations]<br>
   [http://groups.google.com/group/wfrog-users User Forum]<br>
-  [Contribute Contribute]
+  [Contribute Contribute]<br>
   [http://chat.efnet.org:9090/?channels=%23wfrog&Login=Login #wfrog] on irc.efnet.org
 
 *Design Discussions*<br>
