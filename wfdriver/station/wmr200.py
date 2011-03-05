@@ -465,11 +465,10 @@ class WMR200Station(BaseStation):
         uv = self.decodeUV(record[27])
         # Bytes 28 - 32 contain pressure data
         pressure = self.decodePressure(record[28:32])
-        # Byte 32: Unknown
-        if record[32] != 1:
-          self.logger.info("TODO: History byte 32: %02X" % record[32])
+        # Byte 32: number of external sensors
+        externalSensors = record[32]
         # Bytes 33 - end contain temperature and humidity data
-        data = self.decodeTempHumid(record[33:len(record) - 2])
+        data = self.decodeTempHumid(record[33:33 + (1 + externalSensors) * 7])
         self.logger.info("<<<<< End Historic Record <<<<<")
 
         # TODO: Find out how "no wind data" is encoded and ignore it.
