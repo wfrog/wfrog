@@ -35,11 +35,16 @@
 #    ./wflogger -d 2> wmr200.log
 #
 # Attach the wmr200.log file and include the corresponding actual
-# readings from your WMR200 display. I'd like to thank the folks at
+# readings from your WMR200 display.
+# I'd like to thank the folks at
 # http://aguilmard.com/phpBB3/viewtopic.php?f=2&t=508&st=0&sk=t&sd=a&sid=4f64fc06860272367eb6c9e408acabe1
 # for their previous work. Also, the work from Denis Ducret
 # <info@windspots.com> was very helpful to write this driver. His data
 # logger can be found at http://www.sdic.ch/innovation/contributions.
+# Probably the most comprehensive WRM200 protocol description was compiled by
+# Rainer Finkeldeh and can be found at http://www.bashewa.com/wmr200-protocol.php.
+# Without the diligent reverse engineering efforts of these folks, this driver
+# would not have been possible.
 
 from base import BaseStation
 import time
@@ -56,8 +61,7 @@ windDirMap = { 0:"N", 1:"NNE", 2:"NE", 3:"ENE",
 forecastMap = { 0:"Partly Cloudy", 1:"Rainy", 2:"Cloudy", 3:"Sunny",
                 4:"Clear Night", 5:"Snowy",
                 6:"Partly Cloudy Night", 7:"Unknown7" }
-climateSmileys = { 0:"-", 1:":-)", 2:":-(", 3:":-|" }
-humidityTrend = { 0:"Stable", 1:"Rising", 2:"Falling", 3:"Undefined" }
+trends =      { 0:"Stable", 1:"Rising", 2:"Falling", 3:"Undefined" }
 
 usbWait = 0.5
 usbTimeout = 3.0
@@ -516,11 +520,9 @@ class WMR200Station(BaseStation):
         self.logger.info("TODO: 0xD8 frame found: %s" %
                          self._list2bytes(record))
       elif type == 0xD9:
-        # 0xD9 frames have unknown content. Maybe we can find out
-        # what the bits mean.
-        if record[2] != 0 or record[3] != 0 or record[4] != 0 or record[5] != 0:
-          self.logger.info("TODO: 0xD9 frame found: %s" %
-                           self._list2bytes(record[2:6]))
+        # 0x09 frames contain status information about the devices. The
+        # meaning of several bits is still unknown. Maybe they are not in use.
+        self.decodeStatus(record[2:8])
 
     def decodeTimeStamp(self, record, label = 'Time', check = True):
       minutes = record[0]
@@ -543,7 +545,7 @@ class WMR200Station(BaseStation):
       dirDeg = (record[0] & 0xF) * 22.5
       # Byte 1: Always 0x0C? Maybe high nible is high byte of gust speed.
       # Byts 2: The low byte of gust speed in 0.1 m/s.
-      gustSpeed = (((record[1] >> 4) & 0xF) | record[2]) * 0.1
+      gustSpeed = ((((record[1] >> 4) & 0xF) << 8) | record[2]) * 0.1
       if record[1] != 0x0C:
         self.logger.info("TODO: Wind byte 1: %02X" % record[1])
       # Byte 3: High nibble seems to be low nibble of average speed.
@@ -620,8 +622,8 @@ class WMR200Station(BaseStation):
       for i in xrange(len(record) / rSize):
         # Byte 0: low nibble contains sensor ID. 0 for base station.
         sensor = record[i * rSize] & 0xF
-        smiley = (record[i * rSize] >> 6) & 0x3
-        trend = (record[i * rSize] >> 4) & 0x3
+        tempTrend = (record[i * rSize] >> 6) & 0x3
+        humTrend = (record[i * rSize] >> 4) & 0x3
         # Byte 1: probably the high nible contains the sign indicator.
         #         The low nibble is the high byte of the temperature.
         # Byte 2: The low byte of the temperature. The value is in 1/10
@@ -637,23 +639,62 @@ class WMR200Station(BaseStation):
                     record[i * rSize + 4]) * 0.1
         if record[i * rSize + 5] & 0x80:
           dewPoint = -dewPoint
-        # The meaning of byte 6 is still unknown. The observed values are
-        # ususally 0. But I've occasionally observed values in the 0x4F - 0x51
-        # range. There seems to be some correlation with the dew point.
-
+        # Byte 6: Head index
         if record[i * rSize + 6] != 0:
-          self.logger.info("TODO: Sensor %d byte 6: %02X" %
-                           (sensor, record[i * rSize + 6]))
+          headIndex = (record[i * rSize + 6] - 32) / 1.8
+        else:
+          headIndex = None
 
-        self.logger.info("Temperature %d: %.1f C" % (sensor, temp))
-        self.logger.info("Humidity %d: %d%%   Trend: %s   Climate: %s" %
-                         (sensor, humidity, humidityTrend[trend],
-                          climateSmileys[smiley]))
+        self.logger.info("Temperature %d: %.1f C  Trend: %s" %
+                          (sensor, temp, trends[tempTrend]))
+        self.logger.info("Humidity %d: %d%%   Trend: %s" %
+                         (sensor, humidity, trends[humTrend]))
         self.logger.info("Dew point %d: %.1f C" % (sensor, dewPoint))
+        if headIndex:
+          self.logger.info("Heat index: %d" % (headIndex))
 
         data.append((temp, humidity, sensor))
 
       return data
+
+    def decodeStatus(self, record):
+      # Byte 0
+      if record[0] & int('11111100', 2):
+        self.logger.info("TODO: Unknown bits in D9 frame byte 0: %0x2X" %
+                         (record[0]))
+      if record[0] & 0x2:
+        self.logger.warning("Sensor 1 fault (temp/hum outdoor)")
+      if record[0] & 0x1:
+        self.logger.warning("Wind sensor fault")
+
+      # Byte 1
+      if record[1] & int('11001111',2):
+        self.logger.info("TODO: Unknown bits in D9 frame byte 1: %02X" %
+                         (record[1]))
+      if record[1] & 0x20:
+        self.logger.warning("UV Sensor fault")
+      if record[1] & 0x10:
+        self.logger.warning("Rain sensor fault")
+
+      # Byte 2
+      if record[2] & int('01111100', 2):
+        self.logger.info("TODO: Unknown bits in D9 frame byte 2: %02X" %
+                         (record[2]))
+      if record[2] & 0x80:
+        self.logger.warning("Weak RF signal. Clock not synched")
+      if record[2] & 0x02:
+        self.logger.warning("Sensor 1: Battery low")
+      if record[2] & 0x01:
+        self.logger.warning("Wind sensor: Battery low")
+
+      # Byte 3
+      if record[3] & int('11001111', 2):
+        self.logger.info("TODO: Unknown bits in D9 frame byte 3: %02X" %
+                         (record[3]))
+      if record[3] & 0x20:
+        self.logger.warning("UV sensor: Battery low")
+      if record[3] & 0x10:
+        self.logger.warning("Rain sensor: Battery low")
 
     def checkSum(self, packet, checkSum):
       sum = 0
