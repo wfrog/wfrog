@@ -4,7 +4,7 @@ Users are invited to submit as comment to this page the URL of their stations to
 
 || *Location* || *Weather Station* || *Remarks* ||
 || [http://www.mallorcaweb.net/jpuigsegur/wfrog/72hours.html Sant Joan, Mallorca, Balearic Islands] || WMRS200 || Uses FTP renderer. Running on [http://www.pcengines.ch/alix.htm ALIX3D2] with [http://linux.voyage.hk/ voyage linux] 0.6.2. Uploads online data to www.meteoclimatic.com  ||
-|| [http://www.windmaster.ch/meteo/ Cortaillod, Neuchâtel, Switzerland] || WMRS200 ||  Uses HTTP renderer. ||
+|| [http://www.windmaster.ch/meteo/ Cortaillod, Neuchâtel, Switzerland] || WMRS200 ||  Uses HTTP renderer. Logger running on [http://www.pcengines.ch/alix.htm ALIX3D2], renderer on Ubuntu 08.04, CSV file periodically synchronized using rsync. ||
 || [http://meteolajonquera.50webs.com/24hours.html La Jonquera, Catalonia] || WMR928NX || Uses FTP renderer. Running on [http://www.pcengines.ch/alix.htm ALIX3D2] with [http://linux.voyage.hk/ voyage linux] 0.6.2. Uploads online data to www.meteoclimatic.com ||
 || [http://www.6tec.es/estacio/24hours.html (6tec enginyeria) Manacor, Balearic Islands] || WMRS200 || Uses FTP renderer. Running on [http://www.pcengines.ch/alix.htm ALIX3D2] with [http://linux.voyage.hk/ voyage linux] 0.6.2. Uploads online data to www.meteoclimatic.com  ||
 || [http://weather.fire-mgou.ru/ Yubileyny (Moscow region), Russia] || WMR200 || Uses HTTP renderer. ||
