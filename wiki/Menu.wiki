@@ -21,3 +21,8 @@
 
 *Design Discussions*<br>
   [Architecture]<br>
+
+*External Links*<br>
+  [http://github.com/cmcginty/PyWeather PyWeather]<br>
+  [http://code.google.com/p/pywws/ pywws]<br>
+  [http://code.google.com/p/wfrogmunin/ wfrog+munin]<br>
