@@ -8,6 +8,8 @@
   [SupportedStations Supported Stations]<br>
   [ReleaseNotes Release Notes]<br>
 
+  [TroubleshootingFAQ Troubleshooting FAQ]
+
 *Unmaintained Documents*<br>
   [Documentation0_6 wfrog 0.6: Usage and Installation]<br>
   [InstallOnVoyageLinux Installation on Voyage Linux]<br>
