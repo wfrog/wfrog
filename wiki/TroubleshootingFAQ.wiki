@@ -6,7 +6,7 @@
 
 *Q: I start wfrog, nothing happens. Where is the graph window?*
 
-A: It is normal behavious. The wfrog application provides its UI as a web application. Open http://localhost:7680 .
+A: It is normal behaviour. The wfrog application provides its UI as a web application. Open http://localhost:7680 .
 
 *Q: The graphs are empty and measures show 9999*
 
