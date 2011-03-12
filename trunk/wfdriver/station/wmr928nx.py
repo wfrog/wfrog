@@ -41,9 +41,13 @@ class WMR928NXStation(BaseStation):
     
     port [numeric] (optional):
         Serial port number where the station is connected. Defaults to 1.
+
+    pressure_cal [numeric] (optional):
+        Pressure calibration offset in mb. Defaults to 0.
     '''
     
     port = 1
+    pressure_cal = 0
     
     logger = logging.getLogger('station.wmr928nx')
     
@@ -280,7 +284,7 @@ class WMR928NXStation(BaseStation):
         weatherStatus = (record[7] & 0xf0) >> 4
         weatherStatusTxt = self.weatherStatusMap.get(weatherStatus, str(weatherStatus))
     
-        self._report_barometer_absolute(pressure)
+        self._report_barometer_absolute(pressure + self.pressure_cal)
         self._report_temperature(temperature, humidity, 0)        
 
         # Log
