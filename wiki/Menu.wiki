@@ -23,7 +23,7 @@
 
 *Design Discussions*<br>
   [Architecture Architecture wfrog 0.9]<br>
-  [BaseArchitecture Base Architecture (wfrog 0.5)<br>
+  [BaseArchitecture Base Architecture (wfrog 0.5)]<br>
 
 *External Links*<br>
   [http://github.com/cmcginty/PyWeather PyWeather]<br>
