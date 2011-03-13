@@ -51,7 +51,7 @@ class DataTableRenderer(object):
 
         label_key = 'lbl' + str(self.label) if self.label > 1 else 'lbl'
         for measure in new_data.keys():
-            if measure != 'sectors':
+            if measure != 'sectors' and type(new_data[measure]) == dict:
                 lbls = new_data[measure]['series'][label_key]
                 for lbl in lbls:
                     if not lbl in result:
