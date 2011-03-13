@@ -37,6 +37,8 @@ class WH1080Station(object):
     '''
 
     logger = logging.getLogger('station.wh1080')
+    
+    name = 'Fine Offset WH1080 and compatibles'
 
     def run(self, generate_event, send_event, context={}):
     

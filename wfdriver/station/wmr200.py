@@ -73,8 +73,6 @@ usbTimeout = 3.0
 vendor_id  = 0xfde
 product_id = 0xca01
 
-name = "Oregon Scientific WMR200"
-
 def detect():
   station = WMR200Station()
   if station.connectDevice(silent_fail=True) is not None:
@@ -89,6 +87,8 @@ class WMR200Station(BaseStation):
     '''
 
     logger = logging.getLogger('station.wmr200')
+
+    name = "Oregon Scientific WMR200"
 
     def __init__(self):
       # The delay between data requests. This value will be adjusted
@@ -776,3 +776,4 @@ class WMR200Station(BaseStation):
           self.lastResync = now
           self.syncing = True
 
+name = WMR200Station.name

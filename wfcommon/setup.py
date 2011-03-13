@@ -22,6 +22,8 @@ import os
 import os.path
 import yaml
 import logging
+import inspect
+import wfdriver.station
 
 class SetupClient(object):
     '''Interactive setup for user settings'''
@@ -41,6 +43,28 @@ class SetupClient(object):
             os.makedirs(os.path.dirname(target_file))
         except:
             pass
+            
+        # First question is about the station
+        section = {}
+        section['name'] = "station"
+        section['description'] = "Station information"
+        section['type'] = 'dict'
+        question = {}
+        question['name'] = "driver"
+        question['description'] = "the driver for your station model"
+        question['type'] = 'choice'
+        question['default'] = 'none'
+        question['choices'] = {}
+        section['children'] =[question]
+        
+        stations = inspect.getmembers(wfdriver.station, lambda l : inspect.isclass(l) and yaml.YAMLObject in inspect.getmro(l))
+        for station in stations:
+            station_class = station[1]
+            if hasattr(station_class,('name')):
+                question['choices'][str(station_class.yaml_tag)[1:]] = station_class.name
+        
+        defs.insert(0,section)        
+            
         self.welcome(target_file)
         self.recurse_create(defs, source, target)
         yaml.dump(target, file(target_file, 'w'), default_flow_style=False)
@@ -61,7 +85,10 @@ class SetupClient(object):
                 if source_node.has_key(k):
                     default = source_node[k]
                 else:
-                    default = None
+                    if v.has_key('default') and v['default'] == 'none':
+                        default = 'none'
+                    else:
+                        default = None
                 value = None
                 while value == None:
                     value = self.create_value(v, default)
@@ -78,14 +105,26 @@ class SetupClient(object):
             except:
                 return None
         if node['type'] == 'choice':
-            choices = node['choices']
-            if default is not None and choices.count(default) > 0:
-                default = str(choices.index(default)+1)
+            choices_collection = node['choices']
+            if type(choices_collection) == dict:
+                choices=sorted(choices_collection.keys())
             else:
-                default = '1'
-            prompt = choices[int(default)-1]
+                choices=choices_collection            
+            
+            if default != 'none':                
+                if default is not None and choices.count(default) > 0:
+                    default = str(choices.index(default)+1)
+                else:
+                    default = '1'
+                prompt = choices[int(default)-1]
+            else:
+                prompt = None
             for i in range(len(choices)):
-                question = question+'\n '+ str(i+1) +') '+choices[i]
+                if type(choices_collection) == dict:
+                    value = choices[i] + ' - ' + choices_collection[choices[i]]
+                else:
+                    value = choices[i]
+                question = question+'\n '+ str(i+1) +') '+ value
             answer = self.ask_question(question, default, prompt)
             try:
                 return choices[int(answer)-1]
@@ -97,7 +136,9 @@ class SetupClient(object):
 
     def ask_question(self, question, default, prompt):
         print '\n'+question
-        sys.stdout.write('['+str(prompt)+'] > ')
+        if prompt is not None:
+            sys.stdout.write('['+str(prompt)+'] ')    
+        sys.stdout.write('> ')
         line=sys.stdin.readline()
         if line is None or line.strip() == '':
             return default

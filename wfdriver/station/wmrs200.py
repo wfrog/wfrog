@@ -51,8 +51,6 @@ mainThExtSensor = 'th1'
 vendor_id  = 0xfde
 product_id = 0xca01
 
-name = "Oregon Scientific WMRS 200"
-
 def detect():
     station = WMRS200Station()
     if station._search_device(vendor_id, product_id) is not None:
@@ -71,11 +69,13 @@ class WMRS200Station(BaseStation):
         Rain gauge diamater in mm. When specified the driver will do the necessary 
         conversions to adjust rain to the new gauge size. Defaults to 0 (= no calculation)
      '''
-    
+        
     pressure_cal = 0
     rain_gauge_diameter = 0
 
     logger = logging.getLogger('station.wmrs200')
+
+    name = "Oregon Scientific WMRS200"
 
     def _list2bytes(self, d):
         return reduce(lambda a, b: a + b, map(lambda a: "%02X " % a, d))
@@ -447,3 +447,5 @@ class WMRS200Station(BaseStation):
 
         # Log
         self.logger.info("UV  Battery Ok: %s  UV Index: %d" % (batteryOk, uv))
+
+name = WMRS200Station.name

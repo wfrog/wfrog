@@ -51,6 +51,8 @@ class WMR928NXStation(BaseStation):
     
     logger = logging.getLogger('station.wmr928nx')
     
+    name = 'Oregon Scientific WMR928NX'
+    
     weatherStatusMap = {0xc: 'Sunny', 0x6: 'Half cloudy', 0x2: 'Cloudy', 0x3: 'rainy'}
     
     def _list2bytes(self, d):

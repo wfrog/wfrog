@@ -54,10 +54,12 @@ class IncludeElement(wrapper.ElementWrapper):
             dir_name = path.dirname(config_file)
             self.abs_path=path.join(dir_name, self.path)
 
-            if self.variables:
-                conf_str = str(Template(file=file(self.abs_path, "r"), searchList=[self.variables]))
-            else:
-                conf_str = file(self.abs_path, "r").read()
+            if not self.variables:
+                self.variables={}
+            if context:
+                self.variables['settings']=context
+
+            conf_str = str(Template(file=file(self.abs_path, "r"), searchList=[self.variables]))
             config = yaml.load(conf_str)
             self.target = config.values()[0]
 

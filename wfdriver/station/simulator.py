@@ -25,8 +25,6 @@ import logging
 def detect():
     return RandomSimulator()
 
-name = "Random Station Simulator"
-
 
 class RandomSimulator(object):
 
@@ -51,6 +49,8 @@ class RandomSimulator(object):
     rain_total = 55
 
     logger = logging.getLogger('station.simulator')
+
+    name = "Station Simulator"
 
     def new_value(self, current, init, range):
         step = random.random()*(range/8.0) - range/16.0
@@ -108,3 +108,5 @@ class RandomSimulator(object):
                 past_counter = past_counter - 1
             else:
                 time.sleep(2)
+
+name = RandomSimulator.name
