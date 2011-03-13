@@ -20,6 +20,7 @@ import logging
 import wrapper
 import os
 import copy
+import getpass
 
 class UserChoiceElement(wrapper.ElementWrapper):
     """
@@ -41,9 +42,7 @@ class UserChoiceElement(wrapper.ElementWrapper):
     def _init(self, context=None):
 
         if not self.target:
-            user = os.getenv('USER')
-            if(user == None):
-                user = os.getenv('USERNAME')
+            user = getpass.getuser()
             if not self.choices.has_key(user):
                 user = 'default'
             self.logger.debug('Current user:'+user)
