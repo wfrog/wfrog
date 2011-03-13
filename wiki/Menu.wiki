@@ -22,7 +22,8 @@
   [http://chat.efnet.org:9090/?channels=%23wfrog&Login=Login #wfrog] on irc.efnet.org
 
 *Design Discussions*<br>
-  [Architecture]<br>
+  [Architecture Architecture wfrog 0.9]<br>
+  [BaseArchitecture Base Architecture (wfrog 0.5)<br>
 
 *External Links*<br>
   [http://github.com/cmcginty/PyWeather PyWeather]<br>
