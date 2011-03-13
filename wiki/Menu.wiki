@@ -22,7 +22,7 @@
   [http://chat.efnet.org:9090/?channels=%23wfrog&Login=Login #wfrog] on irc.efnet.org
 
 *Design Discussions*<br>
-  [Architecture Architecture] of wfrog 0.9]<br>
+  [Architecture Architecture] of wfrog 0.9<br>
   [BaseArchitecture Base Architecture] (wfrog 0.5)<br>
 
 *External Links*<br>
