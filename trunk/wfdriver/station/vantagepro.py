@@ -42,6 +42,8 @@ class VantageProStation(object):
 
     logger = logging.getLogger('station.vantagepro')
 
+    name = 'Davis VantagePro'
+
     def run(self, generate_event, send_event, context={}):
 
         import weather.stations.davis

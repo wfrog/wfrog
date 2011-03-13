@@ -23,7 +23,7 @@ from wfcommon import units
 class WS2300Station(object):
 
     '''
-    Station driver for LaCrosse 2300.
+    Station driver for LaCrosse WS2300.
       
     This driver is a wrapper around ws2300 (http://ace-host.stuart.id.au/russell/files/ws2300/), 
     thus needs this package installed on your system.    
@@ -43,6 +43,7 @@ class WS2300Station(object):
 
     logger = logging.getLogger('station.ws2300')
     
+    name = 'LaCrosse WS2300'
 
     def run(self, generate_event, send_event, context={}):
     

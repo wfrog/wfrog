@@ -1,6 +1,4 @@
-station: !auto { }
-
-#station: !wmrs200 {}
+station: !${settings.station.driver} { }
 
 output: !service { name: events }
 

@@ -23,6 +23,7 @@ import inspect
 import sys
 import os.path
 import copy
+from Cheetah.Template import Template
 
 wfrog_version = "0.8"
 
@@ -95,8 +96,6 @@ class Configurer(object):
         if not embedded and options.config:
             self.config_file = options.config
 
-        config = yaml.load( file(self.config_file, "r") )
-
         settings_warning=False
         if self.settings_file is None:
             if options.settings is not None:
@@ -105,6 +104,10 @@ class Configurer(object):
                 settings_warning=True
                 self.settings_file = os.path.dirname(self.config_file)+'/../../wfcommon/config/default-settings.yaml'
         settings = yaml.load( file(self.settings_file, 'r') )
+
+        variables = {}
+        variables['settings']=settings
+        config = yaml.load( str(Template(file=file(self.config_file, "r"), searchList=[variables])))
 
         if settings is not None:
             context = copy.deepcopy(settings)
@@ -116,12 +119,12 @@ class Configurer(object):
         if not embedded:
             self.log_configurer.configure(options, config, context)
 
-        self.logger.debug("Loaded config file " + os.path.normpath(self.config_file))
         if settings_warning:
             self.logger.warn('User settings are missing. Loading default ones. Run \'wfrog -S\' for user settings setup.')
         self.logger.info("Loaded settings file " + os.path.normpath(self.settings_file))
         self.logger.debug('Loaded settings %s', repr(settings))
-
+        self.logger.debug("Loaded config file " + os.path.normpath(self.config_file))
+        
         if config.has_key('init'):
             for k,v in config['init'].iteritems():
                 self.logger.debug("Initializing "+k)
