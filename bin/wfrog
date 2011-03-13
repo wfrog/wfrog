@@ -38,6 +38,7 @@ import wfcommon.setup
 import wflogger.wflogger
 import wfrender.wfrender
 import logging
+import getpass
 
 SETTINGS_FILE = 'settings.yaml'
 GLOBAL_CONF_DIR = '/etc/wfrog/'
@@ -47,7 +48,7 @@ if sys.platform == 'win32':
     import _winreg
     HOME_WFROG_DIR = _winreg.ExpandEnvironmentStrings(u'%APPDATA%\\Wfrog\\')
 else:
-    HOME_WFROG_DIR = os.path.expanduser("~")+'/.wfrog/'
+    HOME_WFROG_DIR = os.path.expanduser("~"+getpass.getuser())+'/.wfrog/'
 
 settings = None
 
@@ -106,9 +107,7 @@ else:
             config_dir = WFROG_HOME
 config_file = config_dir + '/'+config_file
 
-user = os.getenv('USER')
-if(user == None):
-    user = os.getenv('USERNAME')
+user = getpass.getuser()
 
 if not options.cwd and not user=='root':
     try:
