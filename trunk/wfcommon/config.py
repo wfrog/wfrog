@@ -115,6 +115,7 @@ class Configurer(object):
             context = {}
 
         context['_yaml_config_file'] = self.config_file
+        context['os']=sys.platform
 
         if not embedded:
             self.log_configurer.configure(options, config, context)
