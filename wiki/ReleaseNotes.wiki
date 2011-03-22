@@ -7,7 +7,7 @@ Dramatically simplified the configuration by choosing the station in startup set
   * WMR928NX: added pressure_cal parameter in order to be able to calibrate pressure. 
   * Fixed sporadic problem creating files under `/root/.wfrog`
 
-_Upgrade notes:_ If you have customized your configuration. In order to have the new settings take effect, you have to upgrade the wfdriver config files to the latest version.
+_Upgrade notes:_ If you have customized your configuration: in order to have the new settings take effect, you have to upgrade the wfdriver config files to the latest version and execute `wfrog -S`.
 
 *wfrog 0.8 - 04.03.2011*
 
