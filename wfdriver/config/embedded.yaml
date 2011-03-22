@@ -1,4 +1,5 @@
 station: !${settings.station.driver} { }
+#    port: /dev/ttyS1
 
 output: !service { name: events }
 

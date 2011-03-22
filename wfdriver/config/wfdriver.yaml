@@ -1,4 +1,5 @@
 station: !${settings.station.driver} { }
+#    port: /dev/ttyS1
 
 #output: !http-out { url: 'http://localhost:8888/' }
 output: !stdio-out {}
