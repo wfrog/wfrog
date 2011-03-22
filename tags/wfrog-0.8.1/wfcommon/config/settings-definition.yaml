@@ -1,0 +1,24 @@
+-   name: altitude
+    description: the altitude of your station (meters from sea level)
+    type: number
+    default: 0
+-   name: units
+    description: Measurement units
+    type: dict
+    children:
+        -   name: temp
+            description: the temperature unit
+            type: choice
+            choices: [ C, F]
+        -   name: wind
+            description: the wind speed unit
+            type: choice
+            choices: [ km/h, mph, m/s, kt, bft ]
+        -   name: rain
+            description: the absolute rain fall unit
+            type: choice
+            choices: [ mm, in ]
+        -   name: press
+            description: the atmospheric pressure unit
+            type: choice
+            choices: [ hPa, mmHg, inHg ]

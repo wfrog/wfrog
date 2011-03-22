@@ -1,0 +1,21 @@
+renderer: !template
+    path: ../../templates/default/main.html
+    mime: text/html
+    renderer: !data
+        source: !accumulator
+            slice: minute
+            span: 180
+            storage: !service
+                name: storage
+        renderer: !multi
+            children:
+                current: !include
+                    path: current.yaml
+                chart: !include
+                    path: charts.yaml
+                    variables:
+                        interpolate: true
+                summary: !datatable
+                    label: 2
+
+

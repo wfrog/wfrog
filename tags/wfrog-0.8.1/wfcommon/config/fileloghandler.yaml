@@ -1,0 +1,5 @@
+handler: !!python/object/new:logging.handlers.RotatingFileHandler
+    kwds:
+        filename: ${filename}
+        maxBytes: 262144
+        backupCount: 3
