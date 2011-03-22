@@ -80,14 +80,12 @@ When a configuration is available at this location, it will be used instead of t
 
 == Configuring the station driver ==
 
-=== Specifying your station model ==
+=== Specifying your station port ==
 
-If your station is not listed as capable of auto-detect in SupportedStations, you will need to configure the correct driver:
+Serial stations need to communicate via a port. To configure it:
 
   * Be sure to have [http://code.google.com/p/wfrog/wiki/CustomizationGuide?ts=1283113562&updated=CustomizationGuide#Preparing_the_customization prepared your custom configuration] 
-  * Modify the file `wfdriver/config/embedded.yaml`:
-    * Comment out the `station: !auto` line.
-    * Add the line `station; !xxxx`. Where `!xxx` is the driver listed in SupportedStations.
+  * Modify the file `wfdriver/config/embedded.yaml` to uncomment and complete the port line under the station line.
 
 == Configuring the renderer ==
 
