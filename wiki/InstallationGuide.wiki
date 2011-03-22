@@ -4,7 +4,7 @@
 _In fact, this will work with any debian based Linux distribution_
   * Download and install the latest wfrog package *.deb* file from the [http://code.google.com/p/wfrog/downloads/list?can=2 download page]
   * Plug your station and [SupportedStations check notes about your station model].
-  * Run `sudo wfrog`
+  * Run `sudo wfrog` and answer the questions.
   * Open http://localhost:7680/
 
 == <img src="http://wfrog.googlecode.com/svn/wiki/images/linux_logo.png"/> Other Linux Distributions==
@@ -20,14 +20,14 @@ sudo easy_install pyyaml                   # For reading config files
 sudo easy_install pygooglechart            # Chart rendering
 }}}
   * Plug your station and [SupportedStations check notes about your station model]
-  * Run `sudo bin/wfrog` 
+  * Run `sudo bin/wfrog` and answer the questions.
   * Open http://localhost:7680/
 
 == <img src="http://wfrog.googlecode.com/svn/wiki/images/windows_logo.png"/> Windows ==
 
   * Download and install the latest win32 wfrog zip file from the [http://code.google.com/p/wfrog/downloads/list?can=2&q=OpSys%3DWindows download page]
   * Plug your station and [SupportedStations check notes about your station model].
-  * Run `wfrog.exe`
+  * Run `wfrog.exe` and answer the questions.
   * Open http://localhost:7680/
 
 <p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
