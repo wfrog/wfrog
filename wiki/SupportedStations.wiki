@@ -27,7 +27,5 @@ Maturity level:
 || *Topcom National Geographic*        || 265NE || USB || Medium || No || !wh1080 || See Fine Offset Electronics WH1080 || Yes || ? ||
 || *Watson*                  || W8681 || USB || Medium || No || !wh1080 || See Fine Offset Electronics WH1080 || Yes || ? ||
 
-<p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
-
-
 Note that some USB drivers in Linux need to be run as root.
+<p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
