@@ -45,16 +45,13 @@ import copy
 def detect():
     return MyStation()
 
-name = "My Station"
-
-
 class MyStation(object):
 
     '''
     Simulates a station. Issues events randomly with random variations.
     '''
 
-    debug_station = True
+    name = "My Station"
 
     types = [ 'temp', 'press', 'hum', 'rain', 'wind', 'uv', 'rad' ]
     init_values = [ 10, 1020, 65, 10, [ 3, 180], 1, 2 ]
