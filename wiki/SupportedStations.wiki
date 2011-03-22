@@ -5,8 +5,6 @@ Maturity level:
   * Medium: Reported to be working.
   * Low: Support has been recently implemented.
 
-/wiki/CustomizationGuide?ts=1283113562&updated=CustomizationGuide#Specifying_your_station_model configure the appropriate driver], listed in the Driver column.
-
 || *Vendor*|| *Model* || *Link* || *Maturity* || *Auto-Detect* || *Driver* || *Notes* || *Linux* || *Windows* ||
 || *Ambient Weather* || WS1080 || USB || Medium || No || !wh1080 || See Fine Offset Electronics WH1080 || Yes || ? ||
 || *Davis* || !VantagePro || Serial || Medium || No || !vantagepro || Needs third party !PyWeather library.<br> Install it with `sudo easy_install weather`. || Yes || ? ||
