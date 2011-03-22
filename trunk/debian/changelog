@@ -1,3 +1,11 @@
+wfrog (0.8.1-1) unstable; urgency=low
+
+  * Dramatically simplified the configuration by choosing the station in
+    startup settings. Some fixes.
+  * See http://code.google.com/p/wfrog/wiki/ReleaseNotes
+
+ -- Laurent Bovet <shaman@naboo>  Tue, 22 Mar 2011 20:47:28 +0100
+
 wfrog (0.8-1) unstable; urgency=low
 
   * Many fixes and improvements, added upload to wunderground, numerical
