@@ -25,7 +25,7 @@ import os.path
 import copy
 from Cheetah.Template import Template
 
-wfrog_version = "0.8.1-svn"
+wfrog_version = "0.8.1"
 
 class Configurer(object):
 
