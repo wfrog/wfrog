@@ -75,6 +75,7 @@ product_id = 0xca01
 
 def detect():
   station = WMR200Station()
+  station.init()
   if station.connectDevice(silent_fail=True) is not None:
     return station
 
@@ -90,7 +91,7 @@ class WMR200Station(BaseStation):
 
     name = "Oregon Scientific WMR200"
 
-    def __init__(self):
+    def init(self):
       # The delay between data requests. This value will be adjusted
       # automatically.
       self.pollDelay = 2.5
@@ -339,6 +340,7 @@ class WMR200Station(BaseStation):
       self.generate_event = generate_event
       self.send_event = send_event
       self.logger.info("Thread started")
+      self.init()
 
       while True:
         try:
