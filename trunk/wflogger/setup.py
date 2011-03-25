@@ -23,6 +23,7 @@ import os.path
 import yaml
 import logging
 import inspect
+import wfcommon.config
 import wfdriver.station
 
 class SetupClient(object):
@@ -146,7 +147,7 @@ class SetupClient(object):
             return line.strip()
 
     def welcome(self, settings_file):
-        print 'This is the setup of wfrog user settings that will be written in '+settings_file
+        print 'This is the setup of wfrog '+wfcommon.config.wfrog_version+' user settings that will be written in '+settings_file
 
     def bye(self):
         print
