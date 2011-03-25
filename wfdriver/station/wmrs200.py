@@ -164,6 +164,10 @@ class WMRS200Station(BaseStation):
                         self.logger.debug('USBError("No error") exception received. Ignoring...(http://bugs.debian.org/476796)')
                         packet = None
                         time.sleep(1)
+                    if e.args == ('Connection timed out',):
+                        self.logger.debug('No event received within timeout.')
+                        packet = None
+                        time.sleep(1)                        
                     else:
                         raise e
             except Exception, e:
