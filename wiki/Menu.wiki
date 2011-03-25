@@ -19,7 +19,7 @@
   [SeeItInAction Online Stations]<br>
   [http://groups.google.com/group/wfrog-users User Forum]<br>
   [Contribute Contribute]<br>
-  [http://chat.efnet.org:9090/?channels=%23wfrog&Login=Login #wfrog] on irc.efnet.org
+  [http://chat.efnet.org:9090/?channels=%23wfrog&Login=Login #wfrog] on irc.efnet.org<br>
   Follow [http://twitter.com/#!/search?q=%23wfrog #wfrog] on Twitter
 
 *Design Discussions*<br>
