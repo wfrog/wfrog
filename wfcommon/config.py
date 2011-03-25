@@ -120,6 +120,7 @@ class Configurer(object):
         if not embedded:
             self.log_configurer.configure(options, config, context)
 
+        self.logger.info("Starting wfrog " + wfrog_version)
         if settings_warning:
             self.logger.warn('User settings are missing. Loading default ones. Run \'wfrog -S\' for user settings setup.')
         self.logger.info("Loaded settings file " + os.path.normpath(self.settings_file))
