@@ -1,0 +1,19 @@
+#labels wfrogwindows,buildwindows
+You can build wfrog yourself, using the wfrog win-build helper. It downloads all necessary dependencies and install them. After the installation of alls necessary tools, the helper can huod wfrog.
+
+*Note:* Currently there are problems using usb-support under windows, we are working on it!
+
+=How can I build wfrog on windows?=
+It's now very easy ;)
+
+  #Checkout latest /trunk of wfrog
+  #run /pkg/windows/setup.bat
+  #Follow the instructions on the screen.
+
+The tool has an integrated update-check, so you can always use the latest version of it.
+
+=Some downloads are not working anymore!=
+No problem, please wait a few days, we release a link-update as soon as possible. Or simply create a ticket, if nothing happens.
+
+=I have suggestions/problems=
+Please open a ticket and describe you suggestion/problem.
