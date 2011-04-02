@@ -29,7 +29,7 @@ These dependencies are being installed:
   * lxml (over easy_install)
   * PySerial
   * PyUSB
-  * Cheetah's _namemapper.pyd (not working, yet)
+  * Cheetah's namemapper.pyd (not working, yet)
 
 =Some downloads are not working anymore!=
 No problem, please wait a few days, we release a link-update as soon as possible. Or simply create a ticket, if nothing happens.
