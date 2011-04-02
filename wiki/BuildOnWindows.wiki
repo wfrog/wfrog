@@ -6,11 +6,28 @@ You can build wfrog yourself, using the wfrog win-build helper. It downloads all
 =How can I build wfrog on windows?=
 It's now very easy ;)
 
-  # Checkout latest /trunk of wfrog
-  # run /pkg/windows/setup.bat
+  # Downloads latest [http://code.google.com/p/wfrog/downloads/list wfrog_winbuild_hlpr.zip] (from download page, or download the "windows" folder at /trunk/pkg) and unzip it.
+  # run setup.bat
   # Follow the instructions on the screen.
 
 The tool has an integrated update-check, so you can always use the latest version of it.
+
+=What software is being installed?=
+These dependencies are being installed:
+
+  * Python 2.6
+  * SlikSVN
+  * easy_install
+  * Cheetah
+  * LibUSB (not working, yet)
+  * Py2EXE
+  * PyYAML
+  * PyWWS
+  * PyGoogleChart
+  * lxml (over easy_install)
+  * PySerial
+  * PyUSB
+  * Cheetah's _namemapper.pyd (not working, yet)
 
 =Some downloads are not working anymore!=
 No problem, please wait a few days, we release a link-update as soon as possible. Or simply create a ticket, if nothing happens.
