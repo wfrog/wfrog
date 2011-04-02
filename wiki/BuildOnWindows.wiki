@@ -3,7 +3,7 @@ You can build wfrog yourself, using the wfrog win-build helper. It downloads all
 
 *Note:* Currently there are problems using usb-support under windows, we are working on it!
 
-=How can I build wfrog on windows?=
+==How can I build wfrog on windows?==
 It's now very easy ;)
 
   # Download the "windows" folder from /trunk/pkg
@@ -14,7 +14,7 @@ The setup.bat download the necessary files and download the latest /trunk to bui
 
 The tool has an integrated update-check, so you can always use the latest version of it.
 
-=What software is being installed?=
+==What software is being installed?==
 These dependencies are being installed:
 
   * Python 2.6
@@ -31,8 +31,8 @@ These dependencies are being installed:
   * PyUSB
   * Cheetah's namemapper.pyd (not working, yet)
 
-=Some downloads are not working anymore!=
+==Some downloads are not working anymore!==
 No problem, please wait a few days, we release a link-update as soon as possible. Or simply create a ticket, if nothing happens.
 
-=I have suggestions/problems=
+==I have suggestions/problems==
 Please open a ticket and describe you suggestion/problem.
