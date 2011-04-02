@@ -6,9 +6,9 @@ You can build wfrog yourself, using the wfrog win-build helper. It downloads all
 =How can I build wfrog on windows?=
 It's now very easy ;)
 
-  #Checkout latest /trunk of wfrog
-  #run /pkg/windows/setup.bat
-  #Follow the instructions on the screen.
+  # Checkout latest /trunk of wfrog
+  # run /pkg/windows/setup.bat
+  # Follow the instructions on the screen.
 
 The tool has an integrated update-check, so you can always use the latest version of it.
 
