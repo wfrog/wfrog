@@ -30,4 +30,6 @@ sudo easy_install pygooglechart            # Chart rendering
   * Run `wfrog.exe` and answer the questions.
   * Open http://localhost:7680/
 
+If you want to build wfrog for windows yourself, click [BuildOnWindows here]
+
 <p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
