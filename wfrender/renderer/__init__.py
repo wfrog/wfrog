@@ -70,6 +70,6 @@ class YamlMeteoclimaticRenderer(meteoclimatic.MeteoclimaticRenderer, yaml.YAMLOb
 class YamlWundergroundRenderer(wunderground.WeatherUndergroundPublisher, yaml.YAMLObject):
     yaml_tag = u'!wunderground'
 
-class YamlWundergroundRenderer(pwsweather.PwsWeatherPublisher, yaml.YAMLObject):
+class PwsWeatherRenderer(pwsweather.PwsWeatherPublisher, yaml.YAMLObject):
     yaml_tag = u'!pwsweather'
 
