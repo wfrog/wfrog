@@ -35,4 +35,4 @@ These dependencies are being installed:
 No problem, please wait a few days, we release a link-update as soon as possible. Or simply create a ticket, if nothing happens.
 
 ==I have suggestions/problems==
-Please open a ticket and describe you suggestion/problem.
+Please open a ticket and describe your suggestion/problem.
