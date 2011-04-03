@@ -4,16 +4,35 @@ rem Todo:
 
 rem - libusb!!! WS32/libusb.* -> Python26/DLLs
 rem - list software which will installed
-rem - if this bat has future: update-check?
 
+set version=1.0.1
+set date=03.04.2011
 
-set python=%cd:~0,1%:\Python26\
+set python="%cd:~0,1%:\Python26\"
 set easyinst=%python%Scripts\easy_install.exe
 set wget="%CD%\wget"
+set sev_za="%CD%\7za"
 
-set version=1.0.0
-set date=27.03.2011
+set upd_srv=http://wfrog.googlecode.com/svn/trunk/pkg/windows
 
+rem ============ 7za & wget check ============
+if not exist %wget%.exe (
+	cls
+	echo !!!! wget.exe not found !!!!
+	echo	Please put wget.exe in this dir:
+	echo	* %CD%
+	pause
+	exit
+)
+
+if not exist %sev_za%.exe (
+	cls
+	echo !!!! 7za.exe not found !!!!
+	echo	Please put 7za.exe in this dir:
+	echo	* %CD%
+	pause
+	exit
+)
 
 rem ============ S O F T W A R E ============
 call links.bat
@@ -31,16 +50,16 @@ set /p update=Can I check for updates [Y/N]?
 if "%update%" == "n" goto setup
 if "%update%" == "N" goto setup
 
-%wget% -q http://dl.webcf.de/updates/wfrog_win_hlpr/updates.txt -O updates.bat
+%wget% -q %upd_srv%/versions.bat -O versions.bat
 
-call updates.bat
+call versions.bat
 
 echo.
 
-if "%new_version%" GTR "%version%" (
+if "%new_core_version%" GTR "%version%" (
 	echo New core version detected!
 	echo	* Yours:	%version%
-	echo	* New:		%new_version%
+	echo	* New:		%new_core_version%
 	echo.
 	set upt_core=true
 ) ELSE (
@@ -64,21 +83,20 @@ pause
 
 if "%upt_core%" == "true" (
 	echo.
-	echo Core engine update... After download, start me again...
-	%wget% -q http://dl.webcf.de/updates/wfrog_win_hlpr/setup.txt -O setup.bat
+	%wget% -q %upd_srv%/setup.bat -O setup.bat
+	echo Core engine updated, start me again...
 	pause
 	exit
 )
 
 
 
-
 if "%upt_lnk_lst%" == "true" (
 	echo.
 	echo Link-list update...
-	%wget% -q http://dl.webcf.de/updates/wfrog_win_hlpr/links.txt -O links.bat
+	%wget% -q %upd_srv%/links.bat -O links.bat
 	call links.bat
-	echo Update successfull
+	echo	done.
 	echo.
 	pause
 )
@@ -227,8 +245,8 @@ echo Cheetah template-system...
 mkdir cheetah
 move download\cheetah.tar.gz cheetah
 cd cheetah
-..\7za x cheetah.tar.gz
-..\7za x -y cheetah-2.2.2.tar
+%sev_za% x cheetah.tar.gz
+%sev_za% x -y cheetah-2.2.2.tar
 cd Cheetah-2.2.2
 setup.py install
 %easyinst% -q dist/Cheetah-2.2.2-py2.6.egg
@@ -248,7 +266,7 @@ rem echo libusb...
 rem mkdir libusb
 rem move download\libusb.7z libusb
 rem cd libusb
-rem ..\7za x libusb.7z
+rem %sev_za% x libusb.7z
 rem cd MS32\dll
 rem xcopy /E "%CD%\*" %python%DLLs
 rem cd ..\
@@ -260,7 +278,7 @@ echo PyWWS...
 mkdir pywws
 move download\pywws.zip pywws
 cd pywws
-..\7za x -y pywws.zip
+%sev_za% x -y pywws.zip
 xcopy /E "%CD%\pywws-11.02_r354\*" %python%Lib
 cd ..
 echo done..
