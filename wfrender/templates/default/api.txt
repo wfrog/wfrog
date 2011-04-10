@@ -1,0 +1,29 @@
+#from wfcommon.units import unit_roll
+#def unitstr(m,u)
+#if $getVar('http', False)
+$u
+#end if
+#end def
+{
+    "temp":
+    {
+        "outdoor": "$rnd($current.temp1, 1) °$unitstr('temp',$units.temp)",
+        "indoor": "$rnd($current.temp0, 1) °$unitstr('temp',$units.temp)"
+    },
+
+    "humidity":
+    {
+        "outdoor": "$rnd($current.hum1) %",
+        "indoor": "$rnd($current.hum0) %"
+    },
+
+    "pressure": "$rnd($current.press) $unitstr('press',$units.press)",
+    "wind":
+    {
+        "speed": "$rnd($current.wind.speed, 1) $unitstr('wind',$units.wind)",
+        "gust": "$rnd($current.wind.gust, 1) $unitstr('wind',$units.wind)"
+    },
+
+    "rain": "$rnd($current.rain, 1) $unitstr('rain',$units.rain)/h"
+
+}

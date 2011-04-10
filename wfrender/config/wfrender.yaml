@@ -18,6 +18,8 @@ renderer: !http
             path: default/365days.yaml
         check: !include
             path: default/check.yaml
+        api: !include
+            path: default/api.yaml
 
 logging:
     level: info
