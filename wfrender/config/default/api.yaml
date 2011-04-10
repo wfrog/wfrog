@@ -1,3 +1,4 @@
+
 renderer: !template
     path: ../../templates/default/api.txt
     mime: text
