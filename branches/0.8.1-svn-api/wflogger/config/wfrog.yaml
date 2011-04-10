@@ -1,0 +1,46 @@
+init:
+    storage: !service
+        name: storage
+        instance: !include { path: ../../wfcommon/config/storage.yaml }
+
+input: !service
+    name: events  # Use embedded wfdriver to receive events
+    instance: !function {}
+
+collector: !multi
+    children:
+        aggregator : !buffer
+            period: 600
+            collector: !aggregator
+                storage : !service
+                    name: storage
+        current : !flush
+            period: 10
+            collector: !user
+                choices:
+                    root: !xmlfile
+                        path: /var/lib/wfrog/wfrog-current.xml
+                        storage : !service
+                            name: storage
+                    default: !xmlfile
+                        path: data/wfrog-current.xml
+                        storage : !service
+                            name: storage
+
+embed:
+    wfdriver: { config: ../../wfdriver/config/embedded.yaml }
+    wfrender: { config: ../../wfrender/config/embedded.yaml }
+
+logging:
+    level: info
+    handlers:
+        default:
+            level: debug
+            handler: !include
+                path: ../../wfcommon/config/loghandler.yaml
+                variables:
+                    process: wfrog
+        #mail:
+        #    level: critical
+        #    handler: !include
+        #        path: ../../wfcommon/config/mailloghandler.yaml

@@ -1,0 +1,28 @@
+# To test PWSWeather update:
+#    python ../wfrender.py -f wunderground.yaml -s ../../wfcommon/config/default-settings.yaml
+
+init:
+    storage: !service
+        name: storage
+        instance: !include
+            path: ../../wfcommon/config/storage.yaml
+
+renderer: !pwsweather
+    id: YOUR_STATION_ID
+    password: YOUR_PASSWORD
+    storage: !service
+        name: storage
+    period: 300
+
+logging:
+    level: info    
+    handlers:
+        default:
+            level: debug
+            handler: !include 
+                path: ../../wfcommon/config/loghandler.yaml
+                variables:
+                    process: wfrender
+
+
+

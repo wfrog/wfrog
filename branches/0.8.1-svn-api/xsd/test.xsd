@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.westep.org/2010/westep/test" xmlns:tns="http://www.westep.org/2010/westep/test" elementFormDefault="qualified" xmlns:Q1="http://www.westep.org/2010/westep">
+
+    <import schemaLocation="westep.xsd" namespace="http://www.westep.org/2010/westep"></import>
+    <element name="test" type="tns:Test"></element>
+    
+    <complexType name="Test">
+    	<sequence>
+    		<choice maxOccurs="unbounded" minOccurs="0">
+    			<element ref="Q1:hum"></element>
+    			<element ref="Q1:press"></element>
+    			<element ref="Q1:rain"></element>
+    			<element ref="Q1:temp"></element>
+    			<element ref="Q1:uv"></element>
+    			<element ref="Q1:wind"></element>
+    		</choice>
+    	</sequence>
+    </complexType>
+</schema>

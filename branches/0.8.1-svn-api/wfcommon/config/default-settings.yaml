@@ -1,0 +1,8 @@
+station:
+    driver: auto
+altitude: 0
+units:
+    temp: C
+    wind: km/h
+    rain: mm
+    press: hPa

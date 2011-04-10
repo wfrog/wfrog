@@ -1,0 +1,37 @@
+init:
+    storage: !service
+        name: storage
+        instance: !include { path: ../../wfcommon/config/storage.yaml }
+
+renderer: !http
+    cookies: [ units ]
+    root: !include
+        path: default/24hours.yaml
+    renderers:
+        3hours.html: !include
+            path: default/3hours.yaml
+        24hours.html: !include
+            path: default/24hours.yaml
+        30days.html: !include
+            path: default/30days.yaml
+        365days.html: !include
+            path: default/365days.yaml
+        check: !include
+            path: default/check.yaml
+        api: !include
+            path: default/api.yaml
+
+logging:
+    level: info
+    handlers:
+        default:
+            level: debug
+            handler: !include
+                path: ../../wfcommon/config/loghandler.yaml
+                variables:
+                    process: wfrender
+        #mail:
+        #    level: critical
+        #    handler: !include
+        #        path: ../../wfcommon/config/mailloghandler.yaml
+

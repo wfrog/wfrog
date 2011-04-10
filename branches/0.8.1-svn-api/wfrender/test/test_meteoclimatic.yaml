@@ -1,0 +1,8 @@
+context:
+    database: { url: 'localhost:/var/lib/firebird/2.0/data/wfrog.db' }  
+renderer: !http    
+    cookies: [ ]
+    root: !meteoclimatic
+        id: XXXXXXXXXXXXXXXXXXX
+            
+    

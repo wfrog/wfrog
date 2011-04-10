@@ -1,0 +1,6 @@
+1.0.1 (03.04.2011)
+	* Now using another update-server
+	+ Check for 7za and wget
+
+1.0.0
+	* 1st release

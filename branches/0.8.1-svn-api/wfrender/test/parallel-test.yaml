@@ -1,0 +1,12 @@
+renderer: !multi
+    parallel: true
+    children:
+        one: !scheduler
+            period: 1
+            renderer: !template
+                path: hello1.txt
+        two: !scheduler
+            period: 3
+            renderer: !template
+                path: hello2.txt
+            
