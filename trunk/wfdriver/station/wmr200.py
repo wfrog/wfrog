@@ -1,4 +1,4 @@
-## Copyright 2010 Chris Schlaeger <cschlaeger@gmail.com>
+## Copyright 2010, 2011 Chris Schlaeger <chris@linux.com>
 ##
 ## This WMR200 driver was modeled after the WMRS200 driver. It contains
 ## some code fragment from the original WMRS200 file. There portions are
@@ -529,7 +529,13 @@ class WMR200Station(BaseStation):
       minutes = record[0]
       hours = record[1]
       day = record[2]
+      # The WMR200 can sometimes return all 0 bytes. We interpret this as
+      # 2000-01-01 0:00
+      if day == 0:
+        day = 1
       month = record[3]
+      if month == 0:
+        month = 1
       year = 2000 + record[4]
       date = "%04d-%02d-%02d %d:%02d" % (year, month, day, hours, minutes)
       self.logger.info("%s: %s" % (label, date))
