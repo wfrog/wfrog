@@ -24,9 +24,9 @@ import wfcommon.database
 from wfcommon.formula.base import LastFormula
 from wfcommon.formula.base import SumFormula
 try:
-    import wfrender.datasource.accumulator
+    from wfrender.datasource.accumulator import AccumulatorDatasource
 except ImportError, e:
-    import datasource.accumulator
+    from datasource.accumulator import AccumulatorDatasource
 from wfcommon.units import HPaToInHg
 from wfcommon.units import CToF
 from wfcommon.units import MmToIn
@@ -73,7 +73,7 @@ class PwsWeatherPublisher(object):
 
             self.alive = True
 
-            accu = datasource.accumulator.AccumulatorDatasource()
+            accu = AccumulatorDatasource()
             accu.slice = 'day'
             accu.span = 1
             accu.storage = self.storage
@@ -90,13 +90,13 @@ class PwsWeatherPublisher(object):
                  'rain_fall' : SumFormula('rain'), 
                  'utctime' : LastFormula('utctime') } }
 
-            accu_month = datasource.accumulator.AccumulatorDatasource()
+            accu_month = AccumulatorDatasource()
             accu_month.slice = 'month'
             accu_month.span = 1
             accu_month.storage = self.storage
             accu_month.formulas = {'current': {'rain_fall' : SumFormula('rain') } }
 
-            accu_year = datasource.accumulator.AccumulatorDatasource()
+            accu_year = AccumulatorDatasource()
             accu_year.slice = 'year'
             accu_year.span = 1
             accu_year.storage = self.storage
