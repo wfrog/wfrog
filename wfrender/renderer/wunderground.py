@@ -24,9 +24,9 @@ import wfcommon.database
 from wfcommon.formula.base import LastFormula
 from wfcommon.formula.base import SumFormula
 try:
-    import wfrender.datasource.accumulator
+    from wfrender.datasource.accumulator import AccumulatorDatasource
 except ImportError, e:
-    import datasource.accumulator
+    from datasource.accumulator import AccumulatorDatasource
 from wfcommon.units import HPaToInHg
 from wfcommon.units import CToF
 from wfcommon.units import MmToIn
@@ -84,7 +84,7 @@ class WeatherUndergroundPublisher(object):
             self.alive = True
             if not self.real_time:
 
-                accu = datasource.accumulator.AccumulatorDatasource()
+                accu = AccumulatorDatasource()
                 accu.slice = 'day'
                 accu.span = 1
                 accu.storage = self.storage
