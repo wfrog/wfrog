@@ -57,6 +57,8 @@ class TemplateRenderer(object):
     
     mime = "text/plain"
 
+    compiled_template = None
+
     logger = logging.getLogger("renderer.template")
 
     def render(self,data={}, context={}):
@@ -75,5 +77,10 @@ class TemplateRenderer(object):
                 
         self.logger.debug("Rendering with template "+abs_path)
         content["rnd"]=rnd
-        template = Template(file=file(abs_path, "r"), searchList=[content, context])
-        return [ self.mime, str(template) ]
+
+        # 1st time compile template
+        if not self.compiled_template: 
+            self.logger.debug("Compiling template "+abs_path)
+            self.compiled_template = Template.compile(file=file(abs_path, "r"))
+
+        return [ self.mime, str(self.compiled_template(searchList=[content, context])) ]
