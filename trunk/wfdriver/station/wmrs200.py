@@ -17,13 +17,9 @@
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Protocol information obtained from:
-# http://www.ejeklint.se/development/wmr100n-driver-for-mac-os-x/wmr100n-usb-protocol/
-# http://wmrx00.sourceforge.net/  (WMR100 weather logger project)
-
-## TODO: DOCUMENT MESSAGES' PROTOCOL
-##       WMRS100 projects implement a calibration for humidity sensor to obtain 100% value (necessary?)
-##       GENERATE CRITICAL LOG ENTRIES FOR LOW BATTERY LEVEL (ONE ALARM PER DAY!)
-##       ALLOW CONFIG TO SPECIFY WHICH temp/hum SENSOR(S) SHOULD BE USED
+# 1) http://www.ejeklint.se/development/wmr100n-driver-for-mac-os-x/ 
+#    (protocol: https://github.com/ejeklint/WLoggerDaemon/blob/master/Station_protocol.md)
+# 2) http://wmrx00.sourceforge.net/  (WMR100 weather logger project)
 
 # Attention!
 # In individual measures wind avg. value can be higher than wind gust.
@@ -164,7 +160,7 @@ class WMRS200Station(BaseStation):
                         self.logger.debug('USBError("No error") exception received. Ignoring...(http://bugs.debian.org/476796)')
                         packet = None
                         time.sleep(1)
-                    if e.args == ('Connection timed out',):
+                    elif e.args == ('Connection timed out',):
                         self.logger.debug('No event received within timeout.')
                         packet = None
                         time.sleep(1)                        
