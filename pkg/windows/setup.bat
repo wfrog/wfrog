@@ -5,8 +5,8 @@ rem Todo:
 rem - libusb!!! WS32/libusb.* -> Python26/DLLs
 rem - list software which will installed
 
-set version=1.0.1
-set date=03.04.2011
+set version=1.0.2
+set date=28.05.2011
 
 set python="%cd:~0,1%:\Python26\"
 set easyinst=%python%Scripts\easy_install.exe
@@ -228,7 +228,7 @@ echo done..
 echo.
 
 echo PyUSB
-rem pyusb.exe
+pyusb.exe
 echo done..
 echo.
 
