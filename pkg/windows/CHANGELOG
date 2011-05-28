@@ -1,3 +1,9 @@
+1.1.0 (28.05.2011)
+	* New main-menu
+	* New versions of dependencies released
+	* Minor bugfixes
+	* Cleanup-possibility
+
 1.0.2 (28.05.2011)
 	* Fixed ignored install of PyUSB 0.x
 

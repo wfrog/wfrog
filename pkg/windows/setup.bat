@@ -5,13 +5,14 @@ rem Todo:
 rem - libusb!!! WS32/libusb.* -> Python26/DLLs
 rem - list software which will installed
 
-set version=1.0.2
+set version=1.1.0
 set date=28.05.2011
 
 set python="%cd:~0,1%:\Python26\"
 set easyinst=%python%Scripts\easy_install.exe
 set wget="%CD%\wget"
 set sev_za="%CD%\7za"
+set coredir="%CD%"
 
 set upd_srv=http://wfrog.googlecode.com/svn/trunk/pkg/windows
 
@@ -109,18 +110,33 @@ goto setup
 :setup
 cls
 echo.
-echo Please choose if you want the Installmode or not..
+echo Please choose what you want:
 echo.
-echo	Y	Enter the installmode to install
+echo	1)	Enter the installmode to install
 echo		PyThon, SlikSVN and other dependencies
 echo.
-echo	N	(Try) to build wfrog for windows :)
+echo	==================================================
+echo.
+echo	2)	Enter the download-only mode
+echo.
+echo	==================================================
+echo.
+echo	3)	Enter the install-only mode
+echo.
+echo	==================================================
+echo.
+echo	4)	(Try) to build wfrog for windows :)
 echo		INSTALL DEPENDENCIES BEFORE RUN THIS MODE!
 echo.
-set /p install=Enter Installmode? [Y/N]:
-if "%install%" == "N" goto cfg
-if "%install%" == "n" goto cfg
-
+echo	==================================================
+echo.
+echo	x)	Exit
+echo.
+set /p install=Enter Installmode? [1-4, x]: 
+if "%install%" == "4" goto cfg
+if "%install%" == "3" goto install
+if "%install%" == "x" exit
+if "%install%" == "X" exit
 
 
 
@@ -140,7 +156,7 @@ echo done..
 echo.
 
 echo easy_install...
-%wget% -q %pkg_easyinst%
+%wget% -q %pkg_easyinst% -O ez_setup.py
 echo done..
 echo.
 
@@ -149,7 +165,7 @@ echo cheetah template-engine...
 echo done..
 echo.
 
-echo cheetah libusb1.0...
+echo libusb1.0...
 %wget% -q %pkg_libusb10% -O libusb.7z
 echo done..
 echo.
@@ -183,16 +199,23 @@ echo PyUSB...
 %wget% -q %pkg_pyusb% -O pyusb.exe
 echo done..
 echo.
-rem ==== BUGGY! Does not support Python 2.6, ignored - NOT required for build - but a should-have feature - next version..
-rem echo NameMapper for Cheetah...
-rem %wget% -q %pkg_namemapper% -O _namemapper.pyd
-rem echo done..
+
+echo NameMapper for Cheetah...
+%wget% -q %pkg_namemapper%
+echo done..
+echo.
+
+echo Step 1 finished...
+cd ..\
 pause
+
+if "%install%" == "2" exit
+
 cls
 
+:install
 
-
-
+cd download
 
 echo Step 2: Install tools - PLEASE WAIT!
 echo.
@@ -253,25 +276,25 @@ setup.py install
 cd ..\..\
 echo done..
 echo.
-rem ==== BUGGY! Does not support Python 2.6, ignored - NOT required for build - but a should-have feature - next version..
-rem echo Move nameMapper for Cheetah...
-rem move download\_namemapper.pyd %python%Lib\site-packages\Cheetah-2.2.2-py2.6.egg\Cheetah
-rem echo done..
-rem echo.
+
+echo Move nameMapper for Cheetah...
+move download\_namemapper.pyd %python%Lib\site-packages\Cheetah-2.2.2-py2.6.egg\Cheetah
+echo done..
+echo.
 
 
 
 
-rem echo libusb...
-rem mkdir libusb
-rem move download\libusb.7z libusb
-rem cd libusb
-rem %sev_za% x libusb.7z
-rem cd MS32\dll
-rem xcopy /E "%CD%\*" %python%DLLs
-rem cd ..\
-rem echo done..
-rem echo.
+echo libusb...
+mkdir libusb
+move download\libusb.7z libusb
+cd libusb
+%sev_za% x libusb.7z
+cd MS32\dll
+xcopy /E "%CD%\*" %python%DLLs
+cd ..\..\..\
+echo done..
+echo.
 
 
 echo PyWWS...
@@ -279,9 +302,11 @@ mkdir pywws
 move download\pywws.zip pywws
 cd pywws
 %sev_za% x -y pywws.zip
-xcopy /E "%CD%\pywws-11.02_r354\*" %python%Lib
-cd ..
+xcopy /E "%CD%\pywws-11.05_r380\*" %python%Lib
+cd ..\
 echo done..
+
+
 pause
 cls
 
@@ -296,12 +321,46 @@ echo.
 
 echo LXML
 %easyinst% -q %pkg_lxml%
-echo.
 echo done..
 echo.
-sleep 2
+
+pause
 cls
-echo Please run me again with installmode = No
+
+set /p cleanup=Run complete cleanup? [Y/N]: 
+
+if %cleanup% == "N" echo Please run me again with mode 3 (install-mode)
+if %cleanup% == "n" echo Please run me again with mode 3 (install-mode)
+
+echo Step 4: Cleanup...
+cd %coredir%
+echo.
+
+echo Delete downloaded files...
+rmdir /S /Q download
+echo done
+echo.
+
+echo Delete cheetah files...
+rmdir /S /Q cheetah
+echo done
+echo.
+
+echo Delete libusb files...
+rmdir /S /Q libusb
+echo done
+echo.
+
+echo Delete pywws files...
+rmdir /S /Q pywws
+echo done
+echo.
+
+pause
+cls
+
+echo Please run me again with mode 3 (install-mode)
+
 pause
 exit
 
