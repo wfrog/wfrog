@@ -10,7 +10,7 @@ Maturity level:
 || *Davis* || !VantagePro || Serial || Medium || No || !vantagepro || Needs third party !PyWeather library.<br> Install it with `sudo easy_install weather`. || Yes || ? ||
 ||       || !VantagePro2 || Serial || Medium || No || !vantagepro || See !VantagePro || Yes || ? ||
 || *Elecsa*                  || !AstroTouch 6975 || USB || Medium || No || !wh1080 || See Fine Offset Electronics WH1080 || Yes || ? ||
-|| *Fine Offset Electronics* || WH1080, WH1080PC || USB || Medium || No || !wh1080 || Needs third party pywws library (http://code.google.com/p/pywws/downloads/list).<br>Uncompress it and add the uncompressed directory to the `PYTHONPATH` environment variable || Yes || ? ||
+|| *Fine Offset Electronics* || WH1080, WH1080PC || USB || Medium || No || !wh1080 || Needs third party pywws library (http://code.google.com/p/pywws/downloads/list).<br>Install it as root with `setup.py`. || Yes || ? ||
 ||                         || WH1081 || USB || Medium || No || !wh1080 || See WH1080 || Yes || ? ||
 ||                         || WH1090 || USB || Medium || No || !wh1080 || See WH1080 || Yes || ? ||
 ||                         || WH1091 || USB || Medium || No || !wh1080 || See WH1080 || Yes || ? ||
