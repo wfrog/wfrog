@@ -1,3 +1,6 @@
+1.0.2 (28.05.2011)
+	* Fixed ignored install of PyUSB 0.x
+
 1.0.1 (03.04.2011)
 	* Now using another update-server
 	+ Check for 7za and wget
