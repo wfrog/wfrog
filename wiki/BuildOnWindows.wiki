@@ -1,9 +1,9 @@
 #labels wfrogwindows,buildwindows
 You can build wfrog yourself, using the wfrog win-build helper. It downloads all necessary dependencies and install them. After the installation of alls necessary tools, the helper can huod wfrog.
 
-*Note:* Currently there are problems using usb-support under windows, we are working on it!
+<wiki:toc/>
 
-==How can I build wfrog on windows?==
+=How can I build wfrog on windows?=
 It's now very easy ;)
 
   # Download the "windows" folder from /trunk/pkg
@@ -21,7 +21,7 @@ These dependencies are being installed:
   * SlikSVN
   * easy_install
   * Cheetah
-  * LibUSB (not working, yet)
+  * LibUSB
   * Py2EXE
   * PyYAML
   * PyWWS
@@ -29,10 +29,18 @@ These dependencies are being installed:
   * lxml (over easy_install)
   * PySerial
   * PyUSB
-  * Cheetah's namemapper.pyd (not working, yet)
+  * Cheetah's namemapper.pyd
 
+==Tested stations==
+These stations are successfully installed over this program:
+
+  * WMRS200
+
+Your station is working over this tool, too? Let us know!
+
+=Problems=
 ==Some downloads are not working anymore!==
-No problem, please wait a few days, we release a link-update as soon as possible. Or simply create a ticket, if nothing happens.
+Try it again or report this problem, we'll have a look at this.
 
 ==I have suggestions/problems==
 Please open a ticket and describe your suggestion/problem.
