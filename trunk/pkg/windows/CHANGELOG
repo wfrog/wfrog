@@ -1,3 +1,11 @@
+1.2.0 (29.05.2011)
+	* Added station installer
+	* Updated linklist (Zadig)
+	* Added zadig config
+	* Minor bugfixes
+
+	* WMRS200 USB support!!!
+
 1.1.0 (28.05.2011)
 	* New main-menu
 	* New versions of dependencies released

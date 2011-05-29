@@ -2,11 +2,10 @@
 
 rem Todo:
 
-rem - libusb!!! WS32/libusb.* -> Python26/DLLs
-rem - list software which will installed
+rem yay! nothing todo :)
 
-set version=1.1.0
-set date=28.05.2011
+set version=1.2.0
+set date=29.05.2011
 
 set python="%cd:~0,1%:\Python26\"
 set easyinst=%python%Scripts\easy_install.exe
@@ -110,10 +109,7 @@ goto setup
 :setup
 cls
 echo.
-echo Please choose what you want:
-echo.
-echo	1)	Enter the installmode to install
-echo		PyThon, SlikSVN and other dependencies
+echo	1)	Enter normal mode (download and install)
 echo.
 echo	==================================================
 echo.
@@ -130,21 +126,27 @@ echo		INSTALL DEPENDENCIES BEFORE RUN THIS MODE!
 echo.
 echo	==================================================
 echo.
+echo	i)	Station installer
+echo.
+echo	==================================================
+echo.
 echo	x)	Exit
 echo.
-set /p install=Enter Installmode? [1-4, x]: 
+set /p install=What do you want? [1-4,i,x]: 
 if "%install%" == "4" goto cfg
 if "%install%" == "3" goto install
 if "%install%" == "x" exit
 if "%install%" == "X" exit
+if "%install%" == "i" goto dev_install
+if "%install%" == "I" goto dev_install
 
 
-
+cls
 echo Step 1: Downloading tools
 mkdir download
 cd download
 echo.
-echo Python 2.6...
+echo Python 2.6.6
 
 %wget% -q %pkg_python% -O python26.msi
 echo done..
@@ -155,17 +157,17 @@ echo SlikSVN
 echo done..
 echo.
 
-echo easy_install...
+echo easy_install
 %wget% -q %pkg_easyinst% -O ez_setup.py
 echo done..
 echo.
 
-echo cheetah template-engine...
+echo cheetah template-engine
 %wget% -q %pkg_cheetah% -O cheetah.tar.gz
 echo done..
 echo.
 
-echo libusb1.0...
+echo libusb1.0
 %wget% -q %pkg_libusb10% -O libusb.7z
 echo done..
 echo.
@@ -180,27 +182,27 @@ echo PyYAML
 echo done..
 echo.
 
-echo PyWWS...
+echo PyWWS
 %wget% -q %pkg_pywws% -O pywws.zip
 echo done..
 echo.
 
-echo PyGoogleChart...
+echo PyGoogleChart
 %wget% -q %pkg_pygchart% -O pygchart.exe
 echo done..
 echo.
 
-echo PySerial...
+echo PySerial
 %wget% -q %pkg_pyserial% -O pyserial.exe
 echo done..
 echo.
 
-echo PyUSB...
+echo PyUSB
 %wget% -q %pkg_pyusb% -O pyusb.exe
 echo done..
 echo.
 
-echo NameMapper for Cheetah...
+echo NameMapper for Cheetah
 %wget% -q %pkg_namemapper%
 echo done..
 echo.
@@ -220,7 +222,7 @@ cd download
 echo Step 2: Install tools - PLEASE WAIT!
 echo.
 
-echo Python2.6...
+echo Python2.6.6
 msiexec /i python26.msi /quiet
 echo done..
 echo.
@@ -264,11 +266,11 @@ cd ..
 
 
 
-echo Cheetah template-system...
+echo Cheetah template-system
 mkdir cheetah
 move download\cheetah.tar.gz cheetah
 cd cheetah
-%sev_za% x cheetah.tar.gz
+%sev_za% x -y cheetah.tar.gz
 %sev_za% x -y cheetah-2.2.2.tar
 cd Cheetah-2.2.2
 setup.py install
@@ -277,7 +279,7 @@ cd ..\..\
 echo done..
 echo.
 
-echo Move nameMapper for Cheetah...
+echo Move nameMapper for Cheetah
 move download\_namemapper.pyd %python%Lib\site-packages\Cheetah-2.2.2-py2.6.egg\Cheetah
 echo done..
 echo.
@@ -285,11 +287,11 @@ echo.
 
 
 
-echo libusb...
+echo libusb
 mkdir libusb
 move download\libusb.7z libusb
 cd libusb
-%sev_za% x libusb.7z
+%sev_za% x -y libusb.7z
 cd MS32\dll
 xcopy /E "%CD%\*" %python%DLLs
 cd ..\..\..\
@@ -297,7 +299,7 @@ echo done..
 echo.
 
 
-echo PyWWS...
+echo PyWWS
 mkdir pywws
 move download\pywws.zip pywws
 cd pywws
@@ -305,6 +307,8 @@ cd pywws
 xcopy /E "%CD%\pywws-11.05_r380\*" %python%Lib
 cd ..\
 echo done..
+echo.
+echo Step 2 finished...
 
 
 pause
@@ -314,7 +318,7 @@ cls
 echo Step 3: Install some tools through easy_install...
 echo.
 cd %python%
-echo PyYAML...
+echo PyYAML
 %easyinst% -q pyyaml
 echo done..
 echo.
@@ -323,16 +327,17 @@ echo LXML
 %easyinst% -q %pkg_lxml%
 echo done..
 echo.
+echo Step 3 finished...
 
 pause
 cls
 
 set /p cleanup=Run complete cleanup? [Y/N]: 
 
-if %cleanup% == "N" echo Please run me again with mode 3 (install-mode)
-if %cleanup% == "n" echo Please run me again with mode 3 (install-mode)
+if "%cleanup%" == "N" echo Please run me again with mode 3 (install-mode)
+if "%cleanup%" == "n" echo Please run me again with mode 3 (install-mode)
 
-echo Step 4: Cleanup...
+echo Step 4: Cleanup
 cd %coredir%
 echo.
 
@@ -355,7 +360,7 @@ echo Delete pywws files...
 rmdir /S /Q pywws
 echo done
 echo.
-
+echo Step 4 finished...
 pause
 cls
 
@@ -373,12 +378,67 @@ echo.
 echo done..
 sleep 2
 cls
-echo Step 4: Build wfrog for Windows...
+echo Step 5: Build wfrog for Windows
 echo.
 cd trunk
 copy bin\wfrog .\wfrog.py
 copy pkg\setup.py .\
 %python%python.exe setup.py py2exe
 echo Build finished!
-echo	Go to: /trunk/dist to run wfrog.exe ;)
+echo	*** Go to: /trunk/dist to run wfrog.exe ;)
 pause
+cls
+
+set /p stationInstaller=Run station installer? [Y/N]: 
+
+if "%stationInstaller%" == "N" goto end
+if "%stationInstaller%" == "n" goto end
+
+
+:dev_install
+
+
+cd %coredir%
+cls
+echo Station-installer
+echo.
+echo 1) WMRS200
+echo.
+set /p station=Which station do you want to use: 
+
+if "%station%" == "1" (
+
+    echo.
+    echo Download zadig...
+    %wget% -q %tool_zadig% -O zadig\zadig.7z
+    echo done...
+    echo.
+    echo Unpack zadig...
+    cd zadig
+    %sev_za% x -y zadig.7z
+    del zadig.7z
+    echo done...
+    echo.
+    pause
+    cls
+    echo INFO: In order to install the wmrs200, select
+    echo.
+    echo * USB-HID (Human Interface Device)
+    echo.
+    echo and click 'Install driver' on the next window!
+    echo.
+    pause
+    zadig.exe
+    echo done...
+    echo.
+    echo.
+    echo Now re-plug the WMRS200 and start wfrog.exe, hope it works ;)
+    pause
+
+)
+
+:end
+cls
+echo Thanks for using!!!
+pause
+exit
