@@ -169,7 +169,11 @@ class WMRS200Station(BaseStation):
             except Exception, e:
                 self.logger.exception("Exception reading interrupt: "+ str(e))
                 errors = errors + 1
-                if errors > 3: break   ## Maximum 3 consecutive errors before reconnection
+		packet = None  ## error in this packet, we do not want it
+                if errors == 1: ## Very often we missed 0xFF, let's try to recover
+                    packet = [1, 0xff, 0, 0, 0, 0, 0, 0]
+                elif errors > 3: 
+                    break   ## Maximum 3 consecutive errors before reconnection
                 time.sleep(3)
 
             if packet != None:
