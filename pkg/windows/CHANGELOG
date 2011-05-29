@@ -1,3 +1,6 @@
+1.2.1 (29.05.2011)
+	* Installs new dependency: PyWin32
+
 1.2.0 (29.05.2011)
 	* Added station installer
 	* Updated linklist (Zadig)

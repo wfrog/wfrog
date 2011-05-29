@@ -4,7 +4,7 @@ rem Todo:
 
 rem yay! nothing todo :)
 
-set version=1.2.0
+set version=1.2.1
 set date=29.05.2011
 
 set python="%cd:~0,1%:\Python26\"
@@ -207,6 +207,11 @@ echo NameMapper for Cheetah
 echo done..
 echo.
 
+echo PyWin32
+%wget% -q %pkg_pywin32% -O pywin32.exe
+echo done..
+echo.
+
 echo Step 1 finished...
 cd ..\
 pause
@@ -254,6 +259,11 @@ echo.
 
 echo PyUSB
 pyusb.exe
+echo done..
+echo.
+
+echo PyWin32
+pywin32.exe
 echo done..
 echo.
 
