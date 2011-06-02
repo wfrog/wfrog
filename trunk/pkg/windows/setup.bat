@@ -4,8 +4,8 @@ rem Todo:
 
 rem yay! nothing todo :)
 
-set version=1.2.1
-set date=29.05.2011
+set version=1.2.2
+set date=02.06.2011
 
 set python="%cd:~0,1%:\Python26\"
 set easyinst=%python%Scripts\easy_install.exe
@@ -374,7 +374,7 @@ echo Step 4 finished...
 pause
 cls
 
-echo Please run me again with mode 3 (install-mode)
+echo Please run me again with mode 4 (build-mode)
 
 pause
 exit
@@ -429,6 +429,11 @@ if "%station%" == "1" (
     del zadig.7z
     echo done...
     echo.
+    if not exist zadig.ini (
+	echo ***W A R N I N G***
+	echo No zadig.ini found, ignoring...
+	echo.
+    )
     pause
     cls
     echo INFO: In order to install the wmrs200, select
