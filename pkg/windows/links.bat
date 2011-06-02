@@ -11,6 +11,7 @@ set pkg_pyyaml=http://pyyaml.org/download/pyyaml/PyYAML-3.09.win32-py2.6.exe
 set pkg_pywws=http://pywws.googlecode.com/files/pywws-11.05_r380.zip
 set pkg_pygchart=http://pygooglechart.slowchop.com/files/download/pygooglechart-0.2.1.win32.exe
 set pkg_lxml=http://pypi.python.org/packages/2.6/l/lxml/lxml-2.3-py2.6-win32.egg
+
 set pkg_pyserial=http://sourceforge.net/projects/pyserial/files/pyserial/2.5/pyserial-2.5.win32.exe/download
 set pkg_pyusb="http://sourceforge.net/projects/pyusb/files/PyUSB 0.x/0.4.3/pyusb-0.4.3.win32-py2.6.exe/download"
 set pkg_namemapper=http://feisley.com/python/cheetah/pyd2.2.1/py26/_namemapper.pyd
