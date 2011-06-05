@@ -1,5 +1,22 @@
 #!/bin/sh
 
+### Requirements ###
+# In order to use this tool, you need following packages installed:
+
+# * make
+# * subversion
+# * tar
+# * devscripts
+# * fakeroot
+# * dpkg-dev
+
+# and (if you have upload permissions)
+
+# * python (2.6)
+
+### Requirements end ###
+
+
 repo=https://wfrog.googlecode.com/svn/
 trunk=$repo/trunk
 vfile=wfcommon/config.py
