@@ -1,4 +1,4 @@
-## Copyright 2010 Laurent Bovet <laurent.bovet@windmaster.ch>
+## Copyright 2010 Laurent Bovet <laurent.bovet@windmaster.ch>,
 ##                derived from pywws by Jim Easterbrook
 ##
 ##  This file is part of wfrog
@@ -23,67 +23,67 @@ from wfcommon import units
 class WH1080Station(object):
 
     '''
-    Station driver for Fine Offset WH1080, WH1081, WH1090, WH1091, WH2080, WH2081. 
+    Station driver for Fine Offset WH1080, WH1081, WH1090, WH1091, WH2080, WH2081.
     This also covers all the re-branded weather stations working with EasyWeather:
       - Elecsa AstroTouch 6975
       - Watson W-8681
       - WH-1080PC
       - Scientific Sales Pro Touch Screen Weather Station
       - TOPCOM NATIONAL GEOGRAPHIC 265NE
-       -PCE-FWS 20 
-      
+      - PCE-FWS 20
+
     This driver is a wrapper around pywws, thus
-    needs this package installed on your system.    
+    needs this package installed on your system.
     '''
 
     logger = logging.getLogger('station.wh1080')
-    
+
     name = 'Fine Offset WH1080 and compatibles'
 
     def run(self, generate_event, send_event, context={}):
-    
-        from pywws import WeatherStation    
+
+        from pywws import WeatherStation
         station = WeatherStation.weather_station()
 
         for data, last_ptr, logged in station.live_data():
-            try:                
+            try:
                 e = generate_event('press')
-                e.value = data['abs_pressure']
+                e.value = (10*(4.5+(data['abs_pressure'])))/10
                 send_event(e)
 
                 e = generate_event('temp')
                 e.sensor = 0
                 e.value = data['temp_in']
                 send_event(e)
-                
+
                 e = generate_event('hum')
                 e.sensor = 0
                 e.value = data['hum_in']
                 send_event(e)
-                                
+
                 e = generate_event('temp')
                 e.sensor = 1
                 e.value = data['temp_out']
                 send_event(e)
-                
+
                 e = generate_event('hum')
                 e.sensor = 1
                 e.value = data['hum_out']
                 send_event(e)
-                
+
                 e = generate_event('rain')
-                e.total = data['rain']
+                e.total = (136*(data['rain']))/100 
                 e.rate = 0
                 send_event(e)
-                
+
                 e = generate_event('wind')
                 e.create_child('mean')
                 e.mean.speed = units.MphToMps(data['wind_ave'])
-                e.mean.dir = data['wind_dir']
+                e.mean.dir = 22.5*(data['wind_dir']) 
                 e.create_child('gust')
                 e.gust.speed = units.MphToMps(data['wind_gust'])
-                e.gust.dir = data['wind_dir']
-                send_event(e)                        
-                
+                e.gust.dir = 22.5*data['wind_dir']
+                send_event(e)
+
             except Exception, e:
                 self.logger.error(e)
