@@ -47,44 +47,53 @@ class WH1080Station(object):
         station = WeatherStation.weather_station()
 
         for data, last_ptr, logged in station.live_data():
-            try:
-                e = generate_event('press')
-                e.value = (10*(4.5+(data['abs_pressure'])))/10
-                send_event(e)
+            if not logged:
+                try:
+                    if data['abs_pressure']:
+                        e = generate_event('press')
+                        e.value = (10*(4.5+(data['abs_pressure'])))/10
+                        send_event(e)
 
-                e = generate_event('temp')
-                e.sensor = 0
-                e.value = data['temp_in']
-                send_event(e)
+                    if data['temp_in']:                    
+                        e = generate_event('temp')
+                        e.sensor = 0
+                        e.value = data['temp_in']
+                        send_event(e)
 
-                e = generate_event('hum')
-                e.sensor = 0
-                e.value = data['hum_in']
-                send_event(e)
+                    if data['hum_in']:
+                        e = generate_event('hum')
+                        e.sensor = 0
+                        e.value = data['hum_in']
+                        send_event(e)
 
-                e = generate_event('temp')
-                e.sensor = 1
-                e.value = data['temp_out']
-                send_event(e)
+                    if data['temp_out']:
+                        e = generate_event('temp')
+                        e.sensor = 1
+                        e.value = data['temp_out']
+                        send_event(e)
 
-                e = generate_event('hum')
-                e.sensor = 1
-                e.value = data['hum_out']
-                send_event(e)
+                    if data['hum_out']:
+                        e = generate_event('hum')
+                        e.sensor = 1
+                        e.value = data['hum_out']
+                        send_event(e)
 
-                e = generate_event('rain')
-                e.total = (136*(data['rain']))/100 
-                e.rate = 0
-                send_event(e)
+                    if data['rain']:
+                        e = generate_event('rain')
+                        e.total = (136*(data['rain']))/100 
+                        e.rate = 0
+                        send_event(e)
 
-                e = generate_event('wind')
-                e.create_child('mean')
-                e.mean.speed = units.MphToMps(data['wind_ave'])
-                e.mean.dir = 22.5*(data['wind_dir']) 
-                e.create_child('gust')
-                e.gust.speed = units.MphToMps(data['wind_gust'])
-                e.gust.dir = 22.5*data['wind_dir']
-                send_event(e)
+                    if data['wind_ave']:
+                        e = generate_event('wind')
+                        e.create_child('mean')
+                        e.mean.speed = units.MphToMps(data['wind_ave'])
+                        e.mean.dir = 22.5*(data['wind_dir']) 
+                        if data['wind_gust']:
+                            e.create_child('gust')
+                            e.gust.speed = units.MphToMps(data['wind_gust'])
+                            e.gust.dir = 22.5*data['wind_dir']
+                        send_event(e)
 
-            except Exception, e:
-                self.logger.error(e)
+                except Exception, e:
+                    self.logger.error(e)
