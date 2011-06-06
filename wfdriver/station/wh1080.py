@@ -1,4 +1,5 @@
 ## Copyright 2010 Laurent Bovet <laurent.bovet@windmaster.ch>,
+##                Jan Commandeur
 ##                derived from pywws by Jim Easterbrook
 ##
 ##  This file is part of wfrog
