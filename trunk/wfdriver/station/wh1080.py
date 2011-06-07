@@ -1,5 +1,5 @@
 ## Copyright 2010 Laurent Bovet <laurent.bovet@windmaster.ch>,
-##                Jan Commandeur
+##                Jan Commandeur <duinzicht@gmail.com>
 ##                derived from pywws by Jim Easterbrook
 ##
 ##  This file is part of wfrog
@@ -49,42 +49,42 @@ class WH1080Station(object):
         for data, last_ptr, logged in station.live_data():
             if not logged:
                 try:
-                    if data['abs_pressure']:
+                    if data['abs_pressure'] is not None:
                         e = generate_event('press')
                         e.value = (10*(4.5+(data['abs_pressure'])))/10
                         send_event(e)
 
-                    if data['temp_in']:                    
+                    if data['temp_in'] is not None:                    
                         e = generate_event('temp')
                         e.sensor = 0
                         e.value = data['temp_in']
                         send_event(e)
 
-                    if data['hum_in']:
+                    if data['hum_in'] is not None:
                         e = generate_event('hum')
                         e.sensor = 0
                         e.value = data['hum_in']
                         send_event(e)
 
-                    if data['temp_out']:
+                    if data['temp_out'] is not None:
                         e = generate_event('temp')
                         e.sensor = 1
                         e.value = data['temp_out']
                         send_event(e)
 
-                    if data['hum_out']:
+                    if data['hum_out'] is not None:
                         e = generate_event('hum')
                         e.sensor = 1
                         e.value = data['hum_out']
                         send_event(e)
 
-                    if data['rain']:
+                    if data['rain'] is not None:
                         e = generate_event('rain')
                         e.total = (136*(data['rain']))/100 
                         e.rate = 0
                         send_event(e)
 
-                    if data['wind_ave']:
+                    if data['wind_ave'] is not None and data['wind_dir'] < 16:
                         e = generate_event('wind')
                         e.create_child('mean')
                         e.mean.speed = units.MphToMps(data['wind_ave'])
