@@ -87,12 +87,12 @@ class WH1080Station(object):
                     if data['wind_ave'] is not None and data['wind_dir'] < 16:
                         e = generate_event('wind')
                         e.create_child('mean')
-                        e.mean.speed = units.MphToMps(data['wind_ave'])
+                        e.mean.speed = data['wind_ave']
                         e.mean.dir = 22.5*(data['wind_dir']) 
                         if data['wind_gust']:
                             e.create_child('gust')
-                            e.gust.speed = units.MphToMps(data['wind_gust'])
-                            e.gust.dir = 22.5*data['wind_dir']
+                            e.gust.speed = data['wind_gust']
+                            e.gust.dir = 22.5*(data['wind_dir'])
                         send_event(e)
 
                 except Exception, e:
