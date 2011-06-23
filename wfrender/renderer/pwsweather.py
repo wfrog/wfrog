@@ -105,34 +105,37 @@ class PwsWeatherPublisher(object):
             while self.alive:
                 try:
                     data = accu.execute()['current']['series']
+                    index = len(data['lbl'])-1
                     data_month= accu_month.execute()['current']['series']
+                    index_month = len(data_month['lbl'])-1
                     data_year = accu_year.execute()['current']['series']
+                    index_year = len(data_year['lbl'])-1
 
                     params = {
                         # <float> pressure: in inches of Hg
-                        'pressure' : HPaToInHg(data['pressure'][0]),
+                        'pressure' : HPaToInHg(data['pressure'][index]),
                         # <float> dewpoint: in Fahrenheit
-                        'dewpoint' : CToF(data['dew_point'][0]),
+                        'dewpoint' : CToF(data['dew_point'][index]),
                         # <float> humidity: between 0.0 and 100.0 inclusive
-                        'humidity' : data['hum'][0],
+                        'humidity' : data['hum'][index],
                         # <float> tempf: in Fahrenheit
-                        'tempf' : CToF(data['temp'][0]),
+                        'tempf' : CToF(data['temp'][index]),
                         # <float> rainin: inches/hour of rain
-                        'rainin' : MmToIn(data['rain_rate'][0]),
+                        'rainin' : MmToIn(data['rain_rate'][index]),
                         # <float> rainday: total rainfall in day (localtime)
-                        'rainday' : MmToIn(data['rain_fall'][0]),
+                        'rainday' : MmToIn(data['rain_fall'][index]),
                         # <float> rainmonth:  total rainfall for month (localtime)
-                        'rainmonth' : MmToIn(data_month['rain_fall'][0]),
+                        'rainmonth' : MmToIn(data_month['rain_fall'][index_month]),
                         # <float> rainyear:   total rainfall for year (localtime)
-                        'rainyear' : MmToIn(data_year['rain_fall'][0]),
+                        'rainyear' : MmToIn(data_year['rain_fall'][index_year]),
                         # <string> dateutc: date "YYYY-MM-DD HH:MM:SS" in GMT timezone
-                        'dateutc' : data['utctime'][0].strftime('%Y-%m-%d %H:%M:%S'),
+                        'dateutc' : data['utctime'][index].strftime('%Y-%m-%d %H:%M:%S'),
                         # <float> windgust: in mph
-                        'windgust' : MpsToMph(data['gust'][0]),
+                        'windgust' : MpsToMph(data['gust'][index]),
                         # <float> windspeed: in mph
-                        'windspeed' : MpsToMph(data['wind'][0]),
+                        'windspeed' : MpsToMph(data['wind'][index]),
                         # <float> winddir: in degrees, between 0.0 and 360.0
-                        'winddir' : data['wind_deg'][0] }
+                        'winddir' : data['wind_deg'][index] }
 
                     # Do not send parameters that are null (None).
                     # from above only dateutc is a mandatory parameter.
