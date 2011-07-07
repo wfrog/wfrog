@@ -1,7 +1,43 @@
 init:
     storage: !service
         name: storage
-        instance: !include { path: ../../wfcommon/config/storage.yaml }
+        instance: !include
+            path: ../../wfcommon/config/storage.yaml
+    accu_3h: !service
+        name: accu_3h
+        instance:  !include
+            path: ../../wfrender/config/default/chart_accumulator.yaml
+            variables:
+                slice: minute
+                span: 180
+    accu_24h: !service
+        name: accu_24h
+        instance:  !include
+            path: ../../wfrender/config/default/chart_accumulator.yaml
+            variables:
+                slice: hour
+                span: 24
+    accu_30d: !service
+        name: accu_30d
+        instance:  !include
+            path: ../../wfrender/config/default/chart_accumulator.yaml
+            variables:
+                slice: day
+                span: 31
+    accu_365d_w: !service
+        name: accu_365d_w
+        instance:  !include
+            path: ../../wfrender/config/default/chart_accumulator.yaml
+            variables:
+                slice: week
+                span: 60
+    accu_365d_m: !service
+        name: accu_365d_m
+        instance: !include
+            path: ../../wfrender/config/default/table_accumulator.yaml
+            variables:
+                slice: month
+                span: 12
 
 input: !service
     name: events  # Use embedded wfdriver to receive events

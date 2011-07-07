@@ -12,6 +12,17 @@ renderer: !multi
                 temp.min:
                     color: wheat
                     min: { color: darkslateblue, text: darkslateblue, thickness: 0.5 }
+                ## Uncomment to add wind chill and/or humidex to graphs (modify also chart_accumulator.yaml)
+                #temp.wind_chill:
+                #    color: blue
+                #    thickness: 1
+                #    dash: 3
+                #    order: 2
+                #temp.humidex:
+                #    color: red
+                #    thickness: 1
+                #    dash: 3
+                #    order: 3
                 dew.avg:
                     color: 8D7641
                     thickness: 1

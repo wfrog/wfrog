@@ -2,11 +2,8 @@ renderer: !template
     path: ../../templates/default/main.html
     mime: text/html
     renderer: !data
-        source: !accumulator
-            slice: hour
-            span: 24
-            storage: !service
-                name: storage                
+        source: !service
+            name: accu_24h                
         renderer: !multi
             children:
                 current: !include

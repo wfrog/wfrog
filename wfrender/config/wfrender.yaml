@@ -1,23 +1,120 @@
 init:
     storage: !service
         name: storage
-        instance: !include { path: ../../wfcommon/config/storage.yaml }
+        instance: !include 
+            path: ../../wfcommon/config/storage.yaml
+    accu_3h: !service
+        name: accu_3h
+        instance:  !include
+            path: default/chart_accumulator.yaml
+            variables:
+                slice: minute
+                span: 180
+    accu_24h: !service
+        name: accu_24h
+        instance:  !include
+            path: default/chart_accumulator.yaml
+            variables:
+                slice: hour
+                span: 24
+    accu_30d: !service
+        name: accu_30d
+        instance:  !include
+            path: default/chart_accumulator.yaml
+            variables:
+                slice: day
+                span: 31
+    accu_365d_w: !service
+        name: accu_365d_w
+        instance:  !include
+            path: default/chart_accumulator.yaml
+            variables:
+                slice: week
+                span: 60
+    accu_365d_m: !service
+        name: accu_365d_m
+        instance: !include
+            path: default/table_accumulator.yaml
+            variables:
+                slice: month
+                span: 12
 
-renderer: !http
-    cookies: [ units ]
-    root: !include
-        path: default/24hours.yaml
-    renderers:
-        3hours.html: !include
-            path: default/3hours.yaml
-        24hours.html: !include
-            path: default/24hours.yaml
-        30days.html: !include
-            path: default/30days.yaml
-        365days.html: !include
-            path: default/365days.yaml
-        check: !include
-            path: default/check.yaml
+renderer: !multi
+    parallel: true
+    children:
+        ## Uncomment to activate PWS Weather for you publisher
+        #pwsweather: !pwsweather
+        #    id: STATION_ID
+        #    password: PASSWORD
+        #    storage: !service
+        #        name: storage
+        #    period: 300
+
+        ## Uncomment to activate Weather Underground publisher
+        #wunderground: !wunderground
+        #    id: STATION_ID
+        #    password: PASSWORD
+        #    storage: !service
+        #        name: storage
+        #    period: 300
+
+        ## Uncomment to publish files by ftp (compatible with http server)
+        #ftp: !scheduler
+        #    period: 600  # in seconds
+        #    delay: 60 # in seconds, delay before start rendering
+        #    renderer: !ftp
+        #        host: HOST.COM 
+        #        username: USERNAME
+        #        password: PASSWORD
+        #        directory: DIRECTORY
+        #        renderers:
+        #            3hours.html: !file
+        #                path: /tmp/3hours.html
+        #                renderer: !include
+        #                    path: default/3hours.yaml
+        #            24hours.html: !file
+        #                path: /tmp/24hours.html
+        #                renderer: !include
+        #                    path: default/24hours.yaml
+        #            30days.html: !file
+        #                path: /tmp/30days.html
+        #                renderer: !include
+        #                    path: default/30days.yaml
+        #            365days.html: !file
+        #                path: /tmp/365days.html
+        #                renderer: !include
+        #                    path: default/365days.yaml
+        #            ## Uncomment to activate www.meteoclimatic.com ftp publisher
+        #            #meteoclimatic.txt: !file
+        #            #    path: /tmp/meteoclimatic.txt
+        #            #    renderer: !meteoclimatic
+        #            #        id: STATION_ID  
+        #            #        storage: !service
+        #            #            name: storage
+
+        # Http publishing (default)
+        http: !http
+            cookies: [ units ]
+            root: !include
+                path: default/24hours.yaml
+            renderers:
+                3hours.html: !include
+                    path: default/3hours.yaml
+                24hours.html: !include
+                    path: default/24hours.yaml
+                30days.html: !include
+                    path: default/30days.yaml
+                365days.html: !include
+                    path: default/365days.yaml
+                check: !include
+                    path: default/check.yaml
+                ## Uncomment to activate www.meteoclimatic.com http publisher
+                #meteoclimatic.txt: !file
+                #    path: /tmp/meteoclimatic.txt.txt
+                #    renderer: !meteoclimatic
+                #        id: STATION_ID 
+                #        storage: !service
+                #            name: storage
 
 logging:
     level: info
@@ -28,6 +125,8 @@ logging:
                 path: ../../wfcommon/config/loghandler.yaml
                 variables:
                     process: wfrender
+
+        ## Uncomment to receive mail on critical events
         #mail:
         #    level: critical
         #    handler: !include

@@ -2,11 +2,8 @@ renderer: !template
     path: ../../templates/default/main.html
     mime: text/html
     renderer: !data
-        source: !accumulator
-            slice: day
-            span: 31
-            storage: !service
-                name: storage
+        source: !service
+            name: accu_30d
         renderer: !multi
             children:
                 current: !include
