@@ -15,5 +15,5 @@ Users are invited to submit as comment to this page the URL of their stations to
 || [http://lode-hermsdorf.dyndns.org Hermsdorf, Upper Lusatia, Germany] || WMRS200 || Uses HTTP renderer. Running on Alix1d with Ubuntu 10.04 ||
 || [http://s2.webcf.de/meteo/ Ermsleben, Saxony Anhalt, Germany] || WMRS200 || Uses HTTP renderer. ||
 || [http://www.patraslive.gr/weather/kastelokampos/24hours.html Kastelokampos, Patras, Greece] || WMR100N || Uses FTP renderer. ||
-|| [http://galile0.co.uk:7680/ Preston, Lancashire, England] || H1080 || Http renderer. ||
+|| [http://galile0.co.uk:7680/ Preston, Lancashire, England] || H1080 || Uses Http renderer. Running on a Qnap TS210. ||
 <p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
