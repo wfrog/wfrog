@@ -179,6 +179,10 @@ mysql --user=root --password=secret --database=wfrog < db-mysql-0.3.sql
 
   * Edit `wfcommon/config/storage.yaml` to enable the `!mysql` storage.
 
+== Support for multiple TH sensors ==
+
+When using database storage (both Firebird and mysql) just uncomment the relevant lines in the table creation script and the additional sensors data will be recorded.
+
 == Install as a Boot-Time Services ==
 
 Steps to make wfrog start and stop automatically on a debian-based system:
@@ -200,10 +204,6 @@ Fedora/RedHat:
 sudo chkconfig httpd --add
 sudo chkconfig  httpd  on --level 2,3,5
 }}}
-
-=== Support for multiple TH sensors ===
-
-When using database storage (both Firebird and mysql) just uncomment the relevant lines in the table creation script and the additional sensors data will be recorded.
 
 == Sending pages to a FTP server ==
 
