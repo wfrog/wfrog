@@ -27,7 +27,7 @@ import sys
 
 class CsvStorage(object):
     '''
-    Stores samples in a CSV file.
+    Stores samples in a CSV file. Only supports one TH sensor (number 1).
 
     [ Properties ]
 

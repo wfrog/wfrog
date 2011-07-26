@@ -24,38 +24,32 @@ class DatabaseStorage(object):
     Base class for database storages.
     '''
 
-    initialized = False
-
     time_format = '%Y-%m-%d %H:%M:%S'
 
     tablename = 'METEO'
 
-    def write_sample(self, sample, context={}):
-        if not self.initialized:
-            self.init()
-            self.initialized = True
+    
+    mandatory_storage_fields = ['TEMP', 'HUM', 'DEW_POINT', 'WIND', 'WIND_DIR', 'WIND_GUST', 
+                                'WIND_GUST_DIR', 'RAIN', 'RAIN_RATE', 'PRESSURE']
+    optional_storage_fields = ['UV_INDEX', 'TEMPINT', 'HUMINT', 'TEMP2', 'HUM2', 
+                               'TEMP3', 'HUM3', 'TEMP4', 'HUM4', 'TEMP5', 'HUM5', 
+                               'TEMP6', 'HUM6', 'TEMP7', 'HUM7', 'TEMP8', 'HUM8', 
+                               'TEMP9', 'HUM9']
 
-        statement =  "INSERT INTO %s (TIMESTAMP_UTC, TIMESTAMP_LOCAL," + \
-            " TEMP, HUM, WIND, WIND_DIR, WIND_GUST, WIND_GUST_DIR, DEW_POINT,"+ \
-            " RAIN, RAIN_RATE, PRESSURE, UV_INDEX) "+ \
-            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    # Database storages should rewrite the storage_fields variable with the actual available fields
+    storage_fields = mandatory_storage_fields
+
+
+    def write_sample(self, sample, context={}):
 
         timestamp = time.mktime(sample['localtime'].timetuple())
         utc_time = datetime.utcfromtimestamp(timestamp)
-        sql = statement % (self.tablename,
-                 "'%s'" % utc_time.strftime(self.time_format),
-                 "'%s'" % sample['localtime'].strftime(self.time_format),
-                 self.format(sample['temp']),
-                 self.format(sample['hum']),
-                 self.format(sample['wind']),
-                 self.format(sample['wind_dir']),
-                 self.format(sample['wind_gust']),
-                 self.format(sample['wind_gust_dir']),
-                 self.format(sample['dew_point']),
-                 self.format(sample['rain']),
-                 self.format(sample['rain_rate']),
-                 self.format(sample['pressure']),
-                 self.format(sample['uv_index']))
+        sql =  "INSERT INTO %s (TIMESTAMP_UTC, TIMESTAMP_LOCAL, %s) VALUES (%s, %s, %s)" % (
+                  self.tablename,
+                  ', '.join(self.storage_fields), 
+                  "'%s'" % utc_time.strftime(self.time_format),
+                  "'%s'" % sample['localtime'].strftime(self.time_format),
+                  ', '.join(map(lambda x: self.format(sample[x.lower()] if x.lower() in sample else None), self.storage_fields)))
         try:
             self.db.connect()
             self.db.execute(sql)
@@ -65,38 +59,22 @@ class DatabaseStorage(object):
         finally:
             self.db.disconnect()
 
+
     def keys(self, context={}):
-        return ['utctime',
-                'localtime',
-                'temp',
-                'hum',
-                'wind',
-                'wind_dir',
-                'wind_gust',
-                'wind_gust_dir',
-                'dew_point',
-                'rain',
-                'rain_rate',
-                'pressure',
-                'uv_index']
+        return ['utctime', 'localtime'] + map(str.lower ,self.storage_fields) 
+
 
     def samples(self, from_time=datetime.fromtimestamp(0), to_time=datetime.now(), context={}):
 
         self.logger.debug("Getting samples for range: %s to %s", from_time, to_time)
 
-        if not self.initialized:
-            self.init()
-            self.initialized = True
-
-        statement = "SELECT TIMESTAMP_UTC, TIMESTAMP_LOCAL," + \
-            " TEMP, HUM, WIND, WIND_DIR, WIND_GUST, WIND_GUST_DIR, DEW_POINT,"+ \
-            " RAIN, RAIN_RATE, PRESSURE, UV_INDEX FROM %s " + \
-            " WHERE TIMESTAMP_LOCAL >= '%s' AND TIMESTAMP_LOCAL < '%s' "+ \
-            " ORDER BY TIMESTAMP_LOCAL ASC"
-
-        sql = statement % ( self.tablename, 
-                 from_time.strftime(self.time_format),
-                 to_time.strftime(self.time_format))
+        sql = ( "SELECT TIMESTAMP_UTC, TIMESTAMP_LOCAL, %s FROM %s " + \
+                " WHERE TIMESTAMP_LOCAL >= '%s' AND TIMESTAMP_LOCAL < '%s' "+ \
+                " ORDER BY TIMESTAMP_LOCAL ASC" ) % (
+                    ', '.join(self.storage_fields), 
+                    self.tablename, 
+                    from_time.strftime(self.time_format),
+                    to_time.strftime(self.time_format))
 
         try:
             self.db.connect()
@@ -111,5 +89,5 @@ class DatabaseStorage(object):
         if value is None:
             return 'NULL'
         else:
-            return value
+            return str(value)  # rounds up values to 1 decimal, which is OK. 
 

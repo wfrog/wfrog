@@ -56,3 +56,28 @@ class MysqlStorage(base.DatabaseStorage):
     def init(self, context=None):
         self.db = wfcommon.database.MySQLDB(self.database, self.host, self.port, self.user, self.password)
 
+        table_fields = self._get_table_fields()
+        # Verify Mandatory fields
+        assert 'TIMESTAMP_UTC' in table_fields
+        assert 'TIMESTAMP_LOCAL' in table_fields
+        for field in self.mandatory_storage_fields:
+            assert field in table_fields
+        # Obtain actual storage fields
+        self.storage_fields = self.mandatory_storage_fields + \
+                              [field for field in self.optional_storage_fields if field in table_fields]
+        self.logger.info("Table %s detected with fields: %s" % (self.tablename, ', '.join(self.storage_fields)))
+
+
+    def _get_table_fields(self):
+        sql = "show columns from %s;" % self.tablename
+        fields = []
+
+        try:
+            self.db.connect()
+            for row in self.db.select(sql):
+                fields.append(row[0])
+        finally:
+            self.db.disconnect()
+
+        return fields
+

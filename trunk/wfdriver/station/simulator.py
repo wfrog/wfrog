@@ -36,15 +36,20 @@ class RandomSimulator(object):
     past [number] (optional):
         Will send events "from the past" at startup. Default to 0.
 
+    th_sensors [number] (optional):
+        Number of TH sensors to be simulated. Values allowed are from 2 to 10. 
+        Defaults to 5.
     '''
 
     debug_station = True
 
     past = 0
 
-    types = [ 'temp', 'press', 'hum', 'rain', 'wind', 'uv', 'rad' ]
-    init_values = [ 10, 1020, 65, 10, [ 3, 180], 1, 2 ]
-    range = [ 30, 100, 40, 20, [6, 360], 5, 4 ]
+    th_sensors = 5
+
+    types = [ 'press', 'rain', 'wind', 'uv', 'rad' ] + ['temp', 'hum'] * th_sensors
+    init_values = [ 1020, 10, [ 3, 180], 1, 2 ] + [10, 65] * th_sensors
+    range = [100, 20, [6, 360], 5, 4 ] + [30, 40] * th_sensors
 
     rain_total = 55
 
@@ -80,7 +85,7 @@ class RandomSimulator(object):
                 e.timestamp = timestamp
 
             if type == 'temp' or type=='hum':
-                e.sensor = random.randint(0,1)
+                e.sensor = random.randint(0,self.th_sensors-1)
             if type == 'wind':
                 current_values[t][0] = self.new_value(current_values[t][0], self.init_values[t][0], self.range[t][0])
                 current_values[t][1] = self.new_value(current_values[t][1], self.init_values[t][1], self.range[t][1])
