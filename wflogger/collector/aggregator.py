@@ -21,6 +21,10 @@ import base
 import datetime
 import wfcommon.meteo
 
+MAX_TH_SENSORS = 10  # 0 ..9 
+MAIN_TH_SENSOR = 1   # sensor number 1 is the main TH sensor
+INT_TH_SENSOR = 0    # sensor number 0 is the interior TH sensor
+
 class AggregatorCollector(base.BaseCollector):
     '''
     Collects events, compute aggregated values incrementally and issues
@@ -48,10 +52,14 @@ class AggregatorCollector(base.BaseCollector):
             self.initialized = True
 
     def _new_period(self):
-        ## Temperature
-        self._temp = []
-        ## Humidity
-        self._hum = []
+        ## Temperature (up to 10 sensors, sensor number 1 is the main sensor)
+        self._temp = {}
+        for sensor in xrange(MAX_TH_SENSORS):
+            self._temp[sensor] = []
+        ## Humidity  (up to 10 sensors, sensor number 1 is the main sensor)
+        self._hum = {}
+        for sensor in xrange(MAX_TH_SENSORS):
+            self._hum[sensor] = []
         ## Wind
         self._wind = []
         self._wind_dir = []
@@ -91,19 +99,18 @@ class AggregatorCollector(base.BaseCollector):
         self._pressure.append(pressure)
 
     def _report_temperature(self, temp, sensor):
-        if sensor == 1:
-            self._temp.append(temp)
+        if sensor >= 0 and sensor < MAX_TH_SENSORS:
+            self._temp[sensor].append(temp)
 
     def _report_humidity(self, humidity, sensor):
-        if sensor == 1:
-            self._hum.append(humidity)
+        if sensor >= 0 and sensor < MAX_TH_SENSORS:
+            self._hum[sensor].append(humidity)
 
     def _report_uv(self, uv_index):
         if self._uv_index == None or self._uv_index < uv_index:
             self._uv_index = uv_index
 
     def get_data(self):
-
         data = {
             'temp': None,
             'hum': None,
@@ -118,16 +125,26 @@ class AggregatorCollector(base.BaseCollector):
             'dew_point' : None
         }
 
-        if len(self._temp) > 0:
+        for sensor in xrange(MAX_TH_SENSORS):
+            if sensor == MAIN_TH_SENSOR:
+                tsn = 'temp'
+                hsn = 'hum'
+            elif sensor == INT_TH_SENSOR:
+                tsn = 'tempint'
+                hsn = 'humint'
+            else:
+                tsn = 'temp%d' % sensor
+                hsn = 'hum%d' % sensor
 
-            data['temp'] = round(sum(self._temp)/len(self._temp), 1)
-        else:
-            self.logger.warning('Missing temperature data')
+            if len(self._temp[sensor]) > 0:
+                data[tsn] = round(sum(self._temp[sensor])/len(self._temp[sensor]), 1)
+            elif sensor == MAIN_TH_SENSOR:
+                self.logger.warning('Missing temperature data')
 
-        if len(self._hum) > 0:
-            data['hum'] = round(sum(self._hum)/len(self._hum), 1)
-        else:
-            self.logger.warning('Missing humidity data')
+            if len(self._temp[sensor]) > 0:
+                data[hsn] = round(sum(self._hum[sensor])/len(self._hum[sensor]), 1)
+            elif sensor == MAIN_TH_SENSOR:
+                self.logger.warning('Missing humidity data')
 
         if len(self._wind) > 0:
             data['wind'] = round(sum(self._wind)/len(self._wind), 1)
