@@ -201,6 +201,10 @@ sudo chkconfig httpd --add
 sudo chkconfig  httpd  on --level 2,3,5
 }}}
 
+=== Support for multiple TH sensors ===
+
+When using database storage (both Firebird and mysql) just uncomment the relevant lines in the table creation script and the additional sensors data will be recorded.
+
 == Sending pages to a FTP server ==
 
 The default configuration starts an internal web-server on port 7680.
