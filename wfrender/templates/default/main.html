@@ -9,6 +9,33 @@ $u
 <html>
 <head>
     <title>Weather Dashboard - wfrog $version</title>
+    #if $getVar('http', False)
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/prototype/1.7.0.0/prototype.js"></script>
+    <script type="text/javascript" src="http://calendarview.org/releases/1.2/javascripts/calendarview.js"></script>
+    
+    <link  rel="stylesheet" href="http://calendarview.org/releases/1.2/stylesheets/calendarview.css" />
+    
+    <script type="text/javascript">
+        window.onload = function() {
+            
+            loc = document.location.href;
+            nloc = loc.split('?time_end=');
+            
+            Calendar.setup(
+              {
+                dateField      : 'time_end',
+                triggerElement : 'cal_open',
+                closeHandler   : function() {
+                    window.location=nloc[0]+'?time_end='+document.getElementById('time_end').value;
+                }
+              }
+            );
+            
+            if(nloc[1] != undefined)
+                document.getElementById('date_val').innerHTML=nloc[1];
+        }
+    </script>
+    #end if
     <style>
         body {
             font-family: Arial, Helvetica, Sans-serif;
@@ -163,6 +190,15 @@ $u
             <!-- UV Index <span class="value">0</span> -->
         </div>
     </div>
+	#if $getVar('http', False)
+    <div class="bordered headerNoPad" style="height: 76px;">
+        <input id="time_end" name="time_end" style="display:none;" value="2011-06-06" />
+        <br style="font-size:50%">End-Date: <span style="height: 4px;" class="value" id="date_val"><i>None</i></span><br style="font-size:50%"><a id="cal_open">Choose...</a>
+        <br>
+        <br>
+        <a onclick="document.getElementById('details').style.display = (document.getElementById('details').style.display == 'none') ? 'block' : 'none';">Show/Hide additional informations</a>
+    </div>
+	#end if
     <div class="tabPane">
         <div class="leftCell" style="width:10px;">&nbsp;</div>
         <div id="3hours" class="tab"><a href="3hours.html">3 Hours</a></div>    
@@ -208,7 +244,11 @@ $u
             <div><img src="$chart.uv"/></div>
         </div>
     </div>
-    <div class="bordered cell graph" style="clear: both">
+	#if $getVar('http', False)
+    <div class="bordered cell graph" style="clear: both; display: none;" id="details">
+	#else
+	<div class="bordered cell graph" style="clear: both;" id="details">
+	#end if
        <div style="clear: both"><pre style="font-size:94%">
 #set $indexes = $summary.keys()
 #silent $indexes.sort()
