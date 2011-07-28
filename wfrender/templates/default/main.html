@@ -33,6 +33,14 @@ $u
             
             if(nloc[1] != undefined)
                 document.getElementById('date_val').innerHTML=nloc[1];
+			
+			date = new Date();
+			year = date.getFullYear();
+			month = (date.getMonth() < 10) ? '0'+date.getMonth() : date.getMonth();
+			day = (date.getDate() < 10) ? '0'+date.getDate() : date.getDate();
+			
+			document.getElementById('time_end').value = year+'-'+month+'-'+day;
+			//alert(document.getElementById('time_end').value);
         }
     </script>
     #end if
@@ -134,6 +142,19 @@ $u
             background: wheat;
             border-bottom: 1px solid wheat;
         }
+        .rightTab {
+            margin-bottom:3px;
+            margin-left: 3px;
+            margin-right: 3px;
+            padding-left: 6px;
+            padding-right: 6px;
+            padding-top: 2px;
+            padding-bottom: 2px;
+            float: right;
+            height: 16px;
+            background: wheat;
+            border-bottom: 1px solid wheat;
+        }
         .selected {
             background: white;
             border-right: 1px solid tan;
@@ -190,24 +211,30 @@ $u
             <!-- UV Index <span class="value">0</span> -->
         </div>
     </div>
-	#if $getVar('http', False)
+#if $getVar('http', False)
     <div class="bordered headerNoPad" style="height: 76px;">
-        <input id="time_end" name="time_end" style="display:none;" value="2011-06-06" />
+        <input id="time_end" name="time_end" style="display:none;" value="" />
         <br style="font-size:50%">End-Date: <span style="height: 4px;" class="value" id="date_val"><i>None</i></span><br style="font-size:50%"><a id="cal_open">Choose...</a>
         <br>
         <br>
-        <a onclick="document.getElementById('details').style.display = (document.getElementById('details').style.display == 'none') ? 'block' : 'none';">Show/Hide additional informations</a>
+
     </div>
-	#end if
+#end if
+
     <div class="tabPane">
         <div class="leftCell" style="width:10px;">&nbsp;</div>
         <div id="3hours" class="tab"><a href="3hours.html">3 Hours</a></div>    
         <div id="24hours" class="tab"><a href="24hours.html">24 Hours</a></div>
         <div id="30days" class="tab"><a href="30days.html">30 Days</a></div>
         <div id="365days" class="tab"><a href="365days.html">365 Days</a></div>
+        <div style="float:right; width:10px;">&nbsp;</div>
+        <div id="button-details" class="rightTab" onclick="document.getElementById('charts').style.display = 'none'; document.getElementById('button-charts').className = 'rightTab'; document.getElementById('details').style.display = 'block'; document.getElementById('button-details').className = 'rightTab selected'; ">numerical data</div>
+        <div id="button-charts" class="rightTab selected" onclick="document.getElementById('charts').style.display = 'block'; document.getElementById('button-charts').className = 'rightTab selected'; document.getElementById('details').style.display = 'none'; document.getElementById('button-details').className = 'rightTab';">charts</div>        
     </div>
+
+    <div id="charts">
     <div>
-        <div class="bordered cell graph">
+        <div class="bordered cell graph" style="clear: both">
             <div class="leftCell">Temperature and Dew Point</div><div class="units">&deg;$unitstr('temp',$units.temp)</div>
             <div><img src="$chart.temp"/></div>
         </div>
@@ -221,7 +248,7 @@ $u
         </div>
     </div>
     <div>
-        <div class="bordered cell graph"  style="clear: both">
+        <div class="bordered cell graph" style="clear: both">
             <div class="leftCell">Wind and Gusts</div><div class="units">$unitstr('wind',$units.wind)</div>
             <div><img src="$chart.wind"/></div>
         </div>
@@ -244,11 +271,8 @@ $u
             <div><img src="$chart.uv"/></div>
         </div>
     </div>
-	#if $getVar('http', False)
+    </div>
     <div class="bordered cell graph" style="clear: both; display: none;" id="details">
-	#else
-	<div class="bordered cell graph" style="clear: both;" id="details">
-	#end if
        <div style="clear: both"><pre style="font-size:94%">
 #set $indexes = $summary.keys()
 #silent $indexes.sort()
