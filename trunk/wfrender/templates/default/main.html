@@ -26,7 +26,10 @@ $u
                 dateField      : 'time_end',
                 triggerElement : 'cal_open',
                 closeHandler   : function() {
-                    window.location=nloc[0]+'?time_end='+document.getElementById('time_end').value;
+                    if(document.getElementById('time_end').value != year+'-'+nmonth+'-'+day)
+                        window.location=nloc[0]+'?time_end='+document.getElementById('time_end').value;
+                     else
+                        window._popupCalendar.container.innerHTML='';
                 }
               }
             );
@@ -36,11 +39,11 @@ $u
 			
 			date = new Date();
 			year = date.getFullYear();
-			month = (date.getMonth() < 10) ? '0'+date.getMonth() : date.getMonth();
+			month = date.getMonth() + 1;
+			nmonth = (month < 10) ? '0'+month : month;
 			day = (date.getDate() < 10) ? '0'+date.getDate() : date.getDate();
 			
-			document.getElementById('time_end').value = year+'-'+month+'-'+day;
-			//alert(document.getElementById('time_end').value);
+			document.getElementById('time_end').value = year+'-'+nmonth+'-'+day;
         }
     </script>
     #end if
@@ -214,7 +217,7 @@ $u
 #if $getVar('http', False)
     <div class="bordered headerNoPad" style="height: 76px;">
         <input id="time_end" name="time_end" style="display:none;" value="" />
-        <br style="font-size:50%">End-Date: <span style="height: 4px;" class="value" id="date_val"><i>None</i></span><br style="font-size:50%"><a id="cal_open">Choose...</a>
+        <br style="font-size:50%">End-Date: <span style="height: 4px;" class="value" id="date_val"><i>None</i></span><br style="font-size:50%"><br><br><a id="cal_open">Choose...</a>
         <br>
         <br>
 
