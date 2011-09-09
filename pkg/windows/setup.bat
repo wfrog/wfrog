@@ -4,8 +4,8 @@ rem Todo:
 
 rem yay! nothing todo :)
 
-set version=1.2.2
-set date=02.06.2011
+set version=1.2.3
+set date=09.09.2011
 
 set python="%cd:~0,1%:\Python26\"
 set easyinst=%python%Scripts\easy_install.exe
@@ -47,8 +47,7 @@ pause
 echo.
 set /p update=Can I check for updates [Y/N]?
 
-if "%update%" == "n" goto setup
-if "%update%" == "N" goto setup
+if /I "%update%" == "n" goto setup
 
 %wget% -q %upd_srv%/versions.bat -O versions.bat
 
@@ -135,10 +134,8 @@ echo.
 set /p install=What do you want? [1-4,i,x]: 
 if "%install%" == "4" goto cfg
 if "%install%" == "3" goto install
-if "%install%" == "x" exit
-if "%install%" == "X" exit
-if "%install%" == "i" goto dev_install
-if "%install%" == "I" goto dev_install
+if /I "%install%" == "x" exit
+if /I "%install%" == "i" goto dev_install
 
 
 cls
@@ -168,7 +165,12 @@ echo done..
 echo.
 
 echo libusb1.0
-%wget% -q %pkg_libusb10% -O libusb.7z
+%wget% -q %pkg_libusb10% -O libusb10.7z
+echo done..
+echo.
+
+echo libusb0
+%wget% -q %pkg_libusb0% -O libusb0.zip
 echo done..
 echo.
 
@@ -278,7 +280,7 @@ cd ..
 
 echo Cheetah template-system
 mkdir cheetah
-move download\cheetah.tar.gz cheetah
+xcopy /Y download\cheetah.tar.gz cheetah
 cd cheetah
 %sev_za% x -y cheetah.tar.gz
 %sev_za% x -y cheetah-2.2.2.tar
@@ -290,31 +292,44 @@ echo done..
 echo.
 
 echo Move nameMapper for Cheetah
-move download\_namemapper.pyd %python%Lib\site-packages\Cheetah-2.2.2-py2.6.egg\Cheetah
+xcopy /Y download\_namemapper.pyd %python%Lib\site-packages\Cheetah-2.2.2-py2.6.egg\Cheetah
 echo done..
 echo.
 
 
 
 
-echo libusb
-mkdir libusb
-move download\libusb.7z libusb
-cd libusb
-%sev_za% x -y libusb.7z
+echo libusb1.0
+mkdir libusb10
+move download\libusb10.7z libusb10
+cd libusb10
+%sev_za% x -y libusb10.7z
 cd MS32\dll
-xcopy /E "%CD%\*" %python%DLLs
+xcopy /E /Y "%CD%\*" %python%DLLs
 cd ..\..\..\
+echo done..
+echo.
+
+echo libusb0
+mkdir libusb0
+xcopy /Y download\libusb0.zip libusb0
+cd libusb0
+%sev_za% x -y libusb0.zip
+cd libusb-win32-bin-1.2.5.0\bin\x86
+xcopy /E /Y "%CD%\libusb0_x86.dll" %windir%\system32
+ren "%windir%\system32\libusb0_x86.dll" libusb0.dll
+xcopy /E /Y "%CD%\libusb0.sys" %windir%\system32\drivers
+cd ..\..\..\..\
 echo done..
 echo.
 
 
 echo PyWWS
 mkdir pywws
-move download\pywws.zip pywws
+xcopy /Y download\pywws.zip pywws
 cd pywws
 %sev_za% x -y pywws.zip
-xcopy /E "%CD%\pywws-11.05_r380\*" %python%Lib
+xcopy /E /Y "%CD%\pywws-11.05_r380\*" %python%Lib
 cd ..\
 echo done..
 echo.
@@ -344,8 +359,7 @@ cls
 
 set /p cleanup=Run complete cleanup? [Y/N]: 
 
-if "%cleanup%" == "N" echo Please run me again with mode 3 (install-mode)
-if "%cleanup%" == "n" echo Please run me again with mode 3 (install-mode)
+if /I "%cleanup%" == "y" (
 
 echo Step 4: Cleanup
 cd %coredir%
@@ -372,6 +386,8 @@ echo done
 echo.
 echo Step 4 finished...
 pause
+)
+
 cls
 
 echo Please run me again with mode 4 (build-mode)
@@ -382,11 +398,18 @@ exit
 :cfg
 
 cls
+if exist trunk (
+    set /p update=There exists already a folder trunk. Should I use it? [Y/N]
+)
+
+if /I "%update%" == "n" (
 echo Get latest wfrog trunk...
 svn checkout http://wfrog.googlecode.com/svn/trunk/ --quiet
 echo.
 echo done..
 sleep 2
+)
+
 cls
 echo Step 5: Build wfrog for Windows
 echo.
@@ -401,8 +424,7 @@ cls
 
 set /p stationInstaller=Run station installer? [Y/N]: 
 
-if "%stationInstaller%" == "N" goto end
-if "%stationInstaller%" == "n" goto end
+if /I "%stationInstaller%" == "n" goto end
 
 
 :dev_install
@@ -441,6 +463,7 @@ if "%station%" == "1" (
     echo * USB-HID (Human Interface Device)
     echo.
     echo and click 'Install driver' on the next window!
+    echo Zadig ask to replace the system-file 'libusb0.dll' - Click YES.
     echo.
     pause
     zadig.exe
