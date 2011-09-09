@@ -4,7 +4,7 @@ rem Todo:
 
 rem yay! nothing todo :)
 
-set version=1.2.3
+set version=1.2.4
 set date=09.09.2011
 
 set python="%cd:~0,1%:\Python26\"
@@ -375,8 +375,13 @@ rmdir /S /Q cheetah
 echo done
 echo.
 
-echo Delete libusb files...
-rmdir /S /Q libusb
+echo Delete libusb1.0 files...
+rmdir /S /Q libusb10
+echo done
+echo.
+
+echo Delete libusb0 files...
+rmdir /S /Q libusb0
 echo done
 echo.
 

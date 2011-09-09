@@ -1,3 +1,6 @@
+1.2.4 (09.09.2011)
+        * Cleanup for new packages
+
 1.2.3 (09.09.2011)
         * Minor code cleanups
         * If trunk already exists, you dont need to download it again
