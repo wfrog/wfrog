@@ -1,3 +1,9 @@
+1.2.3 (09.09.2011)
+        * Minor code cleanups
+        * If trunk already exists, you dont need to download it again
+        * Fixed "error: libusb0.dll: No such file or directory"
+        * Dont move any files from source, so you can run install-mode with all files needed
+
 1.2.2 (02.06.2011)
 	* Minor things
 
