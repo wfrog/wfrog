@@ -20,7 +20,7 @@ Maturity level:
 || *!LaCrosse*                 || WS2300 || Serial || Low || No || !ws2300 || Needs third party ws2300 library (http://ace-host.stuart.id.au/russell/files/ws2300/).<br/>Run `sudo ./setup.py install` to make it visible to wfrog. || Yes || ? ||
 || *Oregon Scientific* || WMR100N || USB || High || No || !wmrs200 ||  || Yes || ? ||
 ||                   || WMR200  || USB || High || Yes || !wmr200 ||  || Yes || ? ||
-||                   || WMRS200 || USB || High || Yes || !wmrs200 ||  || Yes || ? ||
+||                   || WMRS200 || USB || High || Yes || !wmrs200 ||  || Yes || Yes ||
 ||                   || WMR928NX || Serial || High || No || !wmr928x||   || Yes || ? ||
 || *PCE*                  || FWS20 || USB || Medium || No || !wh1080 || See Fine Offset Electronics WH1080 || Yes || ? ||
 || *Scientific Sales*                  || Pro Touch Screen Weather Station || USB || Medium || No || !wh1080 || See Fine Offset Electronics WH1080 || Yes || ? ||
