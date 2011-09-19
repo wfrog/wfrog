@@ -37,7 +37,7 @@ import sys
 
 forecastMap = { 0:'PartlyCloudy', 1:'Rainy', 2:'Cloudy', 3:'Sunny', 4:'Snowy' }
 comfortLevelMap = { 0:'-', 1:'Good',  2:'Poor', 3:'Fair' }
-trendMap = { 0:'Steady', 1:'Falling', 2:'Rising'}
+trendMap = { 0:'Steady', 1:'Rising', 2:'Falling'}
 windDirMap = { 0:"N", 1:"NNE", 2:"NE", 3:"ENE", 4:"E", 5:"ESE", 6:"SE", 7:"SSE",
               8:"S", 9:"SSW", 10:"SW", 11:"WSW", 12:"W", 13:"WNW", 14:"NW", 15:"NWN" }
 thSensors = { 0:'thInt', 1:'th1', 2:'th2', 3:'th3', 4:'th4',
@@ -153,7 +153,7 @@ class WMRS200Station(BaseStation):
                 try:
                     packet = devh.interruptRead(usb.ENDPOINT_IN + 1,  # endpoint number
                                                 0x0000008,            # bytes to read
-                                                10000)                # timeout (10 seconds)
+                                                15000)                # timeout (15 seconds)
                     errors = 0
                 except usb.USBError, e:
                     if e.args == ('No error',):
@@ -169,7 +169,7 @@ class WMRS200Station(BaseStation):
             except Exception, e:
                 self.logger.exception("Exception reading interrupt: "+ str(e))
                 errors = errors + 1
-		packet = None  ## error in this packet, we do not want it
+                packet = None  ## error in this packet, we do not want it
                 if errors == 1: ## Very often we missed 0xFF, let's try to recover
                     packet = [1, 0xff, 0, 0, 0, 0, 0, 0]
                 elif errors > 3: 
@@ -324,7 +324,7 @@ class WMRS200Station(BaseStation):
         self._report_rain(total, rate)
 
         # Log
-        self.logger.info("Rain Battery Ok: %s, Rate %g, This Hr %g, This Day %g, Total %g since %4d/%2d/%2d %2d:%2d",
+        self.logger.info("Rain Battery Ok: %s Rate %g, This Hr %g, This Day %g, Total %g since %4d/%2d/%2d %2d:%2d",
                           batteryOk, rate, thisHour, thisDay, total, yearT, monthT, dayT, hourT, minuteT)
 
     def _parse_wind_record(self, record):
@@ -356,7 +356,7 @@ class WMRS200Station(BaseStation):
         self._report_wind(dirDeg, avgSpeed, gustSpeed)
 
         # Log
-        self.logger.info("Wind batteryOk: %s, direction: %d (%g/%s), gust: %g m/s, avg. speed: %g m/s",
+        self.logger.info("Wind Battery Ok: %s direction: %d (%g/%s), gust: %g m/s, avg. speed: %g m/s",
                           batteryOk, dir, dirDeg, dirStr, gustSpeed, avgSpeed)
 
     def _parse_barometer_record(self, record):
@@ -392,7 +392,7 @@ class WMRS200Station(BaseStation):
     Length  11
     Example: 20 42 d1 91 00 48 64 00 00 20 90
     Byte    Data    Comment
-    0   20  Battery level in high nibble. Temp trend in low nibble?
+    0   20  Battery level in high nibble. Temp trend in high nibble.
     1   42  Identifier
     2   d1  Low nibble is device channel number, high nibble humidity trend and smiley code
     3-4 91 00   Temperature: (256 * byte 4 + byte 3) / 10 = 14,5 degrees
@@ -402,14 +402,20 @@ class WMRS200Station(BaseStation):
     9   20  ?
     10  90
         """
+        batteryOk = (record[0] & 0x40) == 0
+        # Temperature trend
+        ttrend = (record[0] >> 4) & 0x03
+        ttrendTxt = trendMap.get(ttrend, str(ttrend))
+
+        # Sensor id
         sensor = record[2] & 0x0f
         sensorName = thSensors[sensor]
 
-        # Confort level and trend
+        # Comfort level and humidity trend
         comfortLevel = record[2] >> 6
-        trend = (record[2] >> 4) & 0x03
         comfortLevelTxt = comfortLevelMap.get(comfortLevel,str(comfortLevel))
-        trendTxt = trendMap.get(trend, str(trend))
+        htrend = (record[2] >> 4) & 0x03
+        htrendTxt = trendMap.get(htrend, str(htrend))
 
         # Temperature
         temp = (((record[4] & 0x0f) * 255.0) + record[3]) / 10.0
@@ -428,8 +434,8 @@ class WMRS200Station(BaseStation):
         self._report_temperature(temp, humidity, sensor)
 
         # Log
-        self.logger.info("Temperature %s  Temp.: %g C (%s), Humidity: %d %% (%s), Dew Point: %g C",
-                          sensorName, temp, trendTxt, humidity, comfortLevelTxt, dewPoint)
+        self.logger.info("Temp Battery Ok: %s Sensor %s  Temperature: %g C (%s), Humidity: %d %% (%s, %s), Dew Point: %g C",
+                          batteryOk, sensorName, temp, ttrendTxt, humidity, comfortLevelTxt, htrendTxt, dewPoint)
 
     def _parse_uv_record(self, record):
         """
@@ -450,6 +456,6 @@ class WMRS200Station(BaseStation):
         self._report_uv(uv)
 
         # Log
-        self.logger.info("UV  Battery Ok: %s  UV Index: %d" % (batteryOk, uv))
+        self.logger.info("UV   Battery Ok: %s UV Index: %d" % (batteryOk, uv))
 
 name = WMRS200Station.name
