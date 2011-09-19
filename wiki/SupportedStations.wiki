@@ -7,8 +7,8 @@ Maturity level:
 
 || *Vendor*|| *Model* || *Link* || *Maturity* || *Auto-Detect* || *Driver* || *Notes* || *Linux* || *Windows* ||
 || *Ambient Weather* || WS1080 || USB || Medium || No || !wh1080 || See Fine Offset Electronics WH1080 || Yes || ? ||
-|| *Davis* || !VantagePro || Serial || Medium || No || !vantagepro2 || || Yes || ? ||
-||       || !VantagePro2 || Serial || Medium || No || !vantagepro2 || || Yes || ? ||
+|| *Davis* || !VantagePro || Serial / USB? || Medium || No || !vantagepro2 || || Yes || ? ||
+||       || !VantagePro2 || Serial / USB? || Medium || No || !vantagepro2 || || Yes || ? ||
 || *Elecsa*                  || !AstroTouch 6975 || USB || Medium || No || !wh1080 || See Fine Offset Electronics WH1080 || Yes || ? ||
 || *Fine Offset Electronics* || WH1080, WH1080PC || USB || Medium || No || !wh1080 || Needs third party pywws library (http://code.google.com/p/pywws/downloads/list).<br>Install it as root with `setup.py`. || Yes || ? ||
 ||                         || WH1081 || USB || Medium || No || !wh1080 || See WH1080 || Yes || ? ||
