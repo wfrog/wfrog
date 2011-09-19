@@ -23,6 +23,7 @@ import wmrs200
 import wmr928nx
 import wmr200
 import vantagepro
+import vantagepro2
 import wh1080
 import ws23xx
 import auto
@@ -46,6 +47,9 @@ auto.stations.append(wmr928nx)
 
 class YamlVantageProStation(vantagepro.VantageProStation, yaml.YAMLObject):
     yaml_tag = u'!vantagepro'
+
+class YamlVantageProStation(vantagepro2.VantageProStation, yaml.YAMLObject):
+    yaml_tag = u'!vantagepro2'
 
 class YamlWH1080Station(wh1080.WH1080Station, yaml.YAMLObject):
     yaml_tag = u'!wh1080'

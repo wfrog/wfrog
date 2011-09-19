@@ -26,6 +26,8 @@ class VantageProStation(object):
     Station driver for the Davis VantagePro. It is a wrapper around PyWeather, thus
     need this package installed on your system (sudo easy_install weather).
 
+    Deprecated - USE vantagepro2 (native wfrog driver)
+
     [Properties]
 
     port [string] (optional):
