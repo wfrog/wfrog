@@ -30,6 +30,7 @@ import value
 import meteoclimatic
 import wunderground
 import pwsweather
+import wettercom
 
 
 # YAML mappings
@@ -72,4 +73,7 @@ class YamlWundergroundRenderer(wunderground.WeatherUndergroundPublisher, yaml.YA
 
 class PwsWeatherRenderer(pwsweather.PwsWeatherPublisher, yaml.YAMLObject):
     yaml_tag = u'!pwsweather'
+
+class WetterComRenderer(wettercom.WetterComPublisher, yaml.YAMLObject):
+    yaml_tag = u'!wettercom'
 
