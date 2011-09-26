@@ -146,10 +146,14 @@ class HttpRendererHandler(BaseHTTPRequestHandler):
 
             cookie_str = self.headers.get('Cookie')
             if cookie_str:
-                cookie = Cookie.SimpleCookie(cookie_str)
-                for i in cookie:
-                    parts = i.split('.')
-                    if len(parts) == 2:
+                try:
+                    cookie = Cookie.SimpleCookie(cookie_str)
+                except Exception:
+                    cookie = Cookie.SimpleCookie(cookie_str.replace(':', ''))
+
+                 for i in cookie:
+                     parts = i.split('.')
+                     if len(parts) == 2:
                         section = parts[0]
                         key = parts[1]
                         if cookie_sections.__contains__(section) and context[section].has_key(key):
