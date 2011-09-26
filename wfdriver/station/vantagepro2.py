@@ -45,7 +45,7 @@ class VantageProStation(object):
 
     port='/dev/ttyS0' 
     baud=19200
-    loops=10
+    loops=25
     rain_bucket = 'eu'
 
     logger = logging.getLogger('station.vantagepro')
@@ -179,6 +179,7 @@ class VantageProStation(object):
             except Exception, e:
                 self.logger.error(e)
             finally:
+                self._port.close()
                 self._port = None
 
             time.sleep(10)
