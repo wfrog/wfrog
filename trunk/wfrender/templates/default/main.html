@@ -26,7 +26,7 @@ $u
                 dateField      : 'time_end',
                 triggerElement : 'cal_open',
                 closeHandler   : function() {
-                    if(document.getElementById('time_end').value != year+'-'+nmonth+'-'+day)
+                    if(document.getElementById('time_end').value != 'None')
                         window.location=nloc[0]+'?time_end='+document.getElementById('time_end').value;
                      else
                         window._popupCalendar.container.innerHTML='';
@@ -37,13 +37,7 @@ $u
             if(nloc[1] != undefined)
                 document.getElementById('date_val').innerHTML=nloc[1];
 			
-			date = new Date();
-			year = date.getFullYear();
-			month = date.getMonth() + 1;
-			nmonth = (month < 10) ? '0'+month : month;
-			day = (date.getDate() < 10) ? '0'+date.getDate() : date.getDate();
-			
-			document.getElementById('time_end').value = year+'-'+nmonth+'-'+day;
+	        document.getElementById('time_end').value = 'None';
         }
     </script>
     #end if
@@ -215,12 +209,12 @@ $u
         </div>
     </div>
 #if $getVar('http', False)
-    <div class="bordered headerNoPad" style="height: 76px;">
-        <input id="time_end" name="time_end" style="display:none;" value="" />
-        <br style="font-size:50%">End-Date: <span style="height: 4px;" class="value" id="date_val"><i>None</i></span><br style="font-size:50%"><br><br><a id="cal_open">Choose...</a>
-        <br>
-        <br>
-
+    <div class="bordered header">
+        <div class="headerContent">
+            <input id="time_end" name="time_end" style="display:none;" value="" />
+            End-Date: <span class="value" id="date_val"><i>None</i></span>
+            <br><br><br><span style="cursor: pointer;" id="cal_open">Choose...</span>
+        </div>
     </div>
 #end if
 
@@ -231,8 +225,8 @@ $u
         <div id="30days" class="tab"><a href="30days.html">30 Days</a></div>
         <div id="365days" class="tab"><a href="365days.html">365 Days</a></div>
         <div style="float:right; width:10px;">&nbsp;</div>
-        <div id="button-details" class="rightTab" onclick="document.getElementById('charts').style.display = 'none'; document.getElementById('button-charts').className = 'rightTab'; document.getElementById('details').style.display = 'block'; document.getElementById('button-details').className = 'rightTab selected'; ">numerical data</div>
-        <div id="button-charts" class="rightTab selected" onclick="document.getElementById('charts').style.display = 'block'; document.getElementById('button-charts').className = 'rightTab selected'; document.getElementById('details').style.display = 'none'; document.getElementById('button-details').className = 'rightTab';">charts</div>        
+        <div id="button-details" class="rightTab" style="cursor: pointer;" onclick="document.getElementById('charts').style.display = 'none'; document.getElementById('button-charts').className = 'rightTab'; document.getElementById('details').style.display = 'block'; document.getElementById('button-details').className = 'rightTab selected'; ">numerical data</div>
+        <div id="button-charts" class="rightTab selected" style="cursor: pointer;" onclick="document.getElementById('charts').style.display = 'block'; document.getElementById('button-charts').className = 'rightTab selected'; document.getElementById('details').style.display = 'none'; document.getElementById('button-details').className = 'rightTab';">charts</div>        
     </div>
 
     <div id="charts">
@@ -304,7 +298,7 @@ ${"%7.1f" % $value.rain_fall if $value.rain_fall != None else "      -"}#slurp
 ${"%7.1f" % $value.rain_rate if $value.rain_rate != None else "      -"}#slurp
 ${"%7.1f" % $value.wind_avg if $value.wind_avg != None else "      -"}#slurp
 ${"%7.1f" % $value.wind_max if $value.wind_max != None else "      -"}#slurp
-${"%5s" % $value.wind_dir  if $value.wind_dir != None else "      -"}#slurp
+${"%5s" % $value.wind_dir  if $value.wind_dir != None else "    -"}#slurp
 ${"%5d" % $value.uv_index  if $value.uv_index != None else "    -"}
 #end if
 #end for
