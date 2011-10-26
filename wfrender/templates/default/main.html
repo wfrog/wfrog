@@ -27,17 +27,104 @@ $u
                 triggerElement : 'cal_open',
                 closeHandler   : function() {
                     if(document.getElementById('time_end').value != 'None')
-                        window.location=nloc[0]+'?time_end='+document.getElementById('time_end').value;
-                     else
+                        window.location=nloc[0]+'?time_end='+document.getElementById('time_end').value+'T'+'23:59:59';
+                    else
                         window._popupCalendar.container.innerHTML='';
                 }
               }
             );
-            
-            if(nloc[1] != undefined)
-                document.getElementById('date_val').innerHTML=nloc[1];
+
+            if(nloc[1] != undefined) { // history processing
+                if(nloc[1].indexOf("T") > -1) { // we have time
+                    nloc1=nloc[1].replace("T", " ");
+                    date_only='N';
+                }
+                else { // no time, let's add it
+                    nloc1=nloc[1]+' 00:00:00';
+                    date_only='Y';
+                }
+                document.getElementById('date_val').innerHTML=nloc1;
+                document.getElementById('period_end').innerHTML=nloc1;
+
+                // calculate start time:
+                end_time=nloc1.split(' '); 
+                // now end_time[0] = date and end_time[1] is the time
+                tmp_date=end_time[0].split('-'); 
+                tmp_time=end_time[1].split(':'); 
+                start_date=new Date(tmp_date[0], tmp_date[1]-1, tmp_date[2], tmp_time[0], tmp_time[1], tmp_time[2]);
+                if(nloc[0].indexOf("30days.html") > -1) { // 30 days backward:
+                    start_date.setDate(start_date.getDate()-30);
+                    // show data from the beginning of the day
+                    if(date_only=='N') {
+                        start_date.setHours(0);
+                        start_date.setMinutes(0);
+                        start_date.setSeconds(0);
+                    }
+                }
+                else if(nloc[0].indexOf("365days.html") > -1) {
+                    // 360 days backward:
+                    start_date.setDate(start_date.getDate()-360);
+                    // show data from the beginning of next month
+                    if(date_only=='N') {
+                        start_date.setHours(0);
+                        start_date.setMinutes(0);
+                        start_date.setSeconds(0);
+                    }
+                    start_date.setDate(1);
+                    start_date.setMonth(start_date.getMonth()+1);
+                }
+                else if(nloc[0].indexOf("3hours.html") > -1) {
+                    start_date.setHours(start_date.getHours()-3);
+                    // show data from the beginning of next full minute
+                    if(date_only=='N') {
+                        start_date.setSeconds(0);
+                    }
+                    start_date.setMinutes(start_date.getMinutes()+1);
+                }
+                else { // nloc[0].indexOf("24hours.html") > -1
+                    start_date.setDate(start_date.getDate()-1);
+                    // show data from the beginning of next full hour
+                    if(date_only=='N') {
+                        start_date.setMinutes(0);
+                        start_date.setSeconds(0);
+                    }
+                    start_date.setHours(start_date.getHours()+1);
+                }
+                start_time=format_start_time(start_date);
+                document.getElementById('period_start').innerHTML=start_time;
+                document.getElementById('period').style.display='block';
+            }
+            else { // No history element
+                document.getElementById('period').style.display='none';
+            }
 			
 	        document.getElementById('time_end').value = 'None';
+
+
+
+            function add_zero(i)
+            {
+                if(i<10)
+                    i="0"+i;
+                return i;
+            }
+            
+            function format_start_time(s_date)
+            {
+                yyyy=s_date.getFullYear();
+                mon=s_date.getMonth()+1;
+                mon=add_zero(mon);
+                dd=s_date.getDate();
+                dd=add_zero(dd);
+                hh=s_date.getHours();
+                hh=add_zero(hh);
+                mm=s_date.getMinutes();
+                mm=add_zero(mm);
+                ss=s_date.getSeconds();
+                ss=add_zero(ss);
+                ret_value=yyyy+'-'+mon+'-'+dd+' '+hh+':'+mm+':'+ss;
+                return ret_value;
+            }
         }
     </script>
     #end if
@@ -126,6 +213,18 @@ $u
             height: 21px;
             border-bottom: 1px solid tan;
         }
+        .history {
+            width: 95%;
+            border: 1px solid tan;
+            background: yellow;
+            margin: 3px;
+            padding-top: 3px;
+            padding-bottom: 3px;
+            padding-left: 6px;
+            padding-right: 6px;
+            clear: both;
+            float: left;
+        }
         .tab {
             margin-bottom:3px;
             margin-left: 3px;
@@ -211,12 +310,16 @@ $u
 #if $getVar('http', False)
     <div class="bordered header">
         <div class="headerContent">
-            <input id="time_end" name="time_end" style="display:none;" value="" />
+            <input id="time_end" name="time_end" style="display:none" value="" />
             End-Date: <span class="value" id="date_val"><i>None</i></span>
             <br><br><br><span style="cursor: pointer;" id="cal_open">Choose...</span>
         </div>
     </div>
 #end if
+
+    <div class="history" id="period" style="display:none">
+        Showing data from period <span class="value" id="period_start">START</span> - <span class="value" id="period_end">END</span>
+    </div>
 
     <div class="tabPane">
         <div class="leftCell" style="width:10px;">&nbsp;</div>
@@ -225,8 +328,8 @@ $u
         <div id="30days" class="tab"><a href="30days.html">30 Days</a></div>
         <div id="365days" class="tab"><a href="365days.html">365 Days</a></div>
         <div style="float:right; width:10px;">&nbsp;</div>
-        <div id="button-details" class="rightTab" style="cursor: pointer;" onclick="document.getElementById('charts').style.display = 'none'; document.getElementById('button-charts').className = 'rightTab'; document.getElementById('details').style.display = 'block'; document.getElementById('button-details').className = 'rightTab selected'; ">numerical data</div>
-        <div id="button-charts" class="rightTab selected" style="cursor: pointer;" onclick="document.getElementById('charts').style.display = 'block'; document.getElementById('button-charts').className = 'rightTab selected'; document.getElementById('details').style.display = 'none'; document.getElementById('button-details').className = 'rightTab';">charts</div>        
+        <div id="button-details" class="rightTab" style="cursor: pointer" onclick="document.getElementById('charts').style.display = 'none'; document.getElementById('button-charts').className = 'rightTab'; document.getElementById('details').style.display = 'block'; document.getElementById('button-details').className = 'rightTab selected'; ">numerical data</div>
+        <div id="button-charts" class="rightTab selected" style="cursor: pointer" onclick="document.getElementById('charts').style.display = 'block'; document.getElementById('button-charts').className = 'rightTab selected'; document.getElementById('details').style.display = 'none'; document.getElementById('button-details').className = 'rightTab';">charts</div>        
     </div>
 
     <div id="charts">
@@ -274,7 +377,7 @@ $u
 #set $indexes = $summary.keys()
 #silent $indexes.sort()
 #silent $indexes.reverse()
-${"%s      Temp. %s         Humidity %%     Pressure %s       Rain %s        Wind %s       UV     " % (
+${"%s      Temp. %s         Humidity %%     Pressure %s       Rain %s         Wind %s       UV     " % (
   " " * len($indexes[0]),
   $unitstr('temp',$units.temp).rstrip(), 
   $unitstr('press',$units.press).rstrip(), 
