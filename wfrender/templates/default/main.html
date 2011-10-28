@@ -90,7 +90,7 @@ $u
                     }
                     start_date.setHours(start_date.getHours()+1);
                 }
-                start_time=format_start_time(start_date);
+                start_time=format_time(start_date, ' ');
                 document.getElementById('period_start').innerHTML=start_time;
                 document.getElementById('period').style.display='block';
             }
@@ -99,33 +99,73 @@ $u
             }
 			
 	        document.getElementById('time_end').value = 'None';
-
-
-
-            function add_zero(i)
-            {
-                if(i<10)
-                    i="0"+i;
-                return i;
-            }
-            
-            function format_start_time(s_date)
-            {
-                yyyy=s_date.getFullYear();
-                mon=s_date.getMonth()+1;
-                mon=add_zero(mon);
-                dd=s_date.getDate();
-                dd=add_zero(dd);
-                hh=s_date.getHours();
-                hh=add_zero(hh);
-                mm=s_date.getMinutes();
-                mm=add_zero(mm);
-                ss=s_date.getSeconds();
-                ss=add_zero(ss);
-                ret_value=yyyy+'-'+mon+'-'+dd+' '+hh+':'+mm+':'+ss;
-                return ret_value;
-            }
         }
+
+        function move(amount, type)
+        {
+            loc = document.location.href;
+            nloc = loc.split('?time_end=');
+
+            if(nloc[1] != undefined) { // parameter exists
+                if(nloc[1].indexOf("T") > -1) { // we have time
+                    nloc1=nloc[1].replace("T", " ");
+                    date_only='N';
+                }
+                else { // no time, let's add it
+                    nloc1=nloc[1]+' 00:00:00';
+                    date_only='Y';
+                }
+
+                // calculate new time:
+                end_time=nloc1.split(' '); 
+                // now end_time[0] = date and end_time[1] is the time
+                tmp_date=end_time[0].split('-'); 
+                tmp_time=end_time[1].split(':'); 
+                new_date=new Date(tmp_date[0], tmp_date[1]-1, tmp_date[2], tmp_time[0], tmp_time[1], tmp_time[2]);
+            }
+            else { // starting point is current date
+                new_date=new Date();
+            }
+            if(type == 'h')
+                new_date.setHours(new_date.getHours()+amount);
+            else if(type == 'd')
+                new_date.setDate(new_date.getDate()+amount);
+            else if(type == 'm')
+                new_date.setMonth(new_date.getMonth()+amount);
+            else if(type == 'y')
+                new_date.setFullYear(new_date.getFullYear()+amount);
+            new_time=format_time(new_date, 'T');
+            window.location=nloc[0]+'?time_end='+new_time;
+        }
+
+
+
+// General purpose functions
+
+        function add_zero(i)
+        {
+            if(i<10)
+                i="0"+i;
+            return i;
+        }
+            
+        function format_time(s_date, time_sep)
+        {
+            yyyy=s_date.getFullYear();
+            mon=s_date.getMonth()+1;
+            mon=add_zero(mon);
+            dd=s_date.getDate();
+            dd=add_zero(dd);
+            hh=s_date.getHours();
+            hh=add_zero(hh);
+            mm=s_date.getMinutes();
+            mm=add_zero(mm);
+            ss=s_date.getSeconds();
+            ss=add_zero(ss);
+            ret_value=yyyy+'-'+mon+'-'+dd+time_sep+hh+':'+mm+':'+ss;
+            return ret_value;
+        }
+
     </script>
     #end if
     <style>
@@ -312,7 +352,15 @@ $u
         <div class="headerContent">
             <input id="time_end" name="time_end" style="display:none" value="" />
             End-Date: <span class="value" id="date_val"><i>None</i></span>
-            <br><br><br><span style="cursor: pointer;" id="cal_open">Choose...</span>
+            <br>go backward <span style="cursor: pointer;" onclick="move(-1, 'h')">1 hour</span>
+            <span style="cursor: pointer;" onclick="move(-1, 'd')">1 day</span>
+            <span style="cursor: pointer;" onclick="move(-1, 'm')">1 month</span>
+            <span style="cursor: pointer;" onclick="move(-1, 'y')">1 year</span>
+            <br>go forward &nbsp; &nbsp;<span style="cursor: pointer;" onclick="move(1, 'h')">1 hour</span>
+            <span style="cursor: pointer;" onclick="move(1, 'd')">1 day</span>
+            <span style="cursor: pointer;" onclick="move(1, 'm')">1 month</span>
+            <span style="cursor: pointer;" onclick="move(1, 'y')">1 year</span>
+            <br><span style="cursor: pointer;" id="cal_open">Choose...</span>
         </div>
     </div>
 #end if
