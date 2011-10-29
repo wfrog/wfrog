@@ -76,7 +76,7 @@ class HttpRenderer(object):
 
     def render(self, data={}, context={}):
 
-        self.context = context
+        self.context = copy.deepcopy(context)
         self.context["http"] = True # Put in the context that we use the http render. It may be useful to know that in templates.
         self.data = data
 
