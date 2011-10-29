@@ -9,6 +9,7 @@
 # * devscripts
 # * fakeroot
 # * dpkg-dev
+# * debhelper
 
 # and (if you have upload permissions)
 
