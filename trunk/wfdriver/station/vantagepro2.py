@@ -168,21 +168,18 @@ class VantageProStation(object):
                     else:
                         self.logger.info("CRC Bad")
                         bad_CRC += 1 
-                        # We wait for the LOOP command to end before dealing with CRC errors
+                        # Two consecutive CRC errors => exception & abort LOOP command
+                        if bad_CRC > 1:
+                            raise Exception("CRC error")
 
-                if bad_CRC > 1:
-                    self.logger.error("LOOP command ended with %d CRC errors" % bad_CRC)
-                    time.sleep(self.loops * 2) 
-                else:
-                    time.sleep(2)
+                time.sleep(2)
 
             except Exception, e:
                 self.logger.error(e)
+                time.sleep(self.loops * 2)
             finally:
                 self._port.close()
                 self._port = None
-
-            time.sleep(self.loops * 2)
 
 
     def _wakeup(self):
