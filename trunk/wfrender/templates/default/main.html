@@ -43,15 +43,11 @@ $u
                     nloc1=nloc[1]+' 00:00:00';
                     date_only='Y';
                 }
-                document.getElementById('date_val').innerHTML=nloc1;
+                document.getElementById('date_val').innerHTML='<i>Show latest data</i>';
                 document.getElementById('period_end').innerHTML=nloc1;
 
+                start_date=convert_to_date(nloc1); // now this is end time !
                 // calculate start time:
-                end_time=nloc1.split(' '); 
-                // now end_time[0] = date and end_time[1] is the time
-                tmp_date=end_time[0].split('-'); 
-                tmp_time=end_time[1].split(':'); 
-                start_date=new Date(tmp_date[0], tmp_date[1]-1, tmp_date[2], tmp_time[0], tmp_time[1], tmp_time[2]);
                 if(nloc[0].indexOf("30days.html") > -1) { // 30 days backward:
                     start_date.setDate(start_date.getDate()-30);
                     // show data from the beginning of the day
@@ -106,41 +102,49 @@ $u
             loc = document.location.href;
             nloc = loc.split('?time_end=');
 
-            if(nloc[1] != undefined) { // parameter exists
-                if(nloc[1].indexOf("T") > -1) { // we have time
-                    nloc1=nloc[1].replace("T", " ");
-                    date_only='N';
+            if(type == 'address') { // direct link
+                if(nloc[1] != undefined) { // parameter exists
+                    window.location=amount+'?time_end='+nloc[1];
                 }
-                else { // no time, let's add it
-                    nloc1=nloc[1]+' 00:00:00';
-                    date_only='Y';
+                else {
+                    window.location=amount;
                 }
+            }
+            else if(type == 'refresh') { // end history view
+                window.location=nloc[0];
+            }
+            else { // time based move
+                if(nloc[1] != undefined) { // parameter exists
+                    if(nloc[1].indexOf("T") > -1) { // we have time
+                        nloc1=nloc[1].replace("T", " ");
+                    }
+                    else { // no time, let's add it
+                        nloc1=nloc[1]+' 00:00:00';
+                    }
 
+                    new_date=convert_to_date(nloc1);
+                }
+                else { // starting point is current date
+                    new_date=new Date();
+                }
                 // calculate new time:
-                end_time=nloc1.split(' '); 
-                // now end_time[0] = date and end_time[1] is the time
-                tmp_date=end_time[0].split('-'); 
-                tmp_time=end_time[1].split(':'); 
-                new_date=new Date(tmp_date[0], tmp_date[1]-1, tmp_date[2], tmp_time[0], tmp_time[1], tmp_time[2]);
+                if(type == 'h')
+                    new_date.setHours(new_date.getHours()+amount);
+                else if(type == 'd')
+                    new_date.setDate(new_date.getDate()+amount);
+                else if(type == 'm')
+                    new_date.setMonth(new_date.getMonth()+amount);
+                else if(type == 'y')
+                    new_date.setFullYear(new_date.getFullYear()+amount);
+                new_time=format_time(new_date, 'T');
+                window.location=nloc[0]+'?time_end='+new_time;
             }
-            else { // starting point is current date
-                new_date=new Date();
-            }
-            if(type == 'h')
-                new_date.setHours(new_date.getHours()+amount);
-            else if(type == 'd')
-                new_date.setDate(new_date.getDate()+amount);
-            else if(type == 'm')
-                new_date.setMonth(new_date.getMonth()+amount);
-            else if(type == 'y')
-                new_date.setFullYear(new_date.getFullYear()+amount);
-            new_time=format_time(new_date, 'T');
-            window.location=nloc[0]+'?time_end='+new_time;
         }
 
 
 
 // General purpose functions
+
 
         function add_zero(i)
         {
@@ -164,6 +168,17 @@ $u
             ss=add_zero(ss);
             ret_value=yyyy+'-'+mon+'-'+dd+time_sep+hh+':'+mm+':'+ss;
             return ret_value;
+        }
+
+        function convert_to_date(time_str)
+        {
+            // time_str must be formatted yyyy-mm-dd hh24:mi:ss
+            time_str=time_str.split(' '); 
+            // now time_str[0] is the date and time_str[1] is the time
+            tmp_date=time_str[0].split('-'); 
+            tmp_time=time_str[1].split(':'); 
+            time_date=new Date(tmp_date[0], tmp_date[1]-1, tmp_date[2], tmp_time[0], tmp_time[1], tmp_time[2]);
+            return(time_date);
         }
 
     </script>
@@ -351,15 +366,17 @@ $u
     <div class="bordered header">
         <div class="headerContent">
             <input id="time_end" name="time_end" style="display:none" value="" />
-            End-Date: <span class="value" id="date_val"><i>None</i></span>
-            <br>go backward <span style="cursor: pointer;" onclick="move(-1, 'h')">1 hour</span>
+            <span id="date_val"style="cursor: pointer;" onclick="move(0, 'refresh')"><i>Refresh latest data</i></span>
+            <br>go <span style="cursor: pointer;" onclick="move(-1, 'h')">1 hour</span>
             <span style="cursor: pointer;" onclick="move(-1, 'd')">1 day</span>
-            <span style="cursor: pointer;" onclick="move(-1, 'm')">1 month</span>
-            <span style="cursor: pointer;" onclick="move(-1, 'y')">1 year</span>
-            <br>go forward &nbsp; &nbsp;<span style="cursor: pointer;" onclick="move(1, 'h')">1 hour</span>
+            <span style="cursor: pointer;" onclick="move(-3, 'h')">3 hours</span>
+            <span style="cursor: pointer;" onclick="move(-3, 'd')">3 days</span>
+            backward 
+            <br>go <span style="cursor: pointer;" onclick="move(1, 'h')">1 hour</span>
             <span style="cursor: pointer;" onclick="move(1, 'd')">1 day</span>
-            <span style="cursor: pointer;" onclick="move(1, 'm')">1 month</span>
-            <span style="cursor: pointer;" onclick="move(1, 'y')">1 year</span>
+            <span style="cursor: pointer;" onclick="move(3, 'h')">3 hours</span>
+            <span style="cursor: pointer;" onclick="move(3, 'd')">3 days</span>
+            forward 
             <br><span style="cursor: pointer;" id="cal_open">Choose...</span>
         </div>
     </div>
@@ -371,10 +388,10 @@ $u
 
     <div class="tabPane">
         <div class="leftCell" style="width:10px;">&nbsp;</div>
-        <div id="3hours" class="tab"><a href="3hours.html">3 Hours</a></div>    
-        <div id="24hours" class="tab"><a href="24hours.html">24 Hours</a></div>
-        <div id="30days" class="tab"><a href="30days.html">30 Days</a></div>
-        <div id="365days" class="tab"><a href="365days.html">365 Days</a></div>
+        <div id="3hours" class="tab" style="cursor: pointer" onclick="move('3hours.html', 'address')">3 Hours</div>
+        <div id="24hours" class="tab" style="cursor: pointer" onclick="move('24hours.html', 'address')">24 Hours</div>
+        <div id="30days" class="tab" style="cursor: pointer" onclick="move('30days.html', 'address')">30 Days</div>
+        <div id="365days" class="tab" style="cursor: pointer" onclick="move('365days.html', 'address')">365 Days</div>
         <div style="float:right; width:10px;">&nbsp;</div>
         <div id="button-details" class="rightTab" style="cursor: pointer" onclick="document.getElementById('charts').style.display = 'none'; document.getElementById('button-charts').className = 'rightTab'; document.getElementById('details').style.display = 'block'; document.getElementById('button-details').className = 'rightTab selected'; ">numerical data</div>
         <div id="button-charts" class="rightTab selected" style="cursor: pointer" onclick="document.getElementById('charts').style.display = 'block'; document.getElementById('button-charts').className = 'rightTab selected'; document.getElementById('details').style.display = 'none'; document.getElementById('button-details').className = 'rightTab';">charts</div>        
