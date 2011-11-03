@@ -405,6 +405,8 @@ exit
 cls
 if exist trunk (
     set /p update=There exists already a folder trunk. Should I use it? [Y/N]
+) else (
+    set update=n
 )
 
 if /I "%update%" == "n" (
