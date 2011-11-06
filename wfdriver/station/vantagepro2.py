@@ -89,10 +89,10 @@ class VantageProStation(object):
  
                         # Pressure
                         e = generate_event('press')
-                        e.value = fields['Pressure'] 
+                        e.value = fields['Pressure'] + self.pressure_cal
                         e.code = 'QFF'  # Davis sends QFF calculated pressure (same as on console)
                         send_event(e)
-                        log_txt =  "DATA PACKET Press:%.1fmb " % fields['Pressure'] 
+                        log_txt =  "DATA PACKET Press:%.1fmb " % (fields['Pressure'] + self.pressure_cal)
 
                         # Inside Temp & Hum sensor
                         e = generate_event('temp')
@@ -370,7 +370,7 @@ class LoopStruct( myStruct ):
 
     def _post_unpack(self,items):
         # Pressure
-        items['Pressure'] = units.InHgToHPa(items['Pressure'] / 1000.0) + self.pressure_cal
+        items['Pressure'] = units.InHgToHPa(items['Pressure'] / 1000.0)
         # Temperature
         items['TempIn'] = units.FToC(items['TempIn'] / 10.0)
         items['TempOut'] = units.FToC(items['TempOut'] / 10.0)
