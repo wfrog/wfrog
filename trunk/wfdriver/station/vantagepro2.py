@@ -41,12 +41,16 @@ class VantageProStation(object):
         Type of rain bucket. Defaults to 'eu'.
         - us: 0.01 inches each bucket tip.
         - eu: 2 mm. each bucket tip.
+
+    pressure_cal [numeric] (optional):
+        Pressure calibration offset in mb. Defaults to 0.
     '''
 
     port='/dev/ttyS0' 
     baud=19200
     loops=25
     rain_bucket = 'eu'
+    pressure_cal = 0
 
     logger = logging.getLogger('station.vantagepro')
 
@@ -85,10 +89,10 @@ class VantageProStation(object):
  
                         # Pressure
                         e = generate_event('press')
-                        e.value = fields['Pressure']
+                        e.value = fields['Pressure'] 
                         e.code = 'QFF'  # Davis sends QFF calculated pressure (same as on console)
                         send_event(e)
-                        log_txt =  "DATA PACKET Press:%.1fmb " % fields['Pressure']
+                        log_txt =  "DATA PACKET Press:%.1fmb " % fields['Pressure'] 
 
                         # Inside Temp & Hum sensor
                         e = generate_event('temp')
@@ -366,7 +370,7 @@ class LoopStruct( myStruct ):
 
     def _post_unpack(self,items):
         # Pressure
-        items['Pressure'] = units.InHgToHPa(items['Pressure'] / 1000.0)
+        items['Pressure'] = units.InHgToHPa(items['Pressure'] / 1000.0) + self.pressure_cal
         # Temperature
         items['TempIn'] = units.FToC(items['TempIn'] / 10.0)
         items['TempOut'] = units.FToC(items['TempOut'] / 10.0)
