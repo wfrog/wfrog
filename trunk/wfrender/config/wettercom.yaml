@@ -1,4 +1,4 @@
-# To test PWSWeather update:
+# To test Wetter.com update:
 #    python ../wfrender.py -f wettercom.yaml -s ../../wfcommon/config/default-settings.yaml
 
 init:

@@ -4,8 +4,8 @@ rem Todo:
 
 rem yay! nothing todo :)
 
-set version=1.2.4
-set date=09.09.2011
+set version=1.2.5
+set date=07.11.2011
 
 set python="%cd:~0,1%:\Python26\"
 set easyinst=%python%Scripts\easy_install.exe
