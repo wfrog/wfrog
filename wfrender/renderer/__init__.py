@@ -22,6 +22,7 @@ import chart
 import data
 import datatable
 import file
+import staticfile
 import ftp
 import http
 import scheduler
@@ -49,6 +50,9 @@ class YamlDataRenderer(datatable.DataTableRenderer, yaml.YAMLObject):
 
 class YamlFileRenderer(file.FileRenderer, yaml.YAMLObject):
     yaml_tag = u'!file'
+
+class YamlStaticFileRenderer(staticfile.StaticFileRenderer, yaml.YAMLObject):
+    yaml_tag = u'!staticfile'
 
 class YamlFtpRenderer(ftp.FtpRenderer, yaml.YAMLObject):
     yaml_tag = u'!ftp'
