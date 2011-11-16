@@ -20,6 +20,7 @@ import ftplib
 import logging
 import time
 import socket
+import os.path
 # Set up socket timeout to prevent hangs when ftp sites fail
 socket.setdefaulttimeout(30)  # 30 seconds 
 
@@ -85,10 +86,13 @@ class FtpRenderer(object):
                     ftp.cwd(self.directory)
                 for remote_file, local_file in files.iteritems():
                     self.logger.debug("Sending %s to %s" % (local_file, remote_file))
-                    f = open(local_file, 'r')
-                    ftp.storbinary("STOR %s" % remote_file, f)
-                    f.close()
-                    self.logger.info("Sent %s to %s" % (local_file, remote_file))
+                    if os.path.exists(local_file):
+                        f = open(local_file, 'r')
+                        ftp.storbinary("STOR %s" % remote_file, f)
+                        f.close()
+                        self.logger.info("Sent %s to %s" % (local_file, remote_file))
+                    else:
+                        self.logger.error("Local file %s does not exist, skipping..." % local_file) 
                 ftp.quit()
                 break
             except Exception, e:
