@@ -125,7 +125,7 @@ class WetterComPublisher(object):
                         self.logger.debug('Publish-data: %s Status: %s Answer: %s' % response)
 
                     except Exception, e:
-                        if str(e) == "'NoneType' object has no attribute 'strftime'":
+                        if (str(e) == "'NoneType' object has no attribute 'strftime'") or (str(e) == "a float is required"):
                             self.logger.error('Could not publish to wetter.com: no valid values at this time. Retry next run...')
                         else:
                             self.logger.exception(e)
