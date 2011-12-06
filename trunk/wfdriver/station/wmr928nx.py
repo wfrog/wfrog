@@ -300,7 +300,7 @@ class WMR928NXStation(BaseStation):
     def _parse_temperature_record(self, record):
         """
         """
-        batteryOk = (record[1] & 0x40) == 0
+        batteryOK = (record[1] & 0x40) == 0
 
         overUnder = not((record[3] & 0x40) == 0)
         dewUnder = not ((record[1] & 0x10) == 0)
