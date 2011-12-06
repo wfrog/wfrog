@@ -321,5 +321,5 @@ class WMR928NXStation(BaseStation):
             self._report_temperature(temp, humidity, 1)
 
         # Log
-        self.logger.info("Temperature  Temp.: %g C, Humidity: %d %%, Dew Point: %g C",
-                          temp, humidity, dewPoint)
+        self.logger.info("Temperature batteryOK: %s, Temp.: %g C, Humidity: %d %%, Dew Point: %g C",
+                          batteryOK, temp, humidity, dewPoint)
