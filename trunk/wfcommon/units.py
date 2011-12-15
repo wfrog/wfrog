@@ -119,13 +119,13 @@ class Converter(object):
         self.units.update(units)
     
     def convert(self, measure, value):        
-        raw_measure = re.split("[0-9]", measure)[0] # strip trailing numbers
+        raw_measure = re.split("[0-9]|int", measure)[0] # strip trailing numbers
         if not self.units.has_key(raw_measure): 
             return value
         return convert(raw_measure, value, self.units[raw_measure])            
 
     def convert_back(self, measure, value):        
-        raw_measure = re.split("[0-9]", measure)[0] # strip trailing numbers
+        raw_measure = re.split("[0-9]|int", measure)[0] # strip trailing numbers
         if not self.units.has_key(raw_measure): 
             return value
         return convert(raw_measure, value, None, self.units[raw_measure])      
