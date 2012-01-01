@@ -114,6 +114,7 @@ class WetterComPublisher(object):
                         self.logger.debug("Publishing wettercom data: %s " % urlencode(args))
 
                         response = self._publish(args, 'www.wetterarchiv.de', '/interface/http/input.php')
+
                         # Split response to determine if the request was ok or not.
                         answer = response[2].split('=')
 
@@ -126,9 +127,9 @@ class WetterComPublisher(object):
 
                     except Exception, e:
                         if (str(e) == "'NoneType' object has no attribute 'strftime'") or (str(e) == "a float is required"):
-                            self.logger.error('Could not publish to wetter.com: no valid values at this time. Retry next run...')
+                            self.logger.error('Could not publish: no valid values at this time. Retry next run...')
                         else:
-                            self.logger.exception(e)
+                            self.logger.error('Got unexpected error. Retry next run. Error: %s' % e)
 
                 except Exception, e:
                     self.logger.exception(e)
