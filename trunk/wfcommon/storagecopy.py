@@ -55,6 +55,15 @@ class StorageCopy(object):
 
         self.from_storage = config['from']
         self.to_storage = config['to']
+        try:
+            self.from_storage.init(context=context)
+        except AttributeError:
+            pass # In case the element has not init method
+
+        try:
+            self.to_storage.init(context=context)
+        except AttributeError:
+            pass # In case the element has not init method
 
     def run(self):
 
