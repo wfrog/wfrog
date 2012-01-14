@@ -68,15 +68,22 @@ class StorageCopy(object):
     def run(self):
 
         keys = self.from_storage.keys()
+        n = 0
 
         for sample in self.from_storage.samples():
+            if n % 500 == 0: 
+                self.logger.info("Processed %d samples" % n)
             sample_to_write = {}
             for i in range(len(keys)):
                 sample_to_write[keys[i]] = sample[i]
             self.to_storage.write_sample(sample_to_write)
+            n += 1
 
 if __name__ == "__main__":
     driver = StorageCopy()
     driver.logger.debug("Started main()")
-    driver.run()
+    try:
+        driver.run()
+    except:
+        driver.logger.exception("An unexpected error has ocurred while copying storages:")
     driver.logger.debug("Finished main()")
