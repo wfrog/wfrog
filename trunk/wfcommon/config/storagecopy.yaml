@@ -1,5 +1,18 @@
 from: !csv
-    path: ../wflogger/test/wfrog.csv
+    path: /tmp/wfrog.csv
 
-to: !csv
-    path: /tmp/wfrog2.csv
+to: !mysql { database: wfrog,
+             host: localhost,
+             user: root,
+             password: root }
+
+logging:
+    level: info
+    handlers:
+        default:
+            level: debug
+            handler: !!python/object/new:logging.FileHandler
+                kwds:
+                    filename: storagecopy.log
+
+
