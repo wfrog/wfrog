@@ -1,3 +1,11 @@
+1.2.6 (22.01.2012)
+    * Updated links & zadig
+    * Existing libusb0.dll is replaced with downloaded one if it exists already on the system
+    * Fixed a bug with zadig, if the zadig folder does not exist
+    * More information on how to install zadig-driver if no zadig.ini is present
+
+    * Happy new year! :)
+
 1.2.5 (07.11.2011)
         * Hotfix for new build-environments
 

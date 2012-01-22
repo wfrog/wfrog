@@ -2,10 +2,9 @@
 
 rem Todo:
 
-rem yay! nothing todo :)
 
-set version=1.2.5
-set date=07.11.2011
+set version=1.2.6
+set date=22.01.2012
 
 set python="%cd:~0,1%:\Python26\"
 set easyinst=%python%Scripts\easy_install.exe
@@ -315,9 +314,8 @@ mkdir libusb0
 xcopy /Y download\libusb0.zip libusb0
 cd libusb0
 %sev_za% x -y libusb0.zip
-cd libusb-win32-bin-1.2.5.0\bin\x86
-xcopy /E /Y "%CD%\libusb0_x86.dll" %windir%\system32
-ren "%windir%\system32\libusb0_x86.dll" libusb0.dll
+cd libusb-win32-bin-1.2.6.0\bin\x86
+xcopy /E /Y "%CD%\libusb0_x86.dll" %windir%\system32\libusb0.dll
 xcopy /E /Y "%CD%\libusb0.sys" %windir%\system32\drivers
 cd ..\..\..\..\
 echo done..
@@ -329,7 +327,7 @@ mkdir pywws
 xcopy /Y download\pywws.zip pywws
 cd pywws
 %sev_za% x -y pywws.zip
-xcopy /E /Y "%CD%\pywws-11.05_r380\*" %python%Lib
+xcopy /E /Y "%CD%\pywws-11.10_r429\*" %python%Lib
 cd ..\
 echo done..
 echo.
@@ -449,6 +447,7 @@ if "%station%" == "1" (
 
     echo.
     echo Download zadig...
+    mkdir zadig
     %wget% -q %tool_zadig% -O zadig\zadig.7z
     echo done...
     echo.
@@ -469,8 +468,8 @@ if "%station%" == "1" (
     echo.
     echo * USB-HID (Human Interface Device)
     echo.
-    echo and click 'Install driver' on the next window!
-    echo Zadig ask to replace the system-file 'libusb0.dll' - Click YES.
+    echo Check if 'libusb-win32' is selected and click 'Install driver' on the next window!
+    echo Zadig ask to replace the system-file 'libusb0.dll' & .sys - Click YES.
     echo.
     pause
     zadig.exe
