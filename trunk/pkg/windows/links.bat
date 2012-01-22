@@ -1,4 +1,4 @@
-set link_version=5
+set link_version=6
 
 set pkg_python=http://python.org/ftp/python/2.6.6/python-2.6.6.msi
 set pkg_sliksvn=http://www.sliksvn.com/pub/Slik-Subversion-1.6.16-win32.msi
