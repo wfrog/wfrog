@@ -754,10 +754,11 @@ class WMR200Station(BaseStation):
       self.logger.info("Resync time: %s (%.1f%%)" %
                        (self.durationToStr(resyncTime),
                         resyncTime * 100.0 / uptime))
-      for i in xrange(9):
-        self.logger.info("0x%X records: %8d (%2d%%)" %
-                         (0xD1 + i, self.recordCounters[i],
-                          self.recordCounters[i] * 100.0 / self.frames))
+      if self.frames > 0:
+        for i in xrange(9):
+          self.logger.info("0x%X records: %8d (%2d%%)" %
+                           (0xD1 + i, self.recordCounters[i],
+                            self.recordCounters[i] * 100.0 / self.frames))
 
     def durationToStr(self, sec):
       seconds = sec % 60
