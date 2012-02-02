@@ -57,12 +57,13 @@ class BaseStation(object):
             event.timestamp = timestamp        
         self.send_event(event)
 
-        event = self.generate_event('hum')
-        event.sensor = sensor
-        event.value = humidity
-        if timestamp:
-            event.timestamp = timestamp        
-        self.send_event(event)
+        if humidity != None:
+            event = self.generate_event('hum')
+            event.sensor = sensor
+            event.value = humidity
+            if timestamp:
+                event.timestamp = timestamp        
+            self.send_event(event)
 
     def _report_uv(self, uv_index, timestamp=None):
         event = self.generate_event('uv')
