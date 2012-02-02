@@ -102,8 +102,10 @@ class WMR928NXStation(BaseStation):
         self._WMR928NX_record_types = {
             0x00: (9, 'Wind', self._parse_wind_record),
             0x01: (14, 'Rain', self._parse_rain_record),
-            0x03: (7, 'Temperature', self._parse_temperature_record),
-            0x06: (12, 'Console', self._parse_console_record),            
+            0x02: (7, 'TempHum', self._parse_temp_hum_record),              # TH sensor
+            0x03: (7, 'TempHum (base)', self._parse_temp_hum_main_record),  # TH mushrom sensor (channel 1)
+            0x04: (5, 'Temp', self._parse_temp_record),                     # T sensor
+            0x06: (12, 'Console', self._parse_console_record),              # EXTBTH sensor
             0x0e: (3, 'Minute', self._parse_minute_record),
             0x0f: (7, 'Clock', self._parse_clock_record)}    
             
@@ -297,9 +299,38 @@ class WMR928NXStation(BaseStation):
             self.logger.info("Console batteryOK: %s, Temp.: %g C, Humidity: %d %%, DewPoint: %g, Pressure: %g, SeaLevelPressure: %g, WeatherStatus: %d, WeatherStatusTxt: %s",
                               batteryOK, temperature, humidity, dewPoint, pressure, seaLevelPressure, weatherStatus, weatherStatusTxt)
 
-    def _parse_temperature_record(self, record):
+    def _parse_temp_record(self, record):
         """
         """
+
+        channel = (record[1] & 0x0f) + 1
+
+        batteryOK = (record[1] & 0x40) == 0
+
+        overUnder = not((record[3] & 0x40) == 0)
+
+        # Temperature
+        temp = self._decode_bcd(record[2]) * 0.1 + self._decode_bcd(record[3] & 0x3f) * 10.0;
+        if not ((record[3] & 0x80) == 0):
+            temp *= -1
+
+        # Report data
+        if not overUnder:
+            self._report_temperature(temp, None, channel)
+
+        # Log
+        self.logger.info("Temp_%d  batteryOK: %s, Temp.: %g C", channel, batteryOK, temp)
+
+    def _parse_temp_hum_main_record(self, record):
+        self._parse_temp_hum_record(record, 1)
+
+    def _parse_temp_hum_record(self, record, channel=None):
+        """
+        """
+
+        if channel == None:
+            channel = (record[1] & 0x0f) + 1
+
         batteryOK = (record[1] & 0x40) == 0
 
         overUnder = not((record[3] & 0x40) == 0)
@@ -318,8 +349,8 @@ class WMR928NXStation(BaseStation):
         
         # Report data
         if not overUnder:
-            self._report_temperature(temp, humidity, 1)
+            self._report_temperature(temp, humidity, channel)
 
         # Log
-        self.logger.info("Temperature batteryOK: %s, Temp.: %g C, Humidity: %d %%, Dew Point: %g C",
-                          batteryOK, temp, humidity, dewPoint)
+        self.logger.info("Temp_Hum_%d  batteryOK: %s, Temp.: %g C, Humidity: %d %%, Dew Point: %g C",
+                          channel, batteryOK, temp, humidity, dewPoint)
