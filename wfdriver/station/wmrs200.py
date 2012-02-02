@@ -382,7 +382,11 @@ class WMRS200Station(BaseStation):
         slpForecastTxt = forecastMap.get(slpForecast, str(slpForecast))
 
         # Report data
-        self._report_barometer_absolute(pressure + self.pressure_cal)
+        if (pressure == 2816):
+            self.logger.warning("Barometer overflow: max measurement value 1050 exceeded, reporting as 1051")
+            self._report_barometer_absolute(1051 + self.pressure_cal)
+        else:
+            self._report_barometer_absolute(pressure + self.pressure_cal)
 
         # Log
         self.logger.info("Barometer Forecast: %s, Absolute pressure: %.1f mb, Sea Level Pressure: %.1f", forecastTxt, pressure, seaLevelPressure)
