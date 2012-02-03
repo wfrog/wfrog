@@ -6,7 +6,7 @@ Write us on the [http://groups.google.com/group/wfrog-users discussion group] an
 
 ==Develop==
 
-Developing new drivers, renderers, formulas or any other pluggable part is quite straightforward if you already now some programming language as [http://www.python.org/ Python] is not so difficult to learn and wfrog architecture is very modular. You can quickly write something useful without having to know the whole stuff.
+Developing new drivers, renderers, formulas or any other pluggable part is quite straightforward if you already now some programming language as [http://www.python.org/ Python] is not so difficult to learn and wfrog architecture is very modular. You can quickly write something useful without having to know the whole stuff. The [http://groups.google.com/group/wfrog-dev wfrog-dev] group is the discussion platform for wfrog developers.
 
 ==Customize==
 
