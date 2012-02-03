@@ -23,6 +23,7 @@
   Follow [http://twitter.com/#!/search?q=%23wfrog #wfrog] on Twitter
 
 *Design Discussions*<br>
+  [http://groups.google.com/group/wfrog-dev Developer Forum]<br>
   [Architecture Architecture] of wfrog 0.9<br>
   [BaseArchitecture Base Architecture] (wfrog 0.5)<br>
 
