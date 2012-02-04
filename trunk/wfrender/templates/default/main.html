@@ -384,27 +384,7 @@ $u
             Rain <span class="value">$rnd($current.rain, 1)</span> $unitstr('rain',$units.rain)/h<br>
             <!-- UV Index <span class="value">0</span> -->
         </div>
-    </div>
-#if $getVar('http', False) and False
-    <div class="bordered header">
-        <div class="headerContent">
-            <input id="time_end" name="time_end" style="display:none" value="" />
-            <span id="date_val"style="cursor: pointer;" onclick="move(0, 'refresh')"><i>Refresh latest data</i></span>
-            <br>go <span style="cursor: pointer;" onclick="move(-1, 'h')">1 hour</span>
-            <span style="cursor: pointer;" onclick="move(-1, 'd')">1 day</span>
-            <span style="cursor: pointer;" onclick="move(-3, 'h')">3 hours</span>
-            <span style="cursor: pointer;" onclick="move(-3, 'd')">3 days</span>
-            backward 
-            <br>go <span style="cursor: pointer;" onclick="move(1, 'h')">1 hour</span>
-            <span style="cursor: pointer;" onclick="move(1, 'd')">1 day</span>
-            <span style="cursor: pointer;" onclick="move(3, 'h')">3 hours</span>
-            <span style="cursor: pointer;" onclick="move(3, 'd')">3 days</span>
-            forward 
-            <br><span style="cursor: pointer;" id="cal_open">Choose...</span>
-        </div>
-    </div>
-#end if
-    
+    </div>   
     <div class="tabPane">
         <div class="leftCell" style="width:10px;">&nbsp;</div>
         <div id="3hours" class="tab" style="cursor: pointer" onclick="move('3hours.html', 'address')">3 Hours</div>
@@ -425,7 +405,7 @@ $u
         </div>
         <div style="float:right; width:10px;">&nbsp;</div>
 #end if                
-        <div id="button-details" class="rightTab" style="cursor: pointer" onclick="document.getElementById('charts').style.display = 'none'; document.getElementById('button-charts').className = 'rightTab'; document.getElementById('details').style.display = 'block'; document.getElementById('button-details').className = 'rightTab selected'; ">numerical data</div>
+        <div id="button-details" class="rightTab" style="cursor: pointer" onclick="document.getElementById('charts').style.display = 'none'; document.getElementById('button-charts').className = 'rightTab'; document.getElementById('details').style.display = 'block'; document.getElementById('button-details').className = 'rightTab selected'; ">numbers</div>
         <div id="button-charts" class="rightTab selected" style="cursor: pointer" onclick="document.getElementById('charts').style.display = 'block'; document.getElementById('button-charts').className = 'rightTab selected'; document.getElementById('details').style.display = 'none'; document.getElementById('button-details').className = 'rightTab';">charts</div>        
     </div>
 
