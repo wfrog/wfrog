@@ -43,7 +43,6 @@ $u
                     nloc1=nloc[1]+' 00:00:00';
                     date_only='Y';
                 }
-                document.getElementById('date_val').innerHTML='<i>Show latest data</i>';
                 document.getElementById('period_end').innerHTML=nloc1;
 
                 start_date=convert_to_date(nloc1); // now this is end time !
@@ -77,7 +76,7 @@ $u
                     }
                     start_date.setMinutes(start_date.getMinutes()+1);
                 }
-                else { // nloc[0].indexOf("24hours.html") > -1
+                else { // nloc[0].indexOf("24hours.html") > -1                
                     start_date.setDate(start_date.getDate()-1);
                     // show data from the beginning of next full hour
                     if(date_only=='N') {
@@ -87,14 +86,30 @@ $u
                     start_date.setHours(start_date.getHours()+1);
                 }
                 start_time=format_time(start_date, ' ');
-                document.getElementById('period_start').innerHTML=start_time;
+                //document.getElementById('period_start').innerHTML=start_time;
                 document.getElementById('period').style.display='block';
+                document.getElementById('next').style.display='block';
+                document.getElementById('date_val').style.display='block';
             }
             else { // No history element
                 document.getElementById('period').style.display='none';
+                document.getElementById('next').style.display='none';
+                document.getElementById('date_val').style.display='none';
             }
 			
 	        document.getElementById('time_end').value = 'None';
+        }
+
+        function move_back() {
+            move(-delta, step)
+        }
+
+        function move_forward() {
+            move(-delta, step)
+        }
+        
+        function move_end() {
+            move(null, 'refresh')
         }
 
         function move(amount, type)
@@ -269,16 +284,13 @@ $u
             border-bottom: 1px solid tan;
         }
         .history {
-            width: 95%;
             border: 1px solid tan;
-            background: yellow;
-            margin: 3px;
-            padding-top: 3px;
-            padding-bottom: 3px;
-            padding-left: 6px;
-            padding-right: 6px;
-            clear: both;
+            background: #fff377;
+            height: 14px;
+            padding-right: 2px;
+            padding-left: 2px;
             float: left;
+            margin-right: -1px;
         }
         .tab {
             margin-bottom:3px;
@@ -293,6 +305,17 @@ $u
             background: wheat;
             border-bottom: 1px solid wheat;
         }
+        .small_button {
+            float: left;
+            height: 14px;
+            width: 14px;
+            text-align: center;
+            margin-bottom: 2px;
+            margin-right: 2px;            
+            border: 1px solid tan;
+            overflow: hidden;
+        }
+        
         .rightTab {
             margin-bottom:3px;
             margin-left: 3px;
@@ -362,7 +385,7 @@ $u
             <!-- UV Index <span class="value">0</span> -->
         </div>
     </div>
-#if $getVar('http', False)
+#if $getVar('http', False) and False
     <div class="bordered header">
         <div class="headerContent">
             <input id="time_end" name="time_end" style="display:none" value="" />
@@ -381,18 +404,27 @@ $u
         </div>
     </div>
 #end if
-
-    <div class="history" id="period" style="display:none">
-        Showing data from period <span class="value" id="period_start">START</span> - <span class="value" id="period_end">END</span>
-    </div>
-
+    
     <div class="tabPane">
         <div class="leftCell" style="width:10px;">&nbsp;</div>
         <div id="3hours" class="tab" style="cursor: pointer" onclick="move('3hours.html', 'address')">3 Hours</div>
         <div id="24hours" class="tab" style="cursor: pointer" onclick="move('24hours.html', 'address')">24 Hours</div>
         <div id="30days" class="tab" style="cursor: pointer" onclick="move('30days.html', 'address')">30 Days</div>
         <div id="365days" class="tab" style="cursor: pointer" onclick="move('365days.html', 'address')">365 Days</div>
+        <div style="float:left; width:20px;">&nbsp;</div>
+#if $getVar('http', False)
+        <div style="float:left"> 
+            <input id="time_end" name="time_end" style="display:none"/>
+            <div class="small_button" style="cursor: pointer;" onclick="move_back()" title="Show previous values"><div style="margin-top: -1px">&lsaquo;</div></div>
+            &nbsp;<div class="history" id="period" style="display:none" title="Date and time of displayed values">
+                <span id="period_end">END</span></div>
+            <div class="small_button" style="cursor: pointer;font-size:80%" id="cal_open" title="Choose date of displayed values"><div style="margin-top: 1px">&nabla;</div></div>&nbsp;
+            <div class="small_button" id="next" style="cursor: pointer;display:none" onclick="move_forward()" title="Show next values"><div style="margin-top: -1px">&rsaquo;</div></div>
+            &nbsp;
+            <div class="small_button" id="date_val" style="cursor: pointer;display:none" onclick="move_end()" title="Show latest values"><div style="margin-top: -1px">&raquo;</div></div>            
+        </div>
         <div style="float:right; width:10px;">&nbsp;</div>
+#end if                
         <div id="button-details" class="rightTab" style="cursor: pointer" onclick="document.getElementById('charts').style.display = 'none'; document.getElementById('button-charts').className = 'rightTab'; document.getElementById('details').style.display = 'block'; document.getElementById('button-details').className = 'rightTab selected'; ">numerical data</div>
         <div id="button-charts" class="rightTab selected" style="cursor: pointer" onclick="document.getElementById('charts').style.display = 'block'; document.getElementById('button-charts').className = 'rightTab selected'; document.getElementById('details').style.display = 'none'; document.getElementById('button-details').className = 'rightTab';">charts</div>        
     </div>
@@ -480,12 +512,20 @@ ${"%5d" % $value.uv_index  if $value.uv_index != None else "    -"}
 // Highlight the correct tab according to the url
 if(window.location.href.indexOf("30days.html") > -1) {
     document.getElementById("30days").className += ' selected';
+    move_back = function() { move(-15, 'd') }
+    move_forward = function() { move(15, 'd') }
 } else if(window.location.href.indexOf("365days.html") > -1) {
     document.getElementById("365days").className += ' selected';
+    move_back = function() { move(-183, 'd') }
+    move_forward = function() { move(183, 'd') }
 } else if(window.location.href.indexOf("3hours.html") > -1) {
     document.getElementById("3hours").className += ' selected';
+    move_back = function() { move(-1, 'h') }
+    move_forward = function() { move(1, 'h') }    
 } else {
     document.getElementById("24hours").className += ' selected';
+    move_back = function() { move(-12, 'h') }
+    move_forward = function() { move(12, 'h') }    
 }
 </script>
 </html>
