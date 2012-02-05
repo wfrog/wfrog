@@ -387,12 +387,12 @@ $u
     </div>   
     <div class="tabPane">
         <div class="leftCell" style="width:10px;">&nbsp;</div>
+#if $getVar('http', False)
         <div id="3hours" class="tab" style="cursor: pointer" onclick="move('3hours.html', 'address')">3 Hours</div>
         <div id="24hours" class="tab" style="cursor: pointer" onclick="move('24hours.html', 'address')">24 Hours</div>
         <div id="30days" class="tab" style="cursor: pointer" onclick="move('30days.html', 'address')">30 Days</div>
         <div id="365days" class="tab" style="cursor: pointer" onclick="move('365days.html', 'address')">365 Days</div>
         <div style="float:left; width:20px;">&nbsp;</div>
-#if $getVar('http', False)
         <div style="float:left"> 
             <input id="time_end" name="time_end" style="display:none"/>
             <div class="small_button" style="cursor: pointer;" onclick="move_back()" title="Show previous values"><div style="margin-top: -1px">&lsaquo;</div></div>
@@ -404,6 +404,11 @@ $u
             <div class="small_button" id="date_val" style="cursor: pointer;display:none" onclick="move_end()" title="Show latest values"><div style="margin-top: -1px">&raquo;</div></div>            
         </div>
         <div style="float:right; width:10px;">&nbsp;</div>
+#else
+        <div id="3hours" class="tab" style="cursor: pointer"><a href="3hours.html">3 Hours</a></div>
+        <div id="24hours" class="tab" style="cursor: pointer"><a href="24hours.html">24 Hours</a></div>
+        <div id="30days" class="tab" style="cursor: pointer"><a href="30days.html">30 Days</a></div>
+        <div id="365days" class="tab" style="cursor: pointer"><a href="365days.html">365 Days</a></div>
 #end if                
         <div id="button-details" class="rightTab" style="cursor: pointer" onclick="document.getElementById('charts').style.display = 'none'; document.getElementById('button-charts').className = 'rightTab'; document.getElementById('details').style.display = 'block'; document.getElementById('button-details').className = 'rightTab selected'; ">numbers</div>
         <div id="button-charts" class="rightTab selected" style="cursor: pointer" onclick="document.getElementById('charts').style.display = 'block'; document.getElementById('button-charts').className = 'rightTab selected'; document.getElementById('details').style.display = 'none'; document.getElementById('button-details').className = 'rightTab';">charts</div>        
