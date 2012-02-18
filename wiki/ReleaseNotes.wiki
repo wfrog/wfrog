@@ -1,6 +1,6 @@
 *wfrog 0.8.2 - 18.02.2012*
 
- * Fixed issues (http://code.google.com/p/wfrog/issues/list?q=label:Milestone-Release0.8.2)
+ * [http://code.google.com/p/wfrog/issues/list?q=label:Milestone-Release0.8.2 Fixed issues]
  * Many small bugs fixed
  * Default template now has tabs for charts and numerical data and a date picker that allows to view history data (only in http mode).
  * Added new native publisher for wetter.com
