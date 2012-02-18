@@ -1,4 +1,4 @@
-wfrog 0.8.2 - 18.02.2012
+*wfrog 0.8.2 - 18.02.2012*
 
 - Fixed issues (http://code.google.com/p/wfrog/issues/list?
 q=label:Milestone-Release0.8.2)
