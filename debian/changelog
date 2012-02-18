@@ -1,3 +1,12 @@
+wfrog (0.8.2-1) maverick; urgency=low
+
+  * * New template with date picker and tabs for charts and numerical
+    data. Support for several TH sensors. Configuration files improved.
+    Several fixes in station drivers and many small bugs fixed.
+  * See http://code.google.com/p/wfrog/wiki/ReleaseNotes
+
+ -- Jordi Puigsegur Figueras <jordi@tramuntana>  Sat, 18 Feb 2012 10:57:58 +0100
+
 wfrog (0.8.1-1) unstable; urgency=low
 
   * Dramatically simplified the configuration by choosing the station in
