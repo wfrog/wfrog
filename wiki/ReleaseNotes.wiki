@@ -1,3 +1,33 @@
+wfrog 0.8.2 - 18.02.2012
+
+- Fixed issues (http://code.google.com/p/wfrog/issues/list?
+q=label:Milestone-Release0.8.2)
+- Many small bugs fixed
+- Default template now has tabs for charts and numerical data and a
+date picker that allows to view history data (only in http mode).
+- Added new native publisher for wetter.com
+- New static file renderer, to be used with ftp or http renderers to
+publish single static files
+- New native driver for Davis VantagePro2 weather stations.
+- OS-WMR928NX driver now is able to receive multiple TH and T sensors
+- Added support for several temp/hum sensors when using database
+storage (i.e. firebird or mysql storage).
+- The configuration files now have additional commented out sections
+to allow easier configuration of:
+ 1) ftp publishing / compatible with http rendering
+ 2) pws, weather underground, wetter.com and meteoclimatic data
+publishing
+ 3) humidex and wind chill in graphs
+ 4) additional sensors
+- Interior temp and hum now allow units configuration.
+- Fix barometer overflow in WMRS200 driver.
+- Several fixes in WMRS200 driver to improve data reporting and error
+management.
+
+Upgrade notes: If you have customized your configuration: in order to
+have the new settings take effect, you have to upgrade the wfdriver
+config files to the latest version and execute wfrog -S.
+
 *wfrog 0.8.1 - 22.03.2011*
 
 Dramatically simplified the configuration by choosing the station in startup settings. Some fixes.
