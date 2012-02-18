@@ -1,0 +1,28 @@
+source: !accumulator
+    slice: $slice
+    span: $span
+    storage: !service
+        name: storage
+    formulas:
+        temp:
+            avg: !avg { index: temp }
+            min: !min { index: temp }
+            max: !max { index: temp }
+        hum: 
+            avg: !avg { index: hum }
+            min: !min { index: hum }
+            max: !max { index: hum }
+        press: 
+            avg: !avg { index: pressure }
+            min: !min { index: pressure }
+            max: !max { index: pressure }
+        wind: 
+            avg: !avg { index: wind }
+            max: !max { index: wind_gust }
+            'deg,dir' : !predominant { index: wind }
+        rain:
+            rate: !max { index: rain_rate }
+            fall: !sum { index: rain }
+        uv:
+            index: !max { index: uv_index }
+

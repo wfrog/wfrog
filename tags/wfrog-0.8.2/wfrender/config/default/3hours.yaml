@@ -1,0 +1,18 @@
+renderer: !template
+    path: ../../templates/default/main.html
+    mime: text/html
+    renderer: !data
+        source: !service
+            name: accu_3h
+        renderer: !multi
+            children:
+                current: !include
+                    path: current.yaml
+                chart: !include
+                    path: charts.yaml
+                    variables:
+                        interpolate: true
+                summary: !datatable
+                    label: 2
+
+

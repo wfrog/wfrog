@@ -1,0 +1,517 @@
+#from wfcommon.units import unit_roll
+#def unitstr(m,u)
+#if $getVar('http', False)
+<a href="-set-?s=units&k=$m&v=$unit_roll($m,$u)">$u</a>
+#else
+$u
+#end if
+#end def
+<html>
+<head>
+    <title>Weather Dashboard - wfrog $version</title>
+    #if $getVar('http', False)
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/prototype/1.7.0.0/prototype.js"></script>
+    <script type="text/javascript" src="http://calendarview.org/releases/1.2/javascripts/calendarview.js"></script>
+    
+    <link  rel="stylesheet" href="http://calendarview.org/releases/1.2/stylesheets/calendarview.css" />
+    
+    <script type="text/javascript">
+        window.onload = function() {
+            
+            loc = document.location.href;
+            nloc = loc.split('?time_end=');
+            
+            Calendar.setup(
+              {
+                dateField      : 'time_end',
+                triggerElement : 'cal_open',
+                closeHandler   : function() {
+                    if(document.getElementById('time_end').value != 'None')
+                        window.location=nloc[0]+'?time_end='+document.getElementById('time_end').value+'T'+'23:59:59';
+                    else
+                        window._popupCalendar.container.innerHTML='';
+                }
+              }
+            );
+
+            if(nloc[1] != undefined) { // history processing
+                if(nloc[1].indexOf("T") > -1) { // we have time
+                    nloc1=nloc[1].replace("T", " ");
+                    date_only='N';
+                }
+                else { // no time, let's add it
+                    nloc1=nloc[1]+' 00:00:00';
+                    date_only='Y';
+                }
+                document.getElementById('period_end').innerHTML=nloc1;
+
+                start_date=convert_to_date(nloc1); // now this is end time !
+                // calculate start time:
+                if(nloc[0].indexOf("30days.html") > -1) { // 30 days backward:
+                    start_date.setDate(start_date.getDate()-30);
+                    // show data from the beginning of the day
+                    if(date_only=='N') {
+                        start_date.setHours(0);
+                        start_date.setMinutes(0);
+                        start_date.setSeconds(0);
+                    }
+                }
+                else if(nloc[0].indexOf("365days.html") > -1) {
+                    // 360 days backward:
+                    start_date.setDate(start_date.getDate()-360);
+                    // show data from the beginning of next month
+                    if(date_only=='N') {
+                        start_date.setHours(0);
+                        start_date.setMinutes(0);
+                        start_date.setSeconds(0);
+                    }
+                    start_date.setDate(1);
+                    start_date.setMonth(start_date.getMonth()+1);
+                }
+                else if(nloc[0].indexOf("3hours.html") > -1) {
+                    start_date.setHours(start_date.getHours()-3);
+                    // show data from the beginning of next full minute
+                    if(date_only=='N') {
+                        start_date.setSeconds(0);
+                    }
+                    start_date.setMinutes(start_date.getMinutes()+1);
+                }
+                else { // nloc[0].indexOf("24hours.html") > -1                
+                    start_date.setDate(start_date.getDate()-1);
+                    // show data from the beginning of next full hour
+                    if(date_only=='N') {
+                        start_date.setMinutes(0);
+                        start_date.setSeconds(0);
+                    }
+                    start_date.setHours(start_date.getHours()+1);
+                }
+                start_time=format_time(start_date, ' ');
+                //document.getElementById('period_start').innerHTML=start_time;
+                document.getElementById('period').style.display='block';
+                document.getElementById('next').style.display='block';
+                document.getElementById('date_val').style.display='block';
+            }
+            else { // No history element
+                document.getElementById('period').style.display='none';
+                document.getElementById('next').style.display='none';
+                document.getElementById('date_val').style.display='none';
+            }
+			
+	        document.getElementById('time_end').value = 'None';
+        }
+
+        function move_back() {
+            move(-delta, step)
+        }
+
+        function move_forward() {
+            move(-delta, step)
+        }
+        
+        function move_end() {
+            move(null, 'refresh')
+        }
+
+        function move(amount, type)
+        {
+            loc = document.location.href;
+            nloc = loc.split('?time_end=');
+
+            if(type == 'address') { // direct link
+                if(nloc[1] != undefined) { // parameter exists
+                    window.location=amount+'?time_end='+nloc[1];
+                }
+                else {
+                    window.location=amount;
+                }
+            }
+            else if(type == 'refresh') { // end history view
+                window.location=nloc[0];
+            }
+            else { // time based move
+                if(nloc[1] != undefined) { // parameter exists
+                    if(nloc[1].indexOf("T") > -1) { // we have time
+                        nloc1=nloc[1].replace("T", " ");
+                    }
+                    else { // no time, let's add it
+                        nloc1=nloc[1]+' 00:00:00';
+                    }
+
+                    new_date=convert_to_date(nloc1);
+                }
+                else { // starting point is current date
+                    new_date=new Date();
+                }
+                // calculate new time:
+                if(type == 'h')
+                    new_date.setHours(new_date.getHours()+amount);
+                else if(type == 'd')
+                    new_date.setDate(new_date.getDate()+amount);
+                else if(type == 'm')
+                    new_date.setMonth(new_date.getMonth()+amount);
+                else if(type == 'y')
+                    new_date.setFullYear(new_date.getFullYear()+amount);
+                new_time=format_time(new_date, 'T');
+                window.location=nloc[0]+'?time_end='+new_time;
+            }
+        }
+
+
+
+// General purpose functions
+
+
+        function add_zero(i)
+        {
+            if(i<10)
+                i="0"+i;
+            return i;
+        }
+            
+        function format_time(s_date, time_sep)
+        {
+            yyyy=s_date.getFullYear();
+            mon=s_date.getMonth()+1;
+            mon=add_zero(mon);
+            dd=s_date.getDate();
+            dd=add_zero(dd);
+            hh=s_date.getHours();
+            hh=add_zero(hh);
+            mm=s_date.getMinutes();
+            mm=add_zero(mm);
+            ss=s_date.getSeconds();
+            ss=add_zero(ss);
+            ret_value=yyyy+'-'+mon+'-'+dd+time_sep+hh+':'+mm+':'+ss;
+            return ret_value;
+        }
+
+        function convert_to_date(time_str)
+        {
+            // time_str must be formatted yyyy-mm-dd hh24:mi:ss
+            time_str=time_str.split(' '); 
+            // now time_str[0] is the date and time_str[1] is the time
+            tmp_date=time_str[0].split('-'); 
+            tmp_time=time_str[1].split(':'); 
+            time_date=new Date(tmp_date[0], tmp_date[1]-1, tmp_date[2], tmp_time[0], tmp_time[1], tmp_time[2]);
+            return(time_date);
+        }
+
+    </script>
+    #end if
+    <style>
+        body {
+            font-family: Arial, Helvetica, Sans-serif;
+            font-size: 13px;
+            color: #8D7641;
+        }
+        a {
+            color: #8D7641;
+        }
+            A:link {text-decoration: none}
+            A:visited {text-decoration: none}
+            A:active {text-decoration: none}
+            A:hover {text-decoration: underline;}
+        .value {
+            color: #007000;
+        }
+        .bordered {
+            border: 1px solid tan;
+        }
+        .cell {
+            margin: 3px;
+            padding: 6px;
+            float: left;
+        }
+        .headerNoPad {
+            margin: 3px;
+            padding-left: 6px;
+            padding-right: 6px;            
+            margin-bottom: 0px; 
+            float: left;
+        }
+        .pad {
+            padding: 6px;
+            padding-top: 10px;
+            padding-bottom: 2px;
+        }
+        .smallpad {
+            padding: 4px;
+            padding-bottom: 2px;
+        }
+        .line {
+            padding-top: 3px;
+            padding-bottom: 3px;
+        }
+        .header {
+            margin: 3px;
+            padding-left: 6px;
+            padding-right: 6px;
+            padding-top: 10px;    
+            padding-bottom: 2px;                 
+            float: left;            
+        }
+        .headerContent {
+            height: 64px;    
+            float: left;        
+        }
+        .wide {
+            width: 95%;
+        }
+        .leftCell {
+            float: left;
+        }
+        .rightAlign {
+            text-align: right;
+        }
+        .rightCell {
+            position: relative;
+            right: 0px;
+            text-align: right;
+        }
+        .leftpad {
+            padding-left: 5;
+        }
+        .bigger {
+            font-size: 140%;
+        }
+        .tabPane {
+            width: 95%;
+            margin: 3px;
+            padding-top: 3px;
+            padding-bottom: 0px;
+            clear: both;
+            height: 21px;
+            border-bottom: 1px solid tan;
+        }
+        .history {
+            border: 1px solid tan;
+            background: #fff377;
+            height: 14px;
+            padding-right: 2px;
+            padding-left: 2px;
+            float: left;
+            margin-right: -1px;
+        }
+        .tab {
+            margin-bottom:3px;
+            margin-left: 3px;
+            margin-right: 3px;
+            padding-left: 6px;
+            padding-right: 6px;
+            padding-top: 2px;
+            padding-bottom: 2px;
+            float: left;
+            height: 16px;
+            background: wheat;
+            border-bottom: 1px solid wheat;
+        }
+        .small_button {
+            float: left;
+            height: 14px;
+            width: 14px;
+            text-align: center;
+            margin-bottom: 2px;
+            margin-right: 2px;            
+            border: 1px solid tan;
+            overflow: hidden;
+        }
+        
+        .rightTab {
+            margin-bottom:3px;
+            margin-left: 3px;
+            margin-right: 3px;
+            padding-left: 6px;
+            padding-right: 6px;
+            padding-top: 2px;
+            padding-bottom: 2px;
+            float: right;
+            height: 16px;
+            background: wheat;
+            border-bottom: 1px solid wheat;
+        }
+        .selected {
+            background: white;
+            border-right: 1px solid tan;
+            border-top: 1px solid tan;
+            border-left: 1px solid tan;
+            border-bottom: 1px solid white;
+        }
+        .symbol {
+            font-size:120%;
+        }
+        .graph {
+            line-height:18px;
+        }
+        .units {
+            position: relative;
+            right: 0px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wide bordered line cell">
+            <div class="leftCell">wfrog $version - Weather Dashboard </div><div class="rightCell"><span class="value">$current.timestamp</span></div>
+</div>
+<div style="width: 100%">
+    <div class="bordered header" style="clear: both">
+        <div class="headerContent">
+            <a href="http://www.wfrog.org"><img border="0" src="http://www.wfrog.org/logo.png?s=$station.driver&o=$os" alt="wfrog"/></a>
+        </div>
+    </div>
+    <div class="bordered header">
+        <div class="headerContent">
+            <div class="leftCell">
+                <span class="symbol"></span> <span class="bigger" ><span class="value">$rnd($current.temp1, 1)</span>&deg;</span>$unitstr('temp',$units.temp)<br>
+                Humidity <span class="value">$rnd($current.hum1)</span> % <br>
+                Pressure <span class="value">$rnd($current.press)</span> $unitstr('press',$units.press)
+            </div>
+            <div class="leftCell leftpad rightAlign">
+                <span class="bigger">&#8962; &nbsp;</span><br>
+                <span class="value">$rnd($current.temp0,1)</span>&deg;$unitstr('temp',$units.temp) <br>
+                <span class="value">$rnd($current.hum0)</span> %
+            </div>
+        </div>
+    </div>
+    <div class="bordered headerNoPad">
+        <div class="leftCell">
+            <img src="$current.wind.dir"/>
+        </div>
+        <div class="leftCell smallpad">
+            <br style="font-size:50%">Wind <span class="value">$rnd($current.wind.speed, 1)</span> $unitstr('wind',$units.wind)<br>
+            Gust <span class="value">$rnd($current.wind.gust, 1)</span> $unitstr('wind',$units.wind)<br>
+            Rain <span class="value">$rnd($current.rain, 1)</span> $unitstr('rain',$units.rain)/h<br>
+            <!-- UV Index <span class="value">0</span> -->
+        </div>
+    </div>   
+    <div class="tabPane">
+        <div class="leftCell" style="width:10px;">&nbsp;</div>
+#if $getVar('http', False)
+        <div id="3hours" class="tab" style="cursor: pointer" onclick="move('3hours.html', 'address')">3 Hours</div>
+        <div id="24hours" class="tab" style="cursor: pointer" onclick="move('24hours.html', 'address')">24 Hours</div>
+        <div id="30days" class="tab" style="cursor: pointer" onclick="move('30days.html', 'address')">30 Days</div>
+        <div id="365days" class="tab" style="cursor: pointer" onclick="move('365days.html', 'address')">365 Days</div>
+        <div style="float:left; width:20px;">&nbsp;</div>
+        <div style="float:left"> 
+            <input id="time_end" name="time_end" style="display:none"/>
+            <div class="small_button" style="cursor: pointer;" onclick="move_back()" title="Show previous values"><div style="margin-top: -1px">&lsaquo;</div></div>
+            &nbsp;<div class="history" id="period" style="display:none" title="Date and time of displayed values">
+                <span id="period_end">END</span></div>
+            <div class="small_button" style="cursor: pointer;font-size:80%" id="cal_open" title="Choose date of displayed values"><div style="margin-top: 1px">&nabla;</div></div>&nbsp;
+            <div class="small_button" id="next" style="cursor: pointer;display:none" onclick="move_forward()" title="Show next values"><div style="margin-top: -1px">&rsaquo;</div></div>
+            &nbsp;
+            <div class="small_button" id="date_val" style="cursor: pointer;display:none" onclick="move_end()" title="Show latest values"><div style="margin-top: -1px">&raquo;</div></div>            
+            &nbsp;
+        </div>
+        <div style="float:right; width:10px;">&nbsp;</div>
+#else
+        <div id="3hours" class="tab" style="cursor: pointer"><a href="3hours.html">3 Hours</a></div>
+        <div id="24hours" class="tab" style="cursor: pointer"><a href="24hours.html">24 Hours</a></div>
+        <div id="30days" class="tab" style="cursor: pointer"><a href="30days.html">30 Days</a></div>
+        <div id="365days" class="tab" style="cursor: pointer"><a href="365days.html">365 Days</a></div>
+#end if                
+        <div id="button-details" class="rightTab" style="cursor: pointer" onclick="document.getElementById('charts').style.display = 'none'; document.getElementById('button-charts').className = 'rightTab'; document.getElementById('details').style.display = 'block'; document.getElementById('button-details').className = 'rightTab selected'; ">numbers</div>
+        <div id="button-charts" class="rightTab selected" style="cursor: pointer" onclick="document.getElementById('charts').style.display = 'block'; document.getElementById('button-charts').className = 'rightTab selected'; document.getElementById('details').style.display = 'none'; document.getElementById('button-details').className = 'rightTab';">charts</div>        
+    </div>
+
+    <div id="charts">
+    <div>
+        <div class="bordered cell graph" style="clear: both">
+            <div class="leftCell">Temperature and Dew Point</div><div class="units">&deg;$unitstr('temp',$units.temp)</div>
+            <div><img src="$chart.temp"/></div>
+        </div>
+        <div class="bordered cell graph">
+            <div class="leftCell">Humidity</div><div class="units">%</div>
+            <div><img src="$chart.hum"/></div>
+        </div>
+        <div class="bordered cell graph">
+           <div class="leftCell">Pressure</div><div class="units">$unitstr('press',$units.press)</div>
+            <div><img src="$chart.press"/></div>
+        </div>
+    </div>
+    <div>
+        <div class="bordered cell graph" style="clear: both">
+            <div class="leftCell">Wind and Gusts</div><div class="units">$unitstr('wind',$units.wind)</div>
+            <div><img src="$chart.wind"/></div>
+        </div>
+        <div class="bordered cell graph">
+            <div class="leftCell">Wind Direction</div><br/>
+            <div><img src="$chart.wind_dir"/></div>
+        </div>
+    </div>
+    <div>
+        <div class="bordered cell graph"  style="clear: both">
+            <div class="leftCell">Rain</div><div class="units">$unitstr('rain',$units.rain)</div>
+            <div><img src="$chart.rain"/></div>
+        </div>
+        <div class="bordered cell graph">
+            <div class="leftCell">Rain rate</div><div class="units">$unitstr('rain',$units.rain)/h</div>
+            <div><img src="$chart.rain_rate"/></div>
+        </div>
+        <div class="bordered cell graph">
+            <div class="leftCell">UV Index</div><br/>
+            <div><img src="$chart.uv"/></div>
+        </div>
+    </div>
+    </div>
+    <div class="bordered cell graph" style="clear: both; display: none;" id="details">
+       <div style="clear: both"><pre style="font-size:94%">
+#set $indexes = $summary.keys()
+#silent $indexes.sort()
+#silent $indexes.reverse()
+${"%s      Temp. %s         Humidity %%     Pressure %s       Rain %s         Wind %s       UV     " % (
+  " " * len($indexes[0]),
+  $unitstr('temp',$units.temp).rstrip(), 
+  $unitstr('press',$units.press).rstrip(), 
+  $unitstr('rain',$units.rain).rstrip(),  
+  $unitstr('wind',$units.wind).rstrip() ) }
+${"%s   max   min   avg  max  min  avg   max   min   avg   fall   rate    avg    max  dir" % (" " * len($indexes[0]))}
+#for $index in $indexes
+#set $value = $summary[$index]
+#if $value.temp_max != None or $value.hum_max != None or $value.press_max != None or $value.rain_fall != None or $value.wind_avg != None
+${"%s" % $index}#slurp
+${"%6.1f" % $value.temp_max if $value.temp_max != None else "     -"}#slurp
+${"%6.1f" % $value.temp_min if $value.temp_min != None else "     -"}#slurp
+${"%6.1f" % $value.temp_avg if $value.temp_avg != None else "     -"}#slurp
+${"%4.0f%%" % $value.hum_max if $value.hum_max != None else "   - "}#slurp
+${"%4.0f%%" % $value.hum_min if $value.hum_min != None else "   - "}#slurp
+${"%4.0f%%" % $value.hum_avg if $value.hum_avg != None else "   - "}#slurp
+${"%6.0f" % $value.press_max if $value.press_max != None else "     -"}#slurp
+${"%6.0f" % $value.press_min if $value.press_min != None else "     -"}#slurp 
+${"%6.0f" % $value.press_avg if $value.press_avg != None else "     -"}#slurp 
+${"%7.1f" % $value.rain_fall if $value.rain_fall != None else "      -"}#slurp
+${"%7.1f" % $value.rain_rate if $value.rain_rate != None else "      -"}#slurp
+${"%7.1f" % $value.wind_avg if $value.wind_avg != None else "      -"}#slurp
+${"%7.1f" % $value.wind_max if $value.wind_max != None else "      -"}#slurp
+${"%5s" % $value.wind_dir  if $value.wind_dir != None else "    -"}#slurp
+${"%5d" % $value.uv_index  if $value.uv_index != None else "    -"}
+#end if
+#end for
+    </pre></div>
+    </div>
+</div>
+<div style="width:100%;clear:both;"><br></div>
+</body>
+
+<script>
+// Highlight the correct tab according to the url
+if(window.location.href.indexOf("30days.html") > -1) {
+    document.getElementById("30days").className += ' selected';
+    move_back = function() { move(-15, 'd') }
+    move_forward = function() { move(15, 'd') }
+} else if(window.location.href.indexOf("365days.html") > -1) {
+    document.getElementById("365days").className += ' selected';
+    move_back = function() { move(-183, 'd') }
+    move_forward = function() { move(183, 'd') }
+} else if(window.location.href.indexOf("3hours.html") > -1) {
+    document.getElementById("3hours").className += ' selected';
+    move_back = function() { move(-1, 'h') }
+    move_forward = function() { move(1, 'h') }    
+} else {
+    document.getElementById("24hours").className += ' selected';
+    move_back = function() { move(-12, 'h') }
+    move_forward = function() { move(12, 'h') }    
+}
+</script>
+</html>

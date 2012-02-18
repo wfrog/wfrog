@@ -1,0 +1,29 @@
+# To test Wetter.com update:
+#    python ../wfrender.py -f wettercom.yaml -s ../../wfcommon/config/default-settings.yaml
+
+init:
+    storage: !service
+        name: storage
+        instance: !include
+            path: ../../wfcommon/config/storage.yaml
+
+renderer: !wettercom
+    username: YOUR_STATION_ID
+    password: YOUR_STATION_PASSWORD
+    storage: !service
+        name: storage
+    test: False
+    period: 900
+
+logging:
+    level: info    
+    handlers:
+        default:
+            level: debug
+            handler: !include 
+                path: ../../wfcommon/config/loghandler.yaml
+                variables:
+                    process: wfrender
+
+
+

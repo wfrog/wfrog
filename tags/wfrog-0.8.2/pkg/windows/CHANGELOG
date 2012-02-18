@@ -1,0 +1,49 @@
+1.2.6 (22.01.2012)
+    * Updated links & zadig
+    * Existing libusb0.dll is replaced with downloaded one if it exists already on the system
+    * Fixed a bug with zadig, if the zadig folder does not exist
+    * More information on how to install zadig-driver if no zadig.ini is present
+
+    * Happy new year! :)
+
+1.2.5 (07.11.2011)
+        * Hotfix for new build-environments
+
+1.2.4 (09.09.2011)
+        * Cleanup for new packages
+
+1.2.3 (09.09.2011)
+        * Minor code cleanups
+        * If trunk already exists, you dont need to download it again
+        * Fixed "error: libusb0.dll: No such file or directory"
+        * Dont move any files from source, so you can run install-mode with all files needed
+
+1.2.2 (02.06.2011)
+	* Minor things
+
+1.2.1 (29.05.2011)
+	* Installs new dependency: PyWin32
+
+1.2.0 (29.05.2011)
+	* Added station installer
+	* Updated linklist (Zadig)
+	* Added zadig config
+	* Minor bugfixes
+
+	* WMRS200 USB support!!!
+
+1.1.0 (28.05.2011)
+	* New main-menu
+	* New versions of dependencies released
+	* Minor bugfixes
+	* Cleanup-possibility
+
+1.0.2 (28.05.2011)
+	* Fixed ignored install of PyUSB 0.x
+
+1.0.1 (03.04.2011)
+	* Now using another update-server
+	* Check for 7za and wget
+
+1.0.0
+	* 1st release

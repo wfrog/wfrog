@@ -1,0 +1,82 @@
+init:
+    storage: !service
+        name: storage
+        instance: !include
+            path: ../../wfcommon/config/storage.yaml
+    accu_3h: !service
+        name: accu_3h
+        instance:  !include
+            path: ../../wfrender/config/default/chart_accumulator.yaml
+            variables:
+                slice: minute
+                span: 180
+    accu_24h: !service
+        name: accu_24h
+        instance:  !include
+            path: ../../wfrender/config/default/chart_accumulator.yaml
+            variables:
+                slice: hour
+                span: 24
+    accu_30d: !service
+        name: accu_30d
+        instance:  !include
+            path: ../../wfrender/config/default/chart_accumulator.yaml
+            variables:
+                slice: day
+                span: 31
+    accu_365d_w: !service
+        name: accu_365d_w
+        instance:  !include
+            path: ../../wfrender/config/default/chart_accumulator.yaml
+            variables:
+                slice: week
+                span: 60
+    accu_365d_m: !service
+        name: accu_365d_m
+        instance: !include
+            path: ../../wfrender/config/default/table_accumulator.yaml
+            variables:
+                slice: month
+                span: 12
+
+input: !service
+    name: events  # Use embedded wfdriver to receive events
+    instance: !function {}
+
+collector: !multi
+    children:
+        aggregator : !buffer
+            period: 600
+            collector: !aggregator
+                storage : !service
+                    name: storage
+        current : !flush
+            period: 10
+            collector: !user
+                choices:
+                    root: !xmlfile
+                        path: /var/lib/wfrog/wfrog-current.xml
+                        storage : !service
+                            name: storage
+                    default: !xmlfile
+                        path: data/wfrog-current.xml
+                        storage : !service
+                            name: storage
+
+embed:
+    wfdriver: { config: ../../wfdriver/config/embedded.yaml }
+    wfrender: { config: ../../wfrender/config/embedded.yaml }
+
+logging:
+    level: info
+    handlers:
+        default:
+            level: debug
+            handler: !include
+                path: ../../wfcommon/config/loghandler.yaml
+                variables:
+                    process: wfrog
+        #mail:
+        #    level: critical
+        #    handler: !include
+        #        path: ../../wfcommon/config/mailloghandler.yaml

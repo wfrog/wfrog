@@ -1,0 +1,127 @@
+source: !accumulator
+    slice: $slice
+    span: $span
+    storage: !service
+        name: storage
+    formulas:
+        temp:
+            avg: !avg { index: temp }
+            min: !min { index: temp }
+            max: !max { index: temp }
+            ## Uncomment to use windchill and / or humidex in temperature chart (modify also charts.yaml)
+            #wind_chill: !windchill { index: [temp, wind_gust] }
+            #humidex: !humidex { index: [temp, hum] }
+        ## Uncomment to display tempint (modify also charts.yaml)
+        #tempint:
+        #    avg: !avg { index: tempint }
+        #    min: !min { index: tempint }
+        #    max: !max { index: tempint }
+        ## Uncomment to display temp2 (modify also charts.yaml)
+        #temp2:
+        #    avg: !avg { index: temp2 }
+        #    min: !min { index: temp2 }
+        #    max: !max { index: temp2 }
+        ## Uncomment to display temp3 (modify also charts.yaml)
+        #temp3:
+        #    avg: !avg { index: temp3 }
+        #    min: !min { index: temp3 }
+        #    max: !max { index: temp3 }
+        ## Uncomment to display temp4 (modify also charts.yaml)
+        #temp4:
+        #    avg: !avg { index: temp4 }
+        #    min: !min { index: temp4 }
+        #    max: !max { index: temp4 }
+        ## Uncomment to display temp5 (modify also charts.yaml)
+        #temp5:
+        #    avg: !avg { index: temp5 }
+        #    min: !min { index: temp5 }
+        #    max: !max { index: temp5 }
+        ## Uncomment to display temp6  (modify also charts.yaml)
+        #temp6:
+        #    avg: !avg { index: temp6 }
+        #    min: !min { index: temp6 }
+        #    max: !max { index: temp6 }
+        ## Uncomment to display temp7 (modify also charts.yaml)
+        #temp7:
+        #    avg: !avg { index: temp7 }
+        #    min: !min { index: temp7 }
+        #    max: !max { index: temp7 }
+        ## Uncomment to display temp8 (modify also charts.yaml)
+        #temp8:
+        #    avg: !avg { index: temp8 }
+        #    min: !min { index: temp8 }
+        #    max: !max { index: temp8 }
+        ## Uncomment to display temp9 (modify also charts.yaml)
+        #temp9:
+        #    avg: !avg { index: temp9 }
+        #    min: !min { index: temp9 }
+        #    max: !max { index: temp9 }
+        dew:
+            avg: !avg { index: dew_point }
+        hum: 
+            avg: !avg { index: hum }
+            min: !min { index: hum }
+            max: !max { index: hum }
+        ## Uncomment to display humint (modify also charts.yaml)
+        #humint: 
+        #    avg: !avg { index: humint }
+        #    min: !min { index: humint }
+        #    max: !max { index: humint }
+        ## Uncomment to display hum2 (modify also charts.yaml)
+        #hum2: 
+        #    avg: !avg { index: hum2 }
+        #    min: !min { index: hum2 }
+        #    max: !max { index: hum2 }
+        ## Uncomment to display hum3 (modify also charts.yaml)
+        #hum3: 
+        #    avg: !avg { index: hum3 }
+        #    min: !min { index: hum3 }
+        #    max: !max { index: hum3 }
+        ## Uncomment to display hum4 (modify also charts.yaml)
+        #hum4: 
+        #    avg: !avg { index: hum4 }
+        #    min: !min { index: hum4 }
+        #    max: !max { index: hum4 }
+        ## Uncomment to display hum5 (modify also charts.yaml)
+        #hum5: 
+        #    avg: !avg { index: hum5 }
+        #    min: !min { index: hum5 }
+        #    max: !max { index: hum5 }
+        ## Uncomment to display hum6 (modify also charts.yaml)
+        #hum6: 
+        #    avg: !avg { index: hum6 }
+        #    min: !min { index: hum6 }
+        #    max: !max { index: hum6 }
+        ## Uncomment to display hum7 (modify also charts.yaml)
+        #hum7: 
+        #    avg: !avg { index: hum7 }
+        #    min: !min { index: hum7 }
+        #    max: !max { index: hum7 }
+        ## Uncomment to display hum8 (modify also charts.yaml)
+        #hum8: 
+        #    avg: !avg { index: hum8 }
+        #    min: !min { index: hum8 }
+        #    max: !max { index: hum8 }
+        ## Uncomment to display hum9 (modify also charts.yaml)
+        #hum9: 
+        #    avg: !avg { index: hum9 }
+        #    min: !min { index: hum9 }
+        #    max: !max { index: hum9 }
+        press: 
+            avg: !avg { index: pressure }
+            min: !min { index: pressure }
+            max: !max { index: pressure }
+        wind: 
+            avg: !avg { index: wind }
+            max: !max { index: wind_gust }
+            'deg,dir' : !predominant { index: wind }
+        sectors:
+            avg: !sector-avg { index: wind }
+            max: !sector-max { index: wind_gust }
+            freq: !sector-freq { index: wind }
+        rain:
+            rate: !max { index: rain_rate }
+            fall: !sum { index: rain }
+        uv:
+            index: !max { index: uv_index }
+

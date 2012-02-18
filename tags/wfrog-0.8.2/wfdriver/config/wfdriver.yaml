@@ -1,0 +1,19 @@
+station: !${settings.station.driver} { }
+#    port: /dev/ttyS1
+
+#output: !http-out { url: 'http://localhost:8888/' }
+output: !stdio-out {}
+
+logging:
+    level: debug
+    handlers:
+        default:
+            handler: !include
+                path: ../../wfcommon/config/loghandler.yaml
+                variables:
+                    process: wfdriver
+        #mail:
+        #    level: critical
+        #    handler: !include
+        #        path: ../../wfcommon/config/mailloghandler.yaml
+
