@@ -15,8 +15,7 @@
     * additional sensors
  * Interior temp and hum now allow units configuration.
  * Fix barometer overflow in WMRS200 driver.
- * Several fixes in WMRS200 driver to improve data reporting and error
-management.
+ * Several fixes in WMRS200 driver to improve data reporting and error management.
 
 Upgrade notes: If you have customized your configuration: in order to
 have the new settings take effect, you have to upgrade the wfdriver
