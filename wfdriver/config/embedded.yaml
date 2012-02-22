@@ -1,5 +1,8 @@
 station: !${settings.station.driver} { }
+
+#station: !${settings.station.driver} 
 #    port: /dev/ttyS1
+#    pressure_cal: -8
 
 output: !service { name: events }
 
