@@ -139,12 +139,12 @@ class AggregatorCollector(base.BaseCollector):
             if len(self._temp[sensor]) > 0:
                 data[tsn] = round(sum(self._temp[sensor])/len(self._temp[sensor]), 1)
             elif sensor == MAIN_TH_SENSOR:
-                self.logger.warning('Missing temperature data')
+                self.logger.warning('Missing temperature data from main sensor')
 
-            if len(self._temp[sensor]) > 0:
+            if len(self._hum[sensor]) > 0:
                 data[hsn] = round(sum(self._hum[sensor])/len(self._hum[sensor]), 1)
             elif sensor == MAIN_TH_SENSOR:
-                self.logger.warning('Missing humidity data')
+                self.logger.warning('Missing humidity data from main sensor')
 
         if len(self._wind) > 0:
             data['wind'] = round(sum(self._wind)/len(self._wind), 1)
