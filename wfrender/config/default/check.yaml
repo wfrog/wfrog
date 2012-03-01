@@ -21,8 +21,8 @@ renderer: !template
                             min: !min { index: hum }
                             max: !max { index: hum }
                         press: 
-                            min: !avg { index: pressure }
-                            max: !avg { index: pressure }
+                            min: !min { index: pressure }
+                            max: !max { index: pressure }
                             count: !count { index: pressure }
                         wind: 
                             max: !max { index: wind_gust }
