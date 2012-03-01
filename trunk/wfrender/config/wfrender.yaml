@@ -120,12 +120,10 @@ renderer: !multi
                 check: !include
                     path: default/check.yaml
                 ## Uncomment to activate www.meteoclimatic.com http publisher
-                #meteoclimatic.txt: !file
-                #    path: /tmp/meteoclimatic.txt.txt
-                #    renderer: !meteoclimatic
-                #        id: STATION_ID 
-                #        storage: !service
-                #            name: storage
+                #meteoclimatic.txt: !meteoclimatic
+                #    id: STATION_ID 
+                #    storage: !service
+                #        name: storage
 
 logging:
     level: info
