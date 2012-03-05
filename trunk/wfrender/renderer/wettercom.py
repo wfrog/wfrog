@@ -112,16 +112,26 @@ class WetterComPublisher(object):
                             args['test'] = "false"
 
                         self.logger.debug("Publishing wettercom data: %s " % urlencode(args))
-
                         response = self._publish(args, 'www.wetterarchiv.de', '/interface/http/input.php')
 
                         # Split response to determine if the request was ok or not.
                         answer = response[2].split('=')
 
-                        if (answer[1] == 'SUCCESS&') or (answer[5] == 'SUCCESS&'):
-                            self.logger.info('Data published successfully')
+			allOk = False
+			try:
+                            if (answer[1] == 'SUCCESS&'):
+			        allOk=True                                
+			except:
+			    if (answer[5] == 'SUCCESS&'):
+                                allOk=True
+
+			if allOk:
+			    self.logger.info('Data published successfully')
                         else:
-                            self.logger.error('Data publishing fails! Response: %s' % answer[5])
+			    try:
+                                self.logger.error('Data publishing fails! Response: %s' % answer[5])
+			    except:
+				self.logger.error('Data publishing fails! Response: %s' % answer[2])
 
                         self.logger.debug('Publish-data: %s Status: %s Answer: %s' % response)
 
