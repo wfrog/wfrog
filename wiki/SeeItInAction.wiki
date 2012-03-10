@@ -13,7 +13,7 @@ Users are invited to submit as comment to this page the URL of their stations to
 ||
 || [http://mazonovo.meteoviedo.es/ Taramundi, Asturias, Spain] || WMRS200 || Uses FTP renderer. Uploads online data to www.meteoclimatic.com ||
 || [http://lode-hermsdorf.dyndns.org Hermsdorf, Upper Lusatia, Germany] || WMRS200 || Uses HTTP renderer. Running on Alix1d with Ubuntu 10.04 ||
-|| [http://s2.webcf.de/meteo/ Ermsleben, Saxony Anhalt, Germany] || WMRS200 || Uses HTTP and [http://www.wetter.com/community/wetternetzwerk/station/wettermeldungen/?uid=5454 Wetter.com] renderer. ||
+|| [http://s2.webcf.de/meteo/ Ermsleben, Saxony Anhalt, Germany] || WMRS200 || Uses HTTP and [http://www.wetter.com/wetter_aktuell/wetternetzwerk/station/5454/wetterdaten/ Wetter.com] renderer. ||
 || [http://www.patraslive.gr/weather/kastelokampos/24hours.html Kastelokampos, Patras, Greece] || WMR100N || Uses FTP renderer. ||
 || [http://galile0.co.uk:7680/ Preston, Lancashire, England] || H1080 || Uses Http renderer. Running on a Qnap TS210. ||
 || [http://v.pk2.se/ Växjö, S. Sweden] || [http://www.oregonscientific.com.au/ulimages/manuals2/WMR928NX.pdf WMR928NX] || Uses FTP renderer. Running on NSLU2 with Debian. [http://www.pk2.se/wfrog/gardsby-weather-station.htm More] ||
