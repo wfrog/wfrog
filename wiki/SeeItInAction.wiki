@@ -18,5 +18,9 @@ Users are invited to submit as comment to this page the URL of their stations to
 || [http://galile0.co.uk:7680/ Preston, Lancashire, England] || H1080 || Uses Http renderer. Running on a Qnap TS210. ||
 || [http://v.pk2.se/ Växjö, S. Sweden] || [http://www.oregonscientific.com.au/ulimages/manuals2/WMR928NX.pdf WMR928NX] || Uses FTP renderer. Running on NSLU2 with Debian. [http://www.pk2.se/wfrog/gardsby-weather-station.htm More] ||
 || [http://meteosonrebassa.webgratis.cat/24hours.html Sant Joan, Mallorca, Balearic Islands] || Oregon WMRS200 || Uses FTP renderer. Running on [http://www.pcengines.ch/alix.htm ALIX3D2] with [http://linux.voyage.hk/ voyage linux] 0.8. Uploads online data to www.meteoclimatic.com ||
+|| [http://lode-hermsdorf.dyndns.org Hermsdorf, Upper Lusatia, Germany] || Oregon WMRS200 || Uses HTTP renderer. Runnning on [http://www.pcengines.ch/alix.htm ALIX1D] with ubuntu 10.04 ||
+|| [http://metmediona.dyndns.org/ Mediona, (Barcelona, Spain)] ||  ||  Uses HTTP renderer. Running on a foxconn NT425 with Ubuntu ||
+|| [http://weather.eckeroth.se/ Falsterbo, Sweden] || Oregon WMRS200 ||  Uses HTTP renderer. Running on a QNAP 659-PRO NAS. ||
+|| [http://www.warmsky.info/wfrog/ Beregovoe, Crimea, Ukraine] || WMRS200 || Uses HTTP renderer ||
 
 <p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
