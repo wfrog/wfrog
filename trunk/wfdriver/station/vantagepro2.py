@@ -20,7 +20,6 @@ import time
 import logging
 from wfcommon import units
 import struct
-import serial
 import array
 
 class VantageProStation(object):
@@ -64,6 +63,7 @@ class VantageProStation(object):
 
 
     def run(self, generate_event, send_event, context={}):
+        import serial
 
         _LoopStruct = LoopStruct(self.rain_bucket)
 
