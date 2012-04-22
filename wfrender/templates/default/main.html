@@ -417,6 +417,20 @@ $u
 
     <div id="charts">
     <div>
+        #if $chart.has_key("tempint")
+        <div class="bordered cell graph" style="clear: both">
+            <div class="leftCell">Inside Temperature</div><div class="units">&deg;$unitstr('temp',$units.temp)</div>
+            <div><img src="$chart.tempint"/></div>
+        </div>
+        #end if
+        #if $chart.has_key("humint")
+        <div class="bordered cell graph">
+            <div class="leftCell">Inside Humidity</div><div class="units">%</div>
+            <div><img src="$chart.humint"/></div>
+        </div>
+        #end if
+    </div>
+    <div>
         <div class="bordered cell graph" style="clear: both">
             <div class="leftCell">Temperature and Dew Point</div><div class="units">&deg;$unitstr('temp',$units.temp)</div>
             <div><img src="$chart.temp"/></div>
@@ -429,6 +443,118 @@ $u
            <div class="leftCell">Pressure</div><div class="units">$unitstr('press',$units.press)</div>
             <div><img src="$chart.press"/></div>
         </div>
+    </div>
+    <div>
+        #if $chart.has_key("temp2")
+        <div class="bordered cell graph" style="clear: both">
+            <div class="leftCell">Temperature (sensor 2)</div><div class="units">&deg;$unitstr('temp',$units.temp)</div>
+            <div><img src="$chart.temp2"/></div>
+        </div>
+        #end if
+        #if $chart.has_key("hum2")
+        <div class="bordered cell graph">
+            <div class="leftCell">Humidity (sensor 2)</div><div class="units">%</div>
+            <div><img src="$chart.hum2"/></div>
+        </div>
+        #end if
+    </div>
+    <div>
+        #if $chart.has_key("temp3")
+        <div class="bordered cell graph" style="clear: both">
+            <div class="leftCell">Temperature (sensor 3)</div><div class="units">&deg;$unitstr('temp',$units.temp)</div>
+            <div><img src="$chart.temp3"/></div>
+        </div>
+        #end if
+        #if $chart.has_key("hum3")
+        <div class="bordered cell graph">
+            <div class="leftCell">Humidity (sensor 3)</div><div class="units">%</div>
+            <div><img src="$chart.hum3"/></div>
+        </div>
+        #end if
+    </div>
+    <div>
+        #if $chart.has_key("temp4")
+        <div class="bordered cell graph" style="clear: both">
+            <div class="leftCell">Temperature (sensor 4)</div><div class="units">&deg;$unitstr('temp',$units.temp)</div>
+            <div><img src="$chart.temp4"/></div>
+        </div>
+        #end if
+        #if $chart.has_key("hum4")
+        <div class="bordered cell graph">
+            <div class="leftCell">Humidity (sensor 4)</div><div class="units">%</div>
+            <div><img src="$chart.hum4"/></div>
+        </div>
+        #end if
+    </div>
+    <div>
+        #if $chart.has_key("temp5")
+        <div class="bordered cell graph" style="clear: both">
+            <div class="leftCell">Temperature (sensor 5)</div><div class="units">&deg;$unitstr('temp',$units.temp)</div>
+            <div><img src="$chart.temp5"/></div>
+        </div>
+        #end if
+        #if $chart.has_key("hum5")
+        <div class="bordered cell graph">
+            <div class="leftCell">Humidity (sensor 5)</div><div class="units">%</div>
+            <div><img src="$chart.hum5"/></div>
+        </div>
+        #end if
+    </div>
+    <div>
+        #if $chart.has_key("temp6")
+        <div class="bordered cell graph" style="clear: both">
+            <div class="leftCell">Temperature (sensor 6)</div><div class="units">&deg;$unitstr('temp',$units.temp)</div>
+            <div><img src="$chart.temp6"/></div>
+        </div>
+        #end if
+        #if $chart.has_key("hum6")
+        <div class="bordered cell graph">
+            <div class="leftCell">Humidity (sensor 6)</div><div class="units">%</div>
+            <div><img src="$chart.hum6"/></div>
+        </div>
+        #end if
+    </div>
+    <div>
+        #if $chart.has_key("temp7")
+        <div class="bordered cell graph" style="clear: both">
+            <div class="leftCell">Temperature (sensor 7)</div><div class="units">&deg;$unitstr('temp',$units.temp)</div>
+            <div><img src="$chart.temp7"/></div>
+        </div>
+        #end if
+        #if $chart.has_key("hum7")
+        <div class="bordered cell graph">
+            <div class="leftCell">Humidity (sensor 7)</div><div class="units">%</div>
+            <div><img src="$chart.hum7"/></div>
+        </div>
+        #end if
+    </div>
+    <div>
+        #if $chart.has_key("temp8")
+        <div class="bordered cell graph" style="clear: both">
+            <div class="leftCell">Temperature (sensor 8)</div><div class="units">&deg;$unitstr('temp',$units.temp)</div>
+            <div><img src="$chart.temp8"/></div>
+        </div>
+        #end if
+        #if $chart.has_key("hum8")
+        <div class="bordered cell graph">
+            <div class="leftCell">Humidity (sensor 8)</div><div class="units">%</div>
+            <div><img src="$chart.hum8"/></div>
+        </div>
+        #end if
+    </div>
+    <div>
+        #if $chart.has_key("temp9")
+        <div class="bordered cell graph" style="clear: both">
+            <div class="leftCell">Temperature (sensor 9)</div><div class="units">&deg;$unitstr('temp',$units.temp)</div>
+            <div><img src="$chart.temp9"/></div>
+        </div>
+        #end if
+        #if $chart.has_key("hum9")
+        <div class="bordered cell graph">
+            <div class="leftCell">Humidity (sensor 9)</div><div class="units">%</div>
+            <div><img src="$chart.hum9"/></div>
+        </div>
+        #end if
     </div>
     <div>
         <div class="bordered cell graph" style="clear: both">
@@ -449,10 +575,12 @@ $u
             <div class="leftCell">Rain rate</div><div class="units">$unitstr('rain',$units.rain)/h</div>
             <div><img src="$chart.rain_rate"/></div>
         </div>
+        #if $chart.has_key("uv")        
         <div class="bordered cell graph">
             <div class="leftCell">UV Index</div><br/>
             <div><img src="$chart.uv"/></div>
         </div>
+        #end if
     </div>
     </div>
     <div class="bordered cell graph" style="clear: both; display: none;" id="details">
@@ -460,23 +588,226 @@ $u
 #set $indexes = $summary.keys()
 #silent $indexes.sort()
 #silent $indexes.reverse()
-${"%s      Temp. %s         Humidity %%     Pressure %s       Rain %s         Wind %s       UV     " % (
-  " " * len($indexes[0]),
-  $unitstr('temp',$units.temp).rstrip(), 
+#set $value = $summary[$indexes[0]]
+${" " * len($indexes[0])}#slurp
+#if $value.has_key("tempint_max")
+${"   Temp. Inside %s " % $unitstr('temp',$units.temp).rstrip()}#slurp
+#end if
+#if $value.has_key("humint_max")
+${"    Hum. Ins.% "}#slurp
+#end if
+${"      Temp. %s     " % $unitstr('temp',$units.temp).rstrip()}#slurp
+${"    Humidity % "}#slurp
+#if $value.has_key("temp2_max")
+${"     Temp. 2 %s    " % $unitstr('temp',$units.temp).rstrip()}#slurp
+#end if
+#if $value.has_key("hum2_max")
+${"   Humidity 2 %"}#slurp
+#end if
+#if $value.has_key("temp3_max")
+${"     Temp. 3 %s    " % $unitstr('temp',$units.temp).rstrip()}#slurp
+#end if
+#if $value.has_key("hum3_max")
+${"   Humidity 3 %"}#slurp
+#end if
+#if $value.has_key("temp4_max")
+${"     Temp. 4 %s    " % $unitstr('temp',$units.temp).rstrip()}#slurp
+#end if
+#if $value.has_key("hum4_max")
+${"   Humidity 4 %"}#slurp
+#end if
+#if $value.has_key("temp5_max")
+${"     Temp. 5 %s    " % $unitstr('temp',$units.temp).rstrip()}#slurp
+#end if
+#if $value.has_key("hum5_max")
+${"   Humidity 5 %"}#slurp
+#end if
+#if $value.has_key("temp6_max")
+${"     Temp. 6 %s    " % $unitstr('temp',$units.temp).rstrip()}#slurp
+#end if
+#if $value.has_key("hum6_max")
+${"   Humidity 6 %"}#slurp
+#end if
+#if $value.has_key("temp7_max")
+${"     Temp. 7 %s    " % $unitstr('temp',$units.temp).rstrip()}#slurp
+#end if
+#if $value.has_key("hum7_max")
+${"   Humidity 7 %"}#slurp
+#end if
+#if $value.has_key("temp8_max")
+${"     Temp. 8 %s    " % $unitstr('temp',$units.temp).rstrip()}#slurp
+#end if
+#if $value.has_key("hum8_max")
+${"   Humidity 8 %"}#slurp
+#end if
+#if $value.has_key("temp9_max")
+${"     Temp. 9 %s    " % $unitstr('temp',$units.temp).rstrip()}#slurp
+#end if
+#if $value.has_key("hum9_max")
+${"   Humidity 9 %"}#slurp
+#end if
+${"    Pressure %s       Rain %s         Wind %s       UV     " % (
   $unitstr('press',$units.press).rstrip(), 
   $unitstr('rain',$units.rain).rstrip(),  
   $unitstr('wind',$units.wind).rstrip() ) }
-${"%s   max   min   avg  max  min  avg   max   min   avg   fall   rate    avg    max  dir" % (" " * len($indexes[0]))}
+${" " * len($indexes[0])}#slurp
+#if $value.has_key("tempint_max")
+${"   max   min   avg"}#slurp
+#end if
+#if $value.has_key("humint_max")
+${"  max  min  avg"}#slurp
+#end if
+${"   max   min   avg"}#slurp
+${"  max  min  avg"}#slurp
+#if $value.has_key("temp2_max")
+${"   max   min   avg"}#slurp
+#end if
+#if $value.has_key("hum2_max")
+${"  max  min  avg"}#slurp
+#end if
+#if $value.has_key("temp3_max")
+${"   max   min   avg"}#slurp
+#end if
+#if $value.has_key("hum3_max")
+${"  max  min  avg"}#slurp
+#end if
+#if $value.has_key("temp4_max")
+${"   max   min   avg"}#slurp
+#end if
+#if $value.has_key("hum4_max")
+${"  max  min  avg"}#slurp
+#end if
+#if $value.has_key("temp5_max")
+${"   max   min   avg"}#slurp
+#end if
+#if $value.has_key("hum5_max")
+${"  max  min  avg"}#slurp
+#end if
+#if $value.has_key("temp6_max")
+${"   max   min   avg"}#slurp
+#end if
+#if $value.has_key("hum6_max")
+${"  max  min  avg"}#slurp
+#end if
+#if $value.has_key("temp7_max")
+${"   max   min   avg"}#slurp
+#end if
+#if $value.has_key("hum7_max")
+${"  max  min  avg"}#slurp
+#end if
+#if $value.has_key("temp8_max")
+${"   max   min   avg"}#slurp
+#end if
+#if $value.has_key("hum8_max")
+${"  max  min  avg"}#slurp
+#end if
+#if $value.has_key("temp9_max")
+${"   max   min   avg"}#slurp
+#end if
+#if $value.has_key("hum9_max")
+${"  max  min  avg"}#slurp
+#end if
+${"   max   min   avg   fall   rate    avg    max  dir"}
 #for $index in $indexes
 #set $value = $summary[$index]
 #if $value.temp_max != None or $value.hum_max != None or $value.press_max != None or $value.rain_fall != None or $value.wind_avg != None
 ${"%s" % $index}#slurp
+#if $value.has_key("tempint_max")
+${"%6.1f" % $value.tempint_max if $value.tempint_max != None else "     -"}#slurp
+${"%6.1f" % $value.tempint_min if $value.tempint_min != None else "     -"}#slurp
+${"%6.1f" % $value.tempint_avg if $value.tempint_avg != None else "     -"}#slurp
+#end if
+#if $value.has_key("humint_max")
+${"%4.0f%%" % $value.humint_max if $value.humint_max != None else "   - "}#slurp
+${"%4.0f%%" % $value.humint_min if $value.humint_min != None else "   - "}#slurp
+${"%4.0f%%" % $value.humint_avg if $value.humint_avg != None else "   - "}#slurp
+#end if
 ${"%6.1f" % $value.temp_max if $value.temp_max != None else "     -"}#slurp
 ${"%6.1f" % $value.temp_min if $value.temp_min != None else "     -"}#slurp
 ${"%6.1f" % $value.temp_avg if $value.temp_avg != None else "     -"}#slurp
 ${"%4.0f%%" % $value.hum_max if $value.hum_max != None else "   - "}#slurp
 ${"%4.0f%%" % $value.hum_min if $value.hum_min != None else "   - "}#slurp
 ${"%4.0f%%" % $value.hum_avg if $value.hum_avg != None else "   - "}#slurp
+#if $value.has_key("temp2_max")
+${"%6.1f" % $value.temp2_max if $value.temp2_max != None else "     -"}#slurp
+${"%6.1f" % $value.temp2_min if $value.temp2_min != None else "     -"}#slurp
+${"%6.1f" % $value.temp2_avg if $value.temp2_avg != None else "     -"}#slurp
+#end if
+#if $value.has_key("hum2_max")
+${"%4.0f%%" % $value.hum2_max if $value.hum2_max != None else "   - "}#slurp
+${"%4.0f%%" % $value.hum2_min if $value.hum2_min != None else "   - "}#slurp
+${"%4.0f%%" % $value.hum2_avg if $value.hum2_avg != None else "   - "}#slurp
+#end if
+#if $value.has_key("temp3_max")
+${"%6.1f" % $value.temp3_max if $value.temp3_max != None else "     -"}#slurp
+${"%6.1f" % $value.temp3_min if $value.temp3_min != None else "     -"}#slurp
+${"%6.1f" % $value.temp3_avg if $value.temp3_avg != None else "     -"}#slurp
+#end if
+#if $value.has_key("hum3_max")
+${"%4.0f%%" % $value.hum3_max if $value.hum3_max != None else "   - "}#slurp
+${"%4.0f%%" % $value.hum3_min if $value.hum3_min != None else "   - "}#slurp
+${"%4.0f%%" % $value.hum3_avg if $value.hum3_avg != None else "   - "}#slurp
+#end if
+#if $value.has_key("temp4_max")
+${"%6.1f" % $value.temp4_max if $value.temp4_max != None else "     -"}#slurp
+${"%6.1f" % $value.temp4_min if $value.temp4_min != None else "     -"}#slurp
+${"%6.1f" % $value.temp4_avg if $value.temp4_avg != None else "     -"}#slurp
+#end if
+#if $value.has_key("hum4_max")
+${"%4.0f%%" % $value.hum4_max if $value.hum4_max != None else "   - "}#slurp
+${"%4.0f%%" % $value.hum4_min if $value.hum4_min != None else "   - "}#slurp
+${"%4.0f%%" % $value.hum4_avg if $value.hum4_avg != None else "   - "}#slurp
+#end if
+#if $value.has_key("temp5_max")
+${"%6.1f" % $value.temp5_max if $value.temp5_max != None else "     -"}#slurp
+${"%6.1f" % $value.temp5_min if $value.temp5_min != None else "     -"}#slurp
+${"%6.1f" % $value.temp5_avg if $value.temp5_avg != None else "     -"}#slurp
+#end if
+#if $value.has_key("hum5_max")
+${"%4.0f%%" % $value.hum5_max if $value.hum5_max != None else "   - "}#slurp
+${"%4.0f%%" % $value.hum5_min if $value.hum5_min != None else "   - "}#slurp
+${"%4.0f%%" % $value.hum5_avg if $value.hum5_avg != None else "   - "}#slurp
+#end if
+#if $value.has_key("temp6_max")
+${"%6.1f" % $value.temp6_max if $value.temp6_max != None else "     -"}#slurp
+${"%6.1f" % $value.temp6_min if $value.temp6_min != None else "     -"}#slurp
+${"%6.1f" % $value.temp6_avg if $value.temp6_avg != None else "     -"}#slurp
+#end if
+#if $value.has_key("hum6_max")
+${"%4.0f%%" % $value.hum6_max if $value.hum6_max != None else "   - "}#slurp
+${"%4.0f%%" % $value.hum6_min if $value.hum6_min != None else "   - "}#slurp
+${"%4.0f%%" % $value.hum6_avg if $value.hum6_avg != None else "   - "}#slurp
+#end if
+#if $value.has_key("temp7_max")
+${"%6.1f" % $value.temp7_max if $value.temp7_max != None else "     -"}#slurp
+${"%6.1f" % $value.temp7_min if $value.temp7_min != None else "     -"}#slurp
+${"%6.1f" % $value.temp7_avg if $value.temp7_avg != None else "     -"}#slurp
+#end if
+#if $value.has_key("hum7_max")
+${"%4.0f%%" % $value.hum7_max if $value.hum7_max != None else "   - "}#slurp
+${"%4.0f%%" % $value.hum7_min if $value.hum7_min != None else "   - "}#slurp
+${"%4.0f%%" % $value.hum7_avg if $value.hum7_avg != None else "   - "}#slurp
+#end if
+#if $value.has_key("temp8_max")
+${"%6.1f" % $value.temp8_max if $value.temp8_max != None else "     -"}#slurp
+${"%6.1f" % $value.temp8_min if $value.temp8_min != None else "     -"}#slurp
+${"%6.1f" % $value.temp8_avg if $value.temp8_avg != None else "     -"}#slurp
+#end if
+#if $value.has_key("hum8_max")
+${"%4.0f%%" % $value.hum8_max if $value.hum8_max != None else "   - "}#slurp
+${"%4.0f%%" % $value.hum8_min if $value.hum8_min != None else "   - "}#slurp
+${"%4.0f%%" % $value.hum8_avg if $value.hum8_avg != None else "   - "}#slurp
+#end if
+#if $value.has_key("temp9_max")
+${"%6.1f" % $value.temp9_max if $value.temp9_max != None else "     -"}#slurp
+${"%6.1f" % $value.temp9_min if $value.temp9_min != None else "     -"}#slurp
+${"%6.1f" % $value.temp9_avg if $value.temp9_avg != None else "     -"}#slurp
+#end if
+#if $value.has_key("hum9_max")
+${"%4.0f%%" % $value.hum9_max if $value.hum9_max != None else "   - "}#slurp
+${"%4.0f%%" % $value.hum9_min if $value.hum9_min != None else "   - "}#slurp
+${"%4.0f%%" % $value.hum9_avg if $value.hum9_avg != None else "   - "}#slurp
+#end if
 ${"%6.0f" % $value.press_max if $value.press_max != None else "     -"}#slurp
 ${"%6.0f" % $value.press_min if $value.press_min != None else "     -"}#slurp 
 ${"%6.0f" % $value.press_avg if $value.press_avg != None else "     -"}#slurp 
@@ -485,7 +816,10 @@ ${"%7.1f" % $value.rain_rate if $value.rain_rate != None else "      -"}#slurp
 ${"%7.1f" % $value.wind_avg if $value.wind_avg != None else "      -"}#slurp
 ${"%7.1f" % $value.wind_max if $value.wind_max != None else "      -"}#slurp
 ${"%5s" % $value.wind_dir  if $value.wind_dir != None else "    -"}#slurp
-${"%5d" % $value.uv_index  if $value.uv_index != None else "    -"}
+#if $value.has_key("uv_index")
+${"%5d" % $value.uv_index  if $value.uv_index != None else "    -"}#slurp
+#end if
+
 #end if
 #end for
     </pre></div>

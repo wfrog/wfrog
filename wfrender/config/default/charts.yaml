@@ -1,5 +1,20 @@
 renderer: !multi
     children:
+        ## Uncomment to display tempint (modify also chart_accumulator.yaml)
+        #tempint: !chart
+        #    interpolate: $interpolate
+        #    series:
+        #        tempint.max:
+        #            color: wheat
+        #            area: { to: tempint.min }
+        #            max: { color: darkred, text: darkred, thickness: 0.5 }
+        #        tempint.avg:
+        #            order: 1
+        #        tempint.min:
+        #            color: wheat
+        #            min: { color: darkslateblue, text: darkslateblue, thickness: 0.5 }
+        #    labels: tempint.lbl
+        #    zero: { color: 8D7641, thickness: 0.5 }
         temp: !chart
             interpolate: $interpolate
             series:
@@ -29,12 +44,195 @@ renderer: !multi
                     dash: 2
             labels: temp.lbl
             zero: { color: 8D7641, thickness: 0.5 }
+        ## Uncomment to display temp2 (modify also chart_accumulator.yaml)
+        #temp2: !chart
+        #    interpolate: $interpolate
+        #    series:
+        #        temp2.max:
+        #            color: wheat
+        #            area: { to: temp2.min }
+        #            max: { color: darkred, text: darkred, thickness: 0.5 }
+        #        temp2.avg:
+        #            order: 1
+        #        temp2.min:
+        #            color: wheat
+        #            min: { color: darkslateblue, text: darkslateblue, thickness: 0.5 }
+        #    labels: temp2.lbl
+        #    zero: { color: 8D7641, thickness: 0.5 }
+        ## Uncomment to display temp3 (modify also chart_accumulator.yaml)
+        #temp3: !chart
+        #    interpolate: $interpolate
+        #    series:
+        #        temp3.max:
+        #            color: wheat
+        #            area: { to: temp3.min }
+        #            max: { color: darkred, text: darkred, thickness: 0.5 }
+        #        temp3.avg:
+        #            order: 1
+        #        temp3.min:
+        #            color: wheat
+        #            min: { color: darkslateblue, text: darkslateblue, thickness: 0.5 }
+        #    labels: temp3.lbl
+        #    zero: { color: 8D7641, thickness: 0.5 }
+        ## Uncomment to display temp4 (modify also chart_accumulator.yaml)
+        #temp4: !chart
+        #    interpolate: $interpolate
+        #    series:
+        #        temp4.max:
+        #            color: wheat
+        #            area: { to: temp4.min }
+        #            max: { color: darkred, text: darkred, thickness: 0.5 }
+        #        temp4.avg:
+        #            order: 1
+        #        temp4.min:
+        #            color: wheat
+        #            min: { color: darkslateblue, text: darkslateblue, thickness: 0.5 }
+        #    labels: temp4.lbl
+        #    zero: { color: 8D7641, thickness: 0.5 }
+        ## Uncomment to display temp5 (modify also chart_accumulator.yaml)
+        #temp5: !chart
+        #    interpolate: $interpolate
+        #    series:
+        #        temp5.max:
+        #            color: wheat
+        #            area: { to: temp5.min }
+        #            max: { color: darkred, text: darkred, thickness: 0.5 }
+        #        temp5.avg:
+        #            order: 1
+        #        temp5.min:
+        #            color: wheat
+        #            min: { color: darkslateblue, text: darkslateblue, thickness: 0.5 }
+        #    labels: temp5.lbl
+        #    zero: { color: 8D7641, thickness: 0.5 }
+        ## Uncomment to display temp6 (modify also chart_accumulator.yaml)
+        #temp6: !chart
+        #    interpolate: $interpolate
+        #    series:
+        #        temp6.max:
+        #            color: wheat
+        #            area: { to: temp6.min }
+        #            max: { color: darkred, text: darkred, thickness: 0.5 }
+        #        temp6.avg:
+        #            order: 1
+        #        temp6.min:
+        #            color: wheat
+        #            min: { color: darkslateblue, text: darkslateblue, thickness: 0.5 }
+        #    labels: temp6.lbl
+        #    zero: { color: 8D7641, thickness: 0.5 }
+        ## Uncomment to display temp7 (modify also chart_accumulator.yaml)
+        #temp7: !chart
+        #    interpolate: $interpolate
+        #    series:
+        #        temp7.max:
+        #            color: wheat
+        #            area: { to: temp7.min }
+        #            max: { color: darkred, text: darkred, thickness: 0.5 }
+        #        temp7.avg:
+        #            order: 1
+        #        temp7.min:
+        #            color: wheat
+        #            min: { color: darkslateblue, text: darkslateblue, thickness: 0.5 }
+        #    labels: temp7.lbl
+        #    zero: { color: 8D7641, thickness: 0.5 }
+        ## Uncomment to display temp8 (modify also chart_accumulator.yaml)
+        #temp8: !chart
+        #    interpolate: $interpolate
+        #    series:
+        #        temp8.max:
+        #            color: wheat
+        #            area: { to: temp8.min }
+        #            max: { color: darkred, text: darkred, thickness: 0.5 }
+        #        temp8.avg:
+        #            order: 1
+        #        temp8.min:
+        #            color: wheat
+        #            min: { color: darkslateblue, text: darkslateblue, thickness: 0.5 }
+        #    labels: temp8.lbl
+        #    zero: { color: 8D7641, thickness: 0.5 }
+        ## Uncomment to display temp9 (modify also chart_accumulator.yaml)
+        #temp9: !chart
+        #    interpolate: $interpolate
+        #    series:
+        #        temp9.max:
+        #            color: wheat
+        #            area: { to: temp9.min }
+        #            max: { color: darkred, text: darkred, thickness: 0.5 }
+        #        temp9.avg:
+        #            order: 1
+        #        temp9.min:
+        #            color: wheat
+        #            min: { color: darkslateblue, text: darkslateblue, thickness: 0.5 }
+        #    labels: temp9.lbl
+        #    zero: { color: 8D7641, thickness: 0.5 }
+        ## Uncomment to display humint (modify also chart_accumulator.yaml)
+        #humint: !chart
+        #    interpolate: $interpolate
+        #    series:
+        #        humint.avg: {}
+        #    labels: humint.lbl
+        #    ymargin: [ 10, 5 ]
         hum: !chart
             interpolate: $interpolate
             series:
                 hum.avg: {}
             labels: hum.lbl
             ymargin: [ 10, 5 ]
+        ## Uncomment to display hum2 (modify also chart_accumulator.yaml)
+        #hum2: !chart
+        #    interpolate: $interpolate
+        #    series:
+        #        hum2.avg: {}
+        #    labels: hum2.lbl
+        #    ymargin: [ 10, 5 ]
+        ## Uncomment to display hum3 (modify also chart_accumulator.yaml)
+        #hum3: !chart
+        #    interpolate: $interpolate
+        #    series:
+        #        hum3.avg: {}
+        #    labels: hum3.lbl
+        #    ymargin: [ 10, 5 ]
+        ## Uncomment to display hum4 (modify also chart_accumulator.yaml)
+        #hum4: !chart
+        #    interpolate: $interpolate
+        #    series:
+        #        hum4.avg: {}
+        #    labels: hum4.lbl
+        #    ymargin: [ 10, 5 ]
+        ## Uncomment to display hum5 (modify also chart_accumulator.yaml)
+        #hum5: !chart
+        #    interpolate: $interpolate
+        #    series:
+        #        hum5.avg: {}
+        #    labels: hum5.lbl
+        #    ymargin: [ 10, 5 ]
+        ## Uncomment to display hum6 (modify also chart_accumulator.yaml)
+        #hum6: !chart
+        #    interpolate: $interpolate
+        #    series:
+        #        hum6.avg: {}
+        #    labels: hum6.lbl
+        #    ymargin: [ 10, 5 ]
+        ## Uncomment to display hum7 (modify also chart_accumulator.yaml)
+        #hum7: !chart
+        #    interpolate: $interpolate
+        #    series:
+        #        hum7.avg: {}
+        #    labels: hum7.lbl
+        #    ymargin: [ 10, 5 ]
+        ## Uncomment to display hum8 (modify also chart_accumulator.yaml)
+        #hum8: !chart
+        #    interpolate: $interpolate
+        #    series:
+        #        hum8.avg: {}
+        #    labels: hum8.lbl
+        #    ymargin: [ 10, 5 ]
+        ## Uncomment to display hum9 (modify also chart_accumulator.yaml)
+        #hum9: !chart
+        #    interpolate: $interpolate
+        #    series:
+        #        hum9.avg: {}
+        #    labels: hum9.lbl
+        #    ymargin: [ 10, 5 ]
         press: !chart
             interpolate: $interpolate
             series:
