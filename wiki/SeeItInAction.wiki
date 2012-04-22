@@ -22,6 +22,6 @@ Users are invited to submit as comment to this page the URL of their stations to
 || [http://metmediona.dyndns.org/ Mediona, (Barcelona, Spain)] ||  ||  Uses HTTP renderer. Running on a foxconn NT425 with Ubuntu ||
 || [http://weather.eckeroth.se/ Falsterbo, Sweden] || Oregon WMRS200 ||  Uses HTTP renderer. Running on a QNAP 659-PRO NAS. ||
 || [http://www.warmsky.info/wfrog/ Beregovoe, Crimea, Ukraine] || WMRS200 || Uses HTTP renderer ||
-|| [http://photing.com/webcam/weather/24hours.html] || WMRS200 || Logger & Renderer running on Sheevaplug with Debian Squeeze, rendering via FTP every 10min (if neighbour's DSL is up ;)) ||
+|| [http://photing.com/webcam/weather/24hours.html Tresdorf, north of Vienna, Austria] || WMRS200 || Logger & Renderer running on Sheevaplug with Debian Squeeze, rendering via FTP every 10min (if neighbour's DSL is up ;)) ||
 
 <p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
