@@ -187,13 +187,17 @@ Multiple sensors are only supported when using database storage (both Firebird a
 
 Just uncomment the relevant lines in the table creation script and the additional sensors data will be recorded. I.e. the logger checks the available fields in the database and then records corresponding available sensors.
 
+Additional sensors (inside th and th sensors 2-9) are only supported when using database storage.
+
 ===Renderer===
 
 In order to render additional sensors you need to:
 
- # uncomment the relevant sections in chart_accumulator.yaml
- # create tempint, temp2, temp3, ..., humint, hum2, hum3,... sections (temp and hum serve as examples)
- # modify your template to include the additional graphs.
+ # Configure the logger to record these additional sensors (see previous section)
+ # Uncomment the relevant sections in *all* the following files:
+ * wfrender/config/default/charts.yaml
+ * wfrender/config/default/chart_accumulator.yaml
+ * wfrender/config/default/table_accumulator.yaml
 
 == Install as a Boot-Time Services ==
 
