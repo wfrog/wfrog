@@ -408,7 +408,7 @@ class LoopStruct( myStruct ):
             items['RainYear'] = units.InToMm(items['RainYear'] / 100.0)
         items['StormStartDate'] = self._unpack_storm_date(items['StormStartDate'])
         # UV
-        items['UV'] = items['UV'] if items['UV'] != 255 else None
+        items['UV'] = (items['UV'] / 10.0) if items['UV'] != 255 else None
         # SolarRad
         items['SolarRad'] = items['SolarRad'] if items['SolarRad'] != 32767 else None
         # evapotranspiration totals
