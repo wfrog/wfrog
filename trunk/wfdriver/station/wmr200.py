@@ -407,6 +407,10 @@ class WMR200Station(BaseStation):
           self.logger.error("Short frame: %s" % self._list2bytes(packets))
           self.badFrames += 1
           break
+        elif packets[1] < 8:
+	  # All valid D2 - D9 frames must have at least a length of 8
+          self.logger.error("Bad frame length: %d" % packets[1])
+          self.badFrames += 1
         else:
           # This is for all frames with length byte and checksum.
           frame = packets[0:packets[1]]
