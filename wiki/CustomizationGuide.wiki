@@ -225,29 +225,47 @@ sudo chkconfig  httpd  on --level 2,3,5
 
 The default configuration starts an internal web-server on port 7680.
 
-To send the generated page periodically to a FTP site instead of serving it in the internal web-server, replace the following part of the configuration file:
+To send the generated page periodically to a FTP site instead of serving it in the internal web-server, you need to uncomment the relevant section of the /etc/wfrog/wfrender/config/wfrender.yaml (or embedded.yaml if using a single wfrog process):
 
 {{{
-renderer: !http
-    root: !template
+        ## Uncomment to publish files by ftp (compatible with http server)
+        #ftp: !scheduler
+        #    period: 600  # in seconds
+        #    delay: 60 # in seconds, delay before start rendering
+        #    renderer: !ftp
+        #        host: HOST.COM 
+        #        username: USERNAME
+        #        password: PASSWORD
+        #        directory: DIRECTORY
+        #        renderers:
+        #            3hours.html: !file
+        #                path: /tmp/3hours.html
+        #                renderer: !include
+        #                    path: default/3hours.yaml
+        #            24hours.html: !file
+        #                path: /tmp/24hours.html
+        #                renderer: !include
+        #                    path: default/24hours.yaml
+        #            30days.html: !file
+        #                path: /tmp/30days.html
+        #                renderer: !include
+        #                    path: default/30days.yaml
+        #            365days.html: !file
+        #                path: /tmp/365days.html
+        #                renderer: !include
+        #                    path: default/365days.yaml
+        #            ## Uncomment to activate www.meteoclimatic.com ftp publisher
+        #            #meteoclimatic.txt: !file
+        #            #    path: /tmp/meteoclimatic.txt
+        #            #    renderer: !meteoclimatic
+        #            #        id: STATION_ID  
+        #            #        storage: !service
+        #            #            name: storage   
 }}}
 
-with 
+Note that you need to inform host, user, password and directory to be used in the ftp connection.
 
-{{{
-renderer: !scheduler
-    period: 120  # in seconds
-    renderer: !ftp
-        host: myhost.mydomain.com            # where to send the file
-        username: myusername
-        password: mypassword
-        renderers:
-            wfrender.html: !file             # The remote filename
-                path: /tmp/wfrender.html     # The local one
-                renderer: !template         
-}}}
-
-And indent the configuration below so that it is one level below the `render: !template` line.
+Both http and ftp publishing can coexist. 
 
 == Getting Help ==
 
