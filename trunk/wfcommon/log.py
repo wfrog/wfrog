@@ -83,6 +83,22 @@ handlers [dict]:
 
                     logger.addHandler(handler)
 
+            # If no handler is specified, by default a RotatingFileHandler with a 
+            # {$process.log} filename  (see issue 85)
+            else:
+                filename = logging_config['filename'] if logging_config.has_key('filename') else 'wfrog'
+ 
+                # Bypass !user elements
+                if hasattr(filename, '_init'):
+                    while hasattr(filename, '_init'):
+                        filename = filename._init(context)
+
+                handler = logging.handlers.RotatingFileHandler(filename = filename, 
+                                                               maxBytes = 262144, 
+                                                               backupCount = 3)
+                handler.setFormatter(formatter)
+                logger.addHandler(handler)
+
         if options.debug or options.verbose:
             if options.debug:
                 level=logging.DEBUG
