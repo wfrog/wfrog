@@ -37,7 +37,10 @@ CREATE TABLE METEO
   RAIN Numeric(4,1),
   RAIN_RATE Numeric(4,1),
   PRESSURE Numeric(5,1),
-  UV_INDEX Smallint,
+  -- Uncomment to record UV Index
+  -- UV_INDEX Smallint,
+  -- Uncomment to record Solar Radiation sensor
+  -- SOLAR_RAD Numeric(5,1)
   -- Uncomment to record additional TEMP/HUM sensors
   -- TEMP2 Numeric(3,1), 
   -- HUM2 Numeric(3,1),

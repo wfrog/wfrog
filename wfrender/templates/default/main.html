@@ -581,6 +581,12 @@ $u
             <div><img src="$chart.uv"/></div>
         </div>
         #end if
+        #if $chart.has_key("solar_rad")        
+        <div class="bordered cell graph">
+            <div class="leftCell">Solar radiation</div><br/>
+            <div><img src="$chart.solar_rad"/></div>
+        </div>
+        #end if
     </div>
     </div>
     <div class="bordered cell graph" style="clear: both; display: none;" id="details">
@@ -646,10 +652,17 @@ ${"     Temp. 9 %s    " % $unitstr('temp',$units.temp).rstrip()}#slurp
 #if $value.has_key("hum9_max")
 ${"   Humidity 9 %"}#slurp
 #end if
-${"    Pressure %s       Rain %s         Wind %s       UV     " % (
+${"    Pressure %s       Rain %s         Wind %s" % (
   $unitstr('press',$units.press).rstrip(), 
   $unitstr('rain',$units.rain).rstrip(),  
-  $unitstr('wind',$units.wind).rstrip() ) }
+  $unitstr('wind',$units.wind).rstrip() ) }#slurp
+#if $value.has_key("uv_index")
+${"       UV%"}#slurp
+#end if
+#if $value.has_key("solar_rad_max")
+${"      Solar W/m2"}#slurp
+#end if
+
 ${" " * len($indexes[0])}#slurp
 #if $value.has_key("tempint_max")
 ${"   max   min   avg"}#slurp
@@ -818,6 +831,9 @@ ${"%7.1f" % $value.wind_max if $value.wind_max != None else "      -"}#slurp
 ${"%5s" % $value.wind_dir  if $value.wind_dir != None else "    -"}#slurp
 #if $value.has_key("uv_index")
 ${"%5d" % $value.uv_index  if $value.uv_index != None else "    -"}#slurp
+#end if
+#if $value.has_key("solar_rad_max")
+${"%7d" % $value.solar_rad_max  if $value.solar_rad_max != None else "      -"}#slurp
 #end if
 
 #end if

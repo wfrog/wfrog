@@ -122,6 +122,10 @@ source: !accumulator
         rain:
             rate: !max { index: rain_rate }
             fall: !sum { index: rain }
-        uv:
-            index: !max { index: uv_index }
+        ## Uncomment to display UV Index (modify also charts.yaml)
+        #uv:
+        #    index: !max { index: uv_index }
+        ## Uncomment to display Solar radiation (modify also charts.yaml)
+        #solar_rad:
+        #    max: !max { index: solar_rad }
 
