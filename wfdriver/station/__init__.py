@@ -25,6 +25,7 @@ import wmr200
 import vantagepro
 import vantagepro2
 import wh1080
+import wh3080
 import ws23xx
 import ws28xx
 import auto
@@ -55,6 +56,9 @@ class YamlVantageProStation(vantagepro2.VantageProStation, yaml.YAMLObject):
 class YamlWH1080Station(wh1080.WH1080Station, yaml.YAMLObject):
     yaml_tag = u'!wh1080'
     
+class YamlWH3080Station(wh1080.WH3080Station, yaml.YAMLObject):
+    yaml_tag = u'!wh3080'
+
 class YamlWS2300Station(ws23xx.WS2300Station, yaml.YAMLObject):
     yaml_tag = u'!ws2300'    
 
