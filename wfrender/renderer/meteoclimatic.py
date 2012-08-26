@@ -125,6 +125,9 @@ class MeteoclimaticRenderer(object):
                          'wind_deg' : LastFormula('wind_dir'),
                          'time' : LastFormula('localtime') } }
 
+                if 'solar_rad' in self.storage.keys():
+                    self.accuD.formulas['current']['solar_rad'] = LastFormula('solar_rad')
+
             self.logger.info("Calculating ...")
 
             template = "*VER=DATA2*COD=%s*%s*%s*%s*%s*EOT*" % (
@@ -150,13 +153,14 @@ class MeteoclimaticRenderer(object):
     def _calculateCurrentData(self, accu):
         data = accu.execute()['current']['series']
         index = len(data['lbl'])-1
-        template = "UPD=%s*TMP=%s*WND=%s*AZI=%s*BAR=%s*HUM=%s*SUN=" % (
+        template = "UPD=%s*TMP=%s*WND=%s*AZI=%s*BAR=%s*HUM=%s*SUN=%s" % (
                self._format(data['time'][index].strftime("%d/%m/%Y %H:%M")), 
                self._format(data['temp'][index]),  
                self._format(MpsToKmh(data['gust'][index])), 
                self._format(data['wind_deg'][index]), 
                self._format(data['pressure'][index]), 
-               self._format(data['hum'][index]) )
+               self._format(data['hum'][index]),
+               self._format(data['solar_rad'][index], '') if 'solar_rad' in self.storage.keys() else '' )
         self.logger.debug("Calculating current data (index: %d): %s" % (index, template))
         return template
 
