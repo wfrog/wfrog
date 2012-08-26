@@ -68,6 +68,9 @@ class BaseCollector(object):
                     self._hum_last = event.value
             elif event._type == 'uv':
                 self._report_uv(event.value)
+            elif event._type == 'rad':
+                self._report_solar_rad(event.value)
+
 
     def _get_mean_temp(self, current_temp, context):  # Last 12 hours mean temp
 

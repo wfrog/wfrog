@@ -31,7 +31,7 @@ class DatabaseStorage(object):
     
     mandatory_storage_fields = ['TEMP', 'HUM', 'DEW_POINT', 'WIND', 'WIND_DIR', 'WIND_GUST', 
                                 'WIND_GUST_DIR', 'RAIN', 'RAIN_RATE', 'PRESSURE']
-    optional_storage_fields = ['UV_INDEX', 'TEMPINT', 'HUMINT', 'TEMP2', 'HUM2', 
+    optional_storage_fields = ['UV_INDEX', 'SOLAR_RAD', 'TEMPINT', 'HUMINT', 'TEMP2', 'HUM2', 
                                'TEMP3', 'HUM3', 'TEMP4', 'HUM4', 'TEMP5', 'HUM5', 
                                'TEMP6', 'HUM6', 'TEMP7', 'HUM7', 'TEMP8', 'HUM8', 
                                'TEMP9', 'HUM9']

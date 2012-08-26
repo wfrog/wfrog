@@ -252,12 +252,20 @@ renderer: !multi
                 rain.rate: {}
             labels: rain.lbl
             ymargin: [ 0, 10 ]
-        uv: !chart
-            interpolate: $interpolate
-            series:
-                uv.index: {}
-            labels: uv.lbl
-            ymargin: [ 0, 1 ]
+        ## Uncomment to display UV Index (modify also chart_accumulator.yaml)
+        #uv: !chart
+        #    interpolate: $interpolate
+        #    series:
+        #        uv.index: {}
+        #    labels: uv.lbl
+        #    ymargin: [ 0, 1 ]
+        ## Uncomment to display Solar radiation (modify also chart_accumulator.yaml)
+        #solar_rad: !chart
+        #    interpolate: $interpolate
+        #    series:
+        #        solar_rad.max: {}
+        #    labels: solar_rad.lbl
+        #    ymargin: [ 0, 1 ]
         wind: !chart
             interpolate: $interpolate
             series:

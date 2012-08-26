@@ -76,6 +76,8 @@ class AggregatorCollector(base.BaseCollector):
         self._pressure = []
         ## UV
         self._uv_index = None
+        ## Solar Rad
+        self._solar_rad = []
         ## Log
         self._timestamp_last = None
         self.logger.info ('New period')
@@ -110,6 +112,10 @@ class AggregatorCollector(base.BaseCollector):
         if self._uv_index == None or self._uv_index < uv_index:
             self._uv_index = uv_index
 
+    def _report_solar_rad(self, solar_rad):
+        self._solar_rad.append(solar_rad)
+
+
     def get_data(self):
         data = {
             'temp': None,
@@ -122,7 +128,8 @@ class AggregatorCollector(base.BaseCollector):
             'rain': None,
             'rain_rate': None,
             'uv_index' : None,
-            'dew_point' : None
+            'dew_point' : None,
+            'solar_rad' : None
         }
 
         for sensor in xrange(MAX_TH_SENSORS):
@@ -184,6 +191,11 @@ class AggregatorCollector(base.BaseCollector):
         ## UV
         if self._uv_index != None:
             data['uv_index'] = int(self._uv_index)
+
+        ## Solar rad
+        if len(self._solar_rad) > 0:
+            solar_rad = round(sum(self._solar_rad)/len(self._solar_rad), 1)
+            data['solar_rad'] = solar_rad
 
         data['localtime'] = self._timestamp_last
 

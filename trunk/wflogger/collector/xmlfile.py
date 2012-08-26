@@ -87,8 +87,10 @@ class XmlFileCollector(base.BaseCollector):
 
         element(hum_elt, 'humidity').text = str(humidity)
 
-
     def _report_uv(self, uv_index):
+        return
+
+    def _report_solar_rad(self, solar_rad):
         return
 
     def flush(self, context={}):
