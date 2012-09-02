@@ -263,9 +263,13 @@ renderer: !multi
         #solar_rad: !chart
         #    interpolate: $interpolate
         #    series:
-        #        solar_rad.max: {}
+        #        solar_rad.max:
+        #            max: { color: darkred, text: darkred, thickness: 0.5 }
+        #        solar_rad.min:
+        #            order: -1
+        #            color: wheat
+        #            area: { to: solar_rad.max }
         #    labels: solar_rad.lbl
-        #    ymargin: [ 0, 1 ]
         wind: !chart
             interpolate: $interpolate
             series:
