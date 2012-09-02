@@ -127,5 +127,7 @@ source: !accumulator
         #    index: !max { index: uv_index }
         ## Uncomment to display Solar radiation (modify also charts.yaml)
         #solar_rad:
+        #    min: !min { index: solar_rad }
         #    max: !max { index: solar_rad }
+
 
