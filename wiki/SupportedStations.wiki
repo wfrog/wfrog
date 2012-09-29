@@ -20,7 +20,7 @@ Maturity level:
 || *!LaCrosse*                 || WS2300 || Serial || Low || No || !ws2300 || Needs third party ws2300 library (http://ace-host.stuart.id.au/russell/files/ws2300/).<br/>Run `sudo ./setup.py install` to make it visible to wfrog. || Yes || ? ||
 ||                             || WS28xx || USB || Low || Yes || !ws28xx || Needs third party ws28xx library (https://github.com/dpeddi/ws-28xx/).<br/>Run `sudo ./setup.py install` to make it visible to wfrog. || Yes || ? ||
 || *Oregon Scientific* || WMR100N || USB || High || Yes? || !wmrs200 ||  || Yes || ? ||
-||                   || WMR88A  || USB || High || Yes? || !wmrs200 ||  || Yes || ? ||
+||                   || WMR88A  || USB || High || Yes? || !wmrs200 || Seems to return always the same value for gust and avg wind (see issue 117) || Yes || ? ||
 ||                   || WMR200  || USB || High || Yes || !wmr200 ||  || Yes || ? ||
 ||                   || WMRS200 || USB || High || Yes || !wmrs200 ||  || Yes || Yes ||
 ||                   || WMR928NX || Serial || High || No || !wmr928x||   || Yes || ? ||
