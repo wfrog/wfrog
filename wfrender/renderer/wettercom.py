@@ -140,7 +140,7 @@ class WetterComPublisher(object):
                             self.logger.error('Could not publish: no valid values at this time. Retry next run...')
                         else:
                             self.logger.error('Got unexpected error. Retry next run. Error: %s' % e)
-                        raise
+                            raise
 
                 except Exception, e:
                     self.logger.exception(e)
