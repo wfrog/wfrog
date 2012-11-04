@@ -26,6 +26,7 @@ Maturity level:
 ||                   || WMR928NX || Serial || High || No || !wmr928x||   || Yes || ? ||
 || *PCE*                  || FWS20 || USB || Medium || No || !wh1080 || See Fine Offset Electronics WH1080 || Yes || ? ||
 || *Scientific Sales*                  || Pro Touch Screen Weather Station || USB || Medium || No || !wh1080 || See Fine Offset Electronics WH1080 || Yes || ? ||
+|| *Tfa-Dostmann* || Primus || USB || Low || Yes || !ws28xx || See La Crosse ws28xx || Yes || ? ||
 || *Topcom National Geographic*        || 265NE || USB || Medium || No || !wh1080 || See Fine Offset Electronics WH1080 || Yes || ? ||
 || *Watson*                  || W8681 || USB || Medium || No || !wh1080 || See Fine Offset Electronics WH1080 || Yes || ? ||
 
