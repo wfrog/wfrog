@@ -21,11 +21,6 @@
 # - http://www.cs.stir.ac.uk/~kjt/software/comms/wmr928.html
 # - http://www.castro.aus.net/~maurice/weather/
 
-## TODO:  DOCUMENT WMRS928NX serial protocol
-
-## TODO: DOCUMENT MESSAGES' PROTOCOL
-##       GENERATE CRITICAL LOG ENTRIES FOR LOW BATTERY LEVEL (ONE ALARM PER DAY!)
-##       ALLOW CONFIG TO SPECIFY WHICH temp/hum SENSOR(S) SHOULD BE USED
 
 import wfcommon.utils
 import logging
@@ -39,8 +34,14 @@ class WMR928NXStation(BaseStation):
     
     [ Properties ]
     
-    port [numeric] (optional):
-        Serial port number where the station is connected. Defaults to 1.
+    port [string] (optional):
+        Serial port where the station is connected. Defaults to 1.
+        It accepts:
+          - serial port number
+          - serial port device name i.e. /dev/ttyUSB0 (Linux)
+          - url for a raw or rfc2217 device:
+                - rfc2217://<host>:<port>
+                - socket://<host>:<port>
 
     pressure_cal [numeric] (optional):
         Pressure calibration offset in mb. Defaults to 0.
@@ -72,14 +73,29 @@ class WMR928NXStation(BaseStation):
             try:
                 self.logger.info("Opening serial port")
                 ## Open Serial port
-                ser = serial.Serial()
-                ser.setBaudrate(9600)
-                ser.setParity(serial.PARITY_NONE)
-                ser.setByteSize(serial.EIGHTBITS)
-                ser.setStopbits(serial.STOPBITS_ONE)
-                ser.setPort(self.port)
-                ser.setTimeout(60)  # 60s timeout
-                ser.open()
+                try:
+                    ser = serial.serial_for_url(self.port, 9600, 
+                                                parity=serial.PARITY_NONE, 
+                                                bytesize=serial.EIGHTBITS,
+                                                stopbits=serial.STOPBITS_ONE,
+                                                timeout=60)
+                except AttributeError:
+                    # happens when the installed pyserial is older than 2.5. use the
+                    # Serial class directly then.
+                    ser = serial.Serial(self.port, 9600, 
+                                        parity=serial.PARITY_NONE, 
+                                        bytesize=serial.EIGHTBITS,
+                                        stopbits=serial.STOPBITS_ONE,
+                                        timeout=60)
+                #ser = serial.Serial()
+                #ser.setBaudrate(9600)
+                #ser.setParity(serial.PARITY_NONE)
+                #ser.setByteSize(serial.EIGHTBITS)
+                #ser.setStopbits(serial.STOPBITS_ONE)
+                #ser.setPort(self.port)
+                #ser.setTimeout(60)  # 60s timeout
+                #ser.open()
+                
                 ser.setRTS(True)
                 ## Do the actual work
                 self.logger.info("Serial port open")

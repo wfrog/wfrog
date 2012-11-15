@@ -32,6 +32,13 @@ class VantageProStation(object):
     port [string] (optional):
         Serial port tty to use. Defaults to /dev/ttyS0.
 
+        It accepts:
+          - serial port number
+          - serial port device name i.e. /dev/ttyUSB0 (Linux)
+          - url for a raw or rfc2217 device:
+                - rfc2217://<host>:<port>
+                - socket://<host>:<port>
+
     baud [integer] (optional):
         Serial port speed. Possible values are 19200, 9600, 4800, 
         2400 and 1200. Defaults to 19200
@@ -71,7 +78,16 @@ class VantageProStation(object):
         assert self.baud in [19200, 9600, 4800, 2400, 1200]
 
         while True:
-            self._port = serial.Serial(self.port, self.baud, timeout=10)
+            self.logger.info("Opening serial port")
+            ## Open Serial port
+            #self._port = serial.Serial(self.port, self.baud, timeout=10)
+            try:
+                self._port = serial.serial_for_url(self.port, self.baud, timeout=10)
+            except AttributeError:
+                # happens when the installed pyserial is older than 2.5. use the
+                # Serial class directly then.
+                self._port = serial.Serial(self.port, self.baud, timeout=10)
+
             try:
                 bad_CRC = 0 
                 self._wakeup()
