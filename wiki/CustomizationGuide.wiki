@@ -198,6 +198,7 @@ In order to render additional sensors you need to:
  * wfrender/config/default/charts.yaml
  * wfrender/config/default/chart_accumulator.yaml
  * wfrender/config/default/table_accumulator.yaml
+ # wfrender/templates/default/main.html needs to be updated to current version in trunk (the one from 0.8.2. doesn't in include the needed changes yet)
 
 == Install as a Boot-Time Services ==
 
