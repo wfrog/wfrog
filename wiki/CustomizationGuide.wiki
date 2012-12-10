@@ -48,9 +48,9 @@ Note: a common module named `wfcommon` provides the infrastructure shared by the
 
 === Backend and Renderer ===
 
-Without parameters, the `wfrog` command runs all modules in the same process.
+Without parameters, the `wfrog` command runs all modules in the same process. _(in this case embedded.yaml is used)_
   * To run the backend (i.e. driver+logger) only: `wfrog --backend`
-  * To run the renderer only: `wfrog --renderer`
+  * To run the renderer only: `wfrog --renderer` _(wfrender/wflogger/config/wfrender.yaml is used)_
 
 === Logger and Driver ===
 
