@@ -109,7 +109,7 @@ class FirebirdDB(DB):
 
         self.db = db
         self.user = user
-        self.password = password
+        self.password = str(password)
         self.charset = charset
 
     def connect(self):
@@ -128,7 +128,7 @@ class MySQLDB(DB):
         self.port = port
         self.db = db
         self.user = user
-        self.password = password
+        self.password = str(password)
 
     def connect(self):
         if self.dbObject != None:
