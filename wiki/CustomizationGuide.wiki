@@ -177,7 +177,7 @@ mysql --user=root --password=secret --database=wfrog < db-mysql-0.3.sql
 
 ==== Configure the Storage ====
 
-  * Edit `wfcommon/config/storage.yaml` to enable the `!mysql` storage. (issue 124 / use '1234' if your password consists of numbers only)
+  * Edit `wfcommon/config/storage.yaml` to enable the `!mysql` storage. (check issue 124 if your password consits of numbers only)
 
 == Support for multiple TH sensors ==
 
