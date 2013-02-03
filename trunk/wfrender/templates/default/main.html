@@ -68,6 +68,18 @@ $u
                     start_date.setDate(1);
                     start_date.setMonth(start_date.getMonth()+1);
                 }
+                else if(nloc[0].indexOf("7days.html") > -1) {
+                    // 7 days backward:
+                    start_date.setDate(start_date.getDate()-7);
+                    // show data from the beginning of next week
+                    if(date_only=='N') {
+                        start_date.setHours(0);
+                        start_date.setMinutes(0);
+                        start_date.setSeconds(0);
+                    }
+                    start_date.setDate(1);
+                    start_date.setMonth(start_date.getHours()+1);
+                }
                 else if(nloc[0].indexOf("3hours.html") > -1) {
                     start_date.setHours(start_date.getHours()-3);
                     // show data from the beginning of next full minute
@@ -390,6 +402,7 @@ $u
 #if $getVar('http', False)
         <div id="3hours" class="tab" style="cursor: pointer" onclick="move('3hours.html', 'address')">3 Hours</div>
         <div id="24hours" class="tab" style="cursor: pointer" onclick="move('24hours.html', 'address')">24 Hours</div>
+        <div id="7days" class="tab" style="cursor: pointer" onclick="move('7days.html', 'address')">7 Days</div>
         <div id="30days" class="tab" style="cursor: pointer" onclick="move('30days.html', 'address')">30 Days</div>
         <div id="365days" class="tab" style="cursor: pointer" onclick="move('365days.html', 'address')">365 Days</div>
         <div style="float:left; width:20px;">&nbsp;</div>
@@ -408,6 +421,7 @@ $u
 #else
         <div id="3hours" class="tab" style="cursor: pointer"><a href="3hours.html">3 Hours</a></div>
         <div id="24hours" class="tab" style="cursor: pointer"><a href="24hours.html">24 Hours</a></div>
+        <div id="7days" class="tab" style="cursor: pointer"><a href="7days.html">7 Days</a></div>
         <div id="30days" class="tab" style="cursor: pointer"><a href="30days.html">30 Days</a></div>
         <div id="365days" class="tab" style="cursor: pointer"><a href="365days.html">365 Days</a></div>
 #end if                
@@ -854,6 +868,10 @@ if(window.location.href.indexOf("30days.html") > -1) {
     document.getElementById("365days").className += ' selected';
     move_back = function() { move(-183, 'd') }
     move_forward = function() { move(183, 'd') }
+} else if(window.location.href.indexOf("7days.html") > -1) {
+    document.getElementById("7days").className += ' selected';
+    move_back = function() { move(-168, 'h') }
+    move_forward = function() { move(168, 'h') }
 } else if(window.location.href.indexOf("3hours.html") > -1) {
     document.getElementById("3hours").className += ' selected';
     move_back = function() { move(-1, 'h') }

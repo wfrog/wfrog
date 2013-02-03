@@ -17,6 +17,13 @@ init:
             variables:
                 slice: hour
                 span: 24
+    accu_7d: !service
+        name: accu_7d
+        instance:  !include
+            path: default/chart_accumulator.yaml
+            variables:
+                slice: hour
+                span: 168
     accu_30d: !service
         name: accu_30d
         instance:  !include
@@ -113,6 +120,8 @@ renderer: !multi
                     path: default/3hours.yaml
                 24hours.html: !include
                     path: default/24hours.yaml
+                7days.html: !include
+                    path: default/7days.yaml
                 30days.html: !include
                     path: default/30days.yaml
                 365days.html: !include

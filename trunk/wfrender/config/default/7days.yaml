@@ -1,0 +1,19 @@
+renderer: !template
+    path: ../../templates/default/main.html
+    mime: text/html
+    renderer: !data
+        source: !service
+            name: accu_7d                
+        renderer: !multi
+            children:
+                current: !include
+                    path: current.yaml
+                chart: !include
+                    path: charts.yaml
+                    variables:
+                        interpolate: off
+                summary: !datatable 
+                    label: 2
+
+
+
