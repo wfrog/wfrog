@@ -17,6 +17,13 @@ init:
             variables:
                 slice: hour
                 span: 24
+    accu_7d: !service
+        name: accu_7d
+        instance:  !include
+            path: ../../wfrender/config/default/chart_accumulator.yaml
+            variables:
+                slice: hour
+                span: 168
     accu_30d: !service
         name: accu_30d
         instance:  !include
