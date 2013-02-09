@@ -3,8 +3,8 @@
 rem Todo:
 
 
-set version=1.2.6
-set date=22.01.2012
+set version=1.2.7
+set date=09.02.2013
 
 set python="%cd:~0,1%:\Python26\"
 set easyinst=%python%Scripts\easy_install.exe
@@ -316,7 +316,9 @@ cd libusb0
 %sev_za% x -y libusb0.zip
 cd libusb-win32-bin-1.2.6.0\bin\x86
 xcopy /E /Y "%CD%\libusb0_x86.dll" %windir%\system32\libusb0.dll
+xcopy /E /Y "%CD%\libusb0_x86.dll" %python%DLLs\libusb0.dll
 xcopy /E /Y "%CD%\libusb0.sys" %windir%\system32\drivers
+xcopy /E /Y "%CD%\libusb0.sys" %python%DLLs
 cd ..\..\..\..\
 echo done..
 echo.
