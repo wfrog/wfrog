@@ -293,8 +293,8 @@ class WMR928NXStation(BaseStation):
             temperature *= -1
         humidity = self._decode_bcd(record[4])
         dewPoint = None
-        if record[1] & 0x10 == 0x10:
-            dewPoint = self._decode_bcd(record[45])
+        if record[1] & 0x10 == 0x00:
+            dewPoint = self._decode_bcd(record[5])
 
         pressure = 600 + record[6] + ((0x1 & record[7]) << 8)
         offset = (((record[8] & 0xf0) >> 4) / 10.0) + self._decode_bcd(record[9]) + \
