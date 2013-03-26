@@ -22,6 +22,6 @@ Users are invited to submit as comment to this page the URL of their stations to
 || [http://www.warmsky.ru/wfrog/ Beregovoe, Crimea, Ukraine] || WMRS200 || Uses HTTP renderer ||
 || [http://photing.com/webcam/weather/24hours.html Tresdorf, north of Vienna, Austria] || WMRS200 || Logger & Renderer running on Sheevaplug with Debian Squeeze, rendering to FTP/wunderground/PWS/wetter.com every 10min (if neighbour's DSL is up ;)) ||
 || [http://www.marrable.org.uk/weather Northampton, UK] || Watson W-8681 || wfrog 0.8.2 svn 910   running on Ubuntu 12.04 and Firebird database storage. Using HTTP renderer on internal network and FTP renderer to a Win2K server for Internet access. ||
-|| [http://www.berg-olsen.net/ Vestrengåsen, Moe, Norway] ||OS WMR88 || wfrog 0.8.2 svn 915 multi-sensor with mysql storage. Running on a Raspberry Pi Model B. Uses HTTP rendererand uploads online data to www.wunderground.com (IAKERSHU33) ||
+
 
 <p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
