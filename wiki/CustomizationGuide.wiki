@@ -131,7 +131,10 @@ This will monitor the directory `/.wfrog/wfrender` and restart wfrog each time a
 
 {{{
 sudo apt-get install firebird2.0-super    #  Firebird database 2.0 
+sudo apt-get install python-kinterbasdb   #  Python Firebird driver
 }}}
+
+Other versions of Firebird (like 2.1) can also be used, as long as their corresponding kinterbasdb driver is also available.
 
 ==== Start Database Server ====
 
@@ -147,7 +150,7 @@ sudo mkdir /var/lib/firebird/2.0/data
 cd database
 isql-fb -u sysdba -p masterkey
 SQL> create database 'localhost:/var/lib/firebird/2.0/data/wfrog.db';
-SQL> IN db-firebird-0.2.sql;
+SQL> IN db-firebird-0.9.sql;
 }}}
 
 ==== Configure the Storage ====
