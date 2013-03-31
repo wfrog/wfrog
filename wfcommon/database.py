@@ -139,6 +139,25 @@ class MySQLDB(DB):
                                         passwd=self.password,
                                         db=self.db)
 
+## sqlite3 database driver
+
+try:
+    import sqlite3
+    if __name__ == '__main__': print "sqlite driver present"
+except ImportError:
+    sqlite3 = None
+
+
+class Sqlite3(DB):
+    def __init__(self, filename):
+        self.filename = filename
+
+    def connect(self):
+        if self.dbObject != None:
+            raise Exception("MySQL: already connected to %s" % self.db)
+        #http://stackoverflow.com/questions/1829872/read-datetime-back-from-sqlite-as-a-datetime-in-python
+        self.dbObject = sqlite3.connect(self.filename,  detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
+
 
 ## Database driver factory
 ##
