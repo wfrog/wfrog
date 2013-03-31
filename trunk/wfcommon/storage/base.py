@@ -80,6 +80,7 @@ class DatabaseStorage(object):
             self.db.connect()
             for row in self.db.select(sql):
                 if not isinstance(row[0], datetime):
+                       row = list(row)
                        row[0] = datetime.strptime(row[0], self.time_format)
                 yield row
         finally:
