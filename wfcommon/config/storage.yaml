@@ -5,6 +5,20 @@ storage: !user
         default: !csv
             path: data/wfrog.csv
 
+## you may use sqlite3 instead of csv ,
+## to this end delete the above lines and undelete below,
+## install pysqlite2 and dependencies,
+## and create the database and its tables
+## using # sqlite3 /var/lib/wfrog/wfrog.sql < database/sqlite3.sql
+## (in case, use the database/csv2sql script to transfer meteo data)
+
+#storage: !user
+#    choices:
+#       root: !sqlite3
+#           database: /var/lib/wfrog/wfrog.sql
+#       default: !sqlite3
+#           database: data/wfrog.sql
+
 #storage: !firebird { database: 'localhost:/var/lib/firebird/2.0/data/wfrog.db',
 #                     user: sysdba,
 #                     password: masterkey }
