@@ -154,7 +154,7 @@ class Sqlite3(DB):
 
     def connect(self):
         if self.dbObject != None:
-            raise Exception("MySQL: already connected to %s" % self.db)
+            raise Exception("MySQL: already connected to %s" % self.filename)
         #http://stackoverflow.com/questions/1829872/read-datetime-back-from-sqlite-as-a-datetime-in-python
         self.dbObject = sqlite3.connect(self.filename,  detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
 
