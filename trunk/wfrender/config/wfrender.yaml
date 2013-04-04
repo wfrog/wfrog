@@ -76,6 +76,17 @@ renderer: !multi
         #        name: storage
         #    period: 300
 
+        ## Uncomment to activate openWeatherMap publisher
+        #openweathermap: !openweathermap
+        #    username: OPENWEATHERMAP-USERNAME
+        #    password: PASSWORD
+        #    name: STATION NAME
+        #    storage: !service
+        #        name: storage
+        #    latitude: STATION LATITUDE (DECIMAL NUMBER)
+        #    longitude: STATION LONGITUDE (DECIMAL NUMBER)
+        #    altitude: STATION ALTITUDE IN M.
+
         ## Uncomment to publish files by ftp (compatible with http server)
         #ftp: !scheduler
         #    period: 600  # in seconds
@@ -128,6 +139,13 @@ renderer: !multi
                     path: default/365days.yaml
                 check: !include
                     path: default/check.yaml
+                
+                ## Uncomment to activate sticker (beta version)
+                #sticker.png: !sticker
+                #    station_name: YOUR STATION NAME
+                #    storage: !service
+                #        name: storage
+
                 ## Uncomment to activate www.meteoclimatic.com http publisher
                 #meteoclimatic.txt: !meteoclimatic
                 #    id: STATION_ID 

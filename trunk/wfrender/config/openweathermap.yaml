@@ -1,0 +1,45 @@
+# To test Weather Underground update:
+#    python ../wfrender.py -f openweathermap.yaml -s ../../wfcommon/config/default-settings.yaml
+
+init:
+    storage: !service
+        name: storage
+        instance: !include
+            path: ../../wfcommon/config/storage.yaml
+
+renderer: !openweathermap
+    username: OPENWEATHERMAP-USERNAME
+    password: PASSWORD
+    name: STATION NAME
+    storage: !service
+        name: storage
+    latitude: STATION LATITUDE (DECIMAL NUMBER)
+    longitude: STATION LONGITUDE (DECIMAL NUMBER)
+    altitude: STATION ALTITUDE IN M.
+
+logging:
+    level: debug
+    filename: !user
+        choices:
+            root: /var/log/wfrender.log
+            default: wfrender.log
+
+    ## By default wfrog uses a Rotating file handler. To set up different handlers
+    ## uncomment the following section. (Warning: does not work under python > 2.7)
+    #handlers:
+    #    default:
+    #        level: debug
+    #
+    #        handler: !include
+    #            path: ../../wfcommon/config/loghandler.yaml
+    #            variables:
+    #                process: wfrender
+    #
+    #    ## Uncomment to receive mail on critical events
+    #    #mail:
+    #    #    level: critical
+    #    #    handler: !include
+    #    #        path: ../../wfcommon/config/mailloghandler.yaml
+
+
+
