@@ -37,6 +37,7 @@ class StickerRenderer(object):
     """
     Renders a wfrog sticker, to be served via http or uploaded with ftp.
     (currently beta version and only using metric units)
+    needs python-pil library
 
     render result [string]:
         The path to the generated file.
@@ -67,7 +68,7 @@ class StickerRenderer(object):
     
     logger = logging.getLogger("renderer.sticker")
 
-    def __init__(self,
+    def __init__(self):
         import Image
         import ImageDraw
         import ImageColor
