@@ -68,13 +68,12 @@ class StickerRenderer(object):
     
     logger = logging.getLogger("renderer.sticker")
 
-    def __init__(self):
-        import Image
-        import ImageDraw
-        import ImageColor
-
     def render(self, data={}, context={}):
         try:
+            import Image
+            import ImageDraw
+            import ImageColor
+
             assert self.storage is not None, "'sticker.storage' must be set"
 
             # Initialize accumulators
