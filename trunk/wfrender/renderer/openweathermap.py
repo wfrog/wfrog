@@ -138,7 +138,6 @@ class OpenWeatherMapPublisher(object):
 
                     if last_timestamp == None or last_timestamp < data['utctime'][index]:
                         last_timestamp = data['utctime'][index]
-                        print "new record", last_timestamp
 
                         args = {
                             'wind_dir':   int(round(data['wind_deg'][index])), # grad
@@ -170,9 +169,6 @@ class OpenWeatherMapPublisher(object):
                             self.logger.debug('Code: %s Status: %s Answer: %s' % response)
                         else:
                             self.logger.error('Error publishing data. Code: %s Status: %s Answer: %s' % response)
-
-                    else:
-                        print "waiting for new record"
 
                 except Exception, e:
                     if (str(e) == "'NoneType' object has no attribute 'strftime'") or (str(e) == "a float is required"):
