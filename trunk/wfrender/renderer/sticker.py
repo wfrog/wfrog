@@ -31,9 +31,7 @@ try:
 except ImportError, e:
     from datasource.accumulator import AccumulatorDatasource
 from wfcommon.units import MpsToKmh
-import Image
-import ImageDraw
-import ImageColor
+
 
 class StickerRenderer(object):
     """
@@ -68,6 +66,11 @@ class StickerRenderer(object):
     logo_file = "/etc/wfrog/wfrender/config/logo.png"
     
     logger = logging.getLogger("renderer.sticker")
+
+    def __init__(self,
+        import Image
+        import ImageDraw
+        import ImageColor
 
     def render(self, data={}, context={}):
         try:
