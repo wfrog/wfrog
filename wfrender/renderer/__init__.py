@@ -32,6 +32,8 @@ import meteoclimatic
 import wunderground
 import pwsweather
 import wettercom
+import sticker
+import openweathermap
 
 
 # YAML mappings
@@ -80,4 +82,10 @@ class PwsWeatherRenderer(pwsweather.PwsWeatherPublisher, yaml.YAMLObject):
 
 class WetterComRenderer(wettercom.WetterComPublisher, yaml.YAMLObject):
     yaml_tag = u'!wettercom'
+
+class StickerRenderer(sticker.StickerRenderer, yaml.YAMLObject):
+    yaml_tag = u'!sticker'
+
+class OpenWeatherMapPublisher(openweathermap.OpenWeatherMapPublisher, yaml.YAMLObject):
+    yaml_tag = u'!openweathermap'
 
