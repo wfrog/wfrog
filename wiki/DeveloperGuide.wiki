@@ -28,7 +28,7 @@ Notes: It must have a class comment to be documented in the -H help.
 
 === Events ===
 
-Event objects are constructed using the `generate_event` callback. The only parameter is the type of the event (temp, hum, ...) as in the [http://www.westep.org WESTEP] specification.
+Event objects are constructed using the `generate_event` callback. The only parameter is the type of the event (temp, hum, ...) as in the [WeatherStationEventProtocol WESTEP] specification.
 
 For structured events, use the `create_child` method.
 
