@@ -106,7 +106,6 @@ handlers [dict]:
                 level=logging.ERROR
             console_handler = logging.StreamHandler()
             console_handler.setFormatter(formatter)
-            console_handler.setFormatter(formatter)
             logger.addHandler(console_handler)
 
         logger.setLevel(level)
