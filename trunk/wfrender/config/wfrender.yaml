@@ -87,6 +87,15 @@ renderer: !multi
         #    longitude: STATION LONGITUDE (DECIMAL NUMBER)
         #    altitude: STATION ALTITUDE IN M.
 
+        ## Uncomment to activate metoffice WoW publisher
+        #metofficewow: !metofficewow
+        #    username: YOUR_SITE_ID
+        #    password: YOUR_SITE_PIN
+        #    storage: !service
+        #        name: storage
+        #    test: False
+        #    period: 600
+
         ## Uncomment to publish files by ftp (compatible with http server)
         #ftp: !scheduler
         #    period: 600  # in seconds

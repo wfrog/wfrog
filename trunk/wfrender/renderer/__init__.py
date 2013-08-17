@@ -34,6 +34,7 @@ import pwsweather
 import wettercom
 import sticker
 import openweathermap
+import metofficewow
 
 
 # YAML mappings
@@ -88,4 +89,7 @@ class StickerRenderer(sticker.StickerRenderer, yaml.YAMLObject):
 
 class OpenWeatherMapPublisher(openweathermap.OpenWeatherMapPublisher, yaml.YAMLObject):
     yaml_tag = u'!openweathermap'
+
+class MetOfficeWowPublisher(metofficewow.MetOfficeWowPublisher, yaml.YAMLObject):
+    yaml_tag = u'!metofficewow'
 
