@@ -45,10 +45,15 @@ class WMR928NXStation(BaseStation):
 
     pressure_cal [numeric] (optional):
         Pressure calibration offset in mb. Defaults to 0.
+
+    rain_gauge_diameter [numeric] (optional):
+        Rain gauge diamater in mm. When specified the driver will do the necessary 
+        conversions to adjust rain to the new gauge size. Defaults to 0 (= no calculation)
     '''
     
     port = 1
     pressure_cal = 0
+    rain_gauge_diameter = 0
     
     logger = logging.getLogger('station.wmr928nx')
     
@@ -252,6 +257,12 @@ class WMR928NXStation(BaseStation):
         dayT = self._decode_bcd(record[10])
         monthT = self._decode_bcd(record[11])
         yearT = 2000 + self._decode_bcd(record[12])
+
+        # Convert rain if the rain gauge is modified 
+        if self.rain_gauge_diameter != 0:  
+          x = 100.0 ** 2 / self.rain_gauge_diameter ** 2
+          total = x * total
+          rate = x * rate 
 
         self._report_rain(total, rate)
 
