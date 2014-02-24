@@ -54,5 +54,10 @@ class ValueRenderer(object):
         elif self.select == "value":
             val_key = self.value if self.value else 'value'
             self.logger.debug("Getting value for '"+self.key+"."+val_key+"'")
-            return wfcommon.units.Converter(context["units"]).convert(self.key, data[self.key][val_key])
+            print  "\nvalue.py return:"
+            #### Do not do unit conversion if deg in case ####
+            if val_key == 'deg':
+                return data[self.key][val_key]
+            else:
+                return wfcommon.units.Converter(context["units"]).convert(self.key, data[self.key][val_key])
 
