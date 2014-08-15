@@ -10,18 +10,20 @@ Users are invited to submit as comment to this page the URL of their stations to
 || [http://weather.fire-mgou.ru/ Yubileyny (Moscow region), Russia] || WMR200 || Uses HTTP renderer. ||
 || [http://meteocieza.dyndns.org/24hours.html Cieza, Murcia, Spain] || WMR200 || Uses HTTP renderer. Running on Asus WL-500gP V2 router, with http://koppel.cz/cdmawifi/ firmware ||
 || [http://mazonovo.meteoviedo.es/ Taramundi, Asturias, Spain] || WMRS200 || Uses FTP renderer. Uploads online data to www.meteoclimatic.com ||
-|| [http://lode-hermsdorf.dyndns.org Hermsdorf, Upper Lusatia, Germany] || WMRS200 || Uses HTTP renderer. Running on Alix1d with Ubuntu 10.04 ||
 || [http://s2.kluthr.de/meteo/ Ermsleben, Saxony Anhalt, Germany] || WMRS200 || Uses HTTP and [http://www.wetter.com/wetter_aktuell/wetternetzwerk/station/5454/dashboard/full/ Wetter.com] renderer. ||
 || [http://www.patraslive.gr/weather/kastelokampos/24hours.html Kastelokampos, Patras, Greece] || WMR100N || Uses FTP renderer. ||
 || [http://galile0.co.uk:7680/ Preston, Lancashire, England] || H1080 || Uses Http renderer. Running on a Qnap TS210. ||
 || [http://v.pk2.se/ Växjö, S. Sweden] || [http://www.oregonscientific.com.au/ulimages/manuals2/WMR928NX.pdf WMR928NX] || Uses FTP renderer. Running on NSLU2 with Debian. [http://www.pk2.se/wfrog/gardsby-weather-station.htm More] ||
 || [http://www.puigsegur.cat/meteosonrebassa/24hours.html Sant Joan, Mallorca, Balearic Islands] || Oregon WMRS200 || Uses FTP renderer. Running on [http://www.pcengines.ch/alix.htm ALIX3D2] with [http://linux.voyage.hk/ voyage linux] 0.8. Uploads online data to www.meteoclimatic.com ||
-|| [http://lode-hermsdorf.dyndns.org Hermsdorf, Upper Lusatia, Germany] || Oregon WMRS200 || Uses HTTP renderer. Runnning on [http://www.pcengines.ch/alix.htm ALIX1D] with ubuntu 10.04 ||
+|| [http://velofreak.de/meteo Hermsdorf, Upper Lusatia, Germany] || Oregon WMRS200 || Uses HTTP renderer. Runnning on [http://www.pcengines.ch/alix.htm ALIX1D] with ubuntu 10.04 ||
 || [http://metmediona.no-ip.org// Mediona, (Barcelona, Spain)] || Oregon WRMS200 ||  Uses HTTP renderer. Running on a foxconn NT425 with Ubuntu ||
 || [http://weather.eckeroth.se/ Falsterbo, Sweden] || Oregon WMR200 ||  Uses HTTP renderer. wfrog 0.8.2 multi-sensors with mysql storage running on a QNAP 659-PRO NAS. ||
 || [http://www.warmsky.ru/wfrog/ Beregovoe, Crimea, Ukraine] || WMRS200 || Uses HTTP renderer ||
 || [http://photing.com/webcam/weather/24hours.html Tresdorf, north of Vienna, Austria] || WMRS200 || Logger & Renderer running on Sheevaplug with Debian Squeeze, rendering to FTP/wunderground/PWS/wetter.com every 10min (if neighbour's DSL is up ;)) ||
 || [http://www.marrable.org.uk/weather Northampton, UK] || Watson W-8681 || wfrog 0.8.2 svn 910   running on Ubuntu 12.04 and Firebird database storage. Using HTTP renderer on internal network and FTP renderer to a Win2K server for Internet access. ||
+|| [http://bbarker.dtdns.net/weather/3hours.html Euston, London, UK] || Maplin weather station with raspberrypi camera. ||
+|| [http://www.sciolto.org/meteo/ Seis am Schlern, Bozen, Italy] ||  LaCrosse WS2355 (with patched /usr/lib/wfrog/wfdriver/station/ws23xx.py). Run on Raspian on RasperryPI with FTP renderer. Data synced to http://www.pwsweather.com/obs/SCIOLTOPWS.html and http://www.wunderground.com/weatherstation/WXDailyHistory.asp?ID=ITRENTIN75 ||
+|| [http://modellflugplatz.com/Wind/3hours.html Bruckmuehl, Bavaria, Germany] || WMRS200 with solar powered raspberry ||
 
 
 <p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
