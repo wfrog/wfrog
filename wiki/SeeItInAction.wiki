@@ -21,9 +21,9 @@ Users are invited to submit as comment to this page the URL of their stations to
 || [http://www.warmsky.ru/wfrog/ Beregovoe, Crimea, Ukraine] || WMRS200 || Uses HTTP renderer ||
 || [http://photing.com/webcam/weather/24hours.html Tresdorf, north of Vienna, Austria] || WMRS200 || Logger & Renderer running on Sheevaplug with Debian Squeeze, rendering to FTP/wunderground/PWS/wetter.com every 10min (if neighbour's DSL is up ;)) ||
 || [http://www.marrable.org.uk/weather Northampton, UK] || Watson W-8681 || wfrog 0.8.2 svn 910   running on Ubuntu 12.04 and Firebird database storage. Using HTTP renderer on internal network and FTP renderer to a Win2K server for Internet access. ||
-|| [http://bbarker.dtdns.net/weather/3hours.html Euston, London, UK] || Maplin weather station with raspberrypi camera. ||
-|| [http://www.sciolto.org/meteo/ Seis am Schlern, Bozen, Italy] ||  LaCrosse WS2355 (with patched /usr/lib/wfrog/wfdriver/station/ws23xx.py). Run on Raspian on RasperryPI with FTP renderer. Data synced to http://www.pwsweather.com/obs/SCIOLTOPWS.html and http://www.wunderground.com/weatherstation/WXDailyHistory.asp?ID=ITRENTIN75 ||
-|| [http://modellflugplatz.com/Wind/3hours.html Bruckmuehl, Bavaria, Germany] || WMRS200 with solar powered raspberry ||
+|| [http://bbarker.dtdns.net/weather/3hours.html Euston, London, UK] || Maplin weather station ||  with raspberrypi camera. ||
+|| [http://www.sciolto.org/meteo/ Seis am Schlern, Bozen, Italy] ||  LaCrosse WS2355 (with patched /usr/lib/wfrog/wfdriver/station/ws23xx.py) || . Run on Raspian on RasperryPI with FTP renderer. Data synced to http://www.pwsweather.com/obs/SCIOLTOPWS.html and http://www.wunderground.com/weatherstation/WXDailyHistory.asp?ID=ITRENTIN75 ||
+|| [http://modellflugplatz.com/Wind/3hours.html Bruckmuehl, Bavaria, Germany] || WMRS200 || with solar powered raspberry ||
 
 
 <p align="right"><img src="http://wfrog.googlecode.com/svn/wiki/images/small-frog.png"/></p>
