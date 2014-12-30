@@ -61,7 +61,7 @@ renderer: !multi
         # SetUp: http://www.wetter.com/community/wetternetzwerk/admin/api/
         # Please use for first setup test: True to test publishing. Check logs!
         #wettercom: !wettercom
-        #    username: YOUR_STATION_ID
+        #    stationId: YOUR_STATION_ID
         #    password: YOUR_STATION_PASSWORD
         #    storage: !service
         #        name: storage

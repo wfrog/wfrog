@@ -20,6 +20,7 @@ import logging
 import sys
 import time
 import hashlib
+import json
 from wfcommon.formula.base import LastFormula
 from httplib import HTTPConnection
 from urllib import urlencode
@@ -35,11 +36,11 @@ class WetterComPublisher(object):
 
     [ Properties ]
 
-    username [string]:
-        Your wetter.com username.
+    stationId [string]:
+        Your wetter.com station-ID.
 
     password [string]:
-        password - wfrog ALWAYS send your password md5-decrypted to wetter.com!
+        Your station password
 
     period [numeric]:
         The update period in seconds.
@@ -51,7 +52,7 @@ class WetterComPublisher(object):
         true if test-publishing
     """
 
-    username = None
+    stationId = None
     password = None
     publisher = None
     storage = None
@@ -62,11 +63,11 @@ class WetterComPublisher(object):
 
     def render(self, data={}, context={}):
         try:
-            assert self.username is not None, "'wettercom.id' must be set"
+            assert self.stationId is not None, "'wettercom.stationId' must be set"
             assert self.password is not None, "'wettercom.password' must be set"
             assert self.period is not None, "'wettercom.period' must be set"
 
-            self.logger.info("Initializing Wetter.com (user %s)" % self.username)
+            self.logger.info("Initializing Wetter.com (stationID %s)" % self.stationId)
 
             self.alive = True
 
@@ -78,62 +79,55 @@ class WetterComPublisher(object):
             accu.formulas =     {'current': {
                  'temp'         : LastFormula('temp'),
                  'hum'          : LastFormula('hum'),
+                 'hum2'         : LastFormula('hum2'),
                  'pressure'     : LastFormula('pressure'),
                  'wind'         : LastFormula('wind'),
                  'wind_deg'     : LastFormula('wind_dir'),
                  'rain'         : LastFormula('rain'),
-                 'localtime'    : LastFormula('localtime') } }
+                 'localtime'    : LastFormula('localtime'),
+                 'utctime'      : LastFormula('utctime'),
+                 'dew_point'    : LastFormula('dew_point') } }
 
             while self.alive:
                 try:
                     data = accu.execute()['current']['series']
+                    self.logger.debug("Got data from accumulator: %s" % data)
                     index = len(data['lbl'])-1
 
                     try:
-                        # try, if date is NoneType, if yes, we need to wait for a new value in wfrog.csv
+                        # If date is NoneType (see except for this try), we need to wait for a new value in wfrog.csv
 
                         args = {
-                            'benutzername':         str(self.username),
-                            'passwortmd5':          hashlib.md5(str(self.password)).hexdigest(),
-                            'datum':                data['localtime'][index].strftime('%Y%m%d%H%M'),
-                            'feuchtigkeit':         int(round(data['hum'][index])),
-                            'temperatur':           str(data['temp'][index]).replace('.', ','),
-                            'windrichtung':         int(round(data['wind_deg'][index])),
-                            'windstaerke':          str(data['wind'][index]).replace('.', ','),
-                            'luftdruck':            str(data['pressure'][index]).replace('.', ','),
-                            'niederschlagsmenge':   str(data['rain'][index]).replace('.', ',')
+                            'sid'                   : 'wfrog',
+                            'id'                    : str(self.stationId),
+                            'pwd'                   : str(self.password),
+                            'dt'                    : data['localtime'][index].strftime('%Y%m%d%H%M'),
+                            'dtutc'                 : data['utctime'][index].strftime('%Y%m%d%H%M'), # we need both, dt (date) and dtutc (date in UTC).
+                            'hu'                    : int(round(data['hum'][index])),
+                            'te'                    : str(data['temp'][index]),
+                            'dp'                    : str(data['dew_point'][index]),
+                            'wd'                    : int(round(data['wind_deg'][index])),
+                            'ws'                    : str(data['wind'][index]),
+                            'pr'                    : str(data['pressure'][index]),
+                            'pa'                    : str(data['rain'][index])
                             }
-
+                            
                         if self.test:
-                            args['test'] = "true"
-                            self.logger.info('Running in test-mode!! The data wont be stored.')
+                            args["test"] = "true"
+                            self.logger.info('#!#!#!#!#!#!#!#!#!#! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Running in test-mode!! The data wont be stored. #!#!#!#!#!#!#!#!#!#!')
+
+                        self.logger.debug("Publishing wettercom data: %s " % args)
+                        rawResponse = self._publish(args, 'interface.wetterarchiv.de', '/weather/')
+                        self.logger.debug('Server response: Code: %s Status: %s API-Answer: %s' % rawResponse)
+                        
+                        # Ok, now create an JSON-object
+                        response = json.loads(rawResponse[2])
+                        
+                        # With the new API, checking for any error is very easy!
+                        if (response["status"] == "success"):
+                            self.logger.info('Data published successfully!')
                         else:
-                            # If test is not true, we must send &test=false. If the GET string ends with rain-value, wetter.com returns an error
-                            args['test'] = "false"
-
-                        self.logger.debug("Publishing wettercom data: %s " % urlencode(args))
-                        response = self._publish(args, 'www.wetterarchiv.de', '/interface/http/input.php')
-
-			self.logger.debug('Server response: Code: %s Status: %s API-Answer: %s' % response)
-
-                        # Split response to determine if the request was ok or not.
-                        answer = response[2].split('=')
-
-			allOk = False
-			try:
-                            if (answer[1] == 'SUCCESS'):
-			        allOk=True                                
-			except:
-			    if (answer[5] == 'SUCCESS'):
-                                allOk=True
-
-			if allOk:
-			    self.logger.info('Data published successfully!')
-                        else:
-			    try:
-                                self.logger.error('Data publishing fails! Response: %s' % answer[5])
-			    except:
-				self.logger.error('Data publishing fails! Response: %s' % answer[2])
+                            self.logger.error('Data publishing fails! Code: %s | Description: %s' % response["errorcode"], response["errormessage"])
 
                     except Exception, e:
                         if (str(e) == "'NoneType' object has no attribute 'strftime'") or (str(e) == "a float is required"):
@@ -141,7 +135,6 @@ class WetterComPublisher(object):
                         else:
                             self.logger.error('Got unexpected error. Retry next run. Error: %s' % e)
                             raise
-
                 except Exception, e:
                     self.logger.exception(e)
 
@@ -155,20 +148,22 @@ class WetterComPublisher(object):
         self.alive = False
 
     def _publish(self, args, server, uri):
-
-      uri = uri + "?" + urlencode(args)
       
       self.logger.debug('Connect to: http://%s' % server)
-      self.logger.debug('GET %s' % uri)
+      self.logger.debug('POST %s' % uri)
+      self.logger.debug('... and the following data: %s' % urlencode(args))
 
       conn = HTTPConnection(server)
       if not conn:
          raise Exception, 'Remote server connection timeout!'
+     
+      headers = {"Content-type": "application/x-www-form-urlencoded","Accept": "text/plain"}
 
-      conn.request("GET", uri)
+      conn.request("POST", uri, urlencode(args), headers)
       conn.sock.settimeout(5.0)
 
       http = conn.getresponse()
+      self.logger.debug("Header: %s" % http.getheaders())
       data = (http.status, http.reason, http.read())
       conn.close()
       if not (data[0] == 200 and data[1] == 'OK'):
