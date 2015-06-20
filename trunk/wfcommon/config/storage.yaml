@@ -5,12 +5,19 @@ storage: !user
         default: !csv
             path: data/wfrog.csv
 
-## you may use sqlite3 instead of csv ,
-## to this end delete the above lines and undelete below,
-## install pysqlite2 and dependencies,
-## and create the database and its tables
-## using # sqlite3 /var/lib/wfrog/wfrog.sql < database/sqlite3.sql
-## (in case, use the database/csv2sql script to transfer meteo data)
+## You may use sqlite3 instead of csv.
+## (1) comment out the above lines and uncomment below,
+## (2) install pysqlite2 and dependencies,
+## (3) create the database and its tables:
+##     to this end, copy the schema somewhere
+#$ cp /usr/lib/wfrog/database/db-sqlite3.sql /tmp/
+##     edit it to enable extra sensor that you may have
+#$ nano /tmp/db-sqlite3.sql
+##     create the table
+#$ sqlite3 /var/lib/wfrog/wfrog.sql < /tmp/db-sqlite3.sql
+## (4) in case, use the  csv2sqlite3  script to
+##    transfer meteo data from the CVS file to the SQL file
+#$ /usr/lib/wfrog/database/csv2sqlite3 /var/lib/wfrog/wfrog.csv /var/lib/wfrog/wfrog.sql
 
 #storage: !user
 #    choices:
@@ -18,6 +25,8 @@ storage: !user
 #           database: /var/lib/wfrog/wfrog.sql
 #       default: !sqlite3
 #           database: data/wfrog.sql
+
+## Similarly you may use other databases as backends.
 
 #storage: !firebird { database: 'localhost:/var/lib/firebird/2.0/data/wfrog.db',
 #                     user: sysdba,
