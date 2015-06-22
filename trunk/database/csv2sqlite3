@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-## Copyright 2013 A Mennucc1
+## Copyright 2013-2015 A Mennucc1
 ##
 ##  This file is part of wfrog
 ##  It converts CSV recordings of meteo data to Sqlite3
@@ -23,7 +23,7 @@
 import csv, time, string, os, sys, sqlite3
 import os.path
 from datetime import datetime
-
+from distutils import util
 
 if len(sys.argv) != 3:
 	print """
@@ -31,13 +31,33 @@ Usage: csv2sql input.csv output.sql
 
 This program reads CSV recordings of meteo data, and adds them to a Sqlite3
 database. The database must be initialized to contain the table 'METEO',
-see database/sqlite3.sql in the source code.
-Note that the SQL table it may contain more fields per record than the CSV;
+see database/db-sqlite3.sql in the source code or under /usr/lib/wfrog .
+Note that the SQL table may contain more fields per record than the CSV;
 this script will selfadapt.
 """
 	sys.exit(0)
 
+
+### read schema from CSV (if any)
 columns = [ 'timestamp', 'localtime', 'temp', 'hum', 'wind', 'wind_dir', 'wind_gust', 'wind_gust_dir', 'dew_point', 'rain', 'rain_rate', 'pressure', 'uv_index' ]
+
+skip_first=False
+c = [z.lower() for z in csv.reader(open(sys.argv[1])).next()]
+if 'timestamp' in c or 'localtime' in c or 'temp' in c:
+    skip_first=True
+    sys.stderr.write("Using first line of CSV as input schema.\n")
+    if c != columns:
+	if c[0] != 'timestamp' or  c[1] != 'localtime': 
+	    sys.stdout.write("First line of CSV is too different from the standard. This is unsupported.\n")
+	    sys.exit(1)
+	else:
+	    sys.stdout.write("First line of CSV is somewhat different than the standard. This is poorly supported.\n")
+	    sys.stdout.write('Do you want to stop here ? ')
+	    if util.strtobool(raw_input()):
+		sys.exit(1)
+	    columns = c
+    
+
 
 def _get_table_fields(db, tablename='METEO'):
         sql = "PRAGMA table_info(%s);" % tablename
@@ -51,12 +71,14 @@ def _get_table_fields(db, tablename='METEO'):
         return fields
 
 reader = csv.reader(open(sys.argv[1]))
+if skip_first:
+    reader.next()
 writer = sqlite3.connect(sys.argv[2],  detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
 
 table_fields = _get_table_fields(writer)
 # Verify Mandatory fields
-assert 'timestamp_utc' in table_fields
-assert 'timestamp_local' in table_fields
+assert 'timestamp_utc'   == table_fields[0]
+assert 'timestamp_local' == table_fields[1]
 
 inserter='?,'*len(table_fields)
 inserter="insert into METEO  values ( %s ) ;" % inserter[:-1]
@@ -68,7 +90,7 @@ for i in range(len(table_fields)):
         themap.append(j)
     except ValueError:
         themap.append(None)
-themap[0]=1
+themap[0]=0 # will remap this to iso UTC
 themap[1]=1
 
 c=writer.cursor()
@@ -77,13 +99,17 @@ for l in reader:
         continue
     w=[]
     for i in range(len(table_fields)):
-        if themap[i] != None:
+	if i == 0:
+	    t=long(l[0]) # convert timestamp to UTC
+	    a=str(datetime.utcfromtimestamp(t))
+	    w.append(a)
+	elif themap[i] != None:
             v=l[themap[i]]
             if len(v)==0:
                 w.append(None)
             else:
                 w.append(v)
-        else:
+	else:
             w.append(None)
     c.execute(inserter, w)
 writer.commit()
