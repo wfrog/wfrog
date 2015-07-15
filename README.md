@@ -1,4 +1,4 @@
-[**Documentation**](wiki/InstallationGuide) | [**Supported Stations**](SupportedStations) | [**Online User Stations**](SeeItInAction) | [**Download**](http://code.google.com/p/wfrog/downloads/list) | [**User Forum**](http://groups.google.com/group/wfrog-users) | [**Release Notes**](ReleaseNotes) | [**Contribute**](Contribute) 
+[**Documentation**](https://github.com/jpuigsegur/wfrog/wiki/InstallationGuide) | [**Supported Stations**](https://github.com/jpuigsegur/wfrog/wiki/SupportedStations) | [**Online User Stations**](https://github.com/jpuigsegur/wfrog/wiki/SeeItInAction) | [**Download**](http://code.google.com/p/wfrog/downloads/list) | [**User Forum**](http://groups.google.com/group/wfrog-users) | [**Release Notes**](https://github.com/jpuigsegur/wfrog/wiki/ReleaseNotes) | [**Contribute**](https://github.com/jpuigsegur/wfrog/wiki/Contribute) 
 
 **wfrog** is a web-based weather station software with nice charts and many ways to publish them on the web, and much more...
 
