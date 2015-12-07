@@ -29,3 +29,5 @@ Currently supported weather data publishers:
 
 Tested on Linux, alpha stage on Windows and may work on OS X.
 
+More information on the [**Wiki**](https://github.com/wfrog/wfrog/wiki)
+
