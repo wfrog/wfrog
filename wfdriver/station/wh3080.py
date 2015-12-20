@@ -21,14 +21,6 @@ import time
 import logging
 from wfcommon import units
 
-def convert_illuminance_wm2(lux):
-    "Approximate conversion of illuminance in lux to solar radiation in W/m2"
-    # This value needs to be adjusted depending on the location.
-    if lux is None:
-        return None
-    return lux * 0.0075
-
-
 class WH3080Station(object):
 
     '''
