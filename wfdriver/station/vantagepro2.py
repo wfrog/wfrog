@@ -102,7 +102,8 @@ class VantageProStation(object):
                         bad_CRC = 0
                         self.logger.debug("CRC OK")
                         fields = _LoopStruct.unpack(raw)
- 
+                        # print fields
+
                         # Pressure
                         e = generate_event('press')
                         e.value = fields['Pressure'] + self.pressure_cal
@@ -110,27 +111,37 @@ class VantageProStation(object):
                         send_event(e)
                         log_txt =  "DATA PACKET Press:%.1fmb " % (fields['Pressure'] + self.pressure_cal)
 
-                        # Inside Temp & Hum sensor
-                        e = generate_event('temp')
-                        e.sensor = 0
-                        e.value = fields['TempIn']
-                        send_event(e)
-                        e = generate_event('hum')
-                        e.sensor = 0
-                        e.value = fields['HumIn']
-                        send_event(e)
-                        log_txt +=  "TempIn:%.1fC HumIn:%d%% " % (fields['TempIn'], fields['HumIn'])
+                        # Inside Temp sensor
+                        if not fields['TempIn'] is None:
+                            e = generate_event('temp')
+                            e.sensor = 0
+                            e.value = fields['TempIn']
+                            send_event(e)
+                            log_txt +=  "TempIn:%.1fC " % fields['TempIn']
+
+                        # Inside Hum sensor
+                        if not fields['HumIn'] is None:
+                            e = generate_event('hum')
+                            e.sensor = 0
+                            e.value = fields['HumIn']
+                            send_event(e)
+                            log_txt +=  "HumIn:%d%% " % fields['HumIn']
                                 
-                        # Outside main Temp & Hum sensor
-                        e = generate_event('temp')
-                        e.sensor = 1
-                        e.value = fields['TempOut']
-                        send_event(e)
-                        e = generate_event('hum')
-                        e.sensor = 1
-                        e.value = fields['HumOut']
-                        send_event(e)
-                        log_txt +=  "TempOut:%.1fC HumOut:%d%% " % (fields['TempOut'], fields['HumOut'])
+                        # Outside main Temp Hum sensor
+                        if not fields['TempOut'] is None:
+                            e = generate_event('temp')
+                            e.sensor = 1
+                            e.value = fields['TempOut']
+                            send_event(e)
+                            log_txt +=  "TempOut:%.1fC " % fields['TempOut']
+
+                        # Outside main Hum sensor
+                        if not fields['HumOut'] is None:
+                            e = generate_event('hum')
+                            e.sensor = 1
+                            e.value = fields['HumOut']
+                            send_event(e)
+                            log_txt +=  "HumOut:%d%% " % fields['HumOut']
 
                         # Rain bucket
                         e = generate_event('rain')
@@ -388,16 +399,18 @@ class LoopStruct( myStruct ):
         # Pressure
         items['Pressure'] = units.InHgToHPa(items['Pressure'] / 1000.0)
         # Temperature
-        items['TempIn'] = units.FToC(items['TempIn'] / 10.0)
-        items['TempOut'] = units.FToC(items['TempOut'] / 10.0)
-        items['ExtraTemp1'] = units.FToC(items['ExtraTemp1'] / 10.0) if items['ExtraTemp1'] != 255 else None
-        items['ExtraTemp2'] = units.FToC(items['ExtraTemp2'] / 10.0) if items['ExtraTemp2'] != 255 else None
-        items['ExtraTemp3'] = units.FToC(items['ExtraTemp3'] / 10.0) if items['ExtraTemp3'] != 255 else None
-        items['ExtraTemp4'] = units.FToC(items['ExtraTemp4'] / 10.0) if items['ExtraTemp4'] != 255 else None
-        items['ExtraTemp5'] = units.FToC(items['ExtraTemp5'] / 10.0) if items['ExtraTemp5'] != 255 else None
-        items['ExtraTemp6'] = units.FToC(items['ExtraTemp6'] / 10.0) if items['ExtraTemp6'] != 255 else None
-        items['ExtraTemp7'] = units.FToC(items['ExtraTemp7'] / 10.0) if items['ExtraTemp7'] != 255 else None
+        items['TempIn'] = units.FToC(items['TempIn'] / 10.0) if items['TempIn'] != 32767 else None
+        items['TempOut'] = units.FToC(items['TempOut'] / 10.0) if items['TempOut'] != 32767 else None
+        items['ExtraTemp1'] = units.FToC(items['ExtraTemp1'] - 90) if items['ExtraTemp1'] != 255 else None
+        items['ExtraTemp2'] = units.FToC(items['ExtraTemp2'] - 90) if items['ExtraTemp2'] != 255 else None
+        items['ExtraTemp3'] = units.FToC(items['ExtraTemp3'] - 90) if items['ExtraTemp3'] != 255 else None
+        items['ExtraTemp4'] = units.FToC(items['ExtraTemp4'] - 90) if items['ExtraTemp4'] != 255 else None
+        items['ExtraTemp5'] = units.FToC(items['ExtraTemp5'] - 90) if items['ExtraTemp5'] != 255 else None
+        items['ExtraTemp6'] = units.FToC(items['ExtraTemp6'] - 90) if items['ExtraTemp6'] != 255 else None
+        items['ExtraTemp7'] = units.FToC(items['ExtraTemp7'] - 90) if items['ExtraTemp7'] != 255 else None
         # Humidity
+        items['HumIn'] = items['HumIn'] if items['HumIn'] != 255 else None
+        items['HumOut'] = items['HumOut'] if items['HumOut'] != 255 else None
         items['ExtraHum1'] = items['ExtraHum1'] if items['ExtraHum1'] != 255 else None
         items['ExtraHum2'] = items['ExtraHum2'] if items['ExtraHum2'] != 255 else None
         items['ExtraHum3'] = items['ExtraHum3'] if items['ExtraHum3'] != 255 else None
@@ -461,10 +474,6 @@ class LoopStruct( myStruct ):
         day   = (date >> 7) & 0x01f         # 5 bits
         month = (date >> 12) & 0x0f         # 4 bits
         return "%s-%s-%s" % (year, month, day)
-
-
-
-
 
 
 
