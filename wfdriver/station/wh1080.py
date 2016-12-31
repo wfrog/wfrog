@@ -89,8 +89,10 @@ class WH1080Station(object):
                         e.create_child('mean')
                         e.mean.speed = data['wind_ave']
                         e.mean.dir = 22.5*(data['wind_dir']) 
+                        e.create_child('gust')
+                        e.gust.speed = 0.0
+                        e.gust.dir = 0.0
                         if data['wind_gust']:
-                            e.create_child('gust')
                             e.gust.speed = data['wind_gust']
                             e.gust.dir = 22.5*(data['wind_dir'])
                         send_event(e)
