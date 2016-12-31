@@ -19,7 +19,7 @@
 
 import time
 import logging
-from wfcommon import units
+from wfcommon import meteo
 
 class WH3080Station(object):
 
@@ -37,7 +37,9 @@ class WH3080Station(object):
     def run(self, generate_event, send_event, context={}):
 
         from pywws import WeatherStation
-        station = WeatherStation.weather_station()
+
+	# pywws manages a wh1080 by default. Therefore '3080' shall be passed.
+        station = WeatherStation.weather_station('3080')
 
         for data, last_ptr, logged in station.live_data():
             if not logged:
@@ -83,23 +85,33 @@ class WH3080Station(object):
                         e.create_child('mean')
                         e.mean.speed = data['wind_ave']
                         e.mean.dir = 22.5*(data['wind_dir']) 
+
+                        e.create_child('gust')
+                        e.gust.speed = 0.0;
+                        e.gust.dir = 0.0;
                         if data['wind_gust']:
-                            e.create_child('gust')
+                            #e.create_child('gust')
                             e.gust.speed = data['wind_gust']
                             e.gust.dir = 22.5*(data['wind_dir'])
                         send_event(e)
 
+                    # pywws manages "uv" in the case of 3080 stations 
                     if data['uv'] is not None:
                         e = generate_event('uv')
                         e.sensor = 1
                         e.value = data['uv']
                         send_event(e)
 
-                    if data['solar_rad'] is not None:
-                       e = generate_event('rad')
-                       e.sensor = 1
-                       e.value = (data['solar_rad'])
-                       send_event(e)
+                    # pywws manages the "illuminance" in the case of 3080 stations 
+                    if data['illuminance'] is not None:
+                        e = generate_event('rad')
+                        e.sensor = 1
+                        e.value = (meteo.convert_illuminance_wm2(data['illuminance']))
+			send_event(e)
+
+                except Exception, e:
+                    self.logger.error(e)
+
 
                 except Exception, e:
                     self.logger.error(e)
