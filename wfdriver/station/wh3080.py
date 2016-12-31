@@ -107,7 +107,7 @@ class WH3080Station(object):
                         e = generate_event('rad')
                         e.sensor = 1
                         e.value = (meteo.convert_illuminance_wm2(data['illuminance']))
-			send_event(e)
+                        send_event(e)
 
                 except Exception, e:
                     self.logger.error(e)
