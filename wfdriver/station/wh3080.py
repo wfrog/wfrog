@@ -19,7 +19,7 @@
 
 import time
 import logging
-from wfcommon import units
+from wfcommon import meteo
 
 class WH3080Station(object):
 
@@ -106,7 +106,7 @@ class WH3080Station(object):
                     if data['illuminance'] is not None:
                         e = generate_event('rad')
                         e.sensor = 1
-                        e.value = (convert_illuminance_wm2(data['illuminance']))
+                        e.value = (meteo.convert_illuminance_wm2(data['illuminance']))
 			send_event(e)
 
                 except Exception, e:
