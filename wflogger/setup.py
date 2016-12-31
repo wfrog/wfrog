@@ -37,8 +37,7 @@ class SetupClient(object):
         defs = yaml.load( file(settings_def_file, 'r') )
         if source_file is not None:
             source = yaml.load( file(source_file, 'r') )
-	source = None
-        if source == None:
+        else:
             source = {}
         target = {}
         try:

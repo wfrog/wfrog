@@ -137,9 +137,9 @@ class PwsWeatherPublisher(object):
                         # <float> winddir: in degrees, between 0.0 and 360.0
                         'winddir' : data['wind_deg'][index] }
 
-                    # Do not send parameters that are null (None).
+                    # Do not send parameters that are null (None), but don't remove zeroes (0.0)
                     # from above only dateutc is a mandatory parameter.
-                    params = dict(filter(lambda (p,v): v, [(p,v) for p,v in params.iteritems()]))
+                    params = dict(filter(lambda (p,v): v is not None, [(p,v) for p,v in params.iteritems()]))
                     self.logger.info("Publishing PWS data: %s " % str(params))
                     self.publisher.set(**params)
                     response = self.publisher.publish()               
