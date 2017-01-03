@@ -6,8 +6,11 @@
 $u
 #end if
 #end def
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather Dashboard - wfrog $version</title>
     #if $getVar('http', False)
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/prototype/1.7.0.0/prototype.js"></script>
@@ -856,7 +859,6 @@ ${"%7d" % $value.solar_rad_max  if $value.solar_rad_max != None else "      -"}#
     </div>
 </div>
 <div style="width:100%;clear:both;"><br></div>
-</body>
 
 <script type="text/javascript">
 // Highlight the correct tab according to the url
@@ -882,4 +884,5 @@ if(window.location.href.indexOf("30days.html") > -1) {
     move_forward = function() { move(12, 'h') }    
 }
 </script>
+</body>
 </html>
