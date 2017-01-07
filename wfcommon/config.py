@@ -25,7 +25,7 @@ import os.path
 import copy
 from Cheetah.Template import Template
 
-wfrog_version = "0.8.2-svn"
+wfrog_version = "0.8.2.99-git"
 
 class Configurer(object):
 
