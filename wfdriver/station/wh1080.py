@@ -51,7 +51,7 @@ class WH1080Station(object):
                 try:
                     if data['abs_pressure'] is not None:
                         e = generate_event('press')
-                        e.value = (10*(4.5+(data['abs_pressure'])))/10
+                        e.value = data['abs_pressure']
                         send_event(e)
 
                     if data['temp_in'] is not None:                    
@@ -80,7 +80,7 @@ class WH1080Station(object):
 
                     if data['rain'] is not None:
                         e = generate_event('rain')
-                        e.total = (136*(data['rain']))/100 
+                        e.total = data['rain']
                         e.rate = 0
                         send_event(e)
 
