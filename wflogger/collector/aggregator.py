@@ -161,7 +161,7 @@ class AggregatorCollector(base.BaseCollector):
             # Wind gust cannot be smaller than wind average
             # (might happen due to different sampling periods)
             if data['wind'] <= self._wind_gust:
-                data['wind_gust'] = self._wind_gust
+                data['wind_gust'] = round(self._wind_gust, 1)
             else:
                 data['wind_gust'] = round(data['wind'], 1)
         else:
