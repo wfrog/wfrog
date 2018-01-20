@@ -39,63 +39,94 @@ class WH1080Station(object):
 
     logger = logging.getLogger('station.wh1080')
 
+    # https://docs.python.org/2/howto/logging-cookbook.html
+    logger_raw = logging.getLogger('data_raw')
+    logger_raw.propagate = False
+    logger_raw.setLevel(logging.DEBUG)
+    fh = logging.FileHandler('/home/td/.wfrog/data/wh1080.log')
+    fh.setLevel(logging.DEBUG)
+    logger_raw.addHandler(fh)
+    formatter = logging.Formatter("%(asctime)s %(levelname)s [%(name)s] %(message)s")
+#    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+#    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+
+
     name = 'Fine Offset WH1080 and compatibles'
 
     def run(self, generate_event, send_event, context={}):
-
         from pywws import WeatherStation
-        station = WeatherStation.weather_station()
 
-        for data, last_ptr, logged in station.live_data():
-            if not logged:
-                try:
-                    if data['abs_pressure'] is not None:
-                        e = generate_event('press')
-                        e.value = data['abs_pressure']
-                        send_event(e)
+        # cyclic try connecting to weather station (when USB is disconnected)
+        while True:
+            try:
+                station = WeatherStation.weather_station()
 
-                    if data['temp_in'] is not None:                    
-                        e = generate_event('temp')
-                        e.sensor = 0
-                        e.value = data['temp_in']
-                        send_event(e)
+                for data, last_ptr, logged in station.live_data():
+                    # raw = 'raw: '
+                    raw = ''
+                    for value in sorted(data):
+                        # print value, data[value]
+                        raw += str(value) + ': ' + str(data[value]) + ', '
+                    # raw += 'end'
+                    # print raw
+                    self.logger_raw.info(msg=raw)
 
-                    if data['hum_in'] is not None:
-                        e = generate_event('hum')
-                        e.sensor = 0
-                        e.value = data['hum_in']
-                        send_event(e)
+                    if not logged:
+                        try:
+                            if data['abs_pressure'] is not None:
+                                e = generate_event('press')
+                                e.value = data['abs_pressure']
+                                send_event(e)
 
-                    if data['temp_out'] is not None:
-                        e = generate_event('temp')
-                        e.sensor = 1
-                        e.value = data['temp_out']
-                        send_event(e)
+                            if data['temp_in'] is not None:
+                                e = generate_event('temp')
+                                e.sensor = 0
+                                e.value = data['temp_in']
+                                send_event(e)
 
-                    if data['hum_out'] is not None:
-                        e = generate_event('hum')
-                        e.sensor = 1
-                        e.value = data['hum_out']
-                        send_event(e)
+                            if data['hum_in'] is not None:
+                                e = generate_event('hum')
+                                e.sensor = 0
+                                e.value = data['hum_in']
+                                send_event(e)
 
-                    if data['rain'] is not None:
-                        e = generate_event('rain')
-                        e.total = data['rain']
-                        e.rate = 0
-                        send_event(e)
+                            if data['temp_out'] is not None:
+                                e = generate_event('temp')
+                                e.sensor = 1
+                                e.value = data['temp_out']
+                                send_event(e)
 
-                    if data['wind_ave'] is not None and data['wind_dir'] < 16:
-                        e = generate_event('wind')
-                        e.create_child('mean')
-                        e.mean.speed = data['wind_ave']
-                        e.mean.dir = 22.5*(data['wind_dir']) 
-                        e.create_child('gust')
-                        e.gust.speed = 0.0
-                        e.gust.dir = 0.0
-                        if data['wind_gust']:
-                            e.gust.speed = data['wind_gust']
-                            e.gust.dir = 22.5*(data['wind_dir'])
-                        send_event(e)
+                            if data['hum_out'] is not None:
+                                e = generate_event('hum')
+                                e.sensor = 1
+                                e.value = data['hum_out']
+                                send_event(e)
 
-                except Exception, e:
-                    self.logger.error(e)
+                            if data['rain'] is not None:
+                                e = generate_event('rain')
+                                e.total = data['rain']
+                                e.rate = 0
+                                send_event(e)
+
+                            if data['wind_ave'] is not None and 0 <= data['wind_dir'] < 16:
+                                dir_degrees = data['wind_dir'] * 22.5  # 360 / 16 = 22.5
+                                e = generate_event('wind')
+                                e.create_child('mean')
+                                e.mean.speed = data['wind_ave']
+                                e.mean.dir = dir_degrees
+                                e.create_child('gust')
+                                if data['wind_gust'] is not None:
+                                    e.gust.speed = data['wind_gust']
+                                    e.gust.dir = dir_degrees
+                                else:
+                                    e.gust.speed = None
+                                    e.gust.dir = None
+                                send_event(e)
+
+                        except Exception, e:
+                            self.logger.error(e)
+            except IOError, e:
+                self.logger.error('Exception IOError: ' + str(e))
+            finally:
+                time.sleep(30)
