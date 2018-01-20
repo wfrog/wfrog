@@ -39,19 +39,6 @@ class WH1080Station(object):
 
     logger = logging.getLogger('station.wh1080')
 
-    # https://docs.python.org/2/howto/logging-cookbook.html
-    logger_raw = logging.getLogger('data_raw')
-    logger_raw.propagate = False
-    logger_raw.setLevel(logging.DEBUG)
-    fh = logging.FileHandler('/home/td/.wfrog/data/wh1080.log')
-    fh.setLevel(logging.DEBUG)
-    logger_raw.addHandler(fh)
-    formatter = logging.Formatter("%(asctime)s %(levelname)s [%(name)s] %(message)s")
-#    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-#    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    fh.setFormatter(formatter)
-
-
     name = 'Fine Offset WH1080 and compatibles'
 
     def run(self, generate_event, send_event, context={}):
@@ -63,14 +50,6 @@ class WH1080Station(object):
                 station = WeatherStation.weather_station()
 
                 for data, last_ptr, logged in station.live_data():
-                    # raw = 'raw: '
-                    raw = ''
-                    for value in sorted(data):
-                        # print value, data[value]
-                        raw += str(value) + ': ' + str(data[value]) + ', '
-                    # raw += 'end'
-                    # print raw
-                    self.logger_raw.info(msg=raw)
 
                     if not logged:
                         try:
