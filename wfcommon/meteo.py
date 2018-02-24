@@ -441,3 +441,35 @@ def WindPredominantDirection(l):
     return WindDir(avg_x, avg_y)
 
 
+###########################################################################################
+## 4) Radiation transformations
+###########################################################################################
+
+# Source: https://en.wikipedia.org/wiki/Lux
+#
+# The lux is one lumen per square metre (lm/m2), and the corresponding radiometric unit,
+# which measures irradiance, is the watt per square metre (W/m2). There is no single
+# conversion factor between lx and W/m2; there is a different conversion factor for
+# every wavelength, and it is not possible to make a conversion unless one knows the
+# spectral composition of the light.
+#
+# Source: http://bccp.berkeley.edu/o/Academy/workshop08/08%20PDFs/Inv_Square_Law.pdf
+#
+# Converting Lux to W/m2
+# There is no simple conversion it depends on
+# the wavelength or color of the light.
+#  However, for the SUN, there is an approximate
+# conversion of 0.0079 W/m2 per Lux.
+#  Example: We read 75,000 Lux on our light
+# sensor. We can convert that reading to W/m2.
+#  75,000 x 0.0079 = 590 W/m2
+
+def convert_illuminance_wm2(lux):
+   "Approximate conversion of illuminance in lux to solar radiation in W/m2"
+   # This value needs to be adjusted depending on the location.
+   if lux is None:
+       return None
+   return lux * 0.0075
+
+
+
