@@ -401,7 +401,7 @@ def WindSpeed(x,y):
     """
     Obtains composite wind speed from x and y speeds
     """
-    return math.sqrt(x**2 + y**2) 
+    return math.sqrt(x**2 + y**2)
 
 
 def WindDir(x,y):
@@ -409,27 +409,11 @@ def WindDir(x,y):
     Obtains composite wind direction from x and y speeds
     """
     # Calculate polar coordinate angle
-    if x == 0:
-        if y > 0:
-            rAlpha = 90
-        elif y < 0:
-            rAlpha = -90
-        else:
-            rAlpha = 0
-    else:
-        if x > 0 and y > 0:
-            rAlpha = 180 / math.pi * math.atan(y/x)
-        elif x < 0 and y < 0:
-            rAlpha = 180 + 180 / math.pi * math.atan(y/x)
-        elif x > 0 and y < 0:
-            rAlpha = 180 / math.pi * math.atan(y/x)
-        else:
-            rAlpha = -180 + 180 / math.pi * math.atan(y/x)
+    degrees = math.degrees(math.atan2(x, y))
     # Convert to compass bearing
-    if rAlpha < 90:
-        return 90 - rAlpha
-    else:
-        return 450 - rAlpha
+    if degrees < 0.0:
+        degrees += 360.0
+    return degrees
 
 
 def WindDirTxt(d):

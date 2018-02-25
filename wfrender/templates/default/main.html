@@ -1,9 +1,9 @@
 #from wfcommon.units import unit_roll
 #def unitstr(m,u)
 #if $getVar('http', False)
-<a href="-set-?s=units&k=$m&v=$unit_roll($m,$u)">$u</a>
+<a href="-set-?s=units&k=$m&v=$unit_roll($m,$u)">$u</a>#slurp
 #else
-$u
+$u#slurp
 #end if
 #end def
 <!DOCTYPE html>

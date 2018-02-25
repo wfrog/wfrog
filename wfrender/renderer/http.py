@@ -136,7 +136,7 @@ class HttpRendererHandler(BaseHTTPRequestHandler):
 
                     self.send_response(302)
                     self.send_header('Location', self.headers["Referer"] if self.headers.has_key("Referer") else "/")
-                    self.wfile.write(cookie)
+                    self.wfile.write(cookie.output()+'\r\n')
                     self.end_headers()
 
                     return
