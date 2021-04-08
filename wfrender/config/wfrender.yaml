@@ -10,6 +10,13 @@ init:
             variables:
                 slice: minute
                 span: 180
+    accu_12h: !service
+        name: accu_12h
+        instance:  !include
+            path: default/chart_accumulator.yaml
+            variables:
+                slice: hour
+                span: 12
     accu_24h: !service
         name: accu_24h
         instance:  !include
@@ -22,8 +29,10 @@ init:
         instance:  !include
             path: default/chart_accumulator.yaml
             variables:
-                slice: hour
-                span: 168
+                slice: day
+                span: 7
+                #slice: hour
+                #span: 168
     accu_30d: !service
         name: accu_30d
         instance:  !include
@@ -49,6 +58,11 @@ init:
 renderer: !multi
     parallel: true
     children:
+        housekeeper: !scheduler
+            period: 1200
+            delay: 1200
+            renderer: !housekeeper
+                docroot: /etc/wfrog/cache
         ## Uncomment to activate PWS Weather for you publisher
         #pwsweather: !pwsweather
         #    id: STATION_ID
@@ -95,7 +109,7 @@ renderer: !multi
         #        name: storage
         #    test: False
         #    period: 600
-
+            
         ## Uncomment to publish files by ftp (compatible with http server)
         #ftp: !scheduler
         #    period: 600  # in seconds
@@ -138,6 +152,8 @@ renderer: !multi
             renderers:
                 3hours.html: !include
                     path: default/3hours.yaml
+                12hours.html: !include
+                    path: default/12hours.yaml
                 24hours.html: !include
                     path: default/24hours.yaml
                 7days.html: !include
@@ -148,6 +164,8 @@ renderer: !multi
                     path: default/365days.yaml
                 check: !include
                     path: default/check.yaml
+            static: img_cache
+            docroot: /etc/wfrog/cache
                 
                 ## Uncomment to activate sticker (beta version)
                 #sticker.png: !sticker
