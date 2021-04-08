@@ -1,25 +1,25 @@
 #from wfcommon.units import unit_roll
 #def unitstr(m,u)
 #if $getVar('http', False)
-<a href="-set-?s=units&k=$m&v=$unit_roll($m,$u)">$u</a>#slurp
+<a href="-set-?s=units&k=$m&v=$unit_roll($m,$u)">$u</a>
 #else
-$u#slurp
+$u
 #end if
 #end def
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset='utf-8'>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather Dashboard - wfrog $version</title>
+    <title>$current.stationname Weather Dashboard - wfrog $version</title>
     #if $getVar('http', False)
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/prototype/1.7.0.0/prototype.js"></script>
-    <script type="text/javascript" src="http://calendarview.org/releases/1.2/javascripts/calendarview.js"></script>
-    
-    <link  rel="stylesheet" href="http://calendarview.org/releases/1.2/stylesheets/calendarview.css" />
+    <script type="text/javascript" src="img_cache/fixed/javascript/calendarview.js"></script>
+    <link  rel="stylesheet" href="img_cache/fixed/javascript/calendarview.css" />
     
     <script type="text/javascript">
         window.onload = function() {
+            
+            setInterval(function(){window.location.reload(true)},5*60000);
             
             loc = document.location.href;
             nloc = loc.split('?time_end=');
@@ -246,8 +246,8 @@ $u#slurp
         }
         .pad {
             padding: 6px;
-            padding-top: 10px;
-            padding-bottom: 2px;
+            padding-top: 7px;
+            padding-bottom: 5px;
         }
         .smallpad {
             padding: 4px;
@@ -261,8 +261,8 @@ $u#slurp
             margin: 3px;
             padding-left: 6px;
             padding-right: 6px;
-            padding-top: 10px;    
-            padding-bottom: 2px;                 
+            padding-top: 7px;    
+            padding-bottom: 5px;                 
             float: left;            
         }
         .headerContent {
@@ -367,12 +367,12 @@ $u#slurp
 <body>
 
 <div class="wide bordered line cell">
-            <div class="leftCell">wfrog $version - Weather Dashboard </div><div class="rightCell"><span class="value">$current.timestamp</span></div>
+            <div class="leftCell">wfrog $version - $current.stationname Weather Dashboard</div><div class="rightCell"><span class="value">$current.timestamp</span></div>
 </div>
 <div style="width: 100%">
     <div class="bordered header" style="clear: both">
         <div class="headerContent">
-            <a href="http://www.wfrog.org"><img border="0" src="http://www.wfrog.org/logo.png?s=$station.driver&o=$os" alt="wfrog"/></a>
+            <a href="http://www.wfrog.org"><img border="0" src="img_cache/fixed/logo.png?s=$station.driver&o=$os" alt="wfrog"/></a>
         </div>
     </div>
     <div class="bordered header">
@@ -380,12 +380,14 @@ $u#slurp
             <div class="leftCell">
                 <span class="symbol"></span> <span class="bigger" ><span class="value">$rnd($current.temp1, 1)</span>&deg;</span>$unitstr('temp',$units.temp)<br>
                 Humidity <span class="value">$rnd($current.hum1)</span> % <br>
-                Pressure <span class="value">$rnd($current.press, 1)</span> $unitstr('press',$units.press)
+                Pressure <span class="value">$rnd($current.press, 1)</span> $unitstr('press',$units.press)<br>
+				Forecast <span class="value">$current.zambretti</span>
             </div>
             <div class="leftCell leftpad rightAlign">
-                <span class="bigger">&#8962; &nbsp;</span><br>
-                <span class="value">$rnd($current.temp0,1)</span>&deg;$unitstr('temp',$units.temp) <br>
-                <span class="value">$rnd($current.hum0)</span> %
+                <!-- <span class="bigger">&#8962; &nbsp;</span><br> -->
+                <span class="bigger"><span class="value">$rnd($current.temp0,1)</span></span>&deg;$unitstr('temp',$units.temp)<br>
+                <span class="value">$rnd($current.hum0)</span> %<br>
+                <span class="bigger">&#8962;</span><br>
             </div>
         </div>
     </div>
@@ -400,10 +402,22 @@ $u#slurp
             <!-- UV Index <span class="value">0</span> -->
         </div>
     </div>   
+
+
+    <div class="bordered header">
+        <div class="headerContent">
+            <div class="leftCell">
+                <style="font-size:50%"><span class="bigger">R-Pi </span><span class="value">$current.hostname</span><br>Remote Renderer<br><span class="value">$current.stationdriver</span> Station<br>Main Sensor&nbsp<span class="value">$current.stationsensor</span><br>
+            </div>
+        </div>
+    </div>
+
+
     <div class="tabPane">
         <div class="leftCell" style="width:10px;">&nbsp;</div>
 #if $getVar('http', False)
         <div id="3hours" class="tab" style="cursor: pointer" onclick="move('3hours.html', 'address')">3 Hours</div>
+        <div id="12hours" class="tab" style="cursor: pointer" onclick="move('12hours.html', 'address')">12 Hours</div>
         <div id="24hours" class="tab" style="cursor: pointer" onclick="move('24hours.html', 'address')">24 Hours</div>
         <div id="7days" class="tab" style="cursor: pointer" onclick="move('7days.html', 'address')">7 Days</div>
         <div id="30days" class="tab" style="cursor: pointer" onclick="move('30days.html', 'address')">30 Days</div>
@@ -423,6 +437,7 @@ $u#slurp
         <div style="float:right; width:10px;">&nbsp;</div>
 #else
         <div id="3hours" class="tab" style="cursor: pointer"><a href="3hours.html">3 Hours</a></div>
+        <div id="12hours" class="tab" style="cursor: pointer"><a href="12hours.html">12 Hours</a></div>
         <div id="24hours" class="tab" style="cursor: pointer"><a href="24hours.html">24 Hours</a></div>
         <div id="7days" class="tab" style="cursor: pointer"><a href="7days.html">7 Days</a></div>
         <div id="30days" class="tab" style="cursor: pointer"><a href="30days.html">30 Days</a></div>
@@ -433,20 +448,6 @@ $u#slurp
     </div>
 
     <div id="charts">
-    <div>
-        #if $chart.has_key("tempint")
-        <div class="bordered cell graph" style="clear: both">
-            <div class="leftCell">Inside Temperature</div><div class="units">&deg;$unitstr('temp',$units.temp)</div>
-            <div><img src="$chart.tempint"/></div>
-        </div>
-        #end if
-        #if $chart.has_key("humint")
-        <div class="bordered cell graph">
-            <div class="leftCell">Inside Humidity</div><div class="units">%</div>
-            <div><img src="$chart.humint"/></div>
-        </div>
-        #end if
-    </div>
     <div>
         <div class="bordered cell graph" style="clear: both">
             <div class="leftCell">Temperature and Dew Point</div><div class="units">&deg;$unitstr('temp',$units.temp)</div>
@@ -460,6 +461,20 @@ $u#slurp
            <div class="leftCell">Pressure</div><div class="units">$unitstr('press',$units.press)</div>
             <div><img src="$chart.press"/></div>
         </div>
+    </div>
+    <div>
+        #if $chart.has_key("tempint")
+        <div class="bordered cell graph" style="clear: both">
+            <div class="leftCell">Inside Temperature</div><div class="units">&deg;$unitstr('temp',$units.temp)</div>
+            <div><img src="$chart.tempint"/></div>
+        </div>
+        #end if
+        #if $chart.has_key("humint")
+        <div class="bordered cell graph">
+            <div class="leftCell">Inside Humidity</div><div class="units">%</div>
+            <div><img src="$chart.humint"/></div>
+        </div>
+        #end if
     </div>
     <div>
         #if $chart.has_key("temp2")
@@ -582,6 +597,12 @@ $u#slurp
             <div class="leftCell">Wind Direction</div><br/>
             <div><img src="$chart.wind_dir"/></div>
         </div>
+        #if $chart.has_key("test")        
+        <div class="bordered cell graph">
+            <div class="leftCell">Test Chart</div><br/>
+            <div><img src="$chart.test"/></div>
+        </div>
+        #end if
     </div>
     <div>
         <div class="bordered cell graph"  style="clear: both">
@@ -859,6 +880,7 @@ ${"%7d" % $value.solar_rad_max  if $value.solar_rad_max != None else "      -"}#
     </div>
 </div>
 <div style="width:100%;clear:both;"><br></div>
+</body>
 
 <script type="text/javascript">
 // Highlight the correct tab according to the url
@@ -874,6 +896,10 @@ if(window.location.href.indexOf("30days.html") > -1) {
     document.getElementById("7days").className += ' selected';
     move_back = function() { move(-168, 'h') }
     move_forward = function() { move(168, 'h') }
+} else if(window.location.href.indexOf("12hours.html") > -1) {
+    document.getElementById("12hours").className += ' selected';
+    move_back = function() { move(-6, 'h') }
+    move_forward = function() { move(6, 'h') }    
 } else if(window.location.href.indexOf("3hours.html") > -1) {
     document.getElementById("3hours").className += ' selected';
     move_back = function() { move(-1, 'h') }
@@ -884,5 +910,4 @@ if(window.location.href.indexOf("30days.html") > -1) {
     move_forward = function() { move(12, 'h') }    
 }
 </script>
-</body>
 </html>
