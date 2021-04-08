@@ -35,14 +35,17 @@ import wettercom
 import sticker
 import openweathermap
 import metofficewow
-
+import housekeep
 
 # YAML mappings
 
-class YamlGoogleChartRenderer(chart.GoogleChartRenderer, yaml.YAMLObject):
+class YamlTestChartRenderer(chart.TestChartRenderer, yaml.YAMLObject):
+    yaml_tag = u'!test'
+
+class YamlChartRenderer(chart.ChartRenderer, yaml.YAMLObject):
     yaml_tag = u'!chart'
 
-class YamlGoogleWindRadarChartRenderer(chart.GoogleChartWindRadarRenderer, yaml.YAMLObject):
+class YamlWindRadarChartRenderer(chart.ChartWindRadarRenderer, yaml.YAMLObject):
     yaml_tag = u'!windradar'
 
 class YamlDataRenderer(data.DataRenderer, yaml.YAMLObject):
@@ -93,3 +96,5 @@ class OpenWeatherMapPublisher(openweathermap.OpenWeatherMapPublisher, yaml.YAMLO
 class MetOfficeWowPublisher(metofficewow.MetOfficeWowPublisher, yaml.YAMLObject):
     yaml_tag = u'!metofficewow'
 
+class HousekeepRenderer(housekeep.HousekeepRenderer, yaml.YAMLObject):
+    yaml_tag = u'!housekeeper'
