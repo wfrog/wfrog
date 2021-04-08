@@ -1,0 +1,205 @@
+init:
+    storage: !service
+        name: storage
+        instance: !include 
+            path: ../../wfcommon/config/storage.yaml
+    accu_3h: !service
+        name: accu_3h
+        instance:  !include
+            path: default/chart_accumulator.yaml
+            variables:
+                slice: minute
+                span: 180
+    accu_12h: !service
+        name: accu_12h
+        instance:  !include
+            path: default/chart_accumulator.yaml
+            variables:
+                slice: hour
+                span: 12
+    accu_24h: !service
+        name: accu_24h
+        instance:  !include
+            path: default/chart_accumulator.yaml
+            variables:
+                slice: hour
+                span: 24
+    accu_7d: !service
+        name: accu_7d
+        instance:  !include
+            path: default/chart_accumulator.yaml
+            variables:
+                slice: day
+                span: 7
+                #slice: hour
+                #span: 168
+    accu_30d: !service
+        name: accu_30d
+        instance:  !include
+            path: default/chart_accumulator.yaml
+            variables:
+                slice: day
+                span: 31
+    accu_365d_w: !service
+        name: accu_365d_w
+        instance:  !include
+            path: default/chart_accumulator.yaml
+            variables:
+                slice: week
+                span: 60
+    accu_365d_m: !service
+        name: accu_365d_m
+        instance: !include
+            path: default/table_accumulator.yaml
+            variables:
+                slice: month
+                span: 12
+
+renderer: !multi
+    parallel: true
+    children:
+        housekeeper: !scheduler
+            period: 1200
+            delay: 1200
+            renderer: !housekeeper
+                docroot: /etc/wfrog/cache
+        ## Uncomment to activate PWS Weather for you publisher
+        #pwsweather: !pwsweather
+        #    id: STATION_ID
+        #    password: PASSWORD
+        #    storage: !service
+        #        name: storage
+        #    period: 300
+        
+        ## Uncomment to activate Wetter.com publisher
+        # SetUp: http://www.wetter.com/community/wetternetzwerk/admin/api/
+        # Please use for first setup test: True to test publishing. Check logs!
+        #wettercom: !wettercom
+        #    stationId: YOUR_STATION_ID
+        #    password: YOUR_STATION_PASSWORD
+        #    storage: !service
+        #        name: storage
+        #    test: False
+        #    period: 900
+
+        ## Uncomment to activate Weather Underground publisher
+        #wunderground: !wunderground
+        #    id: STATION_ID
+        #    password: PASSWORD
+        #    storage: !service
+        #        name: storage
+        #    period: 300
+
+        ## Uncomment to activate openWeatherMap publisher
+        #openweathermap: !openweathermap
+        #    username: OPENWEATHERMAP-USERNAME
+        #    password: PASSWORD
+        #    name: STATION NAME
+        #    storage: !service
+        #        name: storage
+        #    latitude: STATION LATITUDE (DECIMAL NUMBER)
+        #    longitude: STATION LONGITUDE (DECIMAL NUMBER)
+        #    altitude: STATION ALTITUDE IN M.
+
+        ## Uncomment to activate metoffice WoW publisher
+        #metofficewow: !metofficewow
+        #    username: YOUR_SITE_ID
+        #    password: YOUR_SITE_PIN
+        #    storage: !service
+        #        name: storage
+        #    test: False
+        #    period: 600
+            
+        ## Uncomment to publish files by ftp (compatible with http server)
+        #ftp: !scheduler
+        #    period: 600  # in seconds
+        #    delay: 60 # in seconds, delay before start rendering
+        #    renderer: !ftp
+        #        host: HOST.COM 
+        #        username: USERNAME
+        #        password: PASSWORD
+        #        directory: DIRECTORY
+        #        renderers:
+        #            3hours.html: !file
+        #                path: /tmp/3hours.html
+        #                renderer: !include
+        #                    path: default/3hours.yaml
+        #            24hours.html: !file
+        #                path: /tmp/24hours.html
+        #                renderer: !include
+        #                    path: default/24hours.yaml
+        #            30days.html: !file
+        #                path: /tmp/30days.html
+        #                renderer: !include
+        #                    path: default/30days.yaml
+        #            365days.html: !file
+        #                path: /tmp/365days.html
+        #                renderer: !include
+        #                    path: default/365days.yaml
+        #            ## Uncomment to activate www.meteoclimatic.com ftp publisher
+        #            #meteoclimatic.txt: !file
+        #            #    path: /tmp/meteoclimatic.txt
+        #            #    renderer: !meteoclimatic
+        #            #        id: STATION_ID  
+        #            #        storage: !service
+        #            #            name: storage
+
+        # Http publishing (default)
+        http: !http
+            cookies: [ units ]
+            root: !include
+                path: default/24hours.yaml
+            renderers:
+                3hours.html: !include
+                    path: default/3hours.yaml
+                12hours.html: !include
+                    path: default/12hours.yaml
+                24hours.html: !include
+                    path: default/24hours.yaml
+                7days.html: !include
+                    path: default/7days.yaml
+                30days.html: !include
+                    path: default/30days.yaml
+                365days.html: !include
+                    path: default/365days.yaml
+                check: !include
+                    path: default/check.yaml
+            static: img_cache
+            docroot: /etc/wfrog/cache
+                
+                ## Uncomment to activate sticker (beta version)
+                #sticker.png: !sticker
+                #    station_name: YOUR STATION NAME
+                #    storage: !service
+                #        name: storage
+
+                ## Uncomment to activate www.meteoclimatic.com http publisher
+                #meteoclimatic.txt: !meteoclimatic
+                #    id: STATION_ID 
+                #    storage: !service
+                #        name: storage
+
+logging:
+    level: info
+    filename: !user
+        choices:
+            root: /var/log/wfrender.log
+            default: wfrender.log
+
+    ## By default wfrog uses a Rotating file handler. To set up different handlers
+    ## uncomment the following section. (Warning: does not work under python > 2.7)
+    #handlers:
+    #    default:
+    #        level: debug
+    #
+    #        handler: !include
+    #            path: ../../wfcommon/config/loghandler.yaml
+    #            variables:
+    #                process: wfrender
+    #
+    #    ## Uncomment to receive mail on critical events
+    #    #mail:
+    #    #    level: critical
+    #    #    handler: !include
+    #    #        path: ../../wfcommon/config/mailloghandler.yaml
+
